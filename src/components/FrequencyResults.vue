@@ -1,5 +1,5 @@
 <template>
-  <v-card v-if="result" class="mt-4">
+  <v-card v-if="result && !loading" class="mt-4">
     <v-card-title>
       {{ result.gene }} Carrier Frequency
       <v-chip v-if="usingDefault" color="warning" size="small" class="ml-2">
