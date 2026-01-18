@@ -8,6 +8,7 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
 import App from './App.vue'
+import { graphqlClient } from '@/api'
 
 const vuetify = createVuetify({
   components,
@@ -26,6 +27,7 @@ const vuetify = createVuetify({
   }
 })
 
-createApp(App)
-  .use(vuetify)
-  .mount('#app')
+const app = createApp(App)
+app.use(vuetify)
+app.use(graphqlClient)
+app.mount('#app')
