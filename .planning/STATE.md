@@ -19,20 +19,20 @@
 ## Current Position
 
 **Milestone:** v1 MVP
-**Phase:** Phase 1 - Foundation (2/5 plans complete)
-**Plan:** 01-02 complete
+**Phase:** Phase 1 - Foundation (3/5 plans complete)
+**Plan:** 01-03 complete
 **Status:** In progress
 
 ### Progress
 
 ```
-Phase 1: Foundation     [##........] 2/5 plans (01-01, 01-02 done)
+Phase 1: Foundation     [###.......] 3/5 plans (01-01, 01-02, 01-03 done)
 Phase 2: Wizard UI      [..........] 0/? plans
 Phase 3: German Text    [..........] 0/? plans
 Phase 4: Deploy         [..........] Validation only
 ```
 
-**Overall:** `[##........] ~20%`
+**Overall:** `[###.......] ~30%`
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 2 |
+| Plans Completed | 3 |
 | Phases Completed | 0 |
 | Requirements Done | 0/32 (infrastructure plans) |
-| Session Count | 3 |
+| Session Count | 4 |
 
 ---
 
@@ -56,6 +56,9 @@ Phase 4: Deploy         [..........] Validation only
 | 4-phase structure | Foundation -> UI -> Text -> Deploy matches delivery boundaries | 2026-01-18 |
 | Heavy Phase 1 | API + filtering + calculation in Phase 1 to validate core logic early | 2026-01-18 |
 | No deploy requirements | Phase 4 validates existing work, no new feature requirements | 2026-01-18 |
+| Config-driven thresholds | All calculation thresholds from config, zero hardcoded values | 2026-01-18 |
+| Pure calculation functions | frequency-calc functions are pure for testability | 2026-01-18 |
+| AN=0 returns null | Distinguish "not detected" from "zero frequency" | 2026-01-18 |
 | Multi-version gnomAD | v4 default, v3/v2 available - population codes differ by version | 2026-01-18 |
 | JSON config files | All thresholds/endpoints in JSON, TS loader provides type safety | 2026-01-18 |
 | npm over Bun | Bun not installed in environment; npm functionally equivalent | 2026-01-18 |
@@ -83,7 +86,7 @@ Phase 4: Deploy         [..........] Validation only
 - [x] Plan Phase 1
 - [x] Execute 01-01 (config system)
 - [x] Execute 01-02 (project setup)
-- [ ] Execute 01-03 (types, calc functions, GraphQL client)
+- [x] Execute 01-03 (types, calc functions, GraphQL client)
 - [ ] Execute 01-04 (GraphQL queries, composables)
 - [ ] Execute 01-05 (carrier frequency composable, test UI)
 
@@ -94,33 +97,43 @@ Phase 4: Deploy         [..........] Validation only
 ### Last Session
 
 **Date:** 2026-01-18
-**Completed:** Plan 01-02 (Project setup) - Vue + Vuetify + TypeScript development environment
-**Next:** Continue Phase 1 plans (01-03 through 01-05)
+**Completed:** Plan 01-03 (Core Logic) - Types, calculation functions, GraphQL client
+**Next:** Continue Phase 1 plans (01-04 through 01-05)
 
 ### Handoff Notes
 
-Project setup provides:
-- Vue 3 + Vuetify 3 with MD3 theme
-- TypeScript strict mode with JSON imports
-- villus + graphql for API integration
-- @vueuse/core for composition utilities
-- Path aliases: @/ -> src/
+Core logic layer provides:
+- TypeScript types for variants and frequency calculations
+- Pure calculation functions (carrier frequency, recurrence risk)
+- Variant filters (LoF HC, ClinVar pathogenic)
+- Display formatters (percent, ratio)
+- Version-aware GraphQL client
 
-Dev commands:
-- `npm run dev` - Start dev server
-- `npm run build` - Build for production
+Type imports:
+```typescript
+import type { GnomadVariant, PopulationFrequency, CarrierFrequencyResult } from '@/types';
+```
 
-Config system (from 01-01):
-- `src/config/types.ts` - TypeScript types for config
-- `src/config/gnomad.json` - Multi-version gnomAD API config
-- `src/config/settings.json` - App thresholds and UI settings
-- `src/config/index.ts` - Type-safe loader with helper functions
+Utility imports:
+```typescript
+import { calculateCarrierFrequency, calculateRecurrenceRisk } from '@/utils/frequency-calc';
+import { filterPathogenicVariants } from '@/utils/variant-filters';
+import { frequencyToRatio, frequencyToPercent } from '@/utils/formatters';
+```
 
-Usage: `import { config, getGnomadVersion, getPopulations } from '@/config'`
+GraphQL client:
+```typescript
+import { useGnomadVersion, graphqlClient } from '@/api';
+```
 
-All subsequent plans should use config - no hardcoded values in application code.
+Key formulas:
+- Carrier frequency = 2 x sum(pathogenic AFs)
+- Recurrence risk (het) = carrier_freq / 4
+- Recurrence risk (hom) = carrier_freq / 2
+
+All thresholds from config. Zero hardcoded values in utils/api layers.
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-18*
+*Last updated: 2026-01-18 (01-03 complete)*
