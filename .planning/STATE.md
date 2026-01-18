@@ -6,10 +6,10 @@
 
 **Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
 
-**Current Focus:** Phase 1 execution - config system complete, continuing with remaining plans
+**Current Focus:** Phase 1 execution - config + project setup complete, ready for core logic
 
 **Key Constraints:**
-- Stack: Bun, Vue 3, Vuetify 3, Vite, TypeScript
+- Stack: npm, Vue 3, Vuetify 3, Vite, TypeScript
 - No backend - direct gnomAD GraphQL from browser
 - German clinical text only for v1
 - Single page wizard UI
@@ -19,20 +19,20 @@
 ## Current Position
 
 **Milestone:** v1 MVP
-**Phase:** Phase 1 - Foundation (1/5 plans complete)
-**Plan:** 01-01 complete
+**Phase:** Phase 1 - Foundation (2/5 plans complete)
+**Plan:** 01-02 complete
 **Status:** In progress
 
 ### Progress
 
 ```
-Phase 1: Foundation     [#.........] 1/5 plans (01-01 done)
+Phase 1: Foundation     [##........] 2/5 plans (01-01, 01-02 done)
 Phase 2: Wizard UI      [..........] 0/? plans
 Phase 3: German Text    [..........] 0/? plans
 Phase 4: Deploy         [..........] Validation only
 ```
 
-**Overall:** `[#.........] ~10%`
+**Overall:** `[##........] ~20%`
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 1 |
+| Plans Completed | 2 |
 | Phases Completed | 0 |
-| Requirements Done | 0/32 (config is infrastructure) |
-| Session Count | 2 |
+| Requirements Done | 0/32 (infrastructure plans) |
+| Session Count | 3 |
 
 ---
 
@@ -58,6 +58,8 @@ Phase 4: Deploy         [..........] Validation only
 | No deploy requirements | Phase 4 validates existing work, no new feature requirements | 2026-01-18 |
 | Multi-version gnomAD | v4 default, v3/v2 available - population codes differ by version | 2026-01-18 |
 | JSON config files | All thresholds/endpoints in JSON, TS loader provides type safety | 2026-01-18 |
+| npm over Bun | Bun not installed in environment; npm functionally equivalent | 2026-01-18 |
+| MD3 light theme | Clinical tool should be clean and readable | 2026-01-18 |
 
 ### Technical Notes
 
@@ -70,6 +72,7 @@ Phase 4: Deploy         [..........] Validation only
   - v2: afr, amr, asj, eas, fin, nfe, oth, sas (GRCh37)
 - Reference values: CFTR ~1:25 NFE, HEXA elevated in ASJ
 - Config settings: founderEffectMultiplier=5, debounceMs=300, defaultCarrierFrequency=0.01
+- Dev environment: npm run dev (Vite), npm run build (vue-tsc + Vite)
 
 ### Blockers
 
@@ -79,7 +82,7 @@ Phase 4: Deploy         [..........] Validation only
 
 - [x] Plan Phase 1
 - [x] Execute 01-01 (config system)
-- [ ] Execute 01-02 (project setup)
+- [x] Execute 01-02 (project setup)
 - [ ] Execute 01-03 (types, calc functions, GraphQL client)
 - [ ] Execute 01-04 (GraphQL queries, composables)
 - [ ] Execute 01-05 (carrier frequency composable, test UI)
@@ -91,12 +94,23 @@ Phase 4: Deploy         [..........] Validation only
 ### Last Session
 
 **Date:** 2026-01-18
-**Completed:** Plan 01-01 (Config system) - centralized configuration for gnomAD versions and app settings
-**Next:** Continue Phase 1 plans (01-02 through 01-05)
+**Completed:** Plan 01-02 (Project setup) - Vue + Vuetify + TypeScript development environment
+**Next:** Continue Phase 1 plans (01-03 through 01-05)
 
 ### Handoff Notes
 
-Config system provides:
+Project setup provides:
+- Vue 3 + Vuetify 3 with MD3 theme
+- TypeScript strict mode with JSON imports
+- villus + graphql for API integration
+- @vueuse/core for composition utilities
+- Path aliases: @/ -> src/
+
+Dev commands:
+- `npm run dev` - Start dev server
+- `npm run build` - Build for production
+
+Config system (from 01-01):
 - `src/config/types.ts` - TypeScript types for config
 - `src/config/gnomad.json` - Multi-version gnomAD API config
 - `src/config/settings.json` - App thresholds and UI settings
