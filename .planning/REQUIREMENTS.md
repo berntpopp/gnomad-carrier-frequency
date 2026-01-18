@@ -23,7 +23,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **FILT-01**: Variants filtered to include LoF "HC" (high confidence) predictions
 - [ ] **FILT-02**: Variants filtered to include ClinVar pathogenic/likely pathogenic
-- [ ] **FILT-03**: ClinVar variants require ≥1 review star
+- [ ] **FILT-03**: ClinVar variants require >=1 review star
 - [ ] **FILT-04**: Filter criteria (LoF HC OR ClinVar P/LP) clearly documented in UI
 
 ### Population Handling
@@ -35,9 +35,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Calculation
 
-- [ ] **CALC-01**: Carrier frequency calculated as 2 × Σ(pathogenic allele frequencies)
-- [ ] **CALC-02**: Recurrence risk for heterozygous carrier: 1/2 × carrier_freq × 1/2 = carrier_freq / 4
-- [ ] **CALC-03**: Recurrence risk for compound het/homozygous affected: 1 × carrier_freq × 1/2 = carrier_freq / 2
+- [ ] **CALC-01**: Carrier frequency calculated as 2 x sum(pathogenic allele frequencies)
+- [ ] **CALC-02**: Recurrence risk for heterozygous carrier: 1/2 x carrier_freq x 1/2 = carrier_freq / 4
+- [ ] **CALC-03**: Recurrence risk for compound het/homozygous affected: 1 x carrier_freq x 1/2 = carrier_freq / 2
 - [ ] **CALC-04**: Results displayed as both percentage and ratio (e.g., 0.5% and 1:200)
 
 ### Index Patient Status
@@ -61,7 +61,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### User Interface
 
-- [ ] **UI-01**: 4-step wizard flow: Gene → Status → Frequency → Results
+- [ ] **UI-01**: 4-step wizard flow: Gene -> Status -> Frequency -> Results
 - [ ] **UI-02**: Vuetify stepper component for navigation
 - [ ] **UI-03**: User can navigate back to previous steps
 - [ ] **UI-04**: Results step shows all population frequencies in table format
@@ -108,44 +108,44 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GENE-01 | TBD | Pending |
-| GENE-02 | TBD | Pending |
-| GENE-03 | TBD | Pending |
-| API-01 | TBD | Pending |
-| API-02 | TBD | Pending |
-| API-03 | TBD | Pending |
-| FILT-01 | TBD | Pending |
-| FILT-02 | TBD | Pending |
-| FILT-03 | TBD | Pending |
-| FILT-04 | TBD | Pending |
-| POP-01 | TBD | Pending |
-| POP-02 | TBD | Pending |
-| POP-03 | TBD | Pending |
-| POP-04 | TBD | Pending |
-| CALC-01 | TBD | Pending |
-| CALC-02 | TBD | Pending |
-| CALC-03 | TBD | Pending |
-| CALC-04 | TBD | Pending |
-| IDX-01 | TBD | Pending |
-| IDX-02 | TBD | Pending |
-| SRC-01 | TBD | Pending |
-| SRC-02 | TBD | Pending |
-| SRC-03 | TBD | Pending |
-| SRC-04 | TBD | Pending |
-| TEXT-01 | TBD | Pending |
-| TEXT-02 | TBD | Pending |
-| TEXT-03 | TBD | Pending |
-| TEXT-04 | TBD | Pending |
-| UI-01 | TBD | Pending |
-| UI-02 | TBD | Pending |
-| UI-03 | TBD | Pending |
-| UI-04 | TBD | Pending |
+| GENE-01 | Phase 1 | Pending |
+| GENE-02 | Phase 1 | Pending |
+| GENE-03 | Phase 1 | Pending |
+| API-01 | Phase 1 | Pending |
+| API-02 | Phase 1 | Pending |
+| API-03 | Phase 1 | Pending |
+| FILT-01 | Phase 1 | Pending |
+| FILT-02 | Phase 1 | Pending |
+| FILT-03 | Phase 1 | Pending |
+| FILT-04 | Phase 1 | Pending |
+| POP-01 | Phase 1 | Pending |
+| POP-02 | Phase 1 | Pending |
+| POP-03 | Phase 1 | Pending |
+| POP-04 | Phase 1 | Pending |
+| CALC-01 | Phase 1 | Pending |
+| CALC-02 | Phase 1 | Pending |
+| CALC-03 | Phase 1 | Pending |
+| CALC-04 | Phase 1 | Pending |
+| IDX-01 | Phase 2 | Pending |
+| IDX-02 | Phase 2 | Pending |
+| SRC-01 | Phase 2 | Pending |
+| SRC-02 | Phase 2 | Pending |
+| SRC-03 | Phase 2 | Pending |
+| SRC-04 | Phase 2 | Pending |
+| UI-01 | Phase 2 | Pending |
+| UI-02 | Phase 2 | Pending |
+| UI-03 | Phase 2 | Pending |
+| UI-04 | Phase 2 | Pending |
+| TEXT-01 | Phase 3 | Pending |
+| TEXT-02 | Phase 3 | Pending |
+| TEXT-03 | Phase 3 | Pending |
+| TEXT-04 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 32 total
-- Mapped to phases: 0
-- Unmapped: 32 ⚠️
+- Mapped to phases: 32
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-18*
-*Last updated: 2026-01-18 after initial definition*
+*Last updated: 2026-01-18 - Traceability updated with phase mappings*
