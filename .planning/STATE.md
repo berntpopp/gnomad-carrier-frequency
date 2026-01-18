@@ -6,7 +6,7 @@
 
 **Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
 
-**Current Focus:** Phase 1 execution - API layer complete, final plan (carrier frequency composable) remaining
+**Current Focus:** Phase 1 complete - ready for Phase 2 (Wizard UI)
 
 **Key Constraints:**
 - Stack: npm, Vue 3, Vuetify 3, Vite, TypeScript
@@ -19,20 +19,20 @@
 ## Current Position
 
 **Milestone:** v1 MVP
-**Phase:** Phase 1 - Foundation (4/5 plans complete)
-**Plan:** 01-04 complete
-**Status:** In progress
+**Phase:** Phase 1 - Foundation COMPLETE
+**Plan:** 01-05 complete (5/5)
+**Status:** Phase complete
 
 ### Progress
 
 ```
-Phase 1: Foundation     [####......] 4/5 plans (01-01, 01-02, 01-03, 01-04 done)
+Phase 1: Foundation     [##########] 5/5 plans COMPLETE
 Phase 2: Wizard UI      [..........] 0/? plans
 Phase 3: German Text    [..........] 0/? plans
 Phase 4: Deploy         [..........] Validation only
 ```
 
-**Overall:** `[####......] ~40%`
+**Overall:** `[#####.....] ~50%` (Phase 1 complete)
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 4 |
-| Phases Completed | 0 |
-| Requirements Done | 0/32 (infrastructure plans) |
-| Session Count | 5 |
+| Plans Completed | 5 |
+| Phases Completed | 1 |
+| Requirements Done | All Phase 1 requirements |
+| Session Count | 6 |
 
 ---
 
@@ -66,6 +66,8 @@ Phase 4: Deploy         [..........] Validation only
 | Static query strings | GraphQL queries are templates; config values passed as variables at runtime | 2026-01-18 |
 | Debounced search | useDebounceFn prevents excessive API calls during typing | 2026-01-18 |
 | Cache-first variants | Variant queries use cache-first to avoid redundant fetches | 2026-01-18 |
+| Type normalization layer | API types converted to internal types for filter compatibility | 2026-01-18 |
+| Global AF calculation | Combined exome+genome AC summed, divided by max AN | 2026-01-18 |
 
 ### Technical Notes
 
@@ -91,7 +93,9 @@ Phase 4: Deploy         [..........] Validation only
 - [x] Execute 01-02 (project setup)
 - [x] Execute 01-03 (types, calc functions, GraphQL client)
 - [x] Execute 01-04 (GraphQL queries, composables)
-- [ ] Execute 01-05 (carrier frequency composable, test UI)
+- [x] Execute 01-05 (carrier frequency composable, test UI)
+- [ ] Plan Phase 2 (Wizard UI)
+- [ ] Execute Phase 2
 
 ---
 
@@ -100,35 +104,50 @@ Phase 4: Deploy         [..........] Validation only
 ### Last Session
 
 **Date:** 2026-01-18
-**Completed:** Plan 01-04 (GraphQL Queries and Composables) - Query definitions, useGeneSearch, useGeneVariants
-**Next:** Execute 01-05 (carrier frequency composable, test UI) to complete Phase 1
+**Completed:** Plan 01-05 (Carrier Frequency Composable and Test UI) - Phase 1 COMPLETE
+**Next:** Plan Phase 2 (Wizard UI)
 
 ### Handoff Notes
 
-API layer complete. Composables provide reactive gene search and variant fetching with config-driven settings.
-
-**Query imports:**
-```typescript
-import { GENE_SEARCH_QUERY, GENE_VARIANTS_QUERY } from '@/api/queries';
-import type { GeneSearchResult, GeneVariant, GeneClinvarVariant } from '@/api/queries';
-```
+Phase 1 Foundation is complete. The application is now functional for testing carrier frequency calculations.
 
 **Composable imports:**
 ```typescript
-import { useGeneSearch, useGeneVariants } from '@/composables';
-import type { UseGeneSearchReturn, UseGeneVariantsReturn } from '@/composables';
+import { useGeneSearch, useGeneVariants, useCarrierFrequency } from '@/composables';
 ```
 
-**Usage pattern:**
+**Primary usage pattern:**
 ```typescript
-const { searchTerm, setSearchTerm, results, selectedGene, selectGene } = useGeneSearch();
-const geneSymbol = computed(() => selectedGene.value?.symbol ?? null);
-const { variants, clinvarVariants, isLoading, errorMessage } = useGeneVariants(geneSymbol);
+const {
+  setGeneSymbol,
+  result,
+  globalFrequency,
+  usingDefault,
+  isLoading,
+  errorMessage,
+  currentVersion,
+  refetch,
+  calculateRisk,
+} = useCarrierFrequency();
+
+// Set gene to trigger calculation
+setGeneSymbol('CFTR');
+
+// Access results
+console.log(result.value?.globalCarrierFrequency); // ~0.04 for CFTR
+console.log(globalFrequency.value?.ratio); // "1:25"
 ```
 
-All config values (debounceMs, minSearchChars, datasetId, referenceGenome) come from config module. Zero hardcoded values in composables.
+**Component imports:**
+```typescript
+import VersionSelector from '@/components/VersionSelector.vue';
+import GeneSearch from '@/components/GeneSearch.vue';
+import FrequencyResults from '@/components/FrequencyResults.vue';
+```
+
+All config values come from config module. Zero hardcoded values in src/composables/ or src/components/.
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-18 (01-04 complete)*
+*Last updated: 2026-01-18 (Phase 1 complete)*
