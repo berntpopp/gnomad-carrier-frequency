@@ -19,6 +19,14 @@ This roadmap delivers a carrier frequency calculator in 4 phases: Foundation est
 
 **Dependencies:** None (starting phase)
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Project setup (Bun, Vue, Vuetify, villus GraphQL client)
+- [ ] 01-02-PLAN.md — Type definitions and pure calculation/filter functions
+- [ ] 01-03-PLAN.md — GraphQL queries and composables (gene search, variants)
+- [ ] 01-04-PLAN.md — Carrier frequency composable and test UI
+
 **Requirements:**
 - GENE-01: User can enter gene symbol with autocomplete suggestions
 - GENE-02: Gene symbol is validated against gnomAD before proceeding
@@ -116,7 +124,7 @@ This roadmap delivers a carrier frequency calculator in 4 phases: Foundation est
 
 | Phase | Status | Progress |
 |-------|--------|----------|
-| Phase 1: Foundation | Pending | 0/18 requirements |
+| Phase 1: Foundation | Planned | 0/18 requirements |
 | Phase 2: Wizard UI | Pending | 0/10 requirements |
 | Phase 3: German Text | Pending | 0/4 requirements |
 | Phase 4: Deploy | Pending | Validation only |
