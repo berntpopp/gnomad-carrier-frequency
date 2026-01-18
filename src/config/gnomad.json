@@ -1,0 +1,59 @@
+{
+  "defaultVersion": "v4",
+  "versions": {
+    "v4": {
+      "version": "v4",
+      "displayName": "gnomAD v4.1",
+      "apiEndpoint": "https://gnomad.broadinstitute.org/api",
+      "datasetId": "gnomad_r4",
+      "referenceGenome": "GRCh38",
+      "populations": [
+        { "code": "afr", "label": "African/African-American", "description": "African and African-American ancestry" },
+        { "code": "amr", "label": "Admixed American", "description": "Latino/Admixed American ancestry" },
+        { "code": "asj", "label": "Ashkenazi Jewish", "description": "Ashkenazi Jewish ancestry" },
+        { "code": "eas", "label": "East Asian", "description": "East Asian ancestry" },
+        { "code": "fin", "label": "Finnish", "description": "Finnish ancestry (separated from NFE)" },
+        { "code": "mid", "label": "Middle Eastern", "description": "Middle Eastern ancestry" },
+        { "code": "nfe", "label": "Non-Finnish European", "description": "European ancestry (non-Finnish)" },
+        { "code": "sas", "label": "South Asian", "description": "South Asian ancestry" }
+      ],
+      "notes": "v4.1 released Nov 2023, largest dataset with 807,162 samples"
+    },
+    "v3": {
+      "version": "v3",
+      "displayName": "gnomAD v3.1.2",
+      "apiEndpoint": "https://gnomad.broadinstitute.org/api",
+      "datasetId": "gnomad_r3",
+      "referenceGenome": "GRCh38",
+      "populations": [
+        { "code": "afr", "label": "African/African-American" },
+        { "code": "ami", "label": "Amish", "description": "Amish ancestry" },
+        { "code": "amr", "label": "Admixed American" },
+        { "code": "asj", "label": "Ashkenazi Jewish" },
+        { "code": "eas", "label": "East Asian" },
+        { "code": "fin", "label": "Finnish" },
+        { "code": "nfe", "label": "Non-Finnish European" },
+        { "code": "sas", "label": "South Asian" }
+      ],
+      "notes": "v3 is genome-only (no exomes), includes Amish population"
+    },
+    "v2": {
+      "version": "v2",
+      "displayName": "gnomAD v2.1.1",
+      "apiEndpoint": "https://gnomad.broadinstitute.org/api",
+      "datasetId": "gnomad_r2_1",
+      "referenceGenome": "GRCh37",
+      "populations": [
+        { "code": "afr", "label": "African/African-American" },
+        { "code": "amr", "label": "Admixed American" },
+        { "code": "asj", "label": "Ashkenazi Jewish" },
+        { "code": "eas", "label": "East Asian" },
+        { "code": "fin", "label": "Finnish" },
+        { "code": "nfe", "label": "Non-Finnish European" },
+        { "code": "oth", "label": "Other", "description": "Other/unknown ancestry" },
+        { "code": "sas", "label": "South Asian" }
+      ],
+      "notes": "v2 uses GRCh37, includes 'oth' instead of 'mid'"
+    }
+  }
+}
