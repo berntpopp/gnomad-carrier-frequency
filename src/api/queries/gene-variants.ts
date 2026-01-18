@@ -28,7 +28,7 @@ export const GENE_VARIANTS_QUERY = `
             an
           }
         }
-        transcript_consequences {
+        transcript_consequence {
           gene_symbol
           transcript_id
           canonical

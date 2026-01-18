@@ -81,7 +81,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
       alt: v.alt,
       exome: v.exome ?? undefined,
       genome: v.genome ?? undefined,
-      transcript_consequences: v.transcript_consequences,
+      transcript_consequence: v.transcript_consequence,
     }));
   });
 

@@ -46,5 +46,5 @@ export interface GnomadVariant {
   alt: string;
   exome?: VariantFrequencyData['exome'];
   genome?: VariantFrequencyData['genome'];
-  transcript_consequences: TranscriptConsequence[];
+  transcript_consequence: TranscriptConsequence | null;
 }

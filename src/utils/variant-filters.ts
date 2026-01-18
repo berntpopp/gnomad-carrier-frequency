@@ -39,7 +39,9 @@ export function shouldIncludeVariant(
   variant: GnomadVariant,
   clinvarVariants: ClinVarVariant[]
 ): boolean {
-  const hasHCLoF = variant.transcript_consequences.some(isHighConfidenceLoF);
+  const hasHCLoF = variant.transcript_consequence
+    ? isHighConfidenceLoF(variant.transcript_consequence)
+    : false;
 
   const clinvarMatch = clinvarVariants.find(
     (cv) => cv.variant_id === variant.variant_id

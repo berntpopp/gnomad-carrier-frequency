@@ -38,7 +38,7 @@ export interface GeneVariant {
   alt: string;
   exome: GeneVariantExomeGenome | null;
   genome: GeneVariantExomeGenome | null;
-  transcript_consequences: GeneVariantTranscript[];
+  transcript_consequence: GeneVariantTranscript | null;
 }
 
 export interface GeneClinvarVariant {
