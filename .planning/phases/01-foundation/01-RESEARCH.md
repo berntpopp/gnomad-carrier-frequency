@@ -503,6 +503,53 @@ Things that couldn't be fully resolved:
    - What's unclear: Any specific CORS restrictions
    - Recommendation: Test from development server early; should work since gnomAD browser is client-side
 
+## Reference Implementation: gnomad-link
+
+The sibling `gnomad-link` project provides production-tested patterns:
+
+### GraphQL Query Organization
+- Queries organized by gnomAD version (v2, v3, v4) with shared fragments
+- Fragment system for reusability: `VariantIdFields`, `PopulationFields`, `FrequencyFields`, `TranscriptConsequenceFields`
+- Versioned queries handle differences between gnomAD releases
+
+### Key Query Patterns
+```graphql
+# Gene search
+query gene_search($query: String!, $reference_genome: ReferenceGenomeId!) {
+  gene_search(query: $query, reference_genome: $reference_genome) {
+    ensembl_id, ensembl_version, symbol
+  }
+}
+
+# Gene variants with LoF
+query gene_variants($gene_id: String!, $dataset: DatasetId!) {
+  gene(gene_id: $gene_id, reference_genome: GRCh38) {
+    variants(dataset: $dataset) {
+      variant_id, lof, consequence, ac, an
+      populations { id, ac, an }
+    }
+  }
+}
+```
+
+### Service Layer Patterns
+- Async caching with configurable TTL (60 min default)
+- Cache sizes: 1024 items (variants), 256 items (genes)
+- Structured error handling: `GnomadApiError`, `DataNotFoundError`, `VariantNotFoundError`
+- Variable processing: dataset → version mapping, reference genome auto-selection
+
+### Data Models
+- `PopulationFrequency`: name (id), allele_count (ac), allele_number (an), homozygote_count
+- `VariantDataSource`: Wraps exome/genome with calculated `overall_frequency` property
+- Separate tracking for exome vs genome sequencing data
+
+### Applicable to Phase 1
+- Query structure verified and production-tested
+- Population frequency retrieval via `ac/an` calculation confirmed
+- LoF filtering on `transcript_consequences.lof === "HC"` confirmed
+- ClinVar integration via separate `clinvar_variant` query confirmed
+- Cache strategy for browser performance
+
 ## Sources
 
 ### Primary (HIGH confidence)
