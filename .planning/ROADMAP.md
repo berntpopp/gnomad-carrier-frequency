@@ -22,11 +22,11 @@ This roadmap delivers a carrier frequency calculator in 4 phases: Foundation est
 **Plans:** 5 plans in 4 waves
 
 Plans:
-- [ ] 01-01-PLAN.md — Config system (gnomAD versions, settings, thresholds) [Wave 1]
-- [ ] 01-02-PLAN.md — Project setup (Bun, Vue, Vuetify, TypeScript) [Wave 1]
-- [ ] 01-03-PLAN.md — Types, calculation functions, GraphQL client [Wave 2]
-- [ ] 01-04-PLAN.md — GraphQL queries and composables [Wave 3]
-- [ ] 01-05-PLAN.md — Carrier frequency composable, test UI, version selector [Wave 4]
+- [x] 01-01-PLAN.md — Config system (gnomAD versions, settings, thresholds) [Wave 1]
+- [x] 01-02-PLAN.md — Project setup (Vue, Vuetify, TypeScript) [Wave 1]
+- [x] 01-03-PLAN.md — Types, calculation functions, GraphQL client [Wave 2]
+- [x] 01-04-PLAN.md — GraphQL queries and composables [Wave 3]
+- [x] 01-05-PLAN.md — Carrier frequency composable, test UI, version selector [Wave 4]
 
 **Key Design Decisions:**
 - Multi-version gnomAD support (v4 default, v3 and v2 selectable)
@@ -133,12 +133,12 @@ Plans:
 
 | Phase | Status | Progress |
 |-------|--------|----------|
-| Phase 1: Foundation | Planned | 0/18 requirements |
+| Phase 1: Foundation | ✓ Complete | 18/18 requirements |
 | Phase 2: Wizard UI | Pending | 0/10 requirements |
 | Phase 3: German Text | Pending | 0/4 requirements |
 | Phase 4: Deploy | Pending | Validation only |
 
-**Overall:** 0/32 requirements complete (0%)
+**Overall:** 18/32 requirements complete (56%)
 
 ---
 
@@ -160,4 +160,4 @@ Plans:
 
 ---
 
-*Last updated: 2026-01-18*
+*Last updated: 2026-01-18 (Phase 1 complete)*
