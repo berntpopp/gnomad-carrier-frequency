@@ -111,6 +111,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   const normalizedClinvar = computed((): ClinVarVariant[] => {
     return clinvarVariants.value.map((cv) => ({
       variant_id: cv.variant_id,
+      clinvar_variation_id: cv.clinvar_variation_id,
       clinical_significance: cv.clinical_significance,
       gold_stars: cv.gold_stars,
       review_status: cv.review_status,

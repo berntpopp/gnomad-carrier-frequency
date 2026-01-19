@@ -402,8 +402,8 @@ const modalVariants = computed((): DisplayVariant[] => {
     ? filterVariantsByPopulation(filteredVariants.value, selectedPopulationCode.value)
     : filteredVariants.value;
 
-  // Transform to display format
-  return toDisplayVariants(variantsToShow, props.clinvarVariants);
+  // Transform to display format with population-specific AC/AN/AF if applicable
+  return toDisplayVariants(variantsToShow, props.clinvarVariants, selectedPopulationCode.value);
 });
 
 // Open modal showing all variants

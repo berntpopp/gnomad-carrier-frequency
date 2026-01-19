@@ -42,6 +42,7 @@ export const GENE_VARIANTS_QUERY = `
       }
       clinvar_variants {
         variant_id
+        clinvar_variation_id
         clinical_significance
         gold_stars
         review_status

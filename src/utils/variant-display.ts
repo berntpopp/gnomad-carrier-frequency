@@ -19,11 +19,13 @@ import {
  *
  * @param variant - gnomAD variant data
  * @param clinvarVariants - Array of ClinVar variants for cross-reference
+ * @param populationCode - Optional population code for population-specific AC/AN/AF
  * @returns DisplayVariant with computed fields
  */
 export function toDisplayVariant(
   variant: GnomadVariant,
-  clinvarVariants: ClinVarVariant[]
+  clinvarVariants: ClinVarVariant[],
+  populationCode?: string | null
 ): DisplayVariant {
   // Extract transcript consequence fields
   const tc = variant.transcript_consequence;
@@ -33,23 +35,47 @@ export function toDisplayVariant(
   const transcriptId = tc?.transcript_id ?? null;
   const lof = tc?.lof ?? null;
 
-  // Compute combined allele frequency
-  const exomeAc = variant.exome?.ac ?? 0;
-  const genomeAc = variant.genome?.ac ?? 0;
-  const exomeAn = variant.exome?.an ?? 0;
-  const genomeAn = variant.genome?.an ?? 0;
+  let totalAc: number;
+  let totalAn: number;
+  let alleleFrequency: number | null;
 
-  const totalAc = exomeAc + genomeAc;
-  const totalAn = Math.max(exomeAn, genomeAn);
-  const alleleFrequency = totalAn > 0 ? totalAc / totalAn : null;
+  if (populationCode) {
+    // Get population-specific counts
+    const exomePop = variant.exome?.populations?.find(
+      (p) => p.id === populationCode
+    );
+    const genomePop = variant.genome?.populations?.find(
+      (p) => p.id === populationCode
+    );
+
+    const popExomeAc = exomePop?.ac ?? 0;
+    const popGenomeAc = genomePop?.ac ?? 0;
+    const popExomeAn = exomePop?.an ?? 0;
+    const popGenomeAn = genomePop?.an ?? 0;
+
+    totalAc = popExomeAc + popGenomeAc;
+    totalAn = popExomeAn + popGenomeAn;
+    alleleFrequency = totalAn > 0 ? totalAc / totalAn : null;
+  } else {
+    // Use global counts
+    const exomeAc = variant.exome?.ac ?? 0;
+    const genomeAc = variant.genome?.ac ?? 0;
+    const exomeAn = variant.exome?.an ?? 0;
+    const genomeAn = variant.genome?.an ?? 0;
+
+    totalAc = exomeAc + genomeAc;
+    totalAn = exomeAn + genomeAn;
+    alleleFrequency = totalAn > 0 ? totalAc / totalAn : null;
+  }
 
   // Find matching ClinVar variant
   const clinvarMatch = clinvarVariants.find(
     (cv) => cv.variant_id === variant.variant_id
   );
 
-  // Set ClinVar status and stars
+  // Set ClinVar status, variation ID, and stars
   const clinvarStatus = clinvarMatch?.clinical_significance ?? null;
+  const clinvarVariationId = clinvarMatch?.clinvar_variation_id ?? null;
   const goldStars = clinvarMatch?.gold_stars ?? null;
 
   // Compute boolean flags
@@ -67,6 +93,7 @@ export function toDisplayVariant(
     alleleCount: totalAc,
     alleleNumber: totalAn,
     clinvarStatus,
+    clinvarVariationId,
     goldStars,
     hgvsc,
     hgvsp,
@@ -83,13 +110,15 @@ export function toDisplayVariant(
  *
  * @param variants - Array of gnomAD variants
  * @param clinvarVariants - Array of ClinVar variants for cross-reference
+ * @param populationCode - Optional population code for population-specific AC/AN/AF
  * @returns Array of DisplayVariant
  */
 export function toDisplayVariants(
   variants: GnomadVariant[],
-  clinvarVariants: ClinVarVariant[]
+  clinvarVariants: ClinVarVariant[],
+  populationCode?: string | null
 ): DisplayVariant[] {
-  return variants.map((v) => toDisplayVariant(v, clinvarVariants));
+  return variants.map((v) => toDisplayVariant(v, clinvarVariants, populationCode));
 }
 
 /**

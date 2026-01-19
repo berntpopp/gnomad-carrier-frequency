@@ -45,6 +45,7 @@ export interface GeneVariant {
 
 export interface GeneClinvarVariant {
   variant_id: string;
+  clinvar_variation_id: string | null;
   clinical_significance: string;
   gold_stars: number;
   review_status: string;

@@ -23,6 +23,8 @@ export interface DisplayVariant {
   alleleNumber: number;
   /** ClinVar clinical significance classification or null */
   clinvarStatus: string | null;
+  /** ClinVar variation ID for direct linking */
+  clinvarVariationId: string | null;
   /** ClinVar review stars (0-4) or null */
   goldStars: number | null;
   /** HGVS coding notation (e.g., "c.1234A>G") */
