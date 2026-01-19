@@ -62,7 +62,11 @@ export function usePwaInstall() {
     isInstalled.value = checkIfInstalled();
 
     // Listen for the beforeinstallprompt event
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    // Cast to EventListener to satisfy TypeScript (the type is correct via vite-env.d.ts)
+    window.addEventListener(
+      'beforeinstallprompt',
+      handleBeforeInstallPrompt as EventListener
+    );
 
     // Listen for the appinstalled event
     window.addEventListener('appinstalled', handleAppInstalled);
@@ -79,7 +83,10 @@ export function usePwaInstall() {
   });
 
   onUnmounted(() => {
-    window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.removeEventListener(
+      'beforeinstallprompt',
+      handleBeforeInstallPrompt as EventListener
+    );
     window.removeEventListener('appinstalled', handleAppInstalled);
   });
 

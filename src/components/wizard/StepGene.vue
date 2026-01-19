@@ -7,6 +7,9 @@
       Search for a gene symbol to calculate carrier frequency.
     </p>
 
+    <!-- Offline fallback message -->
+    <OfflineFallback />
+
     <div
       class="mb-4"
       style="max-width: 300px"
@@ -14,7 +17,10 @@
       <VersionSelector />
     </div>
 
-    <GeneSearch @select="onGeneChange" />
+    <GeneSearch
+      :disabled="!isOnline"
+      @select="onGeneChange"
+    />
 
     <!-- ClinGen validation warning/confirmation -->
     <ClingenWarning
@@ -49,9 +55,12 @@ import GeneSearch from '@/components/GeneSearch.vue';
 import VersionSelector from '@/components/VersionSelector.vue';
 import GeneConstraintCard from '@/components/GeneConstraintCard.vue';
 import ClingenWarning from '@/components/ClingenWarning.vue';
+import OfflineFallback from '@/components/OfflineFallback.vue';
 import type { GeneSearchResult } from '@/api/queries/types';
-import { useGeneSearch } from '@/composables';
+import { useGeneSearch, useNetworkStatus } from '@/composables';
 import { useGnomadVersion } from '@/api';
+
+const { isOnline } = useNetworkStatus();
 
 defineProps<{
   modelValue: GeneSearchResult | null;

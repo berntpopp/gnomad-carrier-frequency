@@ -20,6 +20,8 @@
         </template>
       </v-tooltip>
 
+      <OfflineIndicator class="ml-3" />
+
       <v-spacer />
 
       <v-tooltip
@@ -60,13 +62,34 @@
         </template>
       </v-tooltip>
     </div>
+
+    <!-- Back online notification snackbar -->
+    <v-snackbar
+      v-model="showBackOnlineNotification"
+      :timeout="3000"
+      color="success"
+      location="top"
+    >
+      Back online
+
+      <template #actions>
+        <v-btn
+          variant="text"
+          @click="dismissBackOnlineNotification"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app-bar>
 </template>
 
 <script setup lang="ts">
-import { useAppTheme } from '@/composables';
+import { useAppTheme, useNetworkStatus } from '@/composables';
+import OfflineIndicator from '@/components/OfflineIndicator.vue';
 
 const { toggleTheme, tooltipText, themeIcon } = useAppTheme();
+const { showBackOnlineNotification, dismissBackOnlineNotification } = useNetworkStatus();
 
 const emit = defineEmits<{
   openSettings: [];

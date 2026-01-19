@@ -4,6 +4,7 @@
     v-model:search="searchInput"
     :items="items"
     :loading="loading"
+    :disabled="disabled"
     item-title="symbol"
     item-value="symbol"
     label="Gene Symbol"
@@ -33,6 +34,10 @@
 import { ref, watch, computed } from 'vue';
 import { useGeneSearch } from '@/composables';
 import type { GeneSearchResult } from '@/api/queries/types';
+
+defineProps<{
+  disabled?: boolean;
+}>();
 
 const emit = defineEmits<{
   select: [gene: GeneSearchResult | null];
