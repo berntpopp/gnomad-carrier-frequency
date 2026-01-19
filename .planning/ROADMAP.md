@@ -24,10 +24,11 @@ Enable reproducible and shareable calculations through URL-based state managemen
 - URL-05: Shared URLs work across browser sessions
 - URL-06: Invalid/partial URLs gracefully degrade to defaults
 
-**Plans:** 0 plans
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 11 to break down)
+- [ ] 11-01-PLAN.md - URL state infrastructure (Zod validation, useUrlState composable, App.vue integration)
+- [ ] 11-02-PLAN.md - Copy link UI (clipboard button in StepResults, visual feedback)
 
 **Success Criteria:**
 1. User can copy a shareable link from the results page
@@ -336,8 +337,8 @@ Plans:
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
 | v1.1 Release-Ready | 5-10 | 27/27 | Complete | 2026-01-19 |
-| v1.2 Sharing & Collaboration | 11+ | 0/? | In Progress | - |
+| v1.2 Sharing & Collaboration | 11+ | 2/? | In Progress | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 13 added)*
+*Last updated: 2026-01-19 (Phase 11 planned)*
