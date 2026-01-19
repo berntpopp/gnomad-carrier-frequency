@@ -84,6 +84,14 @@ Plans:
 - INFRA-06: Lighthouse accessibility score >= 95
 - INFRA-07: Lighthouse SEO score >= 95
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 07-01-PLAN.md - SEO meta tags, OG tags, structured data, preview image
+- [ ] 07-02-PLAN.md - Accessibility infrastructure (announcer, focus-trap, sr-only class)
+- [ ] 07-03-PLAN.md - Component accessibility integration (wizard announcements, dialog focus trap)
+- [ ] 07-04-PLAN.md - Lighthouse CI workflow, heading audit, keyboard navigation verification
+
 **Success Criteria:**
 1. User can navigate entire app using only keyboard (Tab, Enter, Escape)
 2. Screen reader announces calculation results and errors without page refresh
@@ -200,8 +208,8 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 4/TBD | In Progress (Phase 6 done, Phase 7 next) | - |
+| v1.1 Release-Ready | 5-10 | 8/TBD | In Progress (Phase 7 planned) | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 6 complete)*
+*Last updated: 2026-01-19 (Phase 7 planned)*
