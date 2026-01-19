@@ -26,5 +26,13 @@ export default defineConfig({
     hmr: {
       overlay: true, // Show error overlay in browser
     },
+    // Proxy for ClinGen API to avoid CORS issues in development
+    proxy: {
+      '/api/clingen': {
+        target: 'https://search.clinicalgenome.org',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/clingen/, '/api'),
+      },
+    },
   },
 })
