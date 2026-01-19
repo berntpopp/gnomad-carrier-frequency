@@ -30,11 +30,8 @@ export function usePwaUpdate(): UsePwaUpdateReturn {
   const needRefresh = ref(false);
   const offlineReady = ref(false);
 
-  // Store the updateSW function reference from registerSW
-  let updateSW: ((reloadPage?: boolean) => Promise<void>) | undefined;
-
-  // Register service worker with callbacks
-  updateSW = registerSW({
+  // Register service worker with callbacks and store the updateSW function reference
+  const updateSW = registerSW({
     onNeedRefresh() {
       needRefresh.value = true;
     },

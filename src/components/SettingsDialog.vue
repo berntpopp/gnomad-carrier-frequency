@@ -190,6 +190,139 @@
                 </div>
               </v-card-text>
             </v-card>
+
+            <!-- Data Cache Section -->
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
+              <v-card-title class="text-subtitle-1">
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-cached
+                </v-icon>
+                Data Cache
+              </v-card-title>
+
+              <v-card-text>
+                <div class="text-body-2 mb-2">
+                  Gene and API data cached for offline use.
+                </div>
+
+                <div
+                  v-if="cacheInfo"
+                  class="text-caption text-medium-emphasis mb-3"
+                >
+                  Using {{ formatBytes(cacheInfo.usage) }} of {{ formatBytes(cacheInfo.quota) }}
+                </div>
+                <div
+                  v-else
+                  class="text-caption text-medium-emphasis mb-3"
+                >
+                  Storage information not available
+                </div>
+
+                <v-alert
+                  v-if="cacheCleared"
+                  type="success"
+                  variant="tonal"
+                  density="compact"
+                  class="mb-3"
+                >
+                  Cache cleared successfully
+                </v-alert>
+
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  color="warning"
+                  prepend-icon="mdi-delete"
+                  :loading="cacheClearing"
+                  @click="clearGeneDataCache"
+                >
+                  Clear Cache
+                </v-btn>
+
+                <div class="text-caption text-medium-emphasis mt-3">
+                  Clearing cache will remove offline gene data. Fresh data will be fetched on next use.
+                </div>
+              </v-card-text>
+            </v-card>
+
+            <!-- Install App Section -->
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
+              <v-card-title class="text-subtitle-1">
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-download
+                </v-icon>
+                Install App
+              </v-card-title>
+
+              <v-card-text>
+                <!-- Already installed -->
+                <template v-if="isInstalled">
+                  <div class="d-flex align-center">
+                    <v-icon
+                      color="success"
+                      class="mr-2"
+                    >
+                      mdi-check-circle
+                    </v-icon>
+                    <span class="text-body-2">App is installed and ready to use offline.</span>
+                  </div>
+                </template>
+
+                <!-- Can install (browser supports) -->
+                <template v-else-if="canInstall">
+                  <div class="text-body-2 mb-3">
+                    Install gCFCalc on your device for quick access and offline use.
+                  </div>
+                  <v-btn
+                    color="primary"
+                    prepend-icon="mdi-download"
+                    @click="promptInstall"
+                  >
+                    Install
+                  </v-btn>
+                </template>
+
+                <!-- iOS device -->
+                <template v-else-if="isIos">
+                  <div class="d-flex align-start">
+                    <v-icon
+                      color="grey"
+                      class="mr-2 mt-1"
+                    >
+                      mdi-apple
+                    </v-icon>
+                    <div>
+                      <div class="text-body-2 mb-2">
+                        To install on iOS:
+                      </div>
+                      <ol class="text-caption text-medium-emphasis pl-4 mb-0">
+                        <li>Tap the Share button</li>
+                        <li>Select "Add to Home Screen"</li>
+                      </ol>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- Not installable -->
+                <template v-else>
+                  <div class="text-body-2 text-medium-emphasis">
+                    Install option not available in this browser. Try Chrome, Edge, or Safari on iOS.
+                  </div>
+                </template>
+              </v-card-text>
+            </v-card>
           </v-tabs-window-item>
           <v-tabs-window-item value="filters">
             <p class="text-body-2 text-medium-emphasis mb-4">
@@ -352,13 +485,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, onMounted } from 'vue';
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 import { useFilterStore } from '@/stores/useFilterStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { useLogStore } from '@/stores/useLogStore';
 import { useTemplateStore } from '@/stores/useTemplateStore';
-import { useClingenValidity } from '@/composables';
+import { useClingenValidity, usePwaInstall } from '@/composables';
 import TemplateEditor from '@/components/TemplateEditor.vue';
 import VariablePicker from '@/components/VariablePicker.vue';
 
@@ -381,6 +514,80 @@ const {
   entryCount: clingenEntryCount,
   refreshCache: refreshClingenCache,
 } = useClingenValidity();
+
+// PWA Install
+const { canInstall, isInstalled, isIos, promptInstall } = usePwaInstall();
+
+// Data Cache management
+interface CacheInfo {
+  usage: number;
+  quota: number;
+}
+
+const cacheInfo = ref<CacheInfo | null>(null);
+const cacheClearing = ref(false);
+const cacheCleared = ref(false);
+
+/**
+ * Get storage estimate from browser API
+ */
+async function loadCacheInfo(): Promise<void> {
+  if (navigator.storage && navigator.storage.estimate) {
+    try {
+      const estimate = await navigator.storage.estimate();
+      cacheInfo.value = {
+        usage: estimate.usage ?? 0,
+        quota: estimate.quota ?? 0,
+      };
+    } catch {
+      cacheInfo.value = null;
+    }
+  }
+}
+
+/**
+ * Format bytes to human-readable string
+ */
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+}
+
+/**
+ * Clear gene data caches (gnomad-api-cache and clingen-api-cache)
+ */
+async function clearGeneDataCache(): Promise<void> {
+  cacheClearing.value = true;
+  cacheCleared.value = false;
+
+  try {
+    // Delete both API caches
+    const gnomadDeleted = await caches.delete('gnomad-api-cache');
+    const clingenDeleted = await caches.delete('clingen-api-cache');
+
+    if (gnomadDeleted || clingenDeleted) {
+      cacheCleared.value = true;
+      // Reload cache info
+      await loadCacheInfo();
+      // Reset cleared message after 3 seconds
+      setTimeout(() => {
+        cacheCleared.value = false;
+      }, 3000);
+    }
+  } catch (error) {
+    console.error('Failed to clear cache:', error);
+  } finally {
+    cacheClearing.value = false;
+  }
+}
+
+// Load cache info on mount
+onMounted(() => {
+  loadCacheInfo();
+});
 
 const tickLabels = {
   0: '0',
