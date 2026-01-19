@@ -4,6 +4,13 @@
       Results
     </h2>
 
+    <!-- ClinGen validation reminder in results -->
+    <ClingenWarning
+      v-if="result"
+      :gene-symbol="result.gene"
+      class="mb-4"
+    />
+
     <!-- Summary card -->
     <v-card
       v-if="result"
@@ -195,6 +202,7 @@ import { toDisplayVariants, filterVariantsByPopulation } from '@/utils/variant-d
 import TextOutput from './TextOutput.vue';
 import FilterPanel from '@/components/FilterPanel.vue';
 import VariantModal from '@/components/VariantModal.vue';
+import ClingenWarning from '@/components/ClingenWarning.vue';
 
 interface TableItem {
   label: string;
