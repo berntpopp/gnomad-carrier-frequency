@@ -1,24 +1,10 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue';
 import { useClingenStore } from '@/stores/useClingenStore';
-import type {
-  ClingenEntry,
-  ClingenValidityResult,
-  ClingenApiResponse,
-  ClingenApiRow,
-} from '@/types';
+import type { ClingenEntry, ClingenValidityResult } from '@/types';
 
-// ClinGen API URL - use Vite proxy in development, direct in production
-const CLINGEN_API_URL =
-  'https://search.clinicalgenome.org/api/validity?queryParams';
-
-function getClingenApiUrl(): string {
-  if (import.meta.env.DEV) {
-    // Development: use Vite proxy to avoid CORS
-    return '/api/clingen/validity?queryParams';
-  }
-  // Production: try direct fetch (may work from GitHub Pages domain)
-  return CLINGEN_API_URL;
-}
+// ClinGen CSV download endpoint - CORS-enabled for browser access
+const CLINGEN_CSV_URL =
+  'https://search.clinicalgenome.org/kb/gene-validity/download';
 
 export interface UseClingenValidityReturn {
   // State
@@ -38,32 +24,55 @@ export interface UseClingenValidityReturn {
 }
 
 /**
- * Transform ClinGen API row to normalized entry
+ * Parse a single CSV line, handling quoted fields
  */
-function transformApiRow(row: ClingenApiRow): ClingenEntry {
-  return {
-    geneSymbol: row.symbol?.toUpperCase() ?? '',
-    hgncId: row.hgnc_id ?? '',
-    diseaseLabel: row.disease_name ?? '',
-    mondoId: row.mondo ?? '',
-    moi: row.moi ?? '',
-    classification: row.classification ?? '',
-    expertPanel: row.ep ?? '',
-    classificationDate: row.released ?? '',
-    permId: row.perm_id ?? '',
-  };
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+
+  result.push(current); // Push last field
+  return result;
 }
 
 /**
- * Parse ClinGen API JSON response into typed entries
+ * Parse ClinGen CSV text into typed entries
+ * CSV columns: GENE SYMBOL, GENE ID (HGNC), DISEASE LABEL, DISEASE ID (MONDO), MOI, SOP, CLASSIFICATION, ONLINE REPORT, CLASSIFICATION DATE, GCEP
  */
-function parseClingenApiResponse(response: ClingenApiResponse): ClingenEntry[] {
-  if (!response.rows || !Array.isArray(response.rows)) {
-    return [];
-  }
+function parseClingenCSV(csvText: string): ClingenEntry[] {
+  const lines = csvText.split('\n');
 
-  return response.rows
-    .map(transformApiRow)
+  // Skip header row, filter empty lines
+  return lines
+    .slice(1)
+    .filter((line) => line.trim().length > 0)
+    .map((line) => {
+      const values = parseCSVLine(line);
+      return {
+        geneSymbol: values[0]?.trim().toUpperCase() ?? '',
+        hgncId: values[1]?.trim() ?? '',
+        diseaseLabel: values[2]?.trim() ?? '',
+        mondoId: values[3]?.trim() ?? '',
+        moi: values[4]?.trim() ?? '',
+        classification: values[6]?.trim() ?? '',
+        expertPanel: values[9]?.trim() ?? '',
+        classificationDate: values[8]?.trim() ?? '',
+        permId: '', // Not in CSV
+      };
+    })
     .filter((entry) => entry.geneSymbol.length > 0);
 }
 
@@ -81,17 +90,17 @@ export function useClingenValidity(): UseClingenValidityReturn {
     store.setError(''); // Clear previous errors
 
     try {
-      const response = await fetch(getClingenApiUrl());
+      const response = await fetch(CLINGEN_CSV_URL);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const json = (await response.json()) as ClingenApiResponse;
-      const entries = parseClingenApiResponse(json);
+      const csvText = await response.text();
+      const entries = parseClingenCSV(csvText);
 
       if (entries.length === 0) {
-        throw new Error('No valid entries parsed from ClinGen API');
+        throw new Error('No valid entries parsed from ClinGen CSV');
       }
 
       store.setData(entries);

@@ -1,38 +1,13 @@
 /**
  * ClinGen gene-disease validity types
  *
- * Provides type definitions for ClinGen API data, cache state,
+ * Provides type definitions for ClinGen CSV data, cache state,
  * and gene validity lookup results.
  */
 
 /**
- * Raw API response row from ClinGen validity endpoint
- * https://search.clinicalgenome.org/api/validity?queryParams
- */
-export interface ClingenApiRow {
-  symbol: string;
-  hgnc_id: string;
-  disease_name: string;
-  mondo: string;
-  moi: string; // AD, AR, XL, SD, UD
-  classification: string; // Definitive, Moderate, Limited, Disputed, Refuted, No Known Disease Relationship
-  ep: string; // Expert panel
-  sop: string;
-  order: number;
-  perm_id: string;
-  released: string;
-  animal_model_only: boolean;
-}
-
-/**
- * ClinGen API response structure
- */
-export interface ClingenApiResponse {
-  rows: ClingenApiRow[];
-}
-
-/**
- * Single ClinGen gene-disease validity entry (normalized from API)
+ * Single ClinGen gene-disease validity entry (parsed from CSV)
+ * CSV columns: GENE SYMBOL, GENE ID (HGNC), DISEASE LABEL, DISEASE ID (MONDO), MOI, SOP, CLASSIFICATION, ONLINE REPORT, CLASSIFICATION DATE, GCEP
  */
 export interface ClingenEntry {
   geneSymbol: string;

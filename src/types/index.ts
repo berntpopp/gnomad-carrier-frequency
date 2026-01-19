@@ -36,8 +36,6 @@ export { FACTORY_FILTER_DEFAULTS } from './filter';
 export type { DisplayVariant, PopulationVariantFrequency } from './display';
 
 export type {
-  ClingenApiRow,
-  ClingenApiResponse,
   ClingenEntry,
   ClingenCacheState,
   ClingenValidityResult,
