@@ -30,3 +30,6 @@ export type { UseLoggerReturn } from './useLogger';
 
 export { useExport } from './useExport';
 export type { UseExportReturn } from './useExport';
+
+export { useUrlState } from './useUrlState';
+export type { UseUrlStateReturn } from './useUrlState';
