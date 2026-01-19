@@ -68,3 +68,9 @@ export {
   decodeFilterFlags,
   filtersMatchDefaults,
 } from './url-state';
+
+export type {
+  PredefinedExclusionReason,
+  ExclusionReason,
+  ExclusionState,
+} from './exclusion';
