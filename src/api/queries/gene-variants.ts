@@ -36,6 +36,8 @@ export const GENE_VARIANTS_QUERY = `
           lof
           lof_filter
           lof_flags
+          hgvsc
+          hgvsp
         }
       }
       clinvar_variants {
