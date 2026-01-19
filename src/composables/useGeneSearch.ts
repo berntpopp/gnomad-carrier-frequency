@@ -1,13 +1,22 @@
 import { computed, ref, type Ref } from 'vue';
 import { useQuery } from 'villus';
 import { useDebounceFn } from '@vueuse/core';
-import { GENE_SEARCH_QUERY } from '@/api/queries/gene-search';
-import type { GeneSearchResponse, GeneSearchResult } from '@/api/queries/types';
+import { GENE_SEARCH_QUERY, GENE_DETAILS_QUERY } from '@/api/queries/gene-search';
+import type {
+  GeneSearchResponse,
+  GeneSearchResult,
+  GeneDetailsResponse,
+} from '@/api/queries/types';
 import { config, getReferenceGenome } from '@/config';
-import { useGnomadVersion } from '@/api';
+import { useGnomadVersion, graphqlClient } from '@/api';
+import type { GeneConstraint } from '@/types';
 
 // Get settings from config - NO HARDCODED VALUES
 const { debounceMs, minSearchChars, maxAutocompleteResults } = config.settings;
+
+// Module-level state for singleton pattern - shared across all consumers
+const sharedGeneConstraint = ref<GeneConstraint | null>(null);
+const sharedConstraintLoading = ref(false);
 
 export interface UseGeneSearchReturn {
   searchTerm: Ref<string>;
@@ -19,6 +28,8 @@ export interface UseGeneSearchReturn {
   selectGene: (gene: GeneSearchResult) => void;
   clearSelection: () => void;
   isValidGene: Ref<boolean>;
+  geneConstraint: Ref<GeneConstraint | null>;
+  constraintLoading: Ref<boolean>;
 }
 
 export function useGeneSearch(): UseGeneSearchReturn {
@@ -63,16 +74,59 @@ export function useGeneSearch(): UseGeneSearchReturn {
     (data.value?.gene_search ?? []).slice(0, maxAutocompleteResults)
   );
 
+  // Fetch constraint data for a selected gene
+  const fetchConstraint = async (symbol: string) => {
+    sharedConstraintLoading.value = true;
+    sharedGeneConstraint.value = null;
+
+    try {
+      const { data: constraintData, error: queryError } =
+        await graphqlClient.executeQuery<GeneDetailsResponse>({
+          query: GENE_DETAILS_QUERY,
+          variables: {
+            geneSymbol: symbol,
+            referenceGenome: getReferenceGenome(version.value),
+          },
+        });
+
+      if (queryError) {
+        console.error('[GeneSearch] Constraint query error:', queryError);
+        return;
+      }
+
+      if (constraintData?.gene?.gnomad_constraint) {
+        const c = constraintData.gene.gnomad_constraint;
+        sharedGeneConstraint.value = {
+          pLI: c.pLI,
+          loeuf: c.oe_lof_upper,
+          oeLof: c.oe_lof,
+          oeLofLower: c.oe_lof_lower,
+          expLof: c.exp_lof,
+          obsLof: c.obs_lof,
+          lofZ: c.lof_z,
+          flags: c.flags,
+        };
+      }
+    } catch (err) {
+      console.error('[GeneSearch] Constraint fetch error:', err);
+    } finally {
+      sharedConstraintLoading.value = false;
+    }
+  };
+
   const selectGene = (gene: GeneSearchResult) => {
     selectedGene.value = gene;
     searchTerm.value = gene.symbol;
     debouncedTerm.value = ''; // Stop searching
+    // Fetch constraint data when gene is selected
+    fetchConstraint(gene.symbol);
   };
 
   const clearSelection = () => {
     selectedGene.value = null;
     searchTerm.value = '';
     debouncedTerm.value = '';
+    sharedGeneConstraint.value = null;
   };
 
   const isValidGene = computed(() => selectedGene.value !== null);
@@ -87,5 +141,7 @@ export function useGeneSearch(): UseGeneSearchReturn {
     selectGene,
     clearSelection,
     isValidGene,
+    geneConstraint: sharedGeneConstraint,
+    constraintLoading: sharedConstraintLoading,
   };
 }
