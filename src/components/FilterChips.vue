@@ -28,6 +28,15 @@
     </v-chip>
 
     <v-chip
+      v-if="filters.clinvarEnabled && filters.clinvarIncludeConflicting"
+      color="warning"
+      size="x-small"
+      prepend-icon="mdi-alert"
+    >
+      Conflicting >= {{ filters.clinvarConflictingThreshold }}% P/LP
+    </v-chip>
+
+    <v-chip
       v-if="!hasActiveFilters"
       color="warning"
       size="x-small"

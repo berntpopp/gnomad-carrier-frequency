@@ -7,6 +7,10 @@ import type {
   FilterConfig,
 } from '@/types';
 import { FACTORY_FILTER_DEFAULTS } from '@/types';
+import {
+  meetsConflictingThreshold,
+  type ClinVarSubmission,
+} from '@/api/queries';
 
 /**
  * Missense-class consequence terms
@@ -74,6 +78,30 @@ export function isPathogenicClinVarWithThreshold(
 }
 
 /**
+ * Check if a ClinVar variant has conflicting classifications
+ * @param variant - ClinVar variant to check
+ */
+export function hasConflictingClassification(variant: ClinVarVariant): boolean {
+  const sig = variant.clinical_significance.toLowerCase();
+  return sig.includes('conflicting');
+}
+
+/**
+ * Get list of variant IDs with conflicting classifications
+ * Used to determine which variants need submissions fetched
+ *
+ * @param clinvarVariants - Array of ClinVar variants
+ * @returns Array of variant IDs with conflicting status
+ */
+export function getConflictingVariantIds(
+  clinvarVariants: ClinVarVariant[]
+): string[] {
+  return clinvarVariants
+    .filter(hasConflictingClassification)
+    .map((cv) => cv.variant_id);
+}
+
+/**
  * Determine if a variant should be included in carrier frequency calculation
  * Include if: LoF HC OR ClinVar Pathogenic/Likely Pathogenic with >= 1 star
  */
@@ -109,11 +137,13 @@ export function shouldIncludeVariant(
  * @param variant - gnomAD variant to check
  * @param clinvarVariants - Array of ClinVar variants for cross-reference
  * @param config - Filter configuration specifying which filters are active
+ * @param submissionsMap - Optional map of variant_id to submissions for conflicting resolution
  */
 export function shouldIncludeVariantConfigurable(
   variant: GnomadVariant,
   clinvarVariants: ClinVarVariant[],
-  config: FilterConfig
+  config: FilterConfig,
+  submissionsMap?: Map<string, ClinVarSubmission[]>
 ): boolean {
   const consequence = variant.transcript_consequence;
 
@@ -121,14 +151,32 @@ export function shouldIncludeVariantConfigurable(
   const isLoFHC = consequence ? isHighConfidenceLoF(consequence) : false;
   const isMissense = consequence ? isMissenseVariant(consequence) : false;
 
-  // Get ClinVar evidence (computed once)
+  // Get ClinVar match (computed once)
   const clinvarMatch = clinvarVariants.find(
     (cv) => cv.variant_id === variant.variant_id
   );
-  const hasClinvarEvidence =
+
+  // Check for standard ClinVar P/LP evidence (non-conflicting)
+  const hasStandardClinvarEvidence =
     config.clinvarEnabled &&
     clinvarMatch !== undefined &&
     isPathogenicClinVarWithThreshold(clinvarMatch, config.clinvarStarThreshold);
+
+  // Check for conflicting classification that meets threshold
+  const hasConflictingEvidence =
+    config.clinvarEnabled &&
+    config.clinvarIncludeConflicting &&
+    clinvarMatch !== undefined &&
+    hasConflictingClassification(clinvarMatch) &&
+    clinvarMatch.gold_stars >= config.clinvarStarThreshold &&
+    submissionsMap !== undefined &&
+    submissionsMap.has(variant.variant_id) &&
+    meetsConflictingThreshold(
+      submissionsMap.get(variant.variant_id)!,
+      config.clinvarConflictingThreshold
+    );
+
+  const hasClinvarEvidence = hasStandardClinvarEvidence || hasConflictingEvidence;
 
   // 1. LoF HC: Include if filter enabled (independent of ClinVar - LOFTEE is sufficient evidence)
   if (config.lofHcEnabled && isLoFHC) {
@@ -167,13 +215,15 @@ export function filterPathogenicVariants(
  * @param variants - Array of gnomAD variants to filter
  * @param clinvarVariants - Array of ClinVar variants for cross-reference
  * @param config - Filter configuration specifying which filters are active
+ * @param submissionsMap - Optional map of variant_id to submissions for conflicting resolution
  */
 export function filterPathogenicVariantsConfigurable(
   variants: GnomadVariant[],
   clinvarVariants: ClinVarVariant[],
-  config: FilterConfig = FACTORY_FILTER_DEFAULTS
+  config: FilterConfig = FACTORY_FILTER_DEFAULTS,
+  submissionsMap?: Map<string, ClinVarSubmission[]>
 ): GnomadVariant[] {
   return variants.filter((v) =>
-    shouldIncludeVariantConfigurable(v, clinvarVariants, config)
+    shouldIncludeVariantConfigurable(v, clinvarVariants, config, submissionsMap)
   );
 }

@@ -76,6 +76,10 @@
           :variants="variants"
           :clinvar-variants="clinvarVariants"
           :filter-config="filterConfig"
+          :submissions="submissions"
+          :conflicting-variant-ids="conflictingVariantIds"
+          :is-loading-submissions="isLoadingSubmissions"
+          :submissions-progress="submissionsProgress"
           @update:filter-config="setFilterConfig"
           @back="prevStep"
           @restart="resetWizard"
@@ -133,6 +137,10 @@ const {
   clinvarVariants,
   filterConfig,
   setFilterConfig,
+  submissions,
+  conflictingVariantIds,
+  isLoadingSubmissions,
+  submissionsProgress,
 } = useCarrierFrequency();
 
 // Screen reader announcements

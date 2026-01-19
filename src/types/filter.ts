@@ -13,6 +13,10 @@ export interface FilterConfig {
   clinvarEnabled: boolean;
   /** ClinVar review star threshold (0-4), variants must have >= this many stars */
   clinvarStarThreshold: number;
+  /** Include variants with "conflicting classifications" if majority are P/LP */
+  clinvarIncludeConflicting: boolean;
+  /** Threshold percentage (0-100) for majority P/LP in conflicting variants */
+  clinvarConflictingThreshold: number;
 }
 
 /**
@@ -30,4 +34,6 @@ export const FACTORY_FILTER_DEFAULTS: FilterConfig = {
   missenseEnabled: true,
   clinvarEnabled: true,
   clinvarStarThreshold: 1,
+  clinvarIncludeConflicting: false,
+  clinvarConflictingThreshold: 80,
 };

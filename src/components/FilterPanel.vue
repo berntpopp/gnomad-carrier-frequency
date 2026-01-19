@@ -163,6 +163,110 @@
               </v-tooltip>
             </div>
           </v-col>
+
+          <!-- Conflicting classification filter -->
+          <v-col cols="12">
+            <v-divider class="mb-3" />
+            <div class="d-flex align-center">
+              <v-switch
+                :model-value="modelValue.clinvarIncludeConflicting"
+                :disabled="!modelValue.clinvarEnabled"
+                color="warning"
+                label="Include conflicting with majority P/LP"
+                density="compact"
+                hide-details
+                @update:model-value="updateFilter('clinvarIncludeConflicting', $event)"
+              />
+              <v-tooltip location="top">
+                <template #activator="{ props: tooltipProps }">
+                  <v-icon
+                    v-bind="tooltipProps"
+                    size="x-small"
+                    class="ml-1"
+                    aria-label="Conflicting classification filter information"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                <span class="tooltip-text">
+                  <strong>Conflicting Classifications</strong><br>
+                  When enabled, variants marked as "Conflicting interpretations"
+                  in ClinVar will be included if the majority of individual
+                  submissions classify them as Pathogenic or Likely Pathogenic.
+                  The threshold below sets the minimum P/LP percentage required.
+                </span>
+              </v-tooltip>
+            </div>
+          </v-col>
+
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <div class="d-flex align-start">
+              <v-slider
+                :model-value="modelValue.clinvarConflictingThreshold"
+                :disabled="!modelValue.clinvarEnabled || !modelValue.clinvarIncludeConflicting"
+                :min="50"
+                :max="100"
+                :step="5"
+                label="P/LP Threshold %"
+                density="compact"
+                thumb-label
+                color="warning"
+                class="flex-grow-1"
+                @update:model-value="updateFilter('clinvarConflictingThreshold', $event)"
+              />
+              <v-tooltip location="top">
+                <template #activator="{ props: tooltipProps }">
+                  <v-icon
+                    v-bind="tooltipProps"
+                    size="x-small"
+                    class="ml-1 mt-3"
+                    aria-label="P/LP threshold information"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                <span class="tooltip-text">
+                  <strong>P/LP Threshold</strong><br>
+                  Minimum percentage of ClinVar submissions that must classify
+                  the variant as Pathogenic or Likely Pathogenic for it to be
+                  included. Default is 80%.
+                </span>
+              </v-tooltip>
+            </div>
+          </v-col>
+
+          <!-- Warning alert for conflicting filter -->
+          <v-col
+            v-if="modelValue.clinvarIncludeConflicting && modelValue.clinvarEnabled"
+            cols="12"
+          >
+            <v-alert
+              type="warning"
+              variant="tonal"
+              density="compact"
+            >
+              <template #prepend>
+                <v-icon>mdi-alert</v-icon>
+              </template>
+              <div class="text-body-2">
+                <strong>Performance warning:</strong>
+                Fetching individual ClinVar submissions can be slow for genes with many
+                conflicting variants. This may take up to 20 seconds for some genes.
+              </div>
+              <div
+                v-if="conflictingCount > 0"
+                class="text-body-2 mt-1"
+              >
+                Found <strong>{{ conflictingCount }}</strong> variant(s) with conflicting classifications.
+                <span v-if="isLoadingSubmissions">
+                  Loading submissions... {{ submissionsProgress }}%
+                </span>
+              </div>
+            </v-alert>
+          </v-col>
         </v-row>
 
         <v-divider class="my-3" />
@@ -194,6 +298,9 @@ import type { FilterConfig } from '@/types';
 const props = defineProps<{
   modelValue: FilterConfig;
   variantCount: number;
+  conflictingCount?: number;
+  isLoadingSubmissions?: boolean;
+  submissionsProgress?: number;
 }>();
 
 const emit = defineEmits<{
@@ -204,6 +311,11 @@ const emit = defineEmits<{
 const panel = ref<number | undefined>(undefined);
 
 const isExpanded = computed(() => panel.value === 0);
+
+// Default values for optional props
+const conflictingCount = computed(() => props.conflictingCount ?? 0);
+const isLoadingSubmissions = computed(() => props.isLoadingSubmissions ?? false);
+const submissionsProgress = computed(() => props.submissionsProgress ?? 0);
 
 const tickLabels = {
   0: '0',

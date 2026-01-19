@@ -103,6 +103,9 @@
       <FilterPanel
         v-model="filters"
         :variant-count="filteredCount"
+        :conflicting-count="props.conflictingVariantIds.length"
+        :is-loading-submissions="props.isLoadingSubmissions"
+        :submissions-progress="props.submissionsProgress"
         @reset="resetFilters"
       />
     </v-card>
@@ -284,6 +287,7 @@
 import { computed, ref } from 'vue';
 import { config, getGnomadVersion, getPopulationLabel } from '@/config';
 import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@/types';
+import type { ClinVarSubmission } from '@/api/queries';
 import { useFilterStore } from '@/stores/useFilterStore';
 import { useExport } from '@/composables';
 import { filterPathogenicVariantsConfigurable } from '@/utils/variant-filters';
@@ -319,6 +323,10 @@ const props = defineProps<{
   variants: GnomadVariant[];
   clinvarVariants: ClinVarVariant[];
   filterConfig: FilterConfig;
+  submissions: Map<string, ClinVarSubmission[]>;
+  conflictingVariantIds: string[];
+  isLoadingSubmissions: boolean;
+  submissionsProgress: number;
 }>();
 
 const emit = defineEmits<{
@@ -365,7 +373,8 @@ const filteredVariants = computed(() => {
   return filterPathogenicVariantsConfigurable(
     props.variants,
     props.clinvarVariants,
-    props.filterConfig
+    props.filterConfig,
+    props.submissions
   );
 });
 
@@ -380,6 +389,8 @@ function resetFilters() {
     missenseEnabled: defaults.missenseEnabled,
     clinvarEnabled: defaults.clinvarEnabled,
     clinvarStarThreshold: defaults.clinvarStarThreshold,
+    clinvarIncludeConflicting: defaults.clinvarIncludeConflicting,
+    clinvarConflictingThreshold: defaults.clinvarConflictingThreshold,
   });
 }
 

@@ -42,7 +42,7 @@
         "recommendation": {
           "id": "recommendation",
           "label": "Empfehlung",
-          "template": "Auch weitere Verwandte haben ggf. ein erhohtes Risiko selbst Anlagetrager{{genderSuffix}} zu sein. Familienangehorigen kann eine Untersuchung auf die hier nachgewiesene Variante angeboten werden."
+          "template": "Auch weitere Verwandte haben ggf. ein erhöhtes Risiko selbst Anlagetrager{{genderSuffix}} zu sein. Familienangehorigen kann eine Untersuchung auf die hier nachgewiesene Variante angeboten werden."
         }
       }
     },
@@ -132,7 +132,7 @@
         "recommendation": {
           "id": "recommendation",
           "label": "Empfehlung",
-          "template": "Eine gezielte Untersuchung auf die in der Familie nachgewiesene Variante kann angeboten werden, um den Anlagetragerstatus zu klaren."
+          "template": "Eine gezielte Untersuchung auf die in der Familie nachgewiesene Variante kann angeboten werden, um den Anlagetragerstatus zu klären."
         }
       }
     }

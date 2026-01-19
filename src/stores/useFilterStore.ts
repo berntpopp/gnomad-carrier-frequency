@@ -33,6 +33,10 @@ export const useFilterStore = defineStore('filters', {
             ? '1 star'
             : `${state.defaults.clinvarStarThreshold} stars`;
         parts.push(`ClinVar >= ${starText}`);
+
+        if (state.defaults.clinvarIncludeConflicting) {
+          parts.push(`Conflicting >= ${state.defaults.clinvarConflictingThreshold}% P/LP`);
+        }
       }
 
       if (parts.length === 0) {
@@ -86,6 +90,22 @@ export const useFilterStore = defineStore('filters', {
       // Clamp to valid range 0-4
       const validThreshold = Math.max(0, Math.min(4, Math.round(threshold)));
       this.defaults.clinvarStarThreshold = validThreshold;
+    },
+
+    /**
+     * Set whether to include conflicting classifications with majority P/LP
+     */
+    setClinvarIncludeConflicting(enabled: boolean) {
+      this.defaults.clinvarIncludeConflicting = enabled;
+    },
+
+    /**
+     * Set threshold percentage for conflicting classifications (validated to 50-100 range)
+     */
+    setClinvarConflictingThreshold(threshold: number) {
+      // Clamp to valid range 50-100
+      const validThreshold = Math.max(50, Math.min(100, Math.round(threshold)));
+      this.defaults.clinvarConflictingThreshold = validThreshold;
     },
   },
 

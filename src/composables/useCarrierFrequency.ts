@@ -1,6 +1,10 @@
-import { computed, ref, type Ref } from 'vue';
+import { computed, ref, watch, type Ref } from 'vue';
 import { useGeneVariants } from './useGeneVariants';
-import { filterPathogenicVariantsConfigurable } from '@/utils/variant-filters';
+import { useClinvarSubmissions } from './useClinvarSubmissions';
+import {
+  filterPathogenicVariantsConfigurable,
+  getConflictingVariantIds,
+} from '@/utils/variant-filters';
 import {
   aggregatePopulationFrequencies,
   buildPopulationFrequencies,
@@ -9,6 +13,7 @@ import { formatCarrierFrequency } from '@/utils/formatters';
 import { config, type GnomadVersion } from '@/config';
 import { useGnomadVersion } from '@/api';
 import { useFilterStore } from '@/stores/useFilterStore';
+import type { ClinVarSubmission } from '@/api/queries';
 import type {
   CarrierFrequencyResult,
   IndexPatientStatus,
@@ -47,6 +52,13 @@ export interface UseCarrierFrequencyReturn {
   filterConfig: Ref<FilterConfig>;
   setFilterConfig: (config: FilterConfig) => void;
 
+  // ClinVar submissions for conflicting classifications
+  submissions: Ref<Map<string, ClinVarSubmission[]>>;
+  conflictingVariantIds: Ref<string[]>;
+  isLoadingSubmissions: Ref<boolean>;
+  submissionsProgress: Ref<number>;
+  submissionsError: Ref<string | null>;
+
   // Version
   currentVersion: Ref<GnomadVersion>;
 
@@ -76,11 +88,23 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     missenseEnabled: filterStore.defaults.missenseEnabled,
     clinvarEnabled: filterStore.defaults.clinvarEnabled,
     clinvarStarThreshold: filterStore.defaults.clinvarStarThreshold,
+    clinvarIncludeConflicting: filterStore.defaults.clinvarIncludeConflicting,
+    clinvarConflictingThreshold: filterStore.defaults.clinvarConflictingThreshold,
   });
 
   const setFilterConfig = (config: FilterConfig) => {
     filterConfig.value = { ...config };
   };
+
+  // ClinVar submissions for resolving conflicting classifications
+  const {
+    submissions,
+    isLoading: isLoadingSubmissions,
+    error: submissionsError,
+    progress: submissionsProgress,
+    fetchSubmissions,
+    clearSubmissions,
+  } = useClinvarSubmissions();
 
   // Fetch variants (uses config for dataset/referenceGenome)
   const {
@@ -121,13 +145,39 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     }));
   });
 
+  // Identify conflicting variant IDs for submissions fetching
+  const conflictingVariantIds = computed(() =>
+    getConflictingVariantIds(normalizedClinvar.value)
+  );
+
+  // Auto-fetch submissions when conflicting filter is enabled and we have conflicting variants
+  watch(
+    [() => filterConfig.value.clinvarIncludeConflicting, conflictingVariantIds],
+    async ([includeConflicting, ids]) => {
+      if (includeConflicting && ids.length > 0) {
+        // Only fetch if we don't already have all the submissions
+        const missingIds = ids.filter((id) => !submissions.value.has(id));
+        if (missingIds.length > 0) {
+          await fetchSubmissions(missingIds);
+        }
+      }
+    },
+    { immediate: true }
+  );
+
+  // Clear submissions when gene changes
+  watch(geneSymbol, () => {
+    clearSubmissions();
+  });
+
   // Filter to pathogenic variants using configurable filters (FILT-01 through FILT-09)
   const pathogenicVariants = computed(() => {
     if (!normalizedVariants.value.length) return [];
     return filterPathogenicVariantsConfigurable(
       normalizedVariants.value,
       normalizedClinvar.value,
-      filterConfig.value
+      filterConfig.value,
+      submissions.value
     );
   });
 
@@ -278,6 +328,11 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     clinvarVariants: normalizedClinvar,
     filterConfig,
     setFilterConfig,
+    submissions,
+    conflictingVariantIds,
+    isLoadingSubmissions,
+    submissionsProgress,
+    submissionsError,
     currentVersion,
     calculateRisk,
     refetch,

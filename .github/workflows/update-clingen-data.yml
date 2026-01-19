@@ -1,0 +1,47 @@
+name: Update ClinGen Data
+
+on:
+  schedule:
+    # Run weekly on Mondays at 6:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download ClinGen Gene Validity CSV
+        run: |
+          mkdir -p public/data
+          curl -sL "https://search.clinicalgenome.org/kb/gene-validity/download" \
+            -o public/data/clingen-gene-validity.csv
+
+          # Verify the file was downloaded and has content
+          if [ ! -s public/data/clingen-gene-validity.csv ]; then
+            echo "Error: Downloaded file is empty"
+            exit 1
+          fi
+
+          # Show file info
+          echo "Downloaded ClinGen data:"
+          wc -l public/data/clingen-gene-validity.csv
+          head -10 public/data/clingen-gene-validity.csv
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git diff --quiet public/data/clingen-gene-validity.csv && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add public/data/clingen-gene-validity.csv
+          git commit -m "chore: update ClinGen gene validity data [skip ci]"
+          git push
