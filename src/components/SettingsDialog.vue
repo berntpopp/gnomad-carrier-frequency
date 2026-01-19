@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="modelValue"
-    max-width="600"
+    :max-width="activeTab === 'templates' ? 900 : 600"
     persistent
     @update:model-value="(val: boolean) => val ? onDialogOpen() : undefined"
   >
@@ -288,6 +288,7 @@ import { ref, nextTick } from 'vue';
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 import { useFilterStore } from '@/stores/useFilterStore';
 import { useAppStore } from '@/stores/useAppStore';
+import { useLogStore } from '@/stores/useLogStore';
 import { useClingenValidity } from '@/composables';
 
 const modelValue = defineModel<boolean>();
@@ -296,6 +297,7 @@ const activeTab = ref('general');
 const dialogCard = ref<HTMLElement | null>(null);
 const filterStore = useFilterStore();
 const appStore = useAppStore();
+const logStore = useLogStore();
 
 const {
   isLoading: clingenLoading,
