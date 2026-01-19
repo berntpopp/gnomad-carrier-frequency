@@ -15,17 +15,17 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.1 Release-Ready
 **Phase:** 5 - Foundation (Settings + Theme)
-**Plan:** 1 of 2 complete
-**Status:** In progress
+**Plan:** 2 of 2 complete
+**Status:** Phase complete
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [#---------]  ~8% - Phase 5 in progress
+v1.1 Release-Ready: [##--------] ~17% - Phase 5 complete
 ```
 
-**Overall:** Phase 5 Plan 01 complete, Plan 02 ready
+**Overall:** Phase 5 complete, Phase 6 ready
 
 ---
 
@@ -46,7 +46,7 @@ v1.1 Release-Ready: [#---------]  ~8% - Phase 5 in progress
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 5 | Foundation | 4 | 1/2 plans complete |
+| 5 | Foundation | 4 | Complete (2/2 plans) |
 | 6 | App Shell | 5 | Pending |
 | 7 | SEO + Accessibility | 9 | Pending |
 | 8 | Filtering + Variant Display | 14 | Pending |
@@ -65,6 +65,7 @@ v1.1 Release-Ready: [#---------]  ~8% - Phase 5 in progress
 | 6 phases from requirements | Natural delivery boundaries from research | 2026-01-19 |
 | ClinGen via CSV, not REST | Public download endpoint is CORS-enabled | 2026-01-19 |
 | Theme storage key 'carrier-freq-theme' | Namespaced key avoids conflicts with other apps | 2026-01-19 |
+| Title in content area | App bar has app name, page content has descriptive header | 2026-01-19 |
 
 ### Blockers
 
@@ -74,7 +75,7 @@ None currently.
 
 - [x] Run `/gsd:plan-phase 5` to create Foundation plans
 - [x] Execute 05-01-PLAN.md (theme + version infrastructure)
-- [ ] Execute 05-02-PLAN.md (settings UI integration)
+- [x] Execute 05-02-PLAN.md (settings UI integration)
 - [ ] ClinGen CSV schema may need exploration during Phase 9
 
 ---
@@ -84,13 +85,13 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 5 Plan 01 - Theme and Version Infrastructure
-**Next:** Execute 05-02-PLAN.md (settings UI integration)
+**Completed:** Phase 5 Plan 02 - Settings UI Integration
+**Next:** Plan Phase 6 (App Shell)
 
 ### Handoff Notes
 
 v1.1 roadmap derived from requirements and research:
-- Phase 5: Foundation (settings store, theme, version display)
+- Phase 5: Foundation (settings store, theme, version display) - COMPLETE
 - Phase 6: App Shell (navigation, logo, favicon, settings access)
 - Phase 7: SEO + Accessibility (WCAG compliance, Lighthouse targets)
 - Phase 8: Filtering + Variant Display (configurable filters, variant modal)
@@ -102,11 +103,14 @@ Key pitfalls from research:
 - ARIA live regions break with v-if (Phase 7)
 - XSS risk in template editor (Phase 10)
 
-**Phase 5 Plan 01 delivered:**
+**Phase 5 deliverables:**
 - useAppTheme composable at src/composables/useTheme.ts
 - Version injection via VITE_APP_VERSION
 - Vuetify dark theme configured
 - Theme persists to localStorage
+- AppBar with theme toggle at src/components/AppBar.vue
+- AppFooter with version display at src/components/AppFooter.vue
+- App shell integrated in src/App.vue
 
 ---
 
@@ -114,3 +118,4 @@ Key pitfalls from research:
 *v1.0 shipped: 2026-01-19*
 *v1.1 roadmap: 2026-01-19*
 *05-01 complete: 2026-01-19*
+*05-02 complete: 2026-01-19*
