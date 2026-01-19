@@ -97,7 +97,14 @@ export function shouldIncludeVariant(
 
 /**
  * Determine if a variant should be included based on configurable filter settings
- * Returns true if ANY enabled filter matches the variant
+ *
+ * Filter logic:
+ * - LoF HC: Include if enabled (high-confidence damaging, no ClinVar evidence needed)
+ * - Missense: Include ONLY if enabled AND has ClinVar P/LP evidence (missense needs clinical validation)
+ * - ClinVar: For non-LoF/non-missense variants (splice, etc.), include if has ClinVar P/LP evidence
+ *
+ * The missense filter acts as a gate - when disabled, missense variants are excluded
+ * regardless of their ClinVar status.
  *
  * @param variant - gnomAD variant to check
  * @param clinvarVariants - Array of ClinVar variants for cross-reference
@@ -108,31 +115,36 @@ export function shouldIncludeVariantConfigurable(
   clinvarVariants: ClinVarVariant[],
   config: FilterConfig
 ): boolean {
-  // Check LoF HC filter
-  if (config.lofHcEnabled && variant.transcript_consequence) {
-    if (isHighConfidenceLoF(variant.transcript_consequence)) {
-      return true;
-    }
+  const consequence = variant.transcript_consequence;
+
+  // Classify the variant by consequence type
+  const isLoFHC = consequence ? isHighConfidenceLoF(consequence) : false;
+  const isMissense = consequence ? isMissenseVariant(consequence) : false;
+
+  // Get ClinVar evidence (computed once)
+  const clinvarMatch = clinvarVariants.find(
+    (cv) => cv.variant_id === variant.variant_id
+  );
+  const hasClinvarEvidence =
+    config.clinvarEnabled &&
+    clinvarMatch !== undefined &&
+    isPathogenicClinVarWithThreshold(clinvarMatch, config.clinvarStarThreshold);
+
+  // 1. LoF HC: Include if filter enabled (independent of ClinVar - LOFTEE is sufficient evidence)
+  if (config.lofHcEnabled && isLoFHC) {
+    return true;
   }
 
-  // Check missense filter
-  if (config.missenseEnabled && variant.transcript_consequence) {
-    if (isMissenseVariant(variant.transcript_consequence)) {
-      return true;
-    }
+  // 2. Missense: Include ONLY if filter enabled AND has ClinVar evidence
+  //    Missense variants without clinical validation are too uncertain
+  if (isMissense) {
+    return config.missenseEnabled && hasClinvarEvidence;
   }
 
-  // Check ClinVar P/LP filter with configurable star threshold
-  if (config.clinvarEnabled) {
-    const clinvarMatch = clinvarVariants.find(
-      (cv) => cv.variant_id === variant.variant_id
-    );
-    if (
-      clinvarMatch &&
-      isPathogenicClinVarWithThreshold(clinvarMatch, config.clinvarStarThreshold)
-    ) {
-      return true;
-    }
+  // 3. Other consequences (splice, start_lost, etc.): Include if has ClinVar evidence
+  //    These aren't LoF HC or missense, but ClinVar says they're pathogenic
+  if (hasClinvarEvidence) {
+    return true;
   }
 
   return false;
