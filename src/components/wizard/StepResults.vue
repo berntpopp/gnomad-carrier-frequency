@@ -381,8 +381,11 @@ const emit = defineEmits<{
 // Get filter store for reset functionality
 const filterStore = useFilterStore();
 
-// Get exclusion state (singleton) for displaying excluded count
-const { excludedCount } = useExclusionState();
+// Get exclusion state (singleton) for displaying excluded count and export data
+const { excludedCount, excluded, reasons } = useExclusionState();
+
+// Computed Set of excluded variant IDs for export
+const excludedSet = computed(() => new Set(excluded.value));
 
 // Set up export composable
 const { exportToJson, exportToExcel } = useExport();
@@ -411,10 +414,23 @@ function handleExport(format: 'json' | 'xlsx') {
   if (!props.result) return;
 
   // Convert filtered variants to display format for export
-  const displayVariants = toDisplayVariants(filteredVariants.value, props.clinvarVariants);
+  // Include ALL variants (including excluded) for complete export
+  const allFilteredVariants = filterPathogenicVariantsConfigurable(
+    props.variants,
+    props.clinvarVariants,
+    props.filterConfig,
+    props.submissions
+  );
+  const displayVariants = toDisplayVariants(allFilteredVariants, props.clinvarVariants);
 
-  // Build complete export data
-  const exportData = buildExportData(props.result, displayVariants, props.filterConfig);
+  // Build complete export data with exclusion info
+  const exportData = buildExportData(
+    props.result,
+    displayVariants,
+    props.filterConfig,
+    excludedSet.value,
+    reasons
+  );
 
   if (format === 'json') {
     exportToJson(exportData, props.result.gene);

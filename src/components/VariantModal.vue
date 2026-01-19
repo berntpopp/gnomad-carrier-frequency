@@ -134,7 +134,10 @@ const emit = defineEmits<{
 }>();
 
 // Get exclusion state composable
-const { excluded, includeAll } = useExclusionState();
+const { excluded, reasons, includeAll } = useExclusionState();
+
+// Computed Set of excluded variant IDs for export
+const excludedSet = computed(() => new Set(excluded.value));
 
 // Count of excluded variants in current modal view
 const excludedInModal = computed(() => {
@@ -179,7 +182,12 @@ function downloadBlob(blob: Blob, filename: string): void {
 function handleVariantExport(format: 'json' | 'xlsx') {
   if (!props.variants.length) return;
 
-  const exportVariants = buildExportVariants(props.variants);
+  // Build export variants with exclusion data
+  const exportVariants = buildExportVariants(
+    props.variants,
+    excludedSet.value,
+    reasons
+  );
   const gene = props.gene || 'variants';
   const population = props.populationCode || undefined;
   const filename = generateFilename(gene, population) + '_variants';
@@ -191,6 +199,7 @@ function handleVariantExport(format: 'json' | 'xlsx') {
       populationLabel: props.populationLabel,
       exportDate: new Date().toISOString(),
       variantCount: exportVariants.length,
+      excludedCount: exportVariants.filter((v) => v.excluded).length,
     };
     const json = JSON.stringify(data, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
