@@ -105,6 +105,8 @@ v1.1 Release-Ready: [#########-] ~98% - Phase 10 plan 7 complete
 | vueTsc: true for checker | Enable parallel TypeScript checking during development | 2026-01-19 |
 | useFlatConfig: true for ESLint | Support ESLint flat config format in vite-plugin-checker | 2026-01-19 |
 | overlay.initialIsOpen: false | Show badge but don't auto-open for non-intrusive DX | 2026-01-19 |
+| SheetJS xlsx for Excel export | Mature library, browser-native, multi-sheet workbook support | 2026-01-19 |
+| Blob URL download pattern | Browser-native file download without server dependency | 2026-01-19 |
 
 ### Blockers
 
