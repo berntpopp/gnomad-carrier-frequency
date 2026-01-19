@@ -77,6 +77,19 @@
       {{ formatRatio(result.maxFrequency) }}
     </div>
 
+    <!-- Text output section -->
+    <v-divider class="my-6" />
+
+    <TextOutput
+      v-if="result"
+      :result="result"
+      :frequency-source="frequencySource"
+      :index-status="indexStatus"
+      :literature-frequency="literatureFrequency"
+      :literature-pmid="literaturePmid"
+      :using-default="usingDefault"
+    />
+
     <!-- Navigation buttons -->
     <div class="d-flex justify-space-between mt-6">
       <v-btn variant="text" @click="$emit('back')">Back</v-btn>
@@ -91,6 +104,7 @@
 import { computed, ref } from 'vue';
 import { config, getGnomadVersion } from '@/config';
 import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource } from '@/types';
+import TextOutput from './TextOutput.vue';
 
 interface TableItem {
   label: string;
