@@ -8,6 +8,21 @@ A single-page application for genetic counselors to calculate carrier frequencie
 
 Accurate recurrence risk calculation from real gnomAD population data, with clinical documentation output that's ready to paste into patient letters.
 
+## Current Milestone: v1.1 Release-Ready
+
+**Goal:** Polish the tool for wider distribution with improved UX, clinical features, and documentation.
+
+**Target features:**
+- App shell with navigation, settings, dark/light theme
+- Variant table modal with per-population drill-down
+- Inheritance validation via ClinGen gene-disease validity (cached)
+- Configurable variant filtering (LoF, missense, ClinVar combinations)
+- Data export (JSON/Excel)
+- In-app template editor for clinical text
+- Browser-based logging for debugging
+- Documentation, README, SEO improvements
+- Lighthouse 90+ performance
+
 ## Current State
 
 **Version:** v1.0 MVP (shipped 2026-01-19)
@@ -35,7 +50,27 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - ✓ German clinical text generation with perspective selection — v1.0
 - ✓ Copy-to-clipboard for clinical text — v1.0
 
-### Active (v1.1+)
+### Active (v1.1)
+
+- [ ] App shell with logo, menu, settings gear, dark/light theme
+- [ ] Variant table modal showing contributing variants
+- [ ] Per-population variant drill-down in modal
+- [ ] ClinGen gene-disease validity integration (cached monthly, manual refresh)
+- [ ] Inheritance validation warning for non-AR genes
+- [ ] Configurable variant filtering (LoF, missense, ClinVar P/LP combinations)
+- [ ] Filter defaults in settings, override per calculation
+- [ ] Data export: JSON and Excel formats
+- [ ] In-app template editor for German + English clinical text
+- [ ] Browser-based logging system (LogViewer pattern)
+- [ ] Logo and favicon
+- [ ] README.md with description and tags
+- [ ] Help/FAQ/Documentation page
+- [ ] SEO: meta description, contrast fixes, heading order
+- [ ] Semantic versioning
+- [ ] Build/lint/typecheck speed improvements
+- [ ] Lighthouse 90+ score
+
+### Deferred (v1.2+)
 
 - [ ] X-linked recessive inheritance calculation
 - [ ] X-linked dominant inheritance calculation
@@ -49,7 +84,6 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 
 - Backend/database — direct gnomAD GraphQL from browser
 - User accounts/authentication — stateless tool
-- Variant-level detail display — aggregated frequencies only
 - Diagnostic claims — clinical tool for documentation, not diagnosis
 
 ## Context
@@ -81,4 +115,4 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 | Patient sex for German grammar | Correct grammatical gender agreement | ✓ Good |
 
 ---
-*Last updated: 2026-01-19 after v1.0 milestone*
+*Last updated: 2026-01-19 after v1.1 milestone start*
