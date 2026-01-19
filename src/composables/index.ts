@@ -42,3 +42,6 @@ export type { UseNetworkStatusReturn } from './useNetworkStatus';
 
 export { usePwaUpdate } from './usePwaUpdate';
 export type { UsePwaUpdateReturn } from './usePwaUpdate';
+
+export { useExclusionState } from './useExclusionState';
+export type { UseExclusionStateReturn } from './useExclusionState';
