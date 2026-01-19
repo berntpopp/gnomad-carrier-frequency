@@ -112,12 +112,13 @@ Plans:
 
 **Dependencies:** Phase 2 (text generation depends on wizard state and calculations)
 
-**Plans:** 3 plans in 3 waves
+**Plans:** 4 plans (3 core + 1 gap closure)
 
 Plans:
-- [ ] 03-01-PLAN.md — Template system foundation (types, renderer, JSON templates) [Wave 1]
-- [ ] 03-02-PLAN.md — Pinia store and useTextGenerator composable [Wave 2]
-- [ ] 03-03-PLAN.md — TextOutput UI and StepResults integration [Wave 3]
+- [x] 03-01-PLAN.md — Template system foundation (types, renderer, JSON templates) [Wave 1]
+- [x] 03-02-PLAN.md — Pinia store and useTextGenerator composable [Wave 2]
+- [x] 03-03-PLAN.md — TextOutput UI and StepResults integration [Wave 3]
+- [ ] 03-04-PLAN.md — Gap closure: affected status granularity + patient sex for German grammar [Wave 1]
 
 **Key Design Decisions:**
 - Config-driven templates with JSON (German + English)
@@ -128,12 +129,18 @@ Plans:
 - Gender-inclusive language configurable (*, :, /, traditional)
 - Pinia + localStorage for template persistence
 - VueUse useClipboard for copy functionality
+- 4 affected statuses: heterozygous, homozygous, compound het confirmed, compound het assumed (gap closure)
+- Patient sex selection for German grammatical gender agreement (gap closure)
 
 **Requirements:**
 - TEXT-01: German clinical text generated based on calculation results
 - TEXT-02: User selects perspective: affected patient, carrier, or family member
 - TEXT-03: Text includes gene name, carrier frequency, source, and recurrence risk
 - TEXT-04: Copy-to-clipboard button for German text
+
+**Gaps Identified:**
+- GAP-03-01: Affected status needs granularity (4 options instead of 2)
+- GAP-03-02: Patient sex for German grammar (der Patient vs die Patientin)
 
 **Success Criteria:**
 1. User can select perspective (affected patient, carrier, or family member) and see text adapt appropriately
@@ -166,10 +173,10 @@ Plans:
 |-------|--------|----------|
 | Phase 1: Foundation | Complete | 18/18 requirements |
 | Phase 2: Wizard UI | Complete | 10/10 requirements |
-| Phase 3: German Text | Planned | 0/4 requirements |
+| Phase 3: German Text | Gap Closure | 4/4 requirements (gaps being closed) |
 | Phase 4: Deploy | Pending | Validation only |
 
-**Overall:** 28/32 requirements complete (87%)
+**Overall:** 32/32 requirements mapped (gap closure in progress)
 
 ---
 
@@ -191,4 +198,4 @@ Plans:
 
 ---
 
-*Last updated: 2026-01-19 (Phase 3 planned)*
+*Last updated: 2026-01-19 (Phase 3 gap closure plan added)*
