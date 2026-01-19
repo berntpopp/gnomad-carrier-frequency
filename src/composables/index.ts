@@ -9,3 +9,6 @@ export type { UseCarrierFrequencyReturn } from './useCarrierFrequency';
 
 export { useWizard } from './useWizard';
 export type { UseWizardReturn } from './useWizard';
+
+export { useTextGenerator } from './useTextGenerator';
+export type { UseTextGeneratorReturn } from './useTextGenerator';
