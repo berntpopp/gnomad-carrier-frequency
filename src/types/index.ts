@@ -59,3 +59,12 @@ export type {
   ExportVariant,
   ExportData,
 } from './export';
+
+export type { UrlState } from './url-state';
+export {
+  UrlStateSchema,
+  parseUrlState,
+  encodeFilterFlags,
+  decodeFilterFlags,
+  filtersMatchDefaults,
+} from './url-state';
