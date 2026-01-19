@@ -186,10 +186,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { config, getGnomadVersion, getPopulationLabel } from '@/config';
-import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant } from '@/types';
-import { useVariantFilters } from '@/composables';
+import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@/types';
+import { useFilterStore } from '@/stores/useFilterStore';
+import { filterPathogenicVariantsConfigurable } from '@/utils/variant-filters';
 import { toDisplayVariants, filterVariantsByPopulation } from '@/utils/variant-display';
 import TextOutput from './TextOutput.vue';
 import FilterPanel from '@/components/FilterPanel.vue';
@@ -219,23 +220,62 @@ const props = defineProps<{
   usingDefault: boolean;
   variants: GnomadVariant[];
   clinvarVariants: ClinVarVariant[];
+  filterConfig: FilterConfig;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   back: [];
   restart: [];
+  'update:filterConfig': [config: FilterConfig];
 }>();
 
-// Set up variant filtering
-const variantsRef = toRef(props, 'variants');
-const clinvarVariantsRef = toRef(props, 'clinvarVariants');
+// Get filter store for reset functionality
+const filterStore = useFilterStore();
 
-const {
+// Local copy of filters for v-model binding with FilterPanel
+const filters = ref<FilterConfig>({ ...props.filterConfig });
+
+// Watch for external filterConfig changes (e.g., from store reset)
+watch(
+  () => props.filterConfig,
+  (newConfig) => {
+    filters.value = { ...newConfig };
+  },
+  { deep: true }
+);
+
+// Watch local filter changes and emit to parent
+watch(
   filters,
-  filteredCount,
-  filteredVariants,
-  resetFilters,
-} = useVariantFilters(variantsRef, clinvarVariantsRef);
+  (newFilters) => {
+    emit('update:filterConfig', { ...newFilters });
+  },
+  { deep: true }
+);
+
+// Compute filtered variants based on current filter settings
+const filteredVariants = computed(() => {
+  if (!props.variants.length) return [];
+  return filterPathogenicVariantsConfigurable(
+    props.variants,
+    props.clinvarVariants,
+    filters.value
+  );
+});
+
+// Count of filtered variants
+const filteredCount = computed(() => filteredVariants.value.length);
+
+// Reset local filters to store defaults
+function resetFilters() {
+  const defaults = filterStore.defaults;
+  filters.value = {
+    lofHcEnabled: defaults.lofHcEnabled,
+    missenseEnabled: defaults.missenseEnabled,
+    clinvarEnabled: defaults.clinvarEnabled,
+    clinvarStarThreshold: defaults.clinvarStarThreshold,
+  };
+}
 
 // Variant modal state
 const showVariantModal = ref(false);

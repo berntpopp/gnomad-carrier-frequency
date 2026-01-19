@@ -1,6 +1,6 @@
 import { computed, ref, type Ref } from 'vue';
 import { useGeneVariants } from './useGeneVariants';
-import { filterPathogenicVariants } from '@/utils/variant-filters';
+import { filterPathogenicVariantsConfigurable } from '@/utils/variant-filters';
 import {
   aggregatePopulationFrequencies,
   buildPopulationFrequencies,
@@ -8,12 +8,14 @@ import {
 import { formatCarrierFrequency } from '@/utils/formatters';
 import { config, type GnomadVersion } from '@/config';
 import { useGnomadVersion } from '@/api';
+import { useFilterStore } from '@/stores/useFilterStore';
 import type {
   CarrierFrequencyResult,
   IndexPatientStatus,
   PopulationFrequency,
   GnomadVariant,
   ClinVarVariant,
+  FilterConfig,
 } from '@/types';
 
 // Default fallback from config - NO MAGIC NUMBERS
@@ -41,6 +43,10 @@ export interface UseCarrierFrequencyReturn {
   variants: Ref<GnomadVariant[]>;
   clinvarVariants: Ref<ClinVarVariant[]>;
 
+  // Filter configuration (reactive)
+  filterConfig: Ref<FilterConfig>;
+  setFilterConfig: (config: FilterConfig) => void;
+
   // Version
   currentVersion: Ref<GnomadVersion>;
 
@@ -58,9 +64,22 @@ export interface UseCarrierFrequencyReturn {
 export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   const geneSymbol = ref<string | null>(null);
   const { version } = useGnomadVersion();
+  const filterStore = useFilterStore();
 
   const setGeneSymbol = (symbol: string | null) => {
     geneSymbol.value = symbol?.toUpperCase() ?? null;
+  };
+
+  // Reactive filter configuration - initialized from store defaults
+  const filterConfig = ref<FilterConfig>({
+    lofHcEnabled: filterStore.defaults.lofHcEnabled,
+    missenseEnabled: filterStore.defaults.missenseEnabled,
+    clinvarEnabled: filterStore.defaults.clinvarEnabled,
+    clinvarStarThreshold: filterStore.defaults.clinvarStarThreshold,
+  });
+
+  const setFilterConfig = (config: FilterConfig) => {
+    filterConfig.value = { ...config };
   };
 
   // Fetch variants (uses config for dataset/referenceGenome)
@@ -101,12 +120,13 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     }));
   });
 
-  // Filter to pathogenic variants (FILT-01, FILT-02, FILT-03)
+  // Filter to pathogenic variants using configurable filters (FILT-01 through FILT-09)
   const pathogenicVariants = computed(() => {
     if (!normalizedVariants.value.length) return [];
-    return filterPathogenicVariants(
+    return filterPathogenicVariantsConfigurable(
       normalizedVariants.value,
-      normalizedClinvar.value
+      normalizedClinvar.value,
+      filterConfig.value
     );
   });
 
@@ -216,6 +236,8 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     usingDefault,
     variants: normalizedVariants,
     clinvarVariants: normalizedClinvar,
+    filterConfig,
+    setFilterConfig,
     currentVersion,
     calculateRisk,
     refetch,

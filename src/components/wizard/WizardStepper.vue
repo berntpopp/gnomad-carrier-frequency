@@ -75,6 +75,8 @@
           :using-default="usingDefault"
           :variants="variants"
           :clinvar-variants="clinvarVariants"
+          :filter-config="filterConfig"
+          @update:filter-config="setFilterConfig"
           @back="prevStep"
           @restart="resetWizard"
         />
@@ -129,6 +131,8 @@ const {
   refetch,
   variants,
   clinvarVariants,
+  filterConfig,
+  setFilterConfig,
 } = useCarrierFrequency();
 
 // Screen reader announcements
