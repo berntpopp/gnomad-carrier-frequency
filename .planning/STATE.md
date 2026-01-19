@@ -15,7 +15,7 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.1 Release-Ready
 **Phase:** 9 - ClinGen + Documentation - IN PROGRESS
-**Plan:** 1 of ? complete
+**Plan:** 2 of 7 complete
 **Status:** In progress
 
 ### Progress
@@ -50,7 +50,7 @@ v1.1 Release-Ready: [########--] ~85% - Phase 9 in progress
 | 6 | App Shell | 5 | Complete (2/2 plans) |
 | 7 | SEO + Accessibility | 9 | Complete (4/4 plans) |
 | 8 | Filtering + Variant Display | 14 | Complete (4/4 plans) |
-| 9 | ClinGen + Documentation | 15 | In Progress (1/? plans) |
+| 9 | ClinGen + Documentation | 15 | In Progress (2/7 plans) |
 | 10 | Export + Templates + Logging | 22 | Pending |
 
 ---
@@ -85,6 +85,8 @@ v1.1 Release-Ready: [########--] ~85% - Phase 9 in progress
 | Dynamic v-slot for Vuetify data-table | #[\`item.xxx\`] syntax required for column slot names with dots | 2026-01-19 |
 | Population drill-down via row click | Cleaner UX than buttons; chevron provides visual affordance | 2026-01-19 |
 | Skip SOP column in ClinGen mapping | SOP not needed for gene validity lookup, simplifies mapping | 2026-01-19 |
+| Singleton state for constraint data | Module-level refs share state between GeneSearch and StepGene | 2026-01-19 |
+| Version-specific LOEUF thresholds | v4 (0.6/1.5) vs v2/v3 (0.35/1.0) per gnomAD documentation | 2026-01-19 |
 
 ### Blockers
 
@@ -109,7 +111,8 @@ None currently.
 - [x] Execute 08-04-PLAN.md (variant modal component)
 - [x] Run `/gsd:plan-phase 9` to create ClinGen + Documentation plans
 - [x] Execute 09-01-PLAN.md (ClinGen infrastructure)
-- [ ] Execute remaining Phase 9 plans
+- [x] Execute 09-02-PLAN.md (Gene constraint display)
+- [ ] Execute remaining Phase 9 plans (03-07)
 
 ---
 
@@ -118,8 +121,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 9 Plan 01 - ClinGen Infrastructure
-**Next:** Execute remaining Phase 9 plans
+**Completed:** Phase 9 Plan 02 - Gene Constraint Display
+**Next:** Execute Phase 9 plans 03-07
 
 ### Handoff Notes
 
@@ -144,8 +147,8 @@ Key pitfalls from research:
 
 **Phase 9 deliverables (in progress):**
 - Plan 01: ClinGen infrastructure (types, store, composable) - COMPLETE
-- Help/documentation system - PENDING
-- About dialog with citations - PENDING
+- Plan 02: Gene constraint display (pLI, LOEUF metrics) - COMPLETE
+- Plan 03-07: ClinGen badge, help system, about dialog - PENDING
 
 ---
 
@@ -166,3 +169,4 @@ Key pitfalls from research:
 *08-04 complete: 2026-01-19*
 *Phase 8 complete: 2026-01-19*
 *09-01 complete: 2026-01-19*
+*09-02 complete: 2026-01-19*
