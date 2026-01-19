@@ -7,25 +7,25 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.1 Release-Ready polish for wider distribution
+**Current focus:** v1.1 Release-Ready - COMPLETE
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.1 Release-Ready
-**Phase:** 10 - Export + Templates + Logging - IN PROGRESS
-**Plan:** 8 of 8 (plan 08 pending)
-**Status:** In progress
+**Phase:** 10 - Export + Templates + Logging - COMPLETE
+**Plan:** 8 of 8 (all plans complete)
+**Status:** Complete
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [#########-] ~99% - Phase 10 plan 05 complete
+v1.1 Release-Ready: [##########] 100% - COMPLETE 2026-01-19
 ```
 
-**Overall:** Phase 10 in progress (7/8 plans complete, plan 08 pending)
+**Overall:** All phases complete (27/27 plans across v1.0 + v1.1)
 
 ---
 
@@ -35,6 +35,12 @@ v1.1 Release-Ready: [#########-] ~99% - Phase 10 plan 05 complete
 - 4 phases, 15 plans
 - 32/32 requirements
 - 3,285 lines TypeScript/Vue
+- Deployed: https://berntpopp.github.io/gnomad-carrier-frequency/
+
+**v1.1 Release-Ready** (2026-01-19)
+- 6 phases, 27 plans total (12 new plans)
+- 69 requirements
+- Full feature set: settings, theming, accessibility, filtering, ClinGen integration, export, templates, logging
 - Deployed: https://berntpopp.github.io/gnomad-carrier-frequency/
 
 ---
@@ -51,7 +57,7 @@ v1.1 Release-Ready: [#########-] ~99% - Phase 10 plan 05 complete
 | 7 | SEO + Accessibility | 9 | Complete (4/4 plans) |
 | 8 | Filtering + Variant Display | 14 | Complete (4/4 plans) |
 | 9 | ClinGen + Documentation | 15 | Complete (7/7 plans) |
-| 10 | Export + Templates + Logging | 22 | In Progress (7/8 plans, 08 pending) |
+| 10 | Export + Templates + Logging | 22 | Complete (8/8 plans) |
 
 ---
 
@@ -112,10 +118,12 @@ v1.1 Release-Ready: [#########-] ~99% - Phase 10 plan 05 complete
 | Level checkboxes for log filtering | DEBUG hidden by default, INFO/WARN/ERROR visible | 2026-01-19 |
 | Dynamic dialog width for templates tab | 900px for templates, 600px for others to fit editor + picker | 2026-01-19 |
 | formatVariable helper for Vue templates | Avoid template literal parsing issues with curly braces | 2026-01-19 |
+| Module-level logApi helper | Try/catch wrapped for non-composable contexts in client.ts | 2026-01-19 |
+| Watch-based logging | Track reactive state changes via watchers for separation of concerns | 2026-01-19 |
 
 ### Blockers
 
-None currently.
+None - v1.1 complete.
 
 ### TODOs
 
@@ -150,7 +158,7 @@ None currently.
 - [x] Execute 10-05-PLAN.md (template editor UI)
 - [x] Execute 10-06-PLAN.md (log viewer UI)
 - [x] Execute 10-07-PLAN.md (vite-plugin-checker)
-- [ ] Execute 10-08-PLAN.md (final integration)
+- [x] Execute 10-08-PLAN.md (final integration)
 
 ---
 
@@ -159,8 +167,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 10 Plan 05 - Template Editor UI
-**Next:** Execute 10-08-PLAN.md (final integration)
+**Completed:** Phase 10 Plan 08 - Final Integration (logging throughout app)
+**Status:** v1.1 COMPLETE
 
 ### Handoff Notes
 
@@ -170,37 +178,28 @@ v1.1 roadmap derived from requirements and research:
 - Phase 7: SEO + Accessibility - COMPLETE (4/4 plans)
 - Phase 8: Filtering + Variant Display (configurable filters, variant modal) - COMPLETE
 - Phase 9: ClinGen + Documentation (clinical validation, help content) - COMPLETE
-- Phase 10: Export + Templates + Logging (data export, template editor, debug tools) - IN PROGRESS (7/8)
+- Phase 10: Export + Templates + Logging (data export, template editor, debug tools) - COMPLETE (8/8)
 
-Key pitfalls from research:
-- ClinVar "conflicting" over-excludes valid variants (Phase 8 - handled)
-- ARIA live regions break with v-if (Phase 7 - solved with VueAnnouncer)
-- XSS risk in template editor (Phase 10)
-
-**Phase 8 deliverables (all complete):**
-- Plan 01: Filter types and settings store extension - COMPLETE
-- Plan 02: HGVS fields + display types for variant modal - COMPLETE
-- Plan 03: Filter UI component + useVariantFilter composable - COMPLETE
-- Plan 04: Variant modal component with sortable table - COMPLETE
-
-**Phase 9 deliverables (all complete):**
-- Plan 01: ClinGen infrastructure (types, store, composable) - COMPLETE
-- Plan 02: Gene constraint display (pLI, LOEUF metrics) - COMPLETE
-- Plan 03: ClinGen warning UI (validation in gene/results steps) - COMPLETE
-- Plan 04: Disclaimer and ClinGen settings - COMPLETE
-- Plan 05: Help system (methodology + FAQ) - COMPLETE
-- Plan 06: About dialog, data sources, README - COMPLETE
-- Plan 07: Contextual help tooltips + coverage warning - COMPLETE
-
-**Phase 10 deliverables (in progress):**
-- Plan 01: Logging infrastructure (types, store, composable) - COMPLETE
-- Plan 02: Export infrastructure (SheetJS, utilities) - COMPLETE
-- Plan 03: Export UI integration (StepResults, VariantModal) - COMPLETE
-- Plan 04: Template infrastructure (variables, parser, store) - COMPLETE
-- Plan 05: Template editor UI - COMPLETE
-- Plan 06: Log viewer UI - COMPLETE
-- Plan 07: Vite plugin checker (parallel TypeScript/ESLint) - COMPLETE
-- Plan 08: Final integration (logging throughout app) - PENDING
+**All v1.1 features implemented:**
+- Settings store with persistence
+- Theme toggle (light/dark/system)
+- Version display
+- Favicon with dark mode support
+- App shell with navigation
+- SEO meta tags and OG image
+- WCAG 2.1 AA accessibility
+- Configurable variant filters
+- Variant modal with detailed view
+- ClinGen gene validity integration
+- Disclaimer banner
+- Help system with methodology and FAQ
+- About dialog and data sources
+- Contextual help tooltips
+- Coverage warnings
+- Excel/JSON export
+- Template editor with variables
+- Log viewer panel
+- Application-wide logging
 
 ---
 
@@ -235,3 +234,6 @@ Key pitfalls from research:
 *10-06 complete: 2026-01-19*
 *10-05 complete: 2026-01-19*
 *10-07 complete: 2026-01-19*
+*10-08 complete: 2026-01-19*
+*Phase 10 complete: 2026-01-19*
+*v1.1 complete: 2026-01-19*
