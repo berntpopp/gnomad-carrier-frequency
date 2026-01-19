@@ -15,3 +15,6 @@ export type { UseTextGeneratorReturn } from './useTextGenerator';
 
 export { useAppTheme } from './useTheme';
 export type { UseAppThemeReturn } from './useTheme';
+
+export { useAppAnnouncer } from './useAppAnnouncer';
+export type { UseAppAnnouncerReturn } from './useAppAnnouncer';
