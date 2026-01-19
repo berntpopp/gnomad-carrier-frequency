@@ -156,6 +156,19 @@ Plans:
 
 **Dependencies:** Phase 3 (all features must be complete before validation)
 
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [ ] 04-01-PLAN.md — CI/Build configuration (ESLint, scripts, base path) [Wave 1]
+- [ ] 04-02-PLAN.md — GitHub Actions workflows (CI + Deploy) [Wave 2]
+- [ ] 04-03-PLAN.md — Deploy and validation (push, verify, validate calculations) [Wave 3]
+
+**Key Design Decisions:**
+- ESLint 9 flat config with Vue 3 + TypeScript support
+- Official GitHub Actions (actions/deploy-pages@v4)
+- Separate CI workflow (all branches) and deploy workflow (main only)
+- Vite base path configuration for subdirectory deployment
+
 **Requirements:**
 (No new requirements - this phase validates and deploys existing work)
 
@@ -174,7 +187,7 @@ Plans:
 | Phase 1: Foundation | Complete | 18/18 requirements |
 | Phase 2: Wizard UI | Complete | 10/10 requirements |
 | Phase 3: German Text | Complete | 4/4 requirements (gaps closed) |
-| Phase 4: Deploy | Pending | Validation only |
+| Phase 4: Deploy | Planned | 3 plans ready |
 
 **Overall:** 32/32 requirements mapped (all phases 1-3 complete)
 
@@ -198,4 +211,4 @@ Plans:
 
 ---
 
-*Last updated: 2026-01-19 (Phase 3 complete with gap closure)*
+*Last updated: 2026-01-19 (Phase 4 planned - 3 plans in 3 waves)*
