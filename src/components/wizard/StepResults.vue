@@ -181,10 +181,10 @@
       <template #bottom />
     </v-data-table>
 
-    <!-- View all variants button -->
+    <!-- View all variants and export buttons -->
     <div
       v-if="filteredCount > 0"
-      class="mt-3"
+      class="d-flex align-center mt-3"
     >
       <v-btn
         variant="text"
@@ -194,6 +194,38 @@
       >
         View all variants ({{ filteredCount }})
       </v-btn>
+
+      <!-- Export dropdown -->
+      <v-menu>
+        <template #activator="{ props: menuProps }">
+          <v-btn
+            v-bind="menuProps"
+            variant="outlined"
+            color="secondary"
+            prepend-icon="mdi-download"
+            class="ml-2"
+          >
+            Export
+            <v-icon end>
+              mdi-chevron-down
+            </v-icon>
+          </v-btn>
+        </template>
+        <v-list density="compact">
+          <v-list-item
+            prepend-icon="mdi-code-json"
+            @click="handleExport('json')"
+          >
+            <v-list-item-title>Export as JSON</v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            prepend-icon="mdi-file-excel"
+            @click="handleExport('xlsx')"
+          >
+            <v-list-item-title>Export as Excel</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </div>
 
     <!-- Range info -->
@@ -252,8 +284,10 @@ import { computed, ref } from 'vue';
 import { config, getGnomadVersion, getPopulationLabel } from '@/config';
 import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@/types';
 import { useFilterStore } from '@/stores/useFilterStore';
+import { useExport } from '@/composables';
 import { filterPathogenicVariantsConfigurable } from '@/utils/variant-filters';
 import { toDisplayVariants, filterVariantsByPopulation } from '@/utils/variant-display';
+import { buildExportData } from '@/utils/export-utils';
 import TextOutput from './TextOutput.vue';
 import FilterPanel from '@/components/FilterPanel.vue';
 import VariantModal from '@/components/VariantModal.vue';
@@ -294,6 +328,26 @@ const emit = defineEmits<{
 
 // Get filter store for reset functionality
 const filterStore = useFilterStore();
+
+// Set up export composable
+const { exportToJson, exportToExcel } = useExport();
+
+// Export handler function
+function handleExport(format: 'json' | 'xlsx') {
+  if (!props.result) return;
+
+  // Convert filtered variants to display format for export
+  const displayVariants = toDisplayVariants(filteredVariants.value, props.clinvarVariants);
+
+  // Build complete export data
+  const exportData = buildExportData(props.result, displayVariants, props.filterConfig);
+
+  if (format === 'json') {
+    exportToJson(exportData, props.result.gene);
+  } else {
+    exportToExcel(exportData, props.result.gene);
+  }
+}
 
 // Use a computed getter/setter for filters to avoid infinite loop
 // The prop is the source of truth; changes emit to parent
