@@ -7,22 +7,22 @@
         "geneIntro": {
           "id": "geneIntro",
           "label": "Geneinleitung",
-          "template": "Bei dem Patienten wurde eine pathogene Variante im {{gene}}-Gen nachgewiesen."
+          "template": "{{statusIntro}}"
         },
         "inheritance": {
           "id": "inheritance",
           "label": "Vererbungsmuster",
-          "template": "Das {{gene}}-Gen wird autosomal rezessiv vererbt. Die Eltern des Patienten sind mit großer Wahrscheinlichkeit jeweils heterozygote Anlageträger{{genderSuffix}}."
+          "template": "Das {{gene}}-Gen wird autosomal rezessiv vererbt. Die Eltern {{patientGenitive}} sind mit grosser Wahrscheinlichkeit jeweils heterozygote Anlagetrager{{genderSuffix}}."
         },
         "carrierFrequency": {
           "id": "carrierFrequency",
           "label": "Heterozygotenfrequenz",
-          "template": "Bei einer geschätzten Heterozygotenfrequenz von {{carrierFrequencyRatio}} {{source}}"
+          "template": "Bei einer geschatzten Heterozygotenfrequenz von {{carrierFrequencyRatio}} {{source}}"
         },
         "recurrenceRisk": {
           "id": "recurrenceRisk",
           "label": "Wiederholungsrisiko",
-          "template": "läge das Risiko für eine {{gene}}-assoziierte Erkrankung bei Nachkommen des Patienten bei etwa {{recurrenceRiskPercent}} ({{recurrenceRiskRatio}})."
+          "template": "lage das Risiko fur eine {{gene}}-assoziierte Erkrankung bei Nachkommen {{patientGenitive}} bei etwa {{recurrenceRiskPercent}} ({{recurrenceRiskRatio}})."
         },
         "populationContext": {
           "id": "populationContext",
@@ -31,8 +31,8 @@
         },
         "founderEffect": {
           "id": "founderEffect",
-          "label": "Gründereffekt",
-          "template": "In bestimmten Populationen kann aufgrund eines Gründereffekts eine erhöhte Heterozygotenfrequenz vorliegen."
+          "label": "Grundereffekt",
+          "template": "In bestimmten Populationen kann aufgrund eines Grundereffekts eine erhohte Heterozygotenfrequenz vorliegen."
         },
         "sourceCitation": {
           "id": "sourceCitation",
@@ -42,32 +42,32 @@
         "recommendation": {
           "id": "recommendation",
           "label": "Empfehlung",
-          "template": "Auch weitere Verwandte haben ggf. ein erhöhtes Risiko selbst Anlageträger{{genderSuffix}} zu sein. Familienangehörigen kann eine Untersuchung auf die hier nachgewiesene Variante angeboten werden."
+          "template": "Auch weitere Verwandte haben ggf. ein erhohtes Risiko selbst Anlagetrager{{genderSuffix}} zu sein. Familienangehorigen kann eine Untersuchung auf die hier nachgewiesene Variante angeboten werden."
         }
       }
     },
     "carrier": {
-      "label": "Gesunder Anlageträger",
+      "label": "Gesunder Anlagetrager",
       "sections": {
         "geneIntro": {
           "id": "geneIntro",
           "label": "Geneinleitung",
-          "template": "Bei der untersuchten Person wurde eine heterozygote pathogene Variante im {{gene}}-Gen nachgewiesen. Die Person ist damit Anlageträger{{genderSuffix}} für eine {{gene}}-assoziierte Erkrankung."
+          "template": "Bei der untersuchten Person wurde eine heterozygote pathogene Variante im {{gene}}-Gen nachgewiesen. Die Person ist damit Anlagetrager{{genderSuffix}} fur eine {{gene}}-assoziierte Erkrankung."
         },
         "inheritance": {
           "id": "inheritance",
           "label": "Vererbungsmuster",
-          "template": "Das {{gene}}-Gen wird autosomal rezessiv vererbt. Anlageträger{{genderSuffix}} sind in der Regel selbst nicht betroffen."
+          "template": "Das {{gene}}-Gen wird autosomal rezessiv vererbt. Anlagetrager{{genderSuffix}} sind in der Regel selbst nicht betroffen."
         },
         "carrierFrequency": {
           "id": "carrierFrequency",
           "label": "Heterozygotenfrequenz",
-          "template": "Bei einer geschätzten Heterozygotenfrequenz von {{carrierFrequencyRatio}} {{source}}"
+          "template": "Bei einer geschatzten Heterozygotenfrequenz von {{carrierFrequencyRatio}} {{source}}"
         },
         "recurrenceRisk": {
           "id": "recurrenceRisk",
           "label": "Wiederholungsrisiko",
-          "template": "läge das Risiko für eine {{gene}}-assoziierte Erkrankung bei gemeinsamen Nachkommen mit einem Partner, der ebenfalls Anlageträger{{genderSuffix}} ist, bei 25%. Das Risiko, dass ein Partner ebenfalls Anlageträger{{genderSuffix}} ist, entspricht der Heterozygotenfrequenz von {{carrierFrequencyRatio}}. Daraus ergibt sich ein kombiniertes Risiko von etwa {{recurrenceRiskPercent}} ({{recurrenceRiskRatio}})."
+          "template": "lage das Risiko fur eine {{gene}}-assoziierte Erkrankung bei gemeinsamen Nachkommen mit einem Partner, der ebenfalls Anlagetrager{{genderSuffix}} ist, bei 25%. Das Risiko, dass ein Partner ebenfalls Anlagetrager{{genderSuffix}} ist, entspricht der Heterozygotenfrequenz von {{carrierFrequencyRatio}}. Daraus ergibt sich ein kombiniertes Risiko von etwa {{recurrenceRiskPercent}} ({{recurrenceRiskRatio}})."
         },
         "populationContext": {
           "id": "populationContext",
@@ -76,8 +76,8 @@
         },
         "founderEffect": {
           "id": "founderEffect",
-          "label": "Gründereffekt",
-          "template": "In bestimmten Populationen kann aufgrund eines Gründereffekts eine erhöhte Heterozygotenfrequenz vorliegen."
+          "label": "Grundereffekt",
+          "template": "In bestimmten Populationen kann aufgrund eines Grundereffekts eine erhohte Heterozygotenfrequenz vorliegen."
         },
         "sourceCitation": {
           "id": "sourceCitation",
@@ -87,12 +87,12 @@
         "recommendation": {
           "id": "recommendation",
           "label": "Empfehlung",
-          "template": "Eine Partneruntersuchung zur Abklärung des Anlageträgerstatus kann erwogen werden. Familienangehörigen kann eine Untersuchung auf die hier nachgewiesene Variante angeboten werden."
+          "template": "Eine Partneruntersuchung zur Abklarung des Anlagetragerstatus kann erwogen werden. Familienangehorigen kann eine Untersuchung auf die hier nachgewiesene Variante angeboten werden."
         }
       }
     },
     "familyMember": {
-      "label": "Familienangehöriger",
+      "label": "Familienangehoriger",
       "sections": {
         "geneIntro": {
           "id": "geneIntro",
@@ -102,17 +102,17 @@
         "inheritance": {
           "id": "inheritance",
           "label": "Vererbungsmuster",
-          "template": "Das {{gene}}-Gen wird autosomal rezessiv vererbt. Verwandte von betroffenen Personen oder Anlageträger{{genderSuffix}}n haben ein erhöhtes Risiko, selbst Anlageträger{{genderSuffix}} zu sein."
+          "template": "Das {{gene}}-Gen wird autosomal rezessiv vererbt. Verwandte von betroffenen Personen oder Anlagetrager{{genderSuffix}}n haben ein erhohtes Risiko, selbst Anlagetrager{{genderSuffix}} zu sein."
         },
         "carrierFrequency": {
           "id": "carrierFrequency",
           "label": "Heterozygotenfrequenz",
-          "template": "Die geschätzte Heterozygotenfrequenz in der Allgemeinbevölkerung beträgt {{carrierFrequencyRatio}} {{source}}."
+          "template": "Die geschatzte Heterozygotenfrequenz in der Allgemeinbevolkerung betragt {{carrierFrequencyRatio}} {{source}}."
         },
         "recurrenceRisk": {
           "id": "recurrenceRisk",
           "label": "Wiederholungsrisiko",
-          "template": "Bei bestätigtem Anlageträgerstatus und einem Partner, der ebenfalls Anlageträger{{genderSuffix}} ist, läge das Risiko für eine {{gene}}-assoziierte Erkrankung bei gemeinsamen Nachkommen bei 25%. Das kombinierte Risiko bei unbekanntem Partnerstatus beträgt etwa {{recurrenceRiskPercent}} ({{recurrenceRiskRatio}})."
+          "template": "Bei bestatigtem Anlagetragerstatus und einem Partner, der ebenfalls Anlagetrager{{genderSuffix}} ist, lage das Risiko fur eine {{gene}}-assoziierte Erkrankung bei gemeinsamen Nachkommen bei 25%. Das kombinierte Risiko bei unbekanntem Partnerstatus betragt etwa {{recurrenceRiskPercent}} ({{recurrenceRiskRatio}})."
         },
         "populationContext": {
           "id": "populationContext",
@@ -121,8 +121,8 @@
         },
         "founderEffect": {
           "id": "founderEffect",
-          "label": "Gründereffekt",
-          "template": "In bestimmten Populationen kann aufgrund eines Gründereffekts eine erhöhte Heterozygotenfrequenz vorliegen."
+          "label": "Grundereffekt",
+          "template": "In bestimmten Populationen kann aufgrund eines Grundereffekts eine erhohte Heterozygotenfrequenz vorliegen."
         },
         "sourceCitation": {
           "id": "sourceCitation",
@@ -132,7 +132,7 @@
         "recommendation": {
           "id": "recommendation",
           "label": "Empfehlung",
-          "template": "Eine gezielte Untersuchung auf die in der Familie nachgewiesene Variante kann angeboten werden, um den Anlageträgerstatus zu klären."
+          "template": "Eine gezielte Untersuchung auf die in der Familie nachgewiesene Variante kann angeboten werden, um den Anlagetragerstatus zu klaren."
         }
       }
     }

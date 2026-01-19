@@ -7,7 +7,7 @@
         "geneIntro": {
           "id": "geneIntro",
           "label": "Gene Introduction",
-          "template": "A pathogenic variant in the {{gene}} gene was identified in the patient."
+          "template": "{{statusIntro}}"
         },
         "inheritance": {
           "id": "inheritance",

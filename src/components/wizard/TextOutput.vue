@@ -21,6 +21,18 @@
         hide-details
         style="max-width: 160px"
       />
+
+      <!-- Patient sex selector (German only) -->
+      <v-select
+        v-if="language === 'de'"
+        v-model="patientSexModel"
+        :items="patientSexOptions"
+        :label="labels.patientSex"
+        density="compact"
+        variant="outlined"
+        hide-details
+        style="max-width: 200px"
+      />
     </v-card-title>
 
     <v-card-text>
@@ -85,12 +97,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useClipboard } from '@vueuse/core';
 import { useTextGenerator } from '@/composables';
 import type {
   Perspective,
   GenderStyle,
+  PatientSex,
   FrequencySource,
   IndexPatientStatus,
   CarrierFrequencyResult,
@@ -113,8 +126,10 @@ const {
   getSections,
   language,
   genderStyle,
+  patientSex,
   setLanguage,
   setGenderStyle,
+  setPatientSex,
   toggleSection,
 } = useTextGenerator(() => ({
   result: props.result,
@@ -136,12 +151,24 @@ const genderStyleModel = computed({
   set: (val: GenderStyle) => setGenderStyle(val),
 });
 
+const patientSexModel = computed({
+  get: () => patientSex.value,
+  set: (val: PatientSex) => setPatientSex(val),
+});
+
 // Gender style options for select
 const genderStyleOptions = computed(() => [
   { value: '*', title: labels.value.genderStyles['*'] },
   { value: ':', title: labels.value.genderStyles[':'] },
   { value: '/', title: labels.value.genderStyles['/'] },
   { value: 'traditional', title: labels.value.genderStyles.traditional },
+]);
+
+// Patient sex options for select
+const patientSexOptions = computed(() => [
+  { value: 'male', title: labels.value.patientSexOptions.male },
+  { value: 'female', title: labels.value.patientSexOptions.female },
+  { value: 'neutral', title: labels.value.patientSexOptions.neutral },
 ]);
 
 // Clipboard
@@ -166,6 +193,7 @@ const labels = computed(() =>
         copy: 'Text kopieren',
         copied: 'Kopiert!',
         noText: 'Kein Text generiert. Bitte mindestens einen Abschnitt aktivieren.',
+        patientSex: 'Patient*in',
         perspectives: {
           affected: 'Betroffener Patient',
           carrier: 'Anlagetrager/in',
@@ -177,6 +205,11 @@ const labels = computed(() =>
           '/': 'Schragstrich (/)',
           traditional: 'Traditionell',
         },
+        patientSexOptions: {
+          male: 'Mannlich (der Patient)',
+          female: 'Weiblich (die Patientin)',
+          neutral: 'Neutral (der/die Patient*in)',
+        },
       }
     : {
         title: 'Clinical Text',
@@ -185,6 +218,7 @@ const labels = computed(() =>
         copy: 'Copy text',
         copied: 'Copied!',
         noText: 'No text generated. Please enable at least one section.',
+        patientSex: 'Patient Sex',
         perspectives: {
           affected: 'Affected Patient',
           carrier: 'Carrier',
@@ -195,6 +229,11 @@ const labels = computed(() =>
           ':': 'Colon (:)',
           '/': 'Slash (/)',
           traditional: 'Traditional',
+        },
+        patientSexOptions: {
+          male: 'Male',
+          female: 'Female',
+          neutral: 'Neutral',
         },
       }
 );
