@@ -27,3 +27,6 @@ export type { UseClingenValidityReturn } from './useClingenValidity';
 
 export { useLogger } from './useLogger';
 export type { UseLoggerReturn } from './useLogger';
+
+export { useExport } from './useExport';
+export type { UseExportReturn } from './useExport';
