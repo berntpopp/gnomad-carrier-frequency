@@ -136,6 +136,60 @@
                 </div>
               </v-card-text>
             </v-card>
+
+            <!-- Logging Configuration Section -->
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
+              <v-card-title class="text-subtitle-1">
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-console
+                </v-icon>
+                Application Logging
+              </v-card-title>
+
+              <v-card-text>
+                <v-slider
+                  v-model="logStore.settings.maxEntries"
+                  :min="100"
+                  :max="2000"
+                  :step="100"
+                  label="Max Log Entries"
+                  thumb-label
+                  class="mb-2"
+                />
+                <div class="text-caption text-medium-emphasis mb-3">
+                  Maximum number of log entries to keep. Older entries are automatically removed.
+                </div>
+
+                <v-switch
+                  v-model="logStore.settings.autoClearOnStart"
+                  label="Clear logs on app start"
+                  density="compact"
+                  hide-details
+                  class="mb-2"
+                />
+
+                <div class="d-flex align-center justify-space-between mt-3">
+                  <div class="text-body-2">
+                    Current: {{ logStore.stats.totalCount }} entries
+                    <span class="text-medium-emphasis">({{ logStore.stats.memoryEstimate }})</span>
+                  </div>
+                  <v-btn
+                    variant="text"
+                    size="small"
+                    color="warning"
+                    @click="logStore.clearAll()"
+                  >
+                    Clear All
+                  </v-btn>
+                </div>
+              </v-card-text>
+            </v-card>
           </v-tabs-window-item>
           <v-tabs-window-item value="filters">
             <p class="text-body-2 text-medium-emphasis mb-4">
@@ -234,6 +288,7 @@ import { ref, nextTick } from 'vue';
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 import { useFilterStore } from '@/stores/useFilterStore';
 import { useAppStore } from '@/stores/useAppStore';
+import { useLogStore } from '@/stores/useLogStore';
 import { useClingenValidity } from '@/composables';
 
 const modelValue = defineModel<boolean>();
@@ -242,6 +297,7 @@ const activeTab = ref('general');
 const dialogCard = ref<HTMLElement | null>(null);
 const filterStore = useFilterStore();
 const appStore = useAppStore();
+const logStore = useLogStore();
 
 const {
   isLoading: clingenLoading,

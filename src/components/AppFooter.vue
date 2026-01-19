@@ -140,6 +140,29 @@
 
     <span class="mx-1">|</span>
 
+    <!-- Log Viewer -->
+    <v-tooltip
+      text="View application logs"
+      location="top"
+    >
+      <template #activator="{ props }">
+        <v-btn
+          v-bind="props"
+          icon
+          variant="text"
+          size="small"
+          aria-label="View application logs"
+          @click="emit('openLogViewer')"
+        >
+          <v-icon size="small">
+            mdi-console
+          </v-icon>
+        </v-btn>
+      </template>
+    </v-tooltip>
+
+    <span class="mx-1">|</span>
+
     <!-- Disclaimer (reopen) -->
     <v-tooltip
       text="View clinical disclaimer"
@@ -169,6 +192,10 @@ import FaqDialog from '@/components/FaqDialog.vue';
 import AboutDialog from '@/components/AboutDialog.vue';
 import DataSourcesDialog from '@/components/DataSourcesDialog.vue';
 import { useAppStore } from '@/stores/useAppStore';
+
+const emit = defineEmits<{
+  openLogViewer: [];
+}>();
 
 const version = import.meta.env.VITE_APP_VERSION;
 const releasesUrl = 'https://github.com/berntpopp/gnomad-carrier-frequency/releases';
