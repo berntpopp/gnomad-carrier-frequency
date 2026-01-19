@@ -74,9 +74,9 @@ Plans:
 **Plans:** 3 plans in 3 waves
 
 Plans:
-- [ ] 02-01-PLAN.md — Wizard types and useWizard composable [Wave 1]
-- [ ] 02-02-PLAN.md — Step components (StepGene, StepStatus, StepFrequency) [Wave 2]
-- [ ] 02-03-PLAN.md — StepResults, WizardStepper, and App integration [Wave 3]
+- [x] 02-01-PLAN.md — Wizard types and useWizard composable [Wave 1]
+- [x] 02-02-PLAN.md — Step components (StepGene, StepStatus, StepFrequency) [Wave 2]
+- [x] 02-03-PLAN.md — StepResults, WizardStepper, and App integration [Wave 3]
 
 **Key Design Decisions:**
 - Linear navigation only (must complete each step before proceeding)
@@ -148,11 +148,11 @@ Plans:
 | Phase | Status | Progress |
 |-------|--------|----------|
 | Phase 1: Foundation | Complete | 18/18 requirements |
-| Phase 2: Wizard UI | Planned | 0/10 requirements |
+| Phase 2: Wizard UI | Complete | 10/10 requirements |
 | Phase 3: German Text | Pending | 0/4 requirements |
 | Phase 4: Deploy | Pending | Validation only |
 
-**Overall:** 18/32 requirements complete (56%)
+**Overall:** 28/32 requirements complete (87%)
 
 ---
 
@@ -174,4 +174,4 @@ Plans:
 
 ---
 
-*Last updated: 2026-01-19 (Phase 2 planned)*
+*Last updated: 2026-01-19 (Phase 2 complete)*
