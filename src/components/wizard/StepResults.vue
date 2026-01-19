@@ -184,10 +184,10 @@
       <template #bottom />
     </v-data-table>
 
-    <!-- View all variants and export buttons -->
+    <!-- View all variants, export, and share buttons -->
     <div
       v-if="filteredCount > 0"
-      class="d-flex align-center mt-3"
+      class="d-flex align-center flex-wrap gap-2 mt-3"
     >
       <v-btn
         variant="text"
@@ -206,7 +206,6 @@
             variant="outlined"
             color="secondary"
             prepend-icon="mdi-download"
-            class="ml-2"
           >
             Export
             <v-icon end>
@@ -229,6 +228,27 @@
           </v-list-item>
         </v-list>
       </v-menu>
+
+      <!-- Copy link button -->
+      <v-tooltip location="top">
+        <template #activator="{ props: tooltipProps }">
+          <v-btn
+            v-bind="tooltipProps"
+            variant="outlined"
+            :color="copied ? 'success' : 'primary'"
+            :prepend-icon="copied ? 'mdi-check' : 'mdi-link'"
+            :disabled="!clipboardSupported"
+            aria-label="Copy shareable link to clipboard"
+            @click="copyShareLink"
+          >
+            {{ copied ? 'Link copied!' : 'Copy link' }}
+          </v-btn>
+        </template>
+        <span class="tooltip-text">
+          Copy a shareable link with your current gene, filters, and settings.
+          Recipients can open this link to see the same calculation.
+        </span>
+      </v-tooltip>
     </div>
 
     <!-- Range info -->
@@ -285,6 +305,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useClipboard } from '@vueuse/core';
 import { config, getGnomadVersion, getPopulationLabel } from '@/config';
 import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@/types';
 import type { ClinVarSubmission } from '@/api/queries';
@@ -340,6 +361,17 @@ const filterStore = useFilterStore();
 
 // Set up export composable
 const { exportToJson, exportToExcel } = useExport();
+
+// Clipboard for copy link functionality
+const { copy, copied, isSupported: clipboardSupported } = useClipboard({
+  copiedDuring: 2000, // Show "copied" state for 2 seconds
+  legacy: true, // Fallback for older browsers
+});
+
+// Copy current URL handler
+function copyShareLink() {
+  copy(window.location.href);
+}
 
 // Export handler function
 function handleExport(format: 'json' | 'xlsx') {
