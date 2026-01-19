@@ -31,6 +31,13 @@ const vuetify = createVuetify({
           primary: '#1976D2',
           secondary: '#424242',
         }
+      },
+      dark: {
+        dark: true,
+        colors: {
+          primary: '#2196F3',
+          secondary: '#616161',
+        }
       }
     }
   }

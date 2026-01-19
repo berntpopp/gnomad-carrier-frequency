@@ -12,3 +12,6 @@ export type { UseWizardReturn } from './useWizard';
 
 export { useTextGenerator } from './useTextGenerator';
 export type { UseTextGeneratorReturn } from './useTextGenerator';
+
+export { useAppTheme } from './useTheme';
+export type { UseAppThemeReturn } from './useTheme';
