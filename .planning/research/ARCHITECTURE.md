@@ -1,711 +1,834 @@
-# Architecture Patterns
+# Architecture Research: v1.1
 
-**Domain:** Vue 3 SPA for gnomAD carrier frequency calculation
-**Researched:** 2026-01-18
-**Confidence:** HIGH (verified with official Vue docs, gnomAD API documentation)
+**Researched:** 2026-01-19
+**Overall confidence:** HIGH (existing patterns well-established, new patterns use existing libraries)
 
-## Recommended Architecture
+## Summary
 
-```
-+-------------------------------------------------------------------+
-|                         App Shell (App.vue)                       |
-|  - Vuetify v-app wrapper                                          |
-|  - Global error boundary                                          |
-|  - Layout structure                                               |
-+-------------------------------------------------------------------+
-           |
-           v
-+-------------------------------------------------------------------+
-|                    Wizard Container (WizardView.vue)              |
-|  - Vuetify v-stepper orchestration                                |
-|  - Step navigation logic                                          |
-|  - Wizard state coordination                                      |
-+-------------------------------------------------------------------+
-           |
-           +------------------+------------------+------------------+
-           |                  |                  |                  |
-           v                  v                  v                  v
-+----------------+  +----------------+  +----------------+  +----------------+
-| Step 1:        |  | Step 2:        |  | Step 3:        |  | Step 4:        |
-| GeneInput      |  | PatientStatus  |  | FrequencySource|  | Results        |
-| Component      |  | Component      |  | Component      |  | Component      |
-+----------------+  +----------------+  +----------------+  +----------------+
-           |                                     |                  |
-           v                                     v                  v
-+-------------------------------------------------------------------+
-|                        Composables Layer                          |
-+-------------------+-------------------+---------------------------+
-| useGnomadApi()    | useWizardState()  | useCarrierCalculation()   |
-| - Gene search     | - Current step    | - Frequency calculation   |
-| - Variant fetch   | - Step data       | - Risk calculation        |
-| - Population data | - Validation      | - Confidence intervals    |
-+-------------------+-------------------+---------------------------+
-           |                                     |
-           v                                     v
-+----------------------------+     +----------------------------+
-|    API Service Layer       |     |    Calculation Service     |
-+----------------------------+     +----------------------------+
-| gnomadService.ts           |     | carrierFrequency.ts        |
-| - GraphQL query building   |     | - Hardy-Weinberg calcs     |
-| - fetch() to gnomAD API    |     | - Population aggregation   |
-| - Response transformation  |     | - Confidence bounds        |
-+----------------------------+     +----------------------------+
-           |                                     |
-           v                                     v
-+----------------------------+     +----------------------------+
-|    Types Layer             |     |    Text Generation         |
-+----------------------------+     +----------------------------+
-| types/gnomad.ts            |     | germanText.ts              |
-| types/wizard.ts            |     | - Template rendering       |
-| types/calculation.ts       |     | - Perspective adaptation   |
-+----------------------------+     +----------------------------+
-```
+The v1.1 features integrate cleanly with the existing Vue 3/Pinia architecture. The current codebase follows consistent patterns:
 
-## Component Boundaries
+1. **Composables** manage reactive state and API calls (`useWizard`, `useGeneSearch`, `useCarrierFrequency`)
+2. **Pinia stores** with `pinia-plugin-persistedstate` for persisted user preferences (`useTemplateStore`)
+3. **Config-driven** approach with JSON files in `src/config/` accessed via typed helpers
+4. **Services/utils** are pure functions without reactive state (`variant-filters.ts`, `frequency-calc.ts`)
 
-| Component | Responsibility | Communicates With |
-|-----------|----------------|-------------------|
-| `App.vue` | Vuetify shell, global layout, error boundary | WizardView |
-| `WizardView.vue` | v-stepper orchestration, step navigation, progress tracking | All step components, useWizardState |
-| `GeneInputStep.vue` | Gene search/selection UI, validation | useGnomadApi, useWizardState |
-| `PatientStatusStep.vue` | Index patient status selection (carrier vs affected) | useWizardState |
-| `FrequencySourceStep.vue` | Source selection (gnomAD, literature, default), PMID input | useWizardState, useGnomadApi |
-| `ResultsStep.vue` | Display frequencies, risks, German text, copy button | useCarrierCalculation, useWizardState |
-| `useGnomadApi` | GraphQL queries, response caching, loading/error states | gnomadService |
-| `useWizardState` | Cross-step data, validation, step progression | None (singleton state) |
-| `useCarrierCalculation` | Derived values from wizard state + API data | useWizardState, useGnomadApi |
-| `gnomadService.ts` | Raw HTTP/GraphQL communication | gnomAD external API |
-| `carrierFrequency.ts` | Pure calculation functions | None |
-| `germanText.ts` | Text template rendering | None |
+The v1.1 features map to these patterns:
 
-## Data Flow
+| Feature | Pattern | Location |
+|---------|---------|----------|
+| ClinGen caching | New Pinia store with TTL | `src/stores/useClingenStore.ts` |
+| Settings system | Extend existing Pinia store + new store | `src/stores/useSettingsStore.ts` |
+| Browser logging | New composable + component | `src/composables/useLogger.ts` |
+| App shell | Refactor `App.vue` with Vuetify layout | `src/App.vue`, `src/layouts/` |
 
-### Primary Flow: Gene to Results
+---
+
+## 1. ClinGen Data Caching
+
+### Integration Pattern
+
+Create a new Pinia store with TTL-based cache invalidation using the existing `pinia-plugin-persistedstate` plugin. The pattern extends what `useTemplateStore` already does, adding timestamp tracking for monthly expiry.
+
+**Key insight:** ClinGen does not expose a public GraphQL API for gene-disease validity. Data is available only via CSV download from https://search.clinicalgenome.org/kb/downloads. The implementation must either:
+
+1. **Option A (Recommended):** Pre-process CSV to JSON at build time, bundle as static asset
+2. **Option B:** Fetch CSV at runtime, parse in browser (larger payload, slower)
+
+### Data Flow
 
 ```
-User Input          API Layer           State              Calculation        Output
------------         ---------           -----              -----------        ------
+[Build Time / First Load]
 
-Gene name    -->    searchGene()   -->  selectedGene  -->
-             |                          |
-             |                          v
-             |      fetchVariants() --> variants       -->  filterVariants()
-             |                          |                   |
-             |                          |                   v
-             |                          |              sumAlleleFreqs()
-             |                          |                   |
-             |                          v                   v
-Patient      ---------------------->    patientStatus -->   calculateCarrier()
-status                                  |                   |
-                                        |                   v
-Freq source  ---------------------->    freqSource    -->   calculateRisk()
-                                        |                   |
-                                        |                   v
-                                        +------------->     generateText() --> German text
+clinicalgenome.org/kb/downloads
+        |
+        v (CSV download)
+  Parse to JSON
+        |
+        v
+useClingenStore (Pinia)
+        |
+        v (persist with timestamp)
+  localStorage
+
+[Subsequent Loads]
+
+localStorage ─────────────────────────────────┐
+        |                                     |
+        v (check timestamp)                   |
+  If expired (>30 days) ─── refetch ──────────┘
+        |
+        v (if valid)
+  Return cached data
+        |
+        v
+useCarrierFrequency (lookup gene)
+        |
+        v
+Display inheritance warning if not AR
 ```
 
-### Reactive Data Flow with Vue 3
-
-```typescript
-// useWizardState.ts - Singleton composable (global state)
-const wizardState = reactive({
-  currentStep: 1,
-  gene: null as Gene | null,
-  patientStatus: null as 'carrier' | 'affected' | null,
-  frequencySource: 'gnomad' as 'gnomad' | 'literature' | 'default',
-  literaturePmid: '',
-  literatureFrequency: null as number | null
-})
-
-// useGnomadApi.ts - API composable (can be instantiated per-use or singleton)
-export function useGnomadApi() {
-  const variants = ref<Variant[]>([])
-  const loading = ref(false)
-  const error = ref<Error | null>(null)
-
-  async function fetchVariantsForGene(geneId: string) {
-    loading.value = true
-    // ... fetch from gnomadService
-  }
-
-  return { variants, loading, error, fetchVariantsForGene }
-}
-
-// useCarrierCalculation.ts - Derived values composable
-export function useCarrierCalculation() {
-  const { gene, patientStatus, frequencySource } = useWizardState()
-  const { variants } = useGnomadApi()
-
-  // Computed values automatically update when dependencies change
-  const carrierFrequency = computed(() => {
-    if (frequencySource === 'gnomad' && variants.value.length > 0) {
-      return calculateCarrierFreqFromVariants(variants.value)
-    }
-    // ... handle other sources
-  })
-
-  const recurrenceRisk = computed(() => {
-    return carrierFrequency.value ? carrierFrequency.value / 4 : null
-  })
-
-  return { carrierFrequency, recurrenceRisk }
-}
-```
-
-## Patterns to Follow
-
-### Pattern 1: Service Layer Separation
-
-**What:** Separate raw API communication from reactive state management.
-
-**When:** Always for external API calls.
-
-**Why:**
-- Testability: Services can be unit tested without Vue
-- Reusability: Same service works with different UI frameworks
-- Maintainability: API changes isolated to service layer
-
-**Example:**
-```typescript
-// services/gnomadService.ts - Pure functions, no Vue reactivity
-const GNOMAD_API = 'https://gnomad.broadinstitute.org/api'
-
-export interface GnomadVariant {
-  variant_id: string
-  pos: number
-  consequence: string
-  exome?: { ac: number; an: number; af: number; populations: Population[] }
-  genome?: { ac: number; an: number; af: number; populations: Population[] }
-}
-
-export async function fetchGeneVariants(
-  geneSymbol: string,
-  dataset = 'gnomad_r4'
-): Promise<GnomadVariant[]> {
-  const query = `
-    query GeneVariants($geneSymbol: String!) {
-      gene(gene_symbol: $geneSymbol, reference_genome: GRCh38) {
-        variants(dataset: ${dataset}) {
-          variant_id
-          pos
-          consequence
-          exome {
-            ac
-            an
-            af
-            populations { id ac an }
-          }
-          genome {
-            ac
-            an
-            af
-            populations { id ac an }
-          }
-        }
-      }
-    }
-  `
-
-  const response = await fetch(GNOMAD_API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, variables: { geneSymbol } })
-  })
-
-  const { data, errors } = await response.json()
-  if (errors) throw new Error(errors[0].message)
-  return data.gene?.variants ?? []
-}
-
-// composables/useGnomadApi.ts - Vue-specific reactive wrapper
-import { ref, readonly } from 'vue'
-import { fetchGeneVariants, type GnomadVariant } from '@/services/gnomadService'
-
-export function useGnomadApi() {
-  const variants = ref<GnomadVariant[]>([])
-  const loading = ref(false)
-  const error = ref<string | null>(null)
-
-  async function loadVariants(geneSymbol: string) {
-    loading.value = true
-    error.value = null
-    try {
-      variants.value = await fetchGeneVariants(geneSymbol)
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Unknown error'
-    } finally {
-      loading.value = false
-    }
-  }
-
-  return {
-    variants: readonly(variants),
-    loading: readonly(loading),
-    error: readonly(error),
-    loadVariants
-  }
-}
-```
-
-### Pattern 2: Composable Singleton for Wizard State
-
-**What:** Single source of truth for wizard data, shared across all steps.
-
-**When:** Data needs to persist across step transitions and be accessible from any step.
-
-**Why:** Vuetify stepper destroys step content when navigating, so component-local state would be lost.
-
-**Example:**
-```typescript
-// composables/useWizardState.ts
-import { reactive, computed, toRefs } from 'vue'
-
-interface WizardState {
-  currentStep: number
-  gene: { symbol: string; id: string } | null
-  patientStatus: 'carrier' | 'affected' | null
-  frequencySource: 'gnomad' | 'literature' | 'default'
-  literaturePmid: string
-  literatureFrequency: number | null
-}
-
-// Singleton state - declared outside function
-const state = reactive<WizardState>({
-  currentStep: 1,
-  gene: null,
-  patientStatus: null,
-  frequencySource: 'gnomad',
-  literaturePmid: '',
-  literatureFrequency: null
-})
-
-export function useWizardState() {
-  // Computed validations
-  const canProceedToStep2 = computed(() => state.gene !== null)
-  const canProceedToStep3 = computed(() => state.patientStatus !== null)
-  const canProceedToStep4 = computed(() => {
-    if (state.frequencySource === 'literature') {
-      return state.literatureFrequency !== null && state.literaturePmid !== ''
-    }
-    return true
-  })
-
-  function reset() {
-    state.currentStep = 1
-    state.gene = null
-    state.patientStatus = null
-    state.frequencySource = 'gnomad'
-    state.literaturePmid = ''
-    state.literatureFrequency = null
-  }
-
-  return {
-    ...toRefs(state),
-    canProceedToStep2,
-    canProceedToStep3,
-    canProceedToStep4,
-    reset
-  }
-}
-```
-
-### Pattern 3: Computed Chains for Derived Values
-
-**What:** Use computed properties to derive values that automatically update when dependencies change.
-
-**When:** Calculations depend on multiple reactive sources.
-
-**Why:** Automatic reactivity, caching, and clear data dependencies.
-
-**Example:**
-```typescript
-// composables/useCarrierCalculation.ts
-import { computed } from 'vue'
-import { useWizardState } from './useWizardState'
-import { useGnomadApi } from './useGnomadApi'
-import {
-  filterPathogenicVariants,
-  calculateCarrierFrequency,
-  calculateRecurrenceRisk
-} from '@/services/carrierFrequency'
-
-export function useCarrierCalculation() {
-  const { frequencySource, literatureFrequency, patientStatus } = useWizardState()
-  const { variants } = useGnomadApi()
-
-  // Filtered variants (only pathogenic/LoF)
-  const pathogenicVariants = computed(() =>
-    filterPathogenicVariants(variants.value)
-  )
-
-  // Carrier frequency from selected source
-  const carrierFrequency = computed(() => {
-    switch (frequencySource.value) {
-      case 'gnomad':
-        return calculateCarrierFrequency(pathogenicVariants.value)
-      case 'literature':
-        return literatureFrequency.value
-      case 'default':
-        return 1 / 100 // 1:100 default
-    }
-  })
-
-  // Recurrence risk (carrier_freq / 4)
-  const recurrenceRisk = computed(() => {
-    if (!carrierFrequency.value) return null
-    return calculateRecurrenceRisk(carrierFrequency.value, patientStatus.value)
-  })
-
-  // Population-specific frequencies
-  const populationFrequencies = computed(() => {
-    if (frequencySource.value !== 'gnomad') return null
-    return calculatePopulationFrequencies(pathogenicVariants.value)
-  })
-
-  return {
-    pathogenicVariants,
-    carrierFrequency,
-    recurrenceRisk,
-    populationFrequencies
-  }
-}
-```
-
-### Pattern 4: Pure Calculation Functions
-
-**What:** Keep domain calculations as pure functions, separate from Vue reactivity.
-
-**When:** Mathematical/business logic that doesn't need reactivity internally.
-
-**Why:** Testability, reusability, no Vue dependency for core logic.
-
-**Example:**
-```typescript
-// services/carrierFrequency.ts
-import type { GnomadVariant, Population } from './gnomadService'
-
-/**
- * Filter variants to only pathogenic ones.
- * Criteria: LoF HC (high confidence) OR ClinVar pathogenic/likely pathogenic
- */
-export function filterPathogenicVariants(variants: GnomadVariant[]): GnomadVariant[] {
-  return variants.filter(v => {
-    const isLoFHC = v.consequence?.includes('lof') // Simplified - check actual field
-    const isClinVarPath = v.clinvar_pathogenicity === 'pathogenic'
-      || v.clinvar_pathogenicity === 'likely_pathogenic'
-    return isLoFHC || isClinVarPath
-  })
-}
-
-/**
- * Calculate carrier frequency from variant allele frequencies.
- * Formula: 2 * sum(AF) for each variant
- * This assumes Hardy-Weinberg equilibrium and rare variants.
- */
-export function calculateCarrierFrequency(variants: GnomadVariant[]): number {
-  const totalAF = variants.reduce((sum, v) => {
-    const af = v.exome?.af ?? v.genome?.af ?? 0
-    return sum + af
-  }, 0)
-
-  // Carrier frequency = 2q where q is total allele frequency
-  // (For rare recessive conditions, heterozygote frequency ~= 2pq ~= 2q)
-  return 2 * totalAF
-}
-
-/**
- * Calculate recurrence risk based on patient status.
- * - Affected patient: offspring risk = carrier_freq / 4
- * - Carrier: offspring risk depends on partner status
- */
-export function calculateRecurrenceRisk(
-  carrierFreq: number,
-  patientStatus: 'carrier' | 'affected'
-): number {
-  // Risk = P(partner is carrier) * P(both transmit) = q * 1/4
-  // For affected patient: both parents are carriers, offspring gets one allele
-  // Partner risk = carrier frequency in population
-  return carrierFreq / 4
-}
-
-/**
- * Calculate carrier frequency per population.
- */
-export function calculatePopulationFrequencies(
-  variants: GnomadVariant[]
-): Map<string, number> {
-  const popFreqs = new Map<string, { ac: number; an: number }>()
-
-  for (const variant of variants) {
-    const populations = variant.exome?.populations ?? variant.genome?.populations ?? []
-    for (const pop of populations) {
-      const existing = popFreqs.get(pop.id) ?? { ac: 0, an: 0 }
-      popFreqs.set(pop.id, {
-        ac: existing.ac + pop.ac,
-        an: Math.max(existing.an, pop.an) // AN should be same across variants
-      })
-    }
-  }
-
-  const result = new Map<string, number>()
-  for (const [popId, { ac, an }] of popFreqs) {
-    if (an > 0) {
-      result.set(popId, 2 * (ac / an)) // 2 * AF = carrier frequency
-    }
-  }
-
-  return result
-}
-```
-
-## Anti-Patterns to Avoid
-
-### Anti-Pattern 1: Direct API Calls in Components
-
-**What:** Calling fetch/axios directly in component script.
-
-**Why bad:**
-- Duplicated error handling
-- No caching/deduplication
-- Hard to test components
-- API changes require touching many files
-
-**Instead:** Use composables that wrap services.
-
-```typescript
-// BAD - in component
-async function searchGene() {
-  const response = await fetch('https://gnomad.broadinstitute.org/api', {
-    method: 'POST',
-    body: JSON.stringify({ query: '...' })
-  })
-  // Error handling duplicated everywhere
-}
-
-// GOOD - in component
-const { searchGene, loading, error, results } = useGnomadApi()
-// All API logic encapsulated
-```
-
-### Anti-Pattern 2: Step-Local State for Wizard Data
-
-**What:** Using ref/reactive inside step components for data that needs to persist.
-
-**Why bad:** Vuetify stepper may unmount step components, losing state.
-
-**Instead:** Use singleton composable for wizard state.
-
-```typescript
-// BAD - in GeneInputStep.vue
-const selectedGene = ref(null) // Lost when step unmounts
-
-// GOOD - any step component
-const { gene } = useWizardState() // Persists across steps
-```
-
-### Anti-Pattern 3: Prop Drilling Through Steps
-
-**What:** Passing all wizard data as props through stepper to each step.
-
-**Why bad:** Tight coupling, verbose, hard to add new data fields.
-
-**Instead:** Steps consume shared state via composables.
-
-```vue
-<!-- BAD -->
-<GeneInputStep
-  :gene="gene"
-  :patient-status="patientStatus"
-  :frequency-source="frequencySource"
-  @update:gene="gene = $event"
-  @update:patient-status="patientStatus = $event"
-/>
-
-<!-- GOOD -->
-<GeneInputStep />
-<!-- Step uses useWizardState() internally -->
-```
-
-### Anti-Pattern 4: GraphQL in Multiple Places
-
-**What:** Writing GraphQL queries in different composables/components.
-
-**Why bad:**
-- Query duplication
-- Schema changes require hunting through codebase
-- No single source of truth for data requirements
-
-**Instead:** Centralize all queries in service layer.
-
-```typescript
-// BAD - queries scattered
-// composables/useGeneSearch.ts
-const GENE_QUERY = `query { gene(...) { ... } }`
-
-// composables/useVariants.ts
-const VARIANT_QUERY = `query { gene(...) { variants { ... } } }`
-
-// GOOD - centralized
-// services/gnomadQueries.ts
-export const GENE_SEARCH_QUERY = `...`
-export const GENE_VARIANTS_QUERY = `...`
-// All queries in one file
-```
-
-### Anti-Pattern 5: Business Logic in Templates
-
-**What:** Complex calculations or conditionals in template expressions.
-
-**Why bad:** Hard to test, hard to read, can't be reused.
-
-**Instead:** Use computed properties or methods.
-
-```vue
-<!-- BAD -->
-<p>Risk: {{ (variants.reduce((s,v) => s + v.af, 0) * 2 / 4 * 100).toFixed(2) }}%</p>
-
-<!-- GOOD -->
-<p>Risk: {{ formattedRisk }}</p>
-<script setup>
-const { recurrenceRisk } = useCarrierCalculation()
-const formattedRisk = computed(() =>
-  recurrenceRisk.value ? `${(recurrenceRisk.value * 100).toFixed(2)}%` : 'N/A'
-)
-</script>
-```
-
-## Project Structure
-
-Recommended folder structure for this application:
+### New Components/Files
 
 ```
 src/
-├── App.vue                          # Root component with Vuetify shell
-├── main.ts                          # App entry, Vuetify plugin setup
-├── components/
-│   ├── wizard/
-│   │   ├── WizardView.vue           # Stepper container
-│   │   ├── GeneInputStep.vue        # Step 1
-│   │   ├── PatientStatusStep.vue    # Step 2
-│   │   ├── FrequencySourceStep.vue  # Step 3
-│   │   └── ResultsStep.vue          # Step 4
-│   └── common/
-│       ├── LoadingSpinner.vue       # Shared loading indicator
-│       └── ErrorAlert.vue           # Shared error display
-├── composables/
-│   ├── useWizardState.ts            # Wizard state singleton
-│   ├── useGnomadApi.ts              # gnomAD API reactive wrapper
-│   └── useCarrierCalculation.ts     # Derived calculations
+├── stores/
+│   └── useClingenStore.ts      # NEW: Cache store with TTL
 ├── services/
-│   ├── gnomadService.ts             # Raw gnomAD API communication
-│   ├── gnomadQueries.ts             # GraphQL query definitions
-│   ├── carrierFrequency.ts          # Pure calculation functions
-│   └── germanText.ts                # German text generation
+│   └── clingen-service.ts      # NEW: CSV fetch + parse logic
 ├── types/
-│   ├── gnomad.ts                    # gnomAD API response types
-│   ├── wizard.ts                    # Wizard state types
-│   └── calculation.ts               # Calculation result types
+│   └── clingen.ts              # NEW: TypeScript interfaces
+└── config/
+    └── clingen.json            # NEW: Cache settings (TTL, URL)
+```
+
+### Store Implementation Pattern
+
+```typescript
+// src/stores/useClingenStore.ts
+interface ClingenCacheState {
+  geneValidity: Record<string, ClingenGeneValidity>;
+  lastUpdated: number | null;  // Unix timestamp
+  isLoading: boolean;
+  error: string | null;
+}
+
+export const useClingenStore = defineStore('clingen', {
+  state: (): ClingenCacheState => ({
+    geneValidity: {},
+    lastUpdated: null,
+    isLoading: false,
+    error: null,
+  }),
+
+  getters: {
+    isExpired: (state) => {
+      if (!state.lastUpdated) return true;
+      const TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+      return Date.now() - state.lastUpdated > TTL_MS;
+    },
+
+    getGeneValidity: (state) => (gene: string) => {
+      return state.geneValidity[gene.toUpperCase()] ?? null;
+    },
+  },
+
+  actions: {
+    async refreshCache(force = false) {
+      if (!force && !this.isExpired) return;
+      // Fetch and parse ClinGen CSV
+    },
+
+    lookupGene(gene: string): ClingenGeneValidity | null {
+      // Trigger refresh if expired, return cached data
+    },
+  },
+
+  persist: {
+    key: 'clingen-cache',
+    storage: localStorage,
+  },
+});
+```
+
+### Dependencies
+
+- Depends on: `pinia-plugin-persistedstate` (already installed)
+- No new npm dependencies required
+- ClinGen CSV parsing can use built-in `fetch` + simple CSV parser (or add `papaparse`)
+
+---
+
+## 2. Settings System
+
+### Integration Pattern
+
+Create a new `useSettingsStore` for application-wide settings (theme, filter defaults). This follows the existing `useTemplateStore` pattern but separates concerns:
+
+- `useTemplateStore`: Clinical text preferences (language, gender style, sections)
+- `useSettingsStore`: Application settings (theme, filter defaults, logging level)
+
+### Data Flow
+
+```
+User interacts with Settings UI
+        |
+        v
+useSettingsStore.setFilterDefaults()
+        |
+        v (auto-persist)
+localStorage
+        |
+        v (reactive)
+Components read via computed getters
+```
+
+### New Components/Files
+
+```
+src/
+├── stores/
+│   └── useSettingsStore.ts     # NEW: App settings store
+├── components/
+│   └── settings/
+│       ├── SettingsDialog.vue  # NEW: Settings modal
+│       ├── FilterSettings.vue  # NEW: Filter defaults panel
+│       └── ThemeSettings.vue   # NEW: Theme toggle panel
+└── config/
+    └── settings.json           # EXTEND: Add filter default schema
+```
+
+### Store Implementation Pattern
+
+```typescript
+// src/stores/useSettingsStore.ts
+interface SettingsState {
+  // Theme
+  theme: 'light' | 'dark' | 'system';
+
+  // Filter defaults
+  filterDefaults: {
+    includeLofHC: boolean;
+    includeMissense: boolean;
+    includeClinVarPathogenic: boolean;
+    includeClinVarLikelyPathogenic: boolean;
+    minClinVarStars: number;
+  };
+
+  // Logging
+  logLevel: 'debug' | 'info' | 'warn' | 'error';
+  logRetentionDays: number;
+}
+
+export const useSettingsStore = defineStore('settings', {
+  state: (): SettingsState => ({
+    theme: 'system',
+    filterDefaults: {
+      includeLofHC: true,
+      includeMissense: false,
+      includeClinVarPathogenic: true,
+      includeClinVarLikelyPathogenic: true,
+      minClinVarStars: 1,
+    },
+    logLevel: 'warn',
+    logRetentionDays: 7,
+  }),
+
+  actions: {
+    setTheme(theme: SettingsState['theme']) {
+      this.theme = theme;
+      this.applyTheme();
+    },
+
+    applyTheme() {
+      // Update Vuetify theme via useTheme()
+    },
+  },
+
+  persist: {
+    key: 'app-settings',
+    storage: localStorage,
+  },
+});
+```
+
+### Theme Integration with Vuetify
+
+```typescript
+// In component or App.vue setup
+import { useTheme } from 'vuetify';
+import { useSettingsStore } from '@/stores/useSettingsStore';
+
+const theme = useTheme();
+const settings = useSettingsStore();
+
+// Apply stored theme on load
+watch(() => settings.theme, (newTheme) => {
+  if (newTheme === 'system') {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    theme.global.name.value = prefersDark ? 'dark' : 'light';
+  } else {
+    theme.global.name.value = newTheme;
+  }
+}, { immediate: true });
+```
+
+### Dependencies
+
+- Vuetify `useTheme()` composable (already available)
+- No new npm dependencies
+
+---
+
+## 3. Browser-Based Logging
+
+### Integration Pattern
+
+Create a logging composable that:
+1. Captures log events with timestamps and context
+2. Stores logs in a circular buffer (memory) with optional persistence
+3. Provides a LogViewer component for debugging
+
+This is NOT a Vue plugin approach (like `vue-logger-plugin`) because the existing codebase uses composables consistently. A composable fits the architecture better.
+
+### Data Flow
+
+```
+Application code
+        |
+        v
+useLogger().log('info', 'message', { context })
+        |
+        v
+Log buffer (reactive ref, max N entries)
+        |
+        v (optional persist)
+localStorage (pruned to retention period)
+        |
+        v
+LogViewer component displays entries
+```
+
+### New Components/Files
+
+```
+src/
+├── composables/
+│   └── useLogger.ts            # NEW: Logging composable
+├── components/
+│   └── debug/
+│       └── LogViewer.vue       # NEW: Log display component
+└── types/
+    └── logger.ts               # NEW: Log entry types
+```
+
+### Composable Implementation Pattern
+
+```typescript
+// src/composables/useLogger.ts
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+interface LogEntry {
+  timestamp: number;
+  level: LogLevel;
+  message: string;
+  context?: Record<string, unknown>;
+  source?: string;
+}
+
+const LOG_BUFFER_SIZE = 500;
+const logs = ref<LogEntry[]>([]);
+
+export function useLogger(source?: string) {
+  const settings = useSettingsStore();
+
+  const shouldLog = (level: LogLevel): boolean => {
+    const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
+    return levels.indexOf(level) >= levels.indexOf(settings.logLevel);
+  };
+
+  const log = (level: LogLevel, message: string, context?: Record<string, unknown>) => {
+    if (!shouldLog(level)) return;
+
+    const entry: LogEntry = {
+      timestamp: Date.now(),
+      level,
+      message,
+      context,
+      source,
+    };
+
+    logs.value.push(entry);
+    if (logs.value.length > LOG_BUFFER_SIZE) {
+      logs.value.shift();
+    }
+
+    // Also log to console in dev
+    if (import.meta.env.DEV) {
+      console[level](message, context);
+    }
+  };
+
+  return {
+    logs: readonly(logs),
+    log,
+    debug: (msg: string, ctx?: Record<string, unknown>) => log('debug', msg, ctx),
+    info: (msg: string, ctx?: Record<string, unknown>) => log('info', msg, ctx),
+    warn: (msg: string, ctx?: Record<string, unknown>) => log('warn', msg, ctx),
+    error: (msg: string, ctx?: Record<string, unknown>) => log('error', msg, ctx),
+    clear: () => { logs.value = []; },
+  };
+}
+```
+
+### LogViewer Component Pattern
+
+```vue
+<!-- src/components/debug/LogViewer.vue -->
+<template>
+  <v-dialog v-model="isOpen" max-width="800">
+    <v-card>
+      <v-card-title>
+        Application Logs
+        <v-spacer />
+        <v-btn icon @click="logger.clear()">
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </v-card-title>
+      <v-card-text>
+        <v-virtual-scroll :items="logs" height="400" item-height="48">
+          <template #default="{ item }">
+            <div class="log-entry" :class="item.level">
+              <span class="timestamp">{{ formatTime(item.timestamp) }}</span>
+              <span class="level">{{ item.level }}</span>
+              <span class="message">{{ item.message }}</span>
+            </div>
+          </template>
+        </v-virtual-scroll>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+</template>
+```
+
+### Dependencies
+
+- Vuetify `v-virtual-scroll` for performance with many log entries
+- No new npm dependencies
+
+---
+
+## 4. App Shell with Navigation
+
+### Integration Pattern
+
+Refactor `App.vue` from a simple single-component layout to a proper Vuetify app shell with:
+
+- `v-app-bar`: Logo, title, settings gear, theme toggle
+- `v-navigation-drawer`: Navigation links (Calculator, Help, About)
+- `v-main`: Current wizard content
+
+This is a structural change that wraps the existing `WizardStepper` component.
+
+### Data Flow
+
+```
+App.vue (shell)
+    |
+    ├── v-app-bar
+    │   ├── Logo
+    │   ├── Title
+    │   ├── Theme toggle (reads/writes useSettingsStore)
+    │   └── Settings gear (opens SettingsDialog)
+    |
+    ├── v-navigation-drawer
+    │   ├── Calculator (current wizard)
+    │   ├── Help/FAQ
+    │   └── About
+    |
+    └── v-main
+        └── <router-view> or WizardStepper
+```
+
+### New Components/Files
+
+```
+src/
+├── App.vue                     # REFACTOR: Add shell structure
+├── components/
+│   ├── AppBar.vue              # NEW: Top bar with logo, actions
+│   ├── AppDrawer.vue           # NEW: Navigation drawer
+│   └── settings/
+│       └── SettingsDialog.vue  # NEW: Settings modal
 └── assets/
-    └── styles/                      # Global styles if needed
+    ├── logo.svg                # NEW: App logo
+    └── favicon.ico             # NEW: Favicon
 ```
 
-## Build Order Implications
+### App.vue Refactored Structure
 
-Based on dependencies between components, recommended build order:
+```vue
+<!-- src/App.vue -->
+<template>
+  <v-app>
+    <AppBar @toggle-drawer="drawer = !drawer" @open-settings="settingsOpen = true" />
 
-### Phase 1: Foundation
-Build first, no dependencies on other app code:
+    <AppDrawer v-model="drawer" />
 
-1. **Types** (`types/*.ts`) - Define data structures
-2. **Pure Services** (`services/carrierFrequency.ts`, `services/germanText.ts`) - No external dependencies
-3. **gnomAD Service** (`services/gnomadService.ts`) - External API only
+    <v-main>
+      <v-container max-width="900">
+        <!-- If using vue-router -->
+        <router-view />
+        <!-- Or keep WizardStepper directly for now -->
+        <WizardStepper />
+      </v-container>
+    </v-main>
 
-**Rationale:** These have no internal dependencies and can be unit tested immediately.
+    <SettingsDialog v-model="settingsOpen" />
+  </v-app>
+</template>
 
-### Phase 2: State Layer
-Depends on types:
+<script setup lang="ts">
+import { ref } from 'vue';
+import AppBar from '@/components/AppBar.vue';
+import AppDrawer from '@/components/AppDrawer.vue';
+import SettingsDialog from '@/components/settings/SettingsDialog.vue';
+import WizardStepper from '@/components/wizard/WizardStepper.vue';
 
-4. **useWizardState** (`composables/useWizardState.ts`) - State management
-5. **useGnomadApi** (`composables/useGnomadApi.ts`) - Depends on gnomadService
+const drawer = ref(false);
+const settingsOpen = ref(false);
+</script>
+```
 
-**Rationale:** Composables depend on types and services being defined.
+### AppBar Component Pattern
 
-### Phase 3: Calculation Layer
-Depends on composables:
+```vue
+<!-- src/components/AppBar.vue -->
+<template>
+  <v-app-bar color="primary" density="comfortable">
+    <v-app-bar-nav-icon @click="$emit('toggle-drawer')" />
 
-6. **useCarrierCalculation** (`composables/useCarrierCalculation.ts`) - Depends on both composables
+    <v-img src="@/assets/logo.svg" max-height="32" max-width="32" class="ml-2" />
 
-**Rationale:** Calculation composable combines state and API data.
+    <v-app-bar-title>gnomAD Carrier Frequency</v-app-bar-title>
 
-### Phase 4: UI Components
-Depends on composables:
+    <v-spacer />
 
-7. **Common components** - LoadingSpinner, ErrorAlert
-8. **Step components** - GeneInputStep through ResultsStep
-9. **WizardView** - Orchestrates all steps
+    <v-btn icon @click="toggleTheme">
+      <v-icon>{{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
+    </v-btn>
 
-**Rationale:** UI components consume composables. Build steps in order (1-4) to validate flow incrementally.
+    <v-btn icon @click="$emit('open-settings')">
+      <v-icon>mdi-cog</v-icon>
+    </v-btn>
+  </v-app-bar>
+</template>
 
-### Phase 5: Integration
-Everything wired together:
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useTheme } from 'vuetify';
+import { useSettingsStore } from '@/stores/useSettingsStore';
 
-10. **App.vue** - Final integration
-11. **E2E testing** - Full flow validation
+defineEmits(['toggle-drawer', 'open-settings']);
 
-### Dependency Graph
+const theme = useTheme();
+const settings = useSettingsStore();
+
+const isDark = computed(() => theme.global.name.value === 'dark');
+
+const toggleTheme = () => {
+  settings.setTheme(isDark.value ? 'light' : 'dark');
+};
+</script>
+```
+
+### Router Consideration
+
+The current app has no router. For v1.1, consider adding `vue-router` if Help/About pages are desired. However, a simpler approach:
+
+- Keep single-page architecture
+- Use tabs or conditional rendering for Help/About content
+- Avoid router complexity for a calculator tool
+
+**Recommendation:** Defer `vue-router` unless multi-page navigation is truly needed.
+
+### Dependencies
+
+- No new npm dependencies (Vuetify layout components already available)
+- Optional: `vue-router` if multi-page navigation desired
+
+---
+
+## 5. Template Editor
+
+### Integration Pattern
+
+Extend the existing `useTemplateStore` which already has `customSections` support. Add a UI component for editing templates.
+
+### Data Flow
 
 ```
-types/*
+useTemplateStore (existing)
     |
-    v
-services/* (pure)
+    ├── customSections: Record<string, string>
+    ├── setCustomSection(key, template)
+    └── resetCustomSection(key)
+        |
+        v
+TemplateEditor.vue (new)
     |
-    +---> gnomadService
-    |         |
-    v         v
-useWizardState    useGnomadApi
-    |                 |
-    +--------+--------+
-             |
-             v
-    useCarrierCalculation
-             |
-             v
-    Step Components
-             |
-             v
-    WizardView.vue
-             |
-             v
-    App.vue
+    ├── Shows default template text
+    ├── Allows editing with preview
+    └── Saves to customSections
 ```
+
+### New Components/Files
+
+```
+src/
+└── components/
+    └── settings/
+        └── TemplateEditor.vue  # NEW: Template editing UI
+```
+
+### Component Pattern
+
+```vue
+<!-- src/components/settings/TemplateEditor.vue -->
+<template>
+  <v-card>
+    <v-card-title>Edit Templates</v-card-title>
+    <v-card-text>
+      <v-select
+        v-model="selectedPerspective"
+        :items="perspectives"
+        label="Perspective"
+      />
+      <v-select
+        v-model="selectedSection"
+        :items="sections"
+        label="Section"
+      />
+      <v-textarea
+        v-model="editedTemplate"
+        label="Template"
+        rows="6"
+        :hint="'Variables: {{gene}}, {{carrierFrequency}}, etc.'"
+      />
+      <v-card variant="tonal" class="mt-4">
+        <v-card-subtitle>Preview</v-card-subtitle>
+        <v-card-text>{{ renderedPreview }}</v-card-text>
+      </v-card>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn @click="resetToDefault">Reset to Default</v-btn>
+      <v-spacer />
+      <v-btn color="primary" @click="save">Save</v-btn>
+    </v-card-actions>
+  </v-card>
+</template>
+```
+
+### Dependencies
+
+- Uses existing `useTemplateStore` and `template-renderer.ts`
+- No new npm dependencies
+
+---
+
+## 6. Filter Configuration
+
+### Integration Pattern
+
+The current `variant-filters.ts` has hardcoded filter logic. Refactor to:
+
+1. Make filter criteria configurable via `useSettingsStore.filterDefaults`
+2. Allow per-calculation override in the wizard UI
+3. Keep pure functions but accept filter config as parameter
+
+### Data Flow
+
+```
+useSettingsStore.filterDefaults (defaults)
+        |
+        v
+StepFrequency.vue (optional override UI)
+        |
+        v
+useCarrierFrequency (passes config to filter)
+        |
+        v
+filterPathogenicVariants(variants, clinvar, filterConfig)
+```
+
+### Modified Files
+
+```
+src/
+├── stores/
+│   └── useSettingsStore.ts     # Has filterDefaults
+├── utils/
+│   └── variant-filters.ts      # MODIFY: Accept FilterConfig parameter
+├── types/
+│   └── filter.ts               # NEW: FilterConfig type
+├── composables/
+│   └── useCarrierFrequency.ts  # MODIFY: Pass filter config
+└── components/
+    └── wizard/
+        └── StepFrequency.vue   # MODIFY: Add filter override UI
+```
+
+### Filter Config Type
+
+```typescript
+// src/types/filter.ts
+export interface FilterConfig {
+  includeLofHC: boolean;
+  includeMissense: boolean;
+  includeClinVarPathogenic: boolean;
+  includeClinVarLikelyPathogenic: boolean;
+  minClinVarStars: number;
+}
+```
+
+### Modified Filter Function
+
+```typescript
+// src/utils/variant-filters.ts
+export function filterPathogenicVariants(
+  variants: GnomadVariant[],
+  clinvarVariants: ClinVarVariant[],
+  config: FilterConfig = defaultFilterConfig
+): GnomadVariant[] {
+  return variants.filter((v) => shouldIncludeVariant(v, clinvarVariants, config));
+}
+```
+
+---
+
+## Suggested Build Order
+
+Based on dependencies between features:
+
+### Phase 1: Foundation (Settings + Theme)
+
+**Build first because other features depend on settings store.**
+
+1. `useSettingsStore.ts` - New store with theme + filter defaults
+2. `ThemeSettings.vue` - Theme toggle component
+3. Refactor `main.ts` - Apply stored theme on load
+4. Update `App.vue` - Add basic app bar with theme toggle
+
+**Deliverable:** Working theme toggle, settings persistence
+
+### Phase 2: App Shell
+
+**Build second because it provides the UI container for other features.**
+
+1. `AppBar.vue` - Full app bar with logo, actions
+2. `AppDrawer.vue` - Navigation drawer (even if minimal)
+3. `SettingsDialog.vue` - Modal for settings
+4. Refactor `App.vue` - Full shell structure
+5. Add logo/favicon assets
+
+**Deliverable:** Complete app shell with navigation and settings access
+
+### Phase 3: Filter Configuration
+
+**Build third because it's isolated and improves core functionality.**
+
+1. `FilterConfig` type in `types/filter.ts`
+2. Refactor `variant-filters.ts` to accept config
+3. `FilterSettings.vue` - Settings panel for defaults
+4. Update `StepFrequency.vue` - Optional override UI
+5. Wire through `useCarrierFrequency`
+
+**Deliverable:** Configurable variant filtering
+
+### Phase 4: ClinGen Integration
+
+**Build fourth because it's independent and adds clinical value.**
+
+1. `useClingenStore.ts` - Cache store with TTL
+2. `clingen-service.ts` - CSV fetch/parse (or static JSON)
+3. Type definitions in `types/clingen.ts`
+4. Inheritance warning UI in `StepGene.vue` or `StepResults.vue`
+
+**Deliverable:** ClinGen gene validity lookup with inheritance warnings
+
+### Phase 5: Browser Logging
+
+**Build fifth because it supports debugging of all previous features.**
+
+1. `useLogger.ts` composable
+2. `LogViewer.vue` component
+3. Add logging to key composables (useGeneSearch, useCarrierFrequency)
+4. Settings integration for log level
+
+**Deliverable:** In-app log viewer for debugging
+
+### Phase 6: Template Editor
+
+**Build last because it extends existing functionality.**
+
+1. `TemplateEditor.vue` component
+2. Integrate into SettingsDialog
+3. Preview functionality
+
+**Deliverable:** User-editable clinical text templates
+
+---
+
+## Component Boundaries Summary
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ App.vue (Shell)                                                 │
+│   ├── AppBar.vue                                                │
+│   │     └── reads: useSettingsStore (theme)                     │
+│   │     └── emits: toggle-drawer, open-settings                 │
+│   ├── AppDrawer.vue                                             │
+│   │     └── Navigation links                                    │
+│   ├── SettingsDialog.vue                                        │
+│   │     ├── ThemeSettings.vue → useSettingsStore                │
+│   │     ├── FilterSettings.vue → useSettingsStore               │
+│   │     └── TemplateEditor.vue → useTemplateStore               │
+│   └── v-main                                                    │
+│         └── WizardStepper.vue (existing)                        │
+│               └── reads: useSettingsStore.filterDefaults        │
+│               └── queries: useClingenStore for warnings         │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ Stores                                                          │
+│   ├── useSettingsStore (NEW)                                    │
+│   │     ├── theme: 'light' | 'dark' | 'system'                  │
+│   │     ├── filterDefaults: FilterConfig                        │
+│   │     └── logLevel, logRetentionDays                          │
+│   ├── useTemplateStore (EXISTING)                               │
+│   │     ├── language, genderStyle, patientSex                   │
+│   │     ├── enabledSections                                     │
+│   │     └── customSections                                      │
+│   └── useClingenStore (NEW)                                     │
+│         ├── geneValidity: Record<string, ClingenGeneValidity>   │
+│         ├── lastUpdated: timestamp                              │
+│         └── isExpired, refreshCache(), lookupGene()             │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ Composables                                                     │
+│   ├── useLogger (NEW)                                           │
+│   │     └── log(), debug(), info(), warn(), error(), clear()    │
+│   ├── useWizard (EXISTING)                                      │
+│   ├── useGeneSearch (EXISTING, add logging)                     │
+│   ├── useCarrierFrequency (MODIFY, accept FilterConfig)         │
+│   └── useTextGenerator (EXISTING)                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
 
 ## Sources
 
-**Vue 3 Architecture:**
-- [Vue.js Composition API FAQ](https://vuejs.org/guide/extras/composition-api-faq) - Official guidance on composables
-- [Vue.js Composables Guide](https://vuejs.org/guide/reusability/composables) - Official composables documentation
-- [Pinia Cookbook: Composables](https://pinia.vuejs.org/cookbook/composables.html) - When to use Pinia vs composables
-- [Vue FAQ: Project Structure](https://vue-faq.org/en/development/project-structure.html) - Folder organization
-- [Vue School: Large Scale Vue Apps](https://vueschool.io/articles/vuejs-tutorials/how-to-structure-a-large-scale-vue-js-application/) - Modular architecture
+### Pinia Persistence & Caching
+- [Pinia Plugin Persistedstate - Advanced Usage](https://prazdevs.github.io/pinia-plugin-persistedstate/guide/advanced.html) - Custom serializers, hooks
+- [Pinia State Documentation](https://pinia.vuejs.org/core-concepts/state.html) - $subscribe for persistence
+- [vue-pinia-cache-composables](https://github.com/volkar/vue-pinia-cache-composables) - TTL-based caching pattern
 
-**Vuetify 3 Stepper:**
-- [Vuetify Stepper Component](https://vuetifyjs.com/en/components/steppers/) - Official stepper documentation
+### Vuetify Layout & Theming
+- [Vuetify Application Layout](https://vuetifyjs.com/en/features/application-layout/) - v-app, v-main, layout components
+- [Vuetify Navigation Drawers](https://vuetifyjs.com/en/components/navigation-drawers/) - Drawer patterns
+- [Vuetify Theme](https://vuetifyjs.com/en/features/theme/) - Theme toggle patterns
+- [Layouts & Theming in Vuetify 3](https://www.thisdot.co/blog/layouts-and-theming-in-vuetify-3) - Implementation guide
 
-**gnomAD API:**
-- [gnomAD GraphQL API](https://gnomad.broadinstitute.org/help/how-do-i-query-a-batch-of-variants-do-you-have-an-api) - Official API documentation
-- [gnomAD Browser GitHub](https://github.com/broadinstitute/gnomad-browser/tree/main/graphql-api) - GraphQL schema reference
-- [gnomAD Forum: API Rate Limiting](https://discuss.gnomad.broadinstitute.org/t/blocked-when-using-api-to-get-af/149) - Rate limiting and query examples
-- [Biostars: Population Allele Frequency](https://www.biostars.org/p/9610668/) - Population-level query structure
+### Vue Logging
+- [vue-logger-plugin](https://github.com/dev-tavern/vue-logger-plugin) - Logging patterns (reference only, using composable instead)
+- [vuejs3-logger](https://github.com/MarcSchaetz/vuejs3-logger) - Log level patterns
 
-**Vue 3 GraphQL Clients:**
-- [Villus GraphQL Client](https://villus.logaretm.com/guide/overview/) - Lightweight Vue 3 GraphQL client
-- [URQL Vue Bindings](https://github.com/urql-graphql/urql/blob/main/docs/basics/vue.md) - Alternative GraphQL client
+### ClinGen Data
+- [ClinGen File Downloads](https://search.clinicalgenome.org/kb/downloads) - Gene validity CSV available, no public API
+- [ClinGen GitHub](https://github.com/clingen-data-model) - genegraph-api (internal use)
 
-**State Management:**
-- [Composables vs Pinia](https://iamjeremie.me/post/2025-01/composables-vs-pinia-vs-provide-inject/) - Decision framework
-- [Managing API Layers in Vue.js](https://dev.to/blindkai/managing-api-layers-in-vue-js-with-typescript-hno) - Service layer patterns
-
-**Wizard State Machines:**
-- [Managing Multi-Step Forms with XState](https://mayashavin.com/articles/manage-multi-step-forms-vue-xstate) - State machine approach
-- [VeeValidate Multi-step Form](https://vee-validate.logaretm.com/v4/examples/multistep-form-wizard/) - Form wizard pattern
+### Existing Codebase
+- `/mnt/c/development/gnomad-carrier-frequency/src/stores/useTemplateStore.ts` - Pinia persist pattern
+- `/mnt/c/development/gnomad-carrier-frequency/src/composables/useWizard.ts` - Composable pattern
+- `/mnt/c/development/gnomad-carrier-frequency/src/utils/variant-filters.ts` - Pure function pattern

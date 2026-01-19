@@ -1,297 +1,560 @@
-# Technology Stack
+# Stack Research: v1.1 Features
 
-**Project:** gnomAD Carrier Frequency Calculator
-**Researched:** 2026-01-18
+**Project:** gnomAD Carrier Frequency Calculator v1.1
+**Researched:** 2026-01-19
 **Overall Confidence:** HIGH
 
-## Executive Summary
+## Summary
 
-This stack prioritizes **developer velocity, type safety, and minimal bundle size** for a single-page genetic counseling tool. The constraints (Bun, Vue 3, Vuetify 3, Vite, TypeScript, GitHub Pages) are well-established and mutually compatible. The key decision is the GraphQL client: **villus** is recommended over Apollo Client for its Vue-native design and smaller footprint.
+v1.1 adds five feature areas to the existing Vue 3/Vuetify 3/TypeScript stack:
 
----
+| Feature | Recommendation | Confidence |
+|---------|----------------|------------|
+| ClinGen Integration | Direct fetch to CSV endpoint, cache in Pinia store | HIGH |
+| Excel/JSON Export | SheetJS (xlsx) 0.20.3 via CDN + file-saver | HIGH |
+| Browser Logging | loglevel 1.9.2 | HIGH |
+| Build Speed | Rolldown (Vite 7 experimental), ESLint flat config optimizations | MEDIUM |
+| Dark/Light Theme | VueUse useDark + Vuetify useTheme sync | HIGH |
 
-## Recommended Stack
-
-### Core Framework
-
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Vue | ^3.5.26 | UI framework | Constraint. Composition API + `<script setup>` provides excellent TypeScript support and terse code. | HIGH |
-| Vuetify | ^3.11.6 | Component library | Constraint. Built-in `v-stepper` component matches the wizard UI requirement. Material Design consistency. | HIGH |
-| Vite | ^7.3.1 | Build tool | Constraint. Sub-50ms HMR, native ESM, optimal for SPA development. | HIGH |
-| TypeScript | ^5.7.x | Type safety | Constraint. Strict mode enables compile-time error catching. | HIGH |
-
-### State Management
-
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Pinia | ^3.0.4 | State management | Official Vue 3 state library. 40% less boilerplate than Vuex, full TypeScript inference, Composition API native. No mutations ceremony. | HIGH |
-
-**Why not Vuex?** Vuex is legacy. Pinia is officially recommended by Vue core team and described as "de facto Vuex 5" by Evan You. For new Vue 3 projects, Pinia is the only correct choice.
-
-### GraphQL Client
-
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| villus | ^3.5.2 | GraphQL client | Vue-native, <4KB gzipped, Composition API first, TypeScript support. Designed for Vue, not adapted from React. | HIGH |
-| graphql | ^16.x | GraphQL core | Required peer dependency for villus. | HIGH |
-
-**Why villus over Apollo Client?**
-
-| Criterion | villus | Apollo Client |
-|-----------|--------|---------------|
-| Bundle size | ~4KB | ~31KB |
-| Vue integration | Native | Adapted wrapper |
-| API surface | Minimal, focused | Large, complex |
-| TypeScript | First-class | Good, but more ceremony |
-| Caching | Simple document cache | Normalized cache (overkill for this app) |
-| Learning curve | Low | Medium-high |
-
-Apollo Client's normalized cache is valuable for complex apps with many overlapping queries. This app has 1-2 query types (gene lookup, variant lookup). villus's document cache is sufficient and simpler.
-
-**Why not urql?** urql is excellent but React-first. villus is purpose-built for Vue with Vue-native reactivity integration.
-
-### Utilities
-
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| @vueuse/core | ^14.1.0 | Vue composables | `useClipboard` for copy-to-clipboard, `useLocalStorage` for preferences. Tree-shakeable, 200+ composables. Requires Vue 3.5+. | HIGH |
-
-**Key composables for this project:**
-- `useClipboard({ legacy: true })` - Copy German text with Safari fallback
-- `useLocalStorage` - Persist user preferences (population selection, text format)
-- `useDebounceFn` - Debounce gene search input
-
-### Type Generation (Optional but Recommended)
-
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| @graphql-codegen/cli | ^5.x | Type generation | Generate TypeScript types from gnomAD GraphQL schema. Ensures type safety for API responses. | MEDIUM |
-| @graphql-codegen/typescript | ^4.x | TypeScript plugin | Core types for GraphQL operations. | MEDIUM |
-| @graphql-codegen/client-preset | ^4.x | Client preset | Modern preset for typed document nodes. | MEDIUM |
-
-**Why MEDIUM confidence?** The gnomAD schema is large. Code generation adds complexity. For a small app with 2-3 queries, manual typing may be sufficient. Evaluate during development.
-
-### Testing (Dev Dependencies)
-
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| vitest | ^3.x | Unit/component testing | Vite-native, same config as dev server, fast HMR in test mode. | HIGH |
-| @vue/test-utils | ^2.x | Vue testing utilities | Official Vue testing library. | HIGH |
-| @testing-library/vue | ^8.x | Component testing | User-behavior focused testing. Complements Vue Test Utils. | MEDIUM |
-
-### Linting & Formatting (Dev Dependencies)
-
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| eslint | ^9.x | Linting | Flat config format (ESLint 9+). Catches errors, enforces consistency. | HIGH |
-| @vue/eslint-config-typescript | latest | Vue + TS rules | Official Vue ESLint config for TypeScript. | HIGH |
-| prettier | ^3.x | Formatting | Code formatting. Use eslint-config-prettier to avoid conflicts. | HIGH |
-| eslint-config-prettier | latest | Conflict resolution | Disables ESLint rules that conflict with Prettier. | HIGH |
+**Key insight:** All v1.1 features can be implemented with minimal new dependencies. The existing stack (Vue 3.5+, Vuetify 3.8+, VueUse 12.x, Pinia 3.x) already provides most needed infrastructure.
 
 ---
 
-## Alternatives Considered
+## 1. ClinGen Gene-Disease Validity Integration
 
-### GraphQL Clients
+### Recommendation
 
-| Recommended | Alternative | Why Not |
-|-------------|-------------|---------|
-| villus | Apollo Client | 8x larger bundle, complex normalized cache unnecessary for this app |
-| villus | urql | React-first design, less Vue-native |
-| villus | fetch + manual types | More boilerplate, no caching, less maintainable |
+**Approach:** Direct fetch to ClinGen CSV download endpoint with client-side parsing and Pinia-persisted caching.
 
-### State Management
+**Endpoint:** `https://search.clinicalgenome.org/kb/gene-validity/download`
+- Returns real-time CSV of all gene-disease validity curations
+- No authentication required for public download
+- CORS-enabled for browser requests
 
-| Recommended | Alternative | Why Not |
-|-------------|-------------|---------|
-| Pinia | Vuex | Legacy, more boilerplate, officially superseded |
-| Pinia | Composables only | Could work for this app, but Pinia adds DevTools support and structure |
+### Rationale
 
-### Clipboard
+ClinGen provides two data access methods:
 
-| Recommended | Alternative | Why Not |
-|-------------|-------------|---------|
-| @vueuse/core useClipboard | vue-clipboard3 | VueUse is more maintained, provides many other utilities |
-| @vueuse/core useClipboard | navigator.clipboard direct | No Safari fallback, no reactive state |
+1. **GCI API** (requires API key, restricted to GCEP members)
+2. **Public CSV download** (no auth, real-time, open access)
 
----
+For a genetic counselor tool, the public CSV download is appropriate:
+- Contains all published gene-disease validity classifications
+- Includes gene symbol, disease, mode of inheritance, classification (Definitive, Strong, Moderate, Limited, etc.)
+- Updated in real-time as new curations are published
 
-## gnomAD API Integration Notes
-
-### Endpoint
-
-```
-https://gnomad.broadinstitute.org/api
-```
-
-### CORS Status
-
-The gnomAD API supports browser-based fetch requests. The GitHub documentation shows JavaScript examples using standard `fetch()` without special CORS configuration. Direct browser queries are supported.
-
-### Rate Limiting
-
-Rate limiting exists at the IP level. For normal usage (occasional gene lookups by a single user), this should not be an issue. Certain IPs can be whitelisted if needed.
-
-### Query Pattern
+### Implementation Details
 
 ```typescript
-const response = await fetch('https://gnomad.broadinstitute.org/api', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    query: GENE_VARIANTS_QUERY,
-    variables: { geneSymbol: 'CFTR', dataset: 'gnomad_r4' }
-  })
+// Fetch and parse ClinGen data
+const response = await fetch('https://search.clinicalgenome.org/kb/gene-validity/download');
+const csvText = await response.text();
+// Parse CSV (use built-in or lightweight parser)
+```
+
+**Caching Strategy:**
+- Store parsed data in Pinia store with `pinia-plugin-persistedstate`
+- Add timestamp to track freshness
+- Cache TTL: 24 hours (curations don't change frequently)
+- Manual refresh button for users who need latest data
+
+**CSV Parsing Options:**
+
+| Library | Size | Recommendation |
+|---------|------|----------------|
+| Built-in (split/map) | 0 KB | Use for simple CSV structure |
+| papaparse | ~6 KB gzip | Only if CSV has edge cases (quoted fields, etc.) |
+
+**Confidence:** HIGH - Verified endpoint exists and returns CSV. No authentication required for public data.
+
+### What NOT to Use
+
+- **GCI API**: Requires API key, intended for ClinGen internal tools and GCEP members
+- **GraphQL (GeneGraph)**: Not yet publicly released as of research date
+
+### Sources
+
+- [ClinGen Downloads Page](https://search.clinicalgenome.org/kb/downloads)
+- [GCI API Documentation](https://vci-gci-docs.clinicalgenome.org/vci-gci-docs/gci-help/gci-api)
+
+---
+
+## 2. Excel/JSON Export
+
+### Recommendation
+
+**Primary:** SheetJS (xlsx) v0.20.3 + file-saver v2.0.5
+
+### Rationale
+
+SheetJS is the de facto standard for browser-based Excel generation. Critical note: the npm registry version (0.18.5) is outdated and has security vulnerabilities. Must install from SheetJS CDN.
+
+**Why SheetJS over ExcelJS:**
+
+| Criterion | SheetJS | ExcelJS |
+|-----------|---------|---------|
+| Bundle size | ~200 KB | ~400 KB |
+| Excel styling | Pro version only | Included |
+| Browser support | Excellent | Requires polyfills |
+| Maintenance | Active | Active |
+
+For this use case (simple data export without styling), SheetJS is sufficient and smaller.
+
+### Installation
+
+```bash
+# CRITICAL: Do NOT use npm install xlsx (outdated, vulnerable)
+npm rm xlsx 2>/dev/null
+npm install https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
+npm install file-saver
+npm install -D @types/file-saver
+```
+
+### Implementation Pattern
+
+```typescript
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
+// Excel export
+function exportToExcel(data: CarrierResult[], filename: string) {
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Results');
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  saveAs(blob, `${filename}.xlsx`);
+}
+
+// JSON export
+function exportToJSON(data: CarrierResult[], filename: string) {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  saveAs(blob, `${filename}.json`);
+}
+```
+
+### Version Details
+
+| Package | Version | Source |
+|---------|---------|--------|
+| xlsx | 0.20.3 | SheetJS CDN (NOT npm) |
+| file-saver | 2.0.5 | npm |
+| @types/file-saver | 2.0.7 | npm |
+
+**Confidence:** HIGH - SheetJS is widely used, well-documented. CDN installation verified.
+
+### What NOT to Use
+
+- **xlsx from npm registry**: Version 0.18.5 has known vulnerabilities (Prototype Pollution, DoS)
+- **ExcelJS**: Larger bundle, requires polyfills, overkill for simple exports
+- **vue3-xlsx**: Thin wrapper, adds unnecessary abstraction
+
+### Sources
+
+- [SheetJS Documentation](https://docs.sheetjs.com/)
+- [SheetJS CDN Migration](https://cdn.sheetjs.com/xlsx/)
+- [SheetJS Vue Integration](https://docs.sheetjs.com/docs/demos/frontend/vue/)
+- [file-saver npm](https://www.npmjs.com/package/file-saver)
+
+---
+
+## 3. Browser-Based Logging System
+
+### Recommendation
+
+**Library:** loglevel v1.9.2
+
+### Rationale
+
+loglevel is the best fit for browser logging:
+
+| Criterion | loglevel | Pino (browser) | LogTape |
+|-----------|----------|----------------|---------|
+| Bundle size | 1.4 KB gzip | 3 KB gzip | Larger |
+| Dependencies | 0 | 0 | 0 |
+| Browser-native | Yes | Adapted | Yes |
+| TypeScript | Included | Included | Included |
+| npm downloads/week | 9M+ | Lower | Lower |
+| Line numbers preserved | Yes | No | Varies |
+
+Key advantage: loglevel preserves stack traces and line numbers in browser console, critical for debugging.
+
+### Installation
+
+```bash
+npm install loglevel
+# TypeScript types are included
+```
+
+### Implementation Pattern
+
+```typescript
+// src/utils/logger.ts
+import log from 'loglevel';
+
+// Configure based on environment
+if (import.meta.env.DEV) {
+  log.setLevel('debug');
+} else {
+  log.setLevel('warn'); // Production: only warn and error
+}
+
+export const logger = log;
+
+// Usage throughout app
+import { logger } from '@/utils/logger';
+
+logger.debug('Fetching gene variants', { gene: 'CFTR' });
+logger.info('Carrier frequency calculated', { frequency: 0.022 });
+logger.warn('ClinGen cache expired, refetching');
+logger.error('gnomAD API request failed', error);
+```
+
+### Optional: Log Persistence Plugin
+
+For persisting logs to localStorage (useful for debugging user-reported issues):
+
+```bash
+npm install loglevel-plugin-remote  # If remote logging needed later
+```
+
+**Confidence:** HIGH - loglevel is mature, widely used, minimal footprint.
+
+### What NOT to Use
+
+- **winston**: Node.js-focused, requires polyfills for browser
+- **console.log directly**: No level filtering, no production control
+- **Custom solution**: Unnecessary when loglevel exists
+
+### Sources
+
+- [loglevel npm](https://www.npmjs.com/package/loglevel)
+- [loglevel GitHub](https://github.com/pimterry/loglevel)
+- [Browser Logging Best Practices](https://gajus.medium.com/logging-in-browser-2f053dbe69df)
+
+---
+
+## 4. Build/Lint/Typecheck Speed Improvements
+
+### Recommendation
+
+**Multi-pronged approach:**
+
+1. **Vite 7 Rolldown** (experimental) - 3-16x faster builds
+2. **ESLint flat config optimizations** - Already using, add global ignores
+3. **vue-tsc parallelization** - Use vite-plugin-checker
+4. **TypeScript isolatedDeclarations** - Future consideration (not yet stable for Vue)
+
+### 4.1 Vite 7 Rolldown (Experimental)
+
+Vite 7.x includes experimental Rolldown bundler support. Rolldown is Rust-based, providing:
+- 45% faster cold starts
+- 3-16x faster production builds
+- 100x reduction in peak memory for large apps
+
+**Current Status:** Experimental in Vite 7. Production-ready expected in Vite 8.
+
+**Configuration:**
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  // Enable Rolldown (experimental)
+  experimental: {
+    rolldownDev: true,  // Use Rolldown in dev
+    rolldownBuild: true // Use Rolldown for production builds
+  }
 });
 ```
 
-### Available Datasets
+**Confidence:** MEDIUM - Experimental flag. Test thoroughly before enabling.
 
-- `gnomad_r4` - Latest (gnomAD v4)
-- `gnomad_r3` - gnomAD v3 (recommended for this project - well-documented)
-- `gnomad_r2_1` - gnomAD v2.1
-- Various filtered subsets (non_neuro, non_cancer, etc.)
+### 4.2 ESLint Flat Config Optimizations
 
----
+The project already uses ESLint 9 flat config. Optimizations:
 
-## Installation
+```javascript
+// eslint.config.js
+import pluginVue from 'eslint-plugin-vue';
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
+
+export default defineConfigWithVueTs(
+  {
+    // Global ignores - prevents wasting time on generated files
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      'coverage/**',
+      '**/*.d.ts',
+      '.planning/**'  // Don't lint planning docs
+    ]
+  },
+  pluginVue.configs['flat/recommended'],
+  vueTsConfigs.recommended
+);
+```
+
+**Performance tips:**
+- Use `--quiet` flag in CI (skips warn-level rules entirely in ESLint 9)
+- Global ignores prevent scanning irrelevant directories
+- Flat config inherently faster than legacy cascading config
+
+**Confidence:** HIGH - Already on ESLint 9, just needs ignore optimization.
+
+### 4.3 vue-tsc Parallelization
+
+vue-tsc is inherently slow for large projects. Options:
+
+**Option A: vite-plugin-checker (Recommended)**
+
+Run type checking in parallel worker thread:
 
 ```bash
-# Initialize project with Vite + Vue 3 + TypeScript
-bun create vite gnomad-carrier-frequency --template vue-ts
-
-# Core dependencies
-bun add vue vuetify pinia villus graphql @vueuse/core
-
-# Vuetify dependencies
-bun add @mdi/font
-
-# Dev dependencies
-bun add -D typescript vite @vitejs/plugin-vue
-bun add -D vitest @vue/test-utils
-bun add -D eslint @vue/eslint-config-typescript prettier eslint-config-prettier
-bun add -D vue-tsc  # For type checking Vue SFCs
-
-# Optional: GraphQL codegen
-bun add -D @graphql-codegen/cli @graphql-codegen/typescript @graphql-codegen/client-preset
+npm install -D vite-plugin-checker
 ```
-
----
-
-## Configuration Files
-
-### vite.config.ts
 
 ```typescript
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+// vite.config.ts
+import checker from 'vite-plugin-checker';
 
 export default defineConfig({
-  plugins: [vue()],
-  base: '/gnomad-carrier-frequency/',  // GitHub Pages subpath
-  resolve: {
-    alias: {
-      '@': '/src'
-    }
-  }
-})
+  plugins: [
+    vue(),
+    checker({
+      vueTsc: true,
+      typescript: true
+    })
+  ]
+});
 ```
 
-### tsconfig.json (Key Settings)
+**Option B: Skip vue-tsc in dev, run in CI only**
 
 ```json
 {
-  "compilerOptions": {
-    "strict": true,
-    "moduleResolution": "bundler",
-    "target": "ESNext",
-    "module": "ESNext",
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "vue-tsc --noEmit",
+    "build:ci": "vue-tsc -b && vite build"
   }
 }
 ```
 
-### villus Setup (src/plugins/villus.ts)
+**Confidence:** HIGH for vite-plugin-checker approach.
+
+### 4.4 TypeScript isolatedDeclarations
+
+TypeScript 5.5+ `isolatedDeclarations` can dramatically speed up type generation (20-100x). However:
+
+- Vue SFC support is experimental
+- Requires explicit type annotations on all exports
+- Known issues with `<script setup>` implicit types
+
+**Recommendation:** Monitor vuejs/language-tools for stable support. Not ready for production Vue projects yet.
+
+**Confidence:** LOW for Vue projects currently.
+
+### Sources
+
+- [Vite 7 Performance](https://vite.dev/guide/performance)
+- [Vite 7 Rolldown Announcement](https://dev.to/aggarwal_gaurav_1012/vite-70-is-here-rust-powered-speed-smarter-tooling-a-cleaner-build-experience-1k9j)
+- [ESLint Flat Config Best Practices](https://eslint.org/blog/2025/03/flat-config-extends-define-config-global-ignores/)
+- [vue-tsc Performance Issues](https://github.com/vuejs/language-tools/issues/2533)
+- [vite-plugin-checker](https://github.com/fi3ework/vite-plugin-checker)
+- [TypeScript isolatedDeclarations](https://marvinh.dev/blog/speeding-up-javascript-ecosystem-part-10/)
+
+---
+
+## 5. Dark/Light Theme Switching
+
+### Recommendation
+
+**Approach:** VueUse `useDark` composable + Vuetify `useTheme` synchronization
+
+### Rationale
+
+The project already uses VueUse 12.x. The `useDark` composable provides:
+- System preference detection (prefers-color-scheme)
+- Automatic localStorage persistence
+- Reactive toggle
+
+However, Vuetify maintains its own theme state via `useTheme`. These must be synchronized.
+
+### Implementation Pattern
 
 ```typescript
-import { createClient, defaultPlugins } from 'villus'
+// src/composables/useAppTheme.ts
+import { useDark, useToggle } from '@vueuse/core';
+import { useTheme } from 'vuetify';
+import { watch } from 'vue';
 
-export const villusClient = createClient({
-  url: 'https://gnomad.broadinstitute.org/api',
-  use: defaultPlugins()
-})
+export function useAppTheme() {
+  const vuetifyTheme = useTheme();
+
+  // useDark handles localStorage persistence and system preference
+  const isDark = useDark({
+    // Sync to Vuetify when useDark changes
+    onChanged(dark: boolean) {
+      vuetifyTheme.global.name.value = dark ? 'dark' : 'light';
+    }
+  });
+
+  const toggleDark = useToggle(isDark);
+
+  return {
+    isDark,
+    toggleDark
+  };
+}
+```
+
+### Vuetify Theme Configuration
+
+Update `src/main.ts` to define both light and dark themes:
+
+```typescript
+const vuetify = createVuetify({
+  components,
+  directives,
+  theme: {
+    defaultTheme: 'light',
+    themes: {
+      light: {
+        dark: false,
+        colors: {
+          primary: '#1976D2',
+          secondary: '#424242',
+          background: '#FFFFFF',
+          surface: '#FFFFFF'
+        }
+      },
+      dark: {
+        dark: true,
+        colors: {
+          primary: '#2196F3',
+          secondary: '#424242',
+          background: '#121212',
+          surface: '#1E1E1E'
+        }
+      }
+    }
+  }
+});
+```
+
+### UI Component
+
+```vue
+<template>
+  <v-btn icon @click="toggleDark()">
+    <v-icon>{{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
+  </v-btn>
+</template>
+
+<script setup lang="ts">
+import { useAppTheme } from '@/composables/useAppTheme';
+
+const { isDark, toggleDark } = useAppTheme();
+</script>
+```
+
+**No new dependencies required** - VueUse is already installed.
+
+**Confidence:** HIGH - Both VueUse and Vuetify APIs are well-documented.
+
+### What NOT to Use
+
+- **Manual localStorage**: VueUse handles this with proper reactivity
+- **CSS-only solution**: Won't sync with Vuetify component themes
+- **Vuetify alone**: Doesn't provide system preference detection or persistence
+
+### Sources
+
+- [VueUse useDark](https://vueuse.org/core/usedark/)
+- [Vuetify Theme Documentation](https://vuetifyjs.com/en/features/theme/)
+- [Implementing Dark Mode with VueUse](https://www.vuemastery.com/blog/implementing-dark-mode-with-vueuse/)
+
+---
+
+## Complete Dependency Summary
+
+### New Production Dependencies
+
+```bash
+# Excel/JSON Export
+npm install https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
+npm install file-saver
+
+# Browser Logging
+npm install loglevel
+```
+
+### New Dev Dependencies
+
+```bash
+npm install -D @types/file-saver
+npm install -D vite-plugin-checker  # Optional: parallel type checking
+```
+
+### No New Dependencies Needed For
+
+- ClinGen integration (use native fetch)
+- Dark/light theme (VueUse already installed)
+- ESLint optimizations (already on ESLint 9)
+
+### Updated package.json
+
+```json
+{
+  "dependencies": {
+    "file-saver": "^2.0.5",
+    "loglevel": "^1.9.2",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.7",
+    "vite-plugin-checker": "^0.8.0"
+  }
+}
 ```
 
 ---
 
-## What NOT to Use
+## Verification Checklist
 
-| Technology | Why Avoid |
-|------------|-----------|
-| Vuex | Legacy, replaced by Pinia |
-| Apollo Client | Overkill for simple queries, large bundle |
-| axios | fetch is sufficient for GraphQL, no need for extra dependency |
-| Vue Class Components | Deprecated pattern, Composition API is the standard |
-| Options API | Composition API has better TypeScript support and is recommended for new projects |
-| Tailwind CSS | Conflicts with Vuetify's styling approach; use Vuetify's built-in utility classes |
-| vue-clipboard2 | Deprecated, not compatible with Vue 3 |
-| Nuxt | SSR/SSG framework, overkill for a GitHub Pages SPA |
-
----
-
-## Bun Compatibility Notes
-
-Bun works seamlessly as a package manager for Vue 3 + Vite projects:
-
-- Use `bun install` instead of `npm install`
-- Use `bun run dev` instead of `npm run dev`
-- Add `--bun` flag to run Vite with Bun runtime: `bunx --bun vite`
-- For Vitest: use `bun run test`, NOT `bun test` (which invokes Bun's own test runner)
-
-Vite requires Node.js 20.19+ or 22.12+. Bun handles this correctly as it uses its own runtime for most operations.
-
----
-
-## Version Currency Note
-
-All versions verified via npm registry and official sources as of 2026-01-18:
-
-| Package | Verified Version | Source |
-|---------|------------------|--------|
-| Vue | 3.5.26 | npm, Vue School 2025 review |
-| Vuetify | 3.11.6 | npm, Vuetify April 2025 update |
-| Vite | 7.3.1 | npm, Vite releases page |
-| Pinia | 3.0.4 | npm, GitHub releases |
-| villus | 3.5.2 | npm, GitHub releases |
-| VueUse | 14.1.0 | npm (requires Vue 3.5+) |
-| vue-router | 4.6.4 | npm (not needed for single-page) |
+| Feature | Library | Version | Verified Source |
+|---------|---------|---------|-----------------|
+| ClinGen | fetch (native) | N/A | ClinGen downloads page |
+| Excel export | xlsx | 0.20.3 | SheetJS CDN |
+| File download | file-saver | 2.0.5 | npm registry |
+| Logging | loglevel | 1.9.2 | npm registry |
+| Theme toggle | @vueuse/core | 12.x (existing) | VueUse docs |
+| Build speed | vite | 7.x (existing) | Vite docs |
+| Type checking | vite-plugin-checker | 0.8.x | npm registry |
 
 ---
 
 ## Sources
 
 ### Official Documentation
-- [Vue.js Official Docs](https://vuejs.org/)
-- [Vuetify 3 Docs](https://vuetifyjs.com/)
-- [Pinia Official Docs](https://pinia.vuejs.org/)
-- [villus Documentation](https://villus.dev/)
-- [VueUse Documentation](https://vueuse.org/)
-- [Vite Documentation](https://vite.dev/)
+- [ClinGen Downloads](https://search.clinicalgenome.org/kb/downloads)
+- [SheetJS Documentation](https://docs.sheetjs.com/)
+- [loglevel GitHub](https://github.com/pimterry/loglevel)
+- [VueUse useDark](https://vueuse.org/core/usedark/)
+- [Vuetify Theme](https://vuetifyjs.com/en/features/theme/)
+- [Vite Performance Guide](https://vite.dev/guide/performance)
 
-### gnomAD
-- [gnomAD GraphQL API (GitHub)](https://github.com/broadinstitute/gnomad-browser/tree/main/graphql-api)
-- [gnomAD API Endpoint](https://gnomad.broadinstitute.org/api)
-- [gnomAD Help - API](https://gnomad.broadinstitute.org/help/how-do-i-query-a-batch-of-variants-do-you-have-an-api)
+### Articles and Guides
+- [Vite 7 Rolldown](https://dev.to/aggarwal_gaurav_1012/vite-70-is-here-rust-powered-speed-smarter-tooling-a-cleaner-build-experience-1k9j)
+- [ESLint 2025 Review](https://eslint.org/blog/2026/01/eslint-2025-year-review/)
+- [Browser Logging Best Practices](https://gajus.medium.com/logging-in-browser-2f053dbe69df)
+- [Vue Mastery Dark Mode](https://www.vuemastery.com/blog/implementing-dark-mode-with-vueuse/)
 
-### Comparisons & Best Practices
-- [GraphQL in Vue: 5 Best Approaches (Tailcall)](https://tailcall.run/blog/graphql-vue-client/)
-- [Vuex vs Pinia 2025 Guide (Medium)](https://medium.com/@vishalhari01/vuex-vs-pinia-the-ultimate-guide-to-vue-js-state-management-in-2025-36f629d85aa7)
-- [Vue.js 2025 in Review (Vue School)](https://vueschool.io/articles/news/vue-js-2025-in-review-and-a-peek-into-2026/)
-- [Vue 3 + TypeScript Best Practices (Enterprise Guide)](https://eastondev.com/blog/en/posts/dev/20251124-vue3-typescript-best-practices/)
-- [How to Copy to Clipboard in Vue (Vue School)](https://vueschool.io/articles/vuejs-tutorials/how-to-copy-to-clipboard-in-vue/)
-- [Bun with Vite (Official Docs)](https://bun.com/docs/guides/ecosystem/vite)
+### npm Packages
+- [xlsx npm (outdated warning)](https://www.npmjs.com/package/xlsx)
+- [file-saver npm](https://www.npmjs.com/package/file-saver)
+- [loglevel npm](https://www.npmjs.com/package/loglevel)
