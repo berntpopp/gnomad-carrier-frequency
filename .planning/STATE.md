@@ -20,7 +20,7 @@
 
 **Milestone:** v1 MVP
 **Phase:** Phase 3 - German Text (3 of 4)
-**Plan:** 03-01 complete (1/3)
+**Plan:** 03-02 complete (2/3)
 **Status:** In progress
 
 ### Progress
@@ -28,11 +28,11 @@
 ```
 Phase 1: Foundation     [##########] 5/5 plans COMPLETE
 Phase 2: Wizard UI      [##########] 3/3 plans COMPLETE
-Phase 3: German Text    [###.......] 1/3 plans
+Phase 3: German Text    [######....] 2/3 plans
 Phase 4: Deploy         [..........] Validation only
 ```
 
-**Overall:** `[#########.] ~85%` (9/11 plans complete)
+**Overall:** `[##########] ~91%` (10/11 plans complete)
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 9 |
+| Plans Completed | 10 |
 | Phases Completed | 2 |
 | Requirements Done | Phase 1-2 complete, Phase 3 in progress |
-| Session Count | 10 |
+| Session Count | 11 |
 
 ---
 
@@ -78,6 +78,9 @@ Phase 4: Deploy         [..........] Validation only
 | Simple template renderer | No micromustache/handlebars; 10-line regex function sufficient | 2026-01-19 |
 | Config-driven templates | JSON templates with {{variable}} syntax, Perspective-based variants | 2026-01-19 |
 | genderSuffix variable | German inclusive language via template variable, not hardcoded | 2026-01-19 |
+| Pinia options API | Options API over setup API for persistence plugin compatibility | 2026-01-19 |
+| Browser language detection | Defaults to English unless browser language is German | 2026-01-19 |
+| Locale-aware formatting | German comma (0,25%), English period (0.25%) for percentages | 2026-01-19 |
 
 ### Technical Notes
 
@@ -98,6 +101,9 @@ Phase 4: Deploy         [..........] Validation only
 - Template files: src/config/templates/de.json, en.json
 - Template renderer: renderTemplate(template, context) in src/utils/template-renderer.ts
 - Text types: Perspective, GenderStyle, TemplateContext in src/types/text.ts
+- Pinia store: useTemplateStore in src/stores/useTemplateStore.ts
+- Text composable: useTextGenerator in src/composables/useTextGenerator.ts
+- localStorage key: carrier-freq-templates (for persistence)
 
 ### Blockers
 
@@ -117,8 +123,8 @@ Phase 4: Deploy         [..........] Validation only
 - [x] Execute 02-03 (results step and stepper integration)
 - [x] Plan Phase 3 (German Text)
 - [x] Execute 03-01 (template system foundation)
-- [ ] Execute 03-02 (Pinia store)
-- [ ] Execute 03-03 (text generator composable and UI)
+- [x] Execute 03-02 (Pinia store and text generator composable)
+- [ ] Execute 03-03 (text generator UI integration)
 - [ ] Plan Phase 4 (Deploy)
 - [ ] Execute Phase 4 plans
 
@@ -129,42 +135,45 @@ Phase 4: Deploy         [..........] Validation only
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Plan 03-01 (Template System Foundation)
-**Next:** Execute 03-02 (Pinia store for template customization)
+**Completed:** Plan 03-02 (Pinia Store and Text Generator)
+**Next:** Execute 03-03 (text generator UI integration)
 
 ### Handoff Notes
 
-Phase 3 template system foundation is complete. Plan 03-01 delivered:
+Plan 03-02 delivered Pinia store and text generator composable:
 
-**Template types (src/types/text.ts):**
-- `Perspective`: 'affected' | 'carrier' | 'familyMember'
-- `GenderStyle`: '*' | ':' | '/' | 'traditional'
-- `TemplateContext`: All template variables for interpolation
-
-**Template renderer (src/utils/template-renderer.ts):**
+**Pinia Store (src/stores/useTemplateStore.ts):**
 ```typescript
-renderTemplate(template: string, context: Partial<TemplateContext>): string
-// Replaces {{variable}} with context values
-// Missing variables: empty string + console.warn
+// State: language, genderStyle, enabledSections, customSections
+// Getters: defaultTemplates (de/en), genderSuffix
+// Actions: setLanguage, setGenderStyle, toggleSection, etc.
+// Persistence: localStorage key 'carrier-freq-templates'
 ```
 
-**Template JSON files:**
+**Text Generator (src/composables/useTextGenerator.ts):**
+```typescript
+useTextGenerator(input: () => TextGeneratorInput)
+// Returns: templateContext, generateText, getSections
+// Plus: language, genderStyle, setLanguage, setGenderStyle, toggleSection
 ```
-src/config/templates/
-├── de.json   # German clinical templates (Heterozygotenfrequenz, etc.)
-└── en.json   # English templates with matching structure
+
+**Key behaviors:**
+- Frequency source resolution: gnomAD -> globalCarrierFrequency; literature -> literatureFrequency; default -> config
+- Recurrence risk divisor: 4 (carrier), 2 (affected)
+- Locale formatting: German comma (0,25%), English period (0.25%)
+- Source attribution per type (gnomAD, PMID, default assumption)
+
+**Integration point:**
+```typescript
+import { useTextGenerator } from '@/composables';
+const { generateText, getSections, language } = useTextGenerator(() => ({
+  result, frequencySource, indexStatus, literatureFrequency, literaturePmid, usingDefault
+}));
 ```
 
-**Template structure (3 perspectives x 8 sections):**
-- Perspectives: affected, carrier, familyMember
-- Sections: geneIntro, inheritance, carrierFrequency, recurrenceRisk, populationContext, founderEffect, sourceCitation, recommendation
-
-**Variables used in templates:**
-gene, carrierFrequencyRatio, recurrenceRiskPercent, recurrenceRiskRatio, source, genderSuffix, accessDate
-
-Ready for 03-02: Install Pinia + persistence plugin, create template store.
+Ready for 03-03: Create text output panel UI with perspective tabs and section toggles.
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 (Plan 03-01 complete)*
+*Last updated: 2026-01-19 (Plan 03-02 complete)*
