@@ -3,7 +3,7 @@
 ## Milestones
 
 - **v1.0 MVP** --- Phases 1-4 (shipped 2026-01-19) -> [Archive](milestones/v1.0-ROADMAP.md)
-- **v1.1 Release-Ready** --- Phases 5-10 (in progress)
+- **v1.1 Release-Ready** --- Phases 5-10 (complete)
 
 ## v1.1 Release-Ready
 
@@ -189,54 +189,56 @@ Plans:
 
 ---
 
-### Phase 10: Export + Templates + Logging
+### Phase 10: Export + Templates + Logging ✓
 
 **Goal:** User can export results, customize templates, and access debug logs
 
 **Dependencies:** Phase 5 (settings), Phase 6 (app shell for log viewer)
 
 **Requirements:**
-- EXP-01: User can export results as JSON file
-- EXP-02: User can export results as Excel (.xlsx) file
-- EXP-03: Export includes gene, populations, frequencies, calculated risks
-- EXP-04: Export includes metadata (gnomAD version, date, filters used)
-- TMPL-01: User can edit German clinical text templates in settings
-- TMPL-02: User can edit English clinical text templates in settings
-- TMPL-03: Template editor highlights {{variable}} placeholders
-- TMPL-04: Variable picker shows available template variables
-- TMPL-05: User can insert variables via picker/autocomplete
-- TMPL-06: User can export templates to file
-- TMPL-07: User can import templates from file
-- TMPL-08: Template changes persist across sessions
-- LOG-01: App logs key events (API calls, calculations, errors)
-- LOG-02: LogViewer panel accessible from app shell
-- LOG-03: User can search logs by text
-- LOG-04: User can filter logs by level (DEBUG, INFO, WARN, ERROR)
-- LOG-05: User can download logs as JSON
-- LOG-06: User can clear all logs
-- LOG-07: Log statistics displayed (count, dropped, memory)
-- LOG-08: Log max entries configurable in settings
-- INFRA-03: Build time improved with vite-plugin-checker
-- INFRA-04: Lint/typecheck runs in parallel
+- EXP-01: User can export results as JSON file ✓
+- EXP-02: User can export results as Excel (.xlsx) file ✓
+- EXP-03: Export includes gene, populations, frequencies, calculated risks ✓
+- EXP-04: Export includes metadata (gnomAD version, date, filters used) ✓
+- TMPL-01: User can edit German clinical text templates in settings ✓
+- TMPL-02: User can edit English clinical text templates in settings ✓
+- TMPL-03: Template editor highlights {{variable}} placeholders ✓
+- TMPL-04: Variable picker shows available template variables ✓
+- TMPL-05: User can insert variables via picker/autocomplete ✓
+- TMPL-06: User can export templates to file ✓
+- TMPL-07: User can import templates from file ✓
+- TMPL-08: Template changes persist across sessions ✓
+- LOG-01: App logs key events (API calls, calculations, errors) ✓
+- LOG-02: LogViewer panel accessible from app shell ✓
+- LOG-03: User can search logs by text ✓
+- LOG-04: User can filter logs by level (DEBUG, INFO, WARN, ERROR) ✓
+- LOG-05: User can download logs as JSON ✓
+- LOG-06: User can clear all logs ✓
+- LOG-07: Log statistics displayed (count, dropped, memory) ✓
+- LOG-08: Log max entries configurable in settings ✓
+- INFRA-03: Build time improved with vite-plugin-checker ✓
+- INFRA-04: Lint/typecheck runs in parallel ✓
 
-**Plans:** 8 plans
+**Plans:** 8 plans (complete)
 
 Plans:
-- [ ] 10-01-PLAN.md - Logging infrastructure (types, store with ring buffer, useLogger composable)
-- [ ] 10-02-PLAN.md - Export infrastructure (xlsx dependency, types, useExport composable)
-- [ ] 10-03-PLAN.md - Export UI (buttons in StepResults and VariantModal)
-- [ ] 10-04-PLAN.md - Template infrastructure (variable config, parser, store extensions)
-- [ ] 10-05-PLAN.md - Template editor UI (TemplateEditor, VariablePicker, Settings integration)
-- [ ] 10-06-PLAN.md - Log viewer UI (LogViewer panel, footer link, settings)
-- [ ] 10-07-PLAN.md - Build improvements (vite-plugin-checker for parallel checking)
-- [ ] 10-08-PLAN.md - Logging integration (wire logging into API, composables, app)
+- [x] 10-01-PLAN.md - Logging infrastructure (types, store with ring buffer, useLogger composable)
+- [x] 10-02-PLAN.md - Export infrastructure (xlsx dependency, types, useExport composable)
+- [x] 10-03-PLAN.md - Export UI (buttons in StepResults and VariantModal)
+- [x] 10-04-PLAN.md - Template infrastructure (variable config, parser, store extensions)
+- [x] 10-05-PLAN.md - Template editor UI (TemplateEditor, VariablePicker, Settings integration)
+- [x] 10-06-PLAN.md - Log viewer UI (LogViewer panel, footer link, settings)
+- [x] 10-07-PLAN.md - Build improvements (vite-plugin-checker for parallel checking)
+- [x] 10-08-PLAN.md - Logging integration (wire logging into API, composables, app)
 
 **Success Criteria:**
-1. User can export calculation results as JSON or Excel file with full metadata
-2. User can edit clinical text templates with syntax highlighting for variables
-3. User can import/export templates to/from files
-4. User can access LogViewer from app shell and search/filter logs
-5. User can configure log max entries in settings and download logs as JSON
+1. ✓ User can export calculation results as JSON or Excel file with full metadata
+2. ✓ User can edit clinical text templates with syntax highlighting for variables
+3. ✓ User can import/export templates to/from files
+4. ✓ User can access LogViewer from app shell and search/filter logs
+5. ✓ User can configure log max entries in settings and download logs as JSON
+
+**Completed:** 2026-01-19
 
 ---
 
@@ -245,8 +247,8 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 27/27 | In Progress (Phase 9 complete) | - |
+| v1.1 Release-Ready | 5-10 | 27/27 | Complete | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 10 planned)*
+*Last updated: 2026-01-19 (Phase 10 complete)*
