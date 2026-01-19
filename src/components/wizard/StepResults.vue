@@ -55,7 +55,6 @@
           <td class="text-right">{{ formatPercent(item.carrierFrequency) }}</td>
           <td class="text-right">{{ formatRatio(item.carrierFrequency) }}</td>
           <td class="text-right">{{ item.recurrenceRisk }}</td>
-          <td class="text-right">{{ item.variantCount }}</td>
           <td class="text-right">{{ item.alleleCount }}</td>
           <td class="text-right">{{ item.alleleNumber?.toLocaleString() ?? '-' }}</td>
           <td>
@@ -99,7 +98,6 @@ interface TableItem {
   ratioDenominator: number | null; // Numeric for sorting (e.g., 25 for "1:25")
   recurrenceRiskValue: number | null; // Numeric for sorting
   recurrenceRisk: string; // Formatted for display
-  variantCount: number;
   alleleCount: number;
   alleleNumber: number | null;
   isFounderEffect: boolean;
@@ -128,7 +126,6 @@ const headers = ref([
   { title: 'Carrier Freq (%)', key: 'carrierFrequency', sortable: true, align: 'end' as const },
   { title: 'Ratio', key: 'ratioDenominator', sortable: true, align: 'end' as const },
   { title: 'Recurrence Risk', key: 'recurrenceRiskValue', sortable: true, align: 'end' as const },
-  { title: 'Variants', key: 'variantCount', sortable: true, align: 'end' as const },
   { title: 'AC', key: 'alleleCount', sortable: true, align: 'end' as const },
   { title: 'AN', key: 'alleleNumber', sortable: true, align: 'end' as const },
   { title: 'Notes', key: 'notes', sortable: true },
@@ -218,7 +215,6 @@ const tableItems = computed((): TableItem[] => {
       ratioDenominator: globalCarrierFreq > 0 ? Math.round(1 / globalCarrierFreq) : null,
       recurrenceRiskValue: risk,
       recurrenceRisk: riskString,
-      variantCount: props.result.qualifyingVariantCount,
       alleleCount: sumAlleleCount(props.result),
       alleleNumber: maxAlleleNumber(props.result),
       isFounderEffect: false,
@@ -241,7 +237,6 @@ const tableItems = computed((): TableItem[] => {
         : null,
       recurrenceRiskValue: risk,
       recurrenceRisk: riskString,
-      variantCount: props.result.qualifyingVariantCount, // Same for all
       alleleCount: pop.alleleCount,
       alleleNumber: pop.alleleNumber,
       isFounderEffect: pop.isFounderEffect,
