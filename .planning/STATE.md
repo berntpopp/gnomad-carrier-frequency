@@ -15,7 +15,7 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.1 Release-Ready
 **Phase:** 9 - ClinGen + Documentation - IN PROGRESS
-**Plan:** 5 of 7 complete
+**Plan:** 6 of 7 complete
 **Status:** In progress
 
 ### Progress
@@ -50,7 +50,7 @@ v1.1 Release-Ready: [########--] ~85% - Phase 9 in progress
 | 6 | App Shell | 5 | Complete (2/2 plans) |
 | 7 | SEO + Accessibility | 9 | Complete (4/4 plans) |
 | 8 | Filtering + Variant Display | 14 | Complete (4/4 plans) |
-| 9 | ClinGen + Documentation | 15 | In Progress (3/7 plans) |
+| 9 | ClinGen + Documentation | 15 | In Progress (6/7 plans) |
 | 10 | Export + Templates + Logging | 22 | Pending |
 
 ---
@@ -87,6 +87,11 @@ v1.1 Release-Ready: [########--] ~85% - Phase 9 in progress
 | Skip SOP column in ClinGen mapping | SOP not needed for gene validity lookup, simplifies mapping | 2026-01-19 |
 | Singleton state for constraint data | Module-level refs share state between GeneSearch and StepGene | 2026-01-19 |
 | Version-specific LOEUF thresholds | v4 (0.6/1.5) vs v2/v3 (0.35/1.0) per gnomAD documentation | 2026-01-19 |
+| Hardy-Weinberg formula in code blocks | Mathematical notation for clear visual distinction | 2026-01-19 |
+| FAQ 4 categories | Grouped by user question areas: gnomAD, Calculations, Usage, Limitations | 2026-01-19 |
+| Help content in JSON | Structured documentation for potential i18n support | 2026-01-19 |
+| Persistent disclaimer modal | Cannot dismiss without acknowledgment - ensures users read clinical disclaimer | 2026-01-19 |
+| carrier-freq-app storage key | Namespaced localStorage key for app-level state | 2026-01-19 |
 
 ### Blockers
 
@@ -113,7 +118,9 @@ None currently.
 - [x] Execute 09-01-PLAN.md (ClinGen infrastructure)
 - [x] Execute 09-02-PLAN.md (Gene constraint display)
 - [x] Execute 09-03-PLAN.md (ClinGen warning UI)
-- [ ] Execute remaining Phase 9 plans (04-07)
+- [x] Execute 09-04-PLAN.md (Disclaimer banner and ClinGen settings)
+- [x] Execute 09-05-PLAN.md (Help system: methodology + FAQ)
+- [ ] Execute remaining Phase 9 plans (06, 07)
 
 ---
 
@@ -122,8 +129,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 9 Plan 03 - ClinGen Warning UI
-**Next:** Execute Phase 9 plans 04-07
+**Completed:** Phase 9 Plan 04 - Disclaimer and ClinGen Settings
+**Next:** Execute Phase 9 plans 05-07
 
 ### Handoff Notes
 
@@ -150,7 +157,9 @@ Key pitfalls from research:
 - Plan 01: ClinGen infrastructure (types, store, composable) - COMPLETE
 - Plan 02: Gene constraint display (pLI, LOEUF metrics) - COMPLETE
 - Plan 03: ClinGen warning UI (validation in gene/results steps) - COMPLETE
-- Plan 04-07: Disclaimer, help system, about dialog - PENDING
+- Plan 04: Disclaimer and ClinGen settings - COMPLETE
+- Plan 05: Help system (methodology + FAQ) - COMPLETE
+- Plan 06-07: About dialog, data sources - PENDING
 
 ---
 
@@ -173,3 +182,4 @@ Key pitfalls from research:
 *09-01 complete: 2026-01-19*
 *09-02 complete: 2026-01-19*
 *09-03 complete: 2026-01-19*
+*09-04 complete: 2026-01-19*
