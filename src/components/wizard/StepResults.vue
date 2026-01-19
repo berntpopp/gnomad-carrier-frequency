@@ -310,7 +310,7 @@ import { config, getGnomadVersion, getPopulationLabel } from '@/config';
 import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@/types';
 import type { ClinVarSubmission } from '@/api/queries';
 import { useFilterStore } from '@/stores/useFilterStore';
-import { useExport } from '@/composables';
+import { useExport, useAppAnnouncer } from '@/composables';
 import { filterPathogenicVariantsConfigurable } from '@/utils/variant-filters';
 import { toDisplayVariants, filterVariantsByPopulation } from '@/utils/variant-display';
 import { buildExportData } from '@/utils/export-utils';
@@ -362,15 +362,23 @@ const filterStore = useFilterStore();
 // Set up export composable
 const { exportToJson, exportToExcel } = useExport();
 
+// Set up announcer for screen reader notifications
+const { polite: announcePolite, assertive: announceAssertive } = useAppAnnouncer();
+
 // Clipboard for copy link functionality
 const { copy, copied, isSupported: clipboardSupported } = useClipboard({
   copiedDuring: 2000, // Show "copied" state for 2 seconds
   legacy: true, // Fallback for older browsers
 });
 
-// Copy current URL handler
-function copyShareLink() {
-  copy(window.location.href);
+// Copy current URL handler with screen reader announcement
+async function copyShareLink() {
+  try {
+    await copy(window.location.href);
+    announcePolite('Link copied to clipboard');
+  } catch {
+    announceAssertive('Failed to copy link');
+  }
 }
 
 // Export handler function
