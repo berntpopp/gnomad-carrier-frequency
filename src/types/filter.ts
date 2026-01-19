@@ -27,7 +27,7 @@ export type FilterDefaults = FilterConfig;
  */
 export const FACTORY_FILTER_DEFAULTS: FilterConfig = {
   lofHcEnabled: true,
-  missenseEnabled: false,
+  missenseEnabled: true,
   clinvarEnabled: true,
   clinvarStarThreshold: 1,
 };
