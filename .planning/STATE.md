@@ -15,17 +15,17 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.1 Release-Ready
 **Phase:** 6 - App Shell (Navigation + Branding)
-**Plan:** 1 of 2 complete
-**Status:** In progress
+**Plan:** 2 of 2 complete
+**Status:** Phase complete
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [###-------] ~25% - Phase 6 plan 1 complete
+v1.1 Release-Ready: [####------] ~33% - Phase 6 complete
 ```
 
-**Overall:** Phase 6 in progress, plan 06-01 complete
+**Overall:** Phase 6 complete, ready for Phase 7
 
 ---
 
@@ -47,7 +47,7 @@ v1.1 Release-Ready: [###-------] ~25% - Phase 6 plan 1 complete
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 5 | Foundation | 4 | Complete (2/2 plans) |
-| 6 | App Shell | 5 | In progress (1/2 plans) |
+| 6 | App Shell | 5 | Complete (2/2 plans) |
 | 7 | SEO + Accessibility | 9 | Pending |
 | 8 | Filtering + Variant Display | 14 | Pending |
 | 9 | ClinGen + Documentation | 15 | Pending |
@@ -68,6 +68,8 @@ v1.1 Release-Ready: [###-------] ~25% - Phase 6 plan 1 complete
 | Title in content area | App bar has app name, page content has descriptive header | 2026-01-19 |
 | SVG favicon with CSS dark mode | Modern browsers support @media prefers-color-scheme in SVG | 2026-01-19 |
 | RequiForm palette #a09588 | LaborBerlin-inspired muted taupe for professional clinical appearance | 2026-01-19 |
+| Persistent settings dialog | Prevents accidental close, requires deliberate user action | 2026-01-19 |
+| Tabs placeholder content | Establishes structure for Phase 8 (Filters) and Phase 10 (Templates) | 2026-01-19 |
 
 ### Blockers
 
@@ -78,6 +80,9 @@ None currently.
 - [x] Run `/gsd:plan-phase 5` to create Foundation plans
 - [x] Execute 05-01-PLAN.md (theme + version infrastructure)
 - [x] Execute 05-02-PLAN.md (settings UI integration)
+- [x] Execute 06-01-PLAN.md (favicon and theme colors)
+- [x] Execute 06-02-PLAN.md (app shell UI)
+- [ ] Run `/gsd:plan-phase 7` to create SEO + Accessibility plans
 - [ ] ClinGen CSV schema may need exploration during Phase 9
 
 ---
@@ -87,14 +92,14 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 6 Plan 01 - Favicon and Theme Colors
-**Next:** Execute 06-02-PLAN.md (App Shell UI)
+**Completed:** Phase 6 Plan 02 - App Shell UI
+**Next:** Plan Phase 7 (SEO + Accessibility)
 
 ### Handoff Notes
 
 v1.1 roadmap derived from requirements and research:
 - Phase 5: Foundation (settings store, theme, version display) - COMPLETE
-- Phase 6: App Shell (navigation, logo, favicon, settings access) - IN PROGRESS (1/2)
+- Phase 6: App Shell (navigation, logo, favicon, settings access) - COMPLETE
 - Phase 7: SEO + Accessibility (WCAG compliance, Lighthouse targets)
 - Phase 8: Filtering + Variant Display (configurable filters, variant modal)
 - Phase 9: ClinGen + Documentation (clinical validation, help content)
@@ -105,12 +110,9 @@ Key pitfalls from research:
 - ARIA live regions break with v-if (Phase 7)
 - XSS risk in template editor (Phase 10)
 
-**Phase 6 Plan 01 deliverables:**
-- public/favicon.svg with CSS dark mode media query
-- public/favicon.png as 32x32 fallback
-- public/apple-touch-icon.png as 180x180 iOS icon
-- Vuetify theme updated to RequiForm palette (#a09588 primary)
-- index.html updated with favicon link elements
+**Phase 6 deliverables:**
+- Plan 01: Custom gCFC favicon with CSS dark mode, RequiForm-inspired theme palette
+- Plan 02: gCFCalc logo in app bar, settings gear opening tabbed dialog, footer icons
 
 ---
 
@@ -120,3 +122,4 @@ Key pitfalls from research:
 *05-01 complete: 2026-01-19*
 *05-02 complete: 2026-01-19*
 *06-01 complete: 2026-01-19*
+*06-02 complete: 2026-01-19*
