@@ -15,6 +15,17 @@ interface TemplateStoreState {
   customSections: Record<string, string>; // section key -> custom template override
 }
 
+/**
+ * Export format for template customizations
+ */
+export interface TemplateExport {
+  version: string;
+  language: 'de' | 'en';
+  exportDate: string;
+  customSections: Record<string, string>;
+  enabledSections: Record<Perspective, string[]>;
+}
+
 export const useTemplateStore = defineStore('templates', {
   state: (): TemplateStoreState => ({
     language: detectBrowserLanguage(),
@@ -110,6 +121,80 @@ export const useTemplateStore = defineStore('templates', {
 
     resetAllCustomizations() {
       this.customSections = {};
+    },
+
+    /**
+     * Export current template customizations for the current language
+     */
+    exportTemplates(): TemplateExport {
+      return {
+        version: '1.0',
+        language: this.language,
+        exportDate: new Date().toISOString(),
+        customSections: { ...this.customSections },
+        enabledSections: { ...this.enabledSections },
+      };
+    },
+
+    /**
+     * Import template customizations from file
+     * Returns true if successful, false if invalid format
+     */
+    importTemplates(data: unknown): boolean {
+      // Validate structure
+      if (!data || typeof data !== 'object') return false;
+      const exported = data as TemplateExport;
+
+      if (!exported.version || !exported.language) return false;
+      if (!exported.customSections || typeof exported.customSections !== 'object') return false;
+      if (!exported.enabledSections || typeof exported.enabledSections !== 'object') return false;
+
+      // Apply customizations
+      this.language = exported.language;
+      this.customSections = { ...exported.customSections };
+
+      // Merge enabled sections (preserve structure for all perspectives)
+      for (const perspective of ['affected', 'carrier', 'familyMember'] as Perspective[]) {
+        if (exported.enabledSections[perspective]) {
+          this.enabledSections[perspective] = [...exported.enabledSections[perspective]];
+        }
+      }
+
+      return true;
+    },
+
+    /**
+     * Reset customizations for a specific language
+     * Only clears customSections when user is on that language
+     */
+    resetLanguageTemplates(lang: 'de' | 'en') {
+      // Custom sections are keyed by perspective.sectionId
+      // They apply regardless of language, but user expects per-language reset
+      // Since templates are language-specific in the JSON files, we clear all customizations
+      // when user resets, as the custom content was likely written in that language
+      if (this.language === lang) {
+        this.customSections = {};
+      }
+    },
+
+    /**
+     * Get effective template for a section
+     * Returns custom if exists, otherwise default
+     */
+    getEffectiveTemplate(perspective: Perspective, sectionId: string): string {
+      const key = `${perspective}.${sectionId}`;
+      if (this.customSections[key]) {
+        return this.customSections[key];
+      }
+      return this.defaultTemplates.perspectives[perspective]?.sections[sectionId]?.template ?? '';
+    },
+
+    /**
+     * Check if a section has customizations
+     */
+    hasCustomization(perspective: Perspective, sectionId: string): boolean {
+      const key = `${perspective}.${sectionId}`;
+      return key in this.customSections;
     },
   },
 
