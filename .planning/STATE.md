@@ -6,7 +6,7 @@
 
 **Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
 
-**Current Focus:** Phase 4 Deploy - CI/CD Workflows Complete
+**Current Focus:** PROJECT COMPLETE - v1 MVP Deployed
 
 **Key Constraints:**
 - Stack: npm, Vue 3, Vuetify 3, Vite, TypeScript
@@ -18,10 +18,10 @@
 
 ## Current Position
 
-**Milestone:** v1 MVP
-**Phase:** Phase 4 - Deploy (4 of 4) - IN PROGRESS
-**Plan:** 04-02 complete (CI/CD workflows)
-**Status:** GitHub Actions CI + deploy workflows created, ready to push
+**Milestone:** v1 MVP - COMPLETE
+**Phase:** Phase 4 - Deploy (4 of 4) - COMPLETE
+**Plan:** 04-03 complete (Deploy and Validation)
+**Status:** All phases complete, application deployed and validated
 
 ### Progress
 
@@ -29,10 +29,10 @@
 Phase 1: Foundation     [##########] 5/5 plans COMPLETE
 Phase 2: Wizard UI      [##########] 3/3 plans COMPLETE
 Phase 3: German Text    [##########] 4/4 plans COMPLETE (3 + 1 gap closure)
-Phase 4: Deploy         [####......] 2/? plans (CI/CD workflows done)
+Phase 4: Deploy         [##########] 3/3 plans COMPLETE
 ```
 
-**Overall:** `[############] 100%` (14/15 plans complete)
+**Overall:** `[##########] 100%` (15/15 plans complete)
 
 ---
 
@@ -40,10 +40,26 @@ Phase 4: Deploy         [####......] 2/? plans (CI/CD workflows done)
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 14 |
-| Phases Completed | 3 (Phase 4 in progress) |
-| Requirements Done | Phase 1-3 complete, Phase 4 CI/CD done |
-| Session Count | 14 |
+| Plans Completed | 15 |
+| Phases Completed | 4 (all phases complete) |
+| Requirements Done | All MVP requirements delivered |
+| Session Count | 15 |
+
+---
+
+## Deployed Application
+
+**URL:** https://berntpopp.github.io/gnomad-carrier-frequency/
+
+**CI/CD:**
+- CI workflow: `.github/workflows/ci.yml` (lint + typecheck on all branches)
+- Deploy workflow: `.github/workflows/deploy.yml` (build + deploy on main)
+
+**Validation Results:**
+- CFTR NFE carrier frequency: 1:15 (6.76%) - validated
+- HEXA ASJ carrier frequency: 1:26 (3.89%) with founder effect flag - validated
+- German text generation: functional with patient sex selector
+- Copy-to-clipboard: functional
 
 ---
 
@@ -88,6 +104,7 @@ Phase 4: Deploy         [####......] 2/? plans (CI/CD workflows done)
 | GitHub Pages base path | /gnomad-carrier-frequency/ for subdirectory deployment | 2026-01-19 |
 | Official GitHub Actions only | No third-party actions for security; actions/checkout, setup-node, deploy-pages | 2026-01-19 |
 | npm ci over npm install | Deterministic builds from lock file in CI | 2026-01-19 |
+| Playwright validation | Automated validation of deployed functionality for reproducibility | 2026-01-19 |
 
 ### Technical Notes
 
@@ -118,10 +135,11 @@ Phase 4: Deploy         [####......] 2/? plans (CI/CD workflows done)
 - Build output: dist/ with base path /gnomad-carrier-frequency/
 - CI workflow: .github/workflows/ci.yml (lint + typecheck on all branches)
 - Deploy workflow: .github/workflows/deploy.yml (GitHub Pages on main push)
+- Deployed URL: https://berntpopp.github.io/gnomad-carrier-frequency/
 
 ### Blockers
 
-(None currently)
+(None - project complete)
 
 ### TODOs
 
@@ -143,6 +161,7 @@ Phase 4: Deploy         [####......] 2/? plans (CI/CD workflows done)
 - [x] Plan Phase 4 (Deploy)
 - [x] Execute 04-01 (ESLint and build configuration)
 - [x] Execute 04-02 (CI/CD workflows)
+- [x] Execute 04-03 (Deploy and validation)
 
 ---
 
@@ -151,33 +170,36 @@ Phase 4: Deploy         [####......] 2/? plans (CI/CD workflows done)
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Plan 04-02 (CI/CD workflows)
-**Next:** Push to GitHub, enable Pages in repository settings
+**Completed:** Plan 04-03 (Deploy and Validation)
+**Status:** PROJECT COMPLETE
 
 ### Handoff Notes
 
-Plan 04-02 created GitHub Actions workflows:
+v1 MVP is complete and deployed:
 
-**CI Workflow (`.github/workflows/ci.yml`):**
-- Runs lint and typecheck on all branch pushes
-- Runs on main branch PRs
-- Uses actions/checkout@v5, actions/setup-node@v6
-- Uses npm ci for deterministic builds
+**Application URL:** https://berntpopp.github.io/gnomad-carrier-frequency/
 
-**Deploy Workflow (`.github/workflows/deploy.yml`):**
-- Runs on main branch pushes only
-- Builds and deploys to GitHub Pages
-- Uses official deploy-pages@v4 action
-- Proper permissions: pages:write, id-token:write
-- Concurrency group prevents conflicting deploys
+**Features Delivered:**
+1. Gene search with gnomAD GraphQL API integration
+2. Variant filtering by clinical significance and review status
+3. Carrier frequency calculation using Hardy-Weinberg equation
+4. Population breakdown with founder effect detection
+5. Recurrence risk calculation based on index patient status
+6. German clinical text generation with perspective variants
+7. Patient sex selector for German grammatical gender
+8. Copy-to-clipboard functionality
 
-**To enable GitHub Pages:**
-1. Push to GitHub
-2. Go to Settings > Pages
-3. Set Source to "GitHub Actions"
-4. First deploy will publish to https://{username}.github.io/gnomad-carrier-frequency/
+**CI/CD:**
+- CI runs lint and typecheck on all branch pushes
+- Deploy workflow publishes to GitHub Pages on main push
+
+**Validation:**
+- CFTR NFE: 1:15 carrier frequency (validated)
+- HEXA ASJ: 1:26 with founder effect flag (validated)
+- German text generation: functional
+- Copy button: shows "Kopiert!" confirmation
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 (Plan 04-02 complete)*
+*Project completed: 2026-01-19*
