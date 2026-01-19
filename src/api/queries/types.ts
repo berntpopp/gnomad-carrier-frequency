@@ -29,6 +29,8 @@ export interface GeneVariantTranscript {
   lof: string | null;
   lof_filter: string | null;
   lof_flags: string | null;
+  hgvsc: string | null; // HGVS coding notation (e.g., "c.1234A>G")
+  hgvsp: string | null; // HGVS protein notation (e.g., "p.Met123Val")
 }
 
 export interface GeneVariant {
