@@ -13,3 +13,9 @@ export type {
   CarrierFrequencyResult,
   RecurrenceRiskResult,
 } from './frequency';
+
+export type {
+  WizardStep,
+  FrequencySource,
+  WizardState,
+} from './wizard';
