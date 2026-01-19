@@ -1,6 +1,8 @@
 import { computed, ref, watch, type Ref } from 'vue';
+import { watchDebounced } from '@vueuse/core';
 import { useGeneVariants } from './useGeneVariants';
 import { useClinvarSubmissions } from './useClinvarSubmissions';
+import { useExclusionState } from './useExclusionState';
 import {
   filterPathogenicVariantsConfigurable,
   getConflictingVariantIds,
@@ -62,6 +64,10 @@ export interface UseCarrierFrequencyReturn {
   // Version
   currentVersion: Ref<GnomadVersion>;
 
+  // Exclusion state
+  excludedCount: Ref<number>;
+  totalPathogenicCount: Ref<number>;
+
   // Recurrence risk
   calculateRisk: (status: IndexPatientStatus) => {
     risk: number;
@@ -95,6 +101,22 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   const setFilterConfig = (config: FilterConfig) => {
     filterConfig.value = { ...config };
   };
+
+  // Get exclusion state (singleton)
+  const { excluded, excludedCount } = useExclusionState();
+
+  // Debounced exclusion set for frequency calculation
+  // Prevents recalculation on every rapid checkbox toggle
+  const debouncedExcluded = ref<Set<string>>(new Set());
+
+  // Watch excluded with debounce
+  watchDebounced(
+    excluded,
+    (newExcluded) => {
+      debouncedExcluded.value = new Set(newExcluded);
+    },
+    { debounce: 500, maxWait: 2000, immediate: true }
+  );
 
   // ClinVar submissions for resolving conflicting classifications
   const {
@@ -171,14 +193,32 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   });
 
   // Filter to pathogenic variants using configurable filters (FILT-01 through FILT-09)
-  const pathogenicVariants = computed(() => {
-    if (!normalizedVariants.value.length) return [];
+  // This is the count BEFORE manual exclusions (for display purposes)
+  const totalPathogenicCount = computed(() => {
+    if (!normalizedVariants.value.length) return 0;
     return filterPathogenicVariantsConfigurable(
       normalizedVariants.value,
       normalizedClinvar.value,
       filterConfig.value,
       submissions.value
+    ).length;
+  });
+
+  // Filter to pathogenic variants using configurable filters (FILT-01 through FILT-09)
+  // Then filter out manually excluded variants (EXCL-04)
+  const pathogenicVariants = computed(() => {
+    if (!normalizedVariants.value.length) return [];
+
+    // First apply standard pathogenicity filters
+    const filtered = filterPathogenicVariantsConfigurable(
+      normalizedVariants.value,
+      normalizedClinvar.value,
+      filterConfig.value,
+      submissions.value
     );
+
+    // Then filter out manually excluded variants
+    return filtered.filter(v => !debouncedExcluded.value.has(v.variant_id));
   });
 
   const qualifyingVariantCount = computed(() => pathogenicVariants.value.length);
@@ -334,6 +374,8 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     submissionsProgress,
     submissionsError,
     currentVersion,
+    excludedCount,
+    totalPathogenicCount,
     calculateRisk,
     refetch,
   };
