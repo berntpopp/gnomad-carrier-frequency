@@ -1,4 +1,4 @@
-import { computed, type Ref } from 'vue';
+import { computed, watch, type Ref } from 'vue';
 import { useQuery } from 'villus';
 import { GENE_VARIANTS_QUERY } from '@/api/queries/gene-variants';
 import type {
@@ -8,6 +8,7 @@ import type {
 } from '@/api/queries/types';
 import { getDatasetId, getReferenceGenome, type GnomadVersion } from '@/config';
 import { useGnomadVersion } from '@/api';
+import { useLogger } from './useLogger';
 
 export interface UseGeneVariantsReturn {
   gene: Ref<GeneVariantsResponse['gene']>;
@@ -25,6 +26,7 @@ export function useGeneVariants(
   geneSymbol: Ref<string | null>
 ): UseGeneVariantsReturn {
   const { version } = useGnomadVersion();
+  const logger = useLogger('api');
 
   // Variables use dataset and referenceGenome from config
   const variables = computed(() => ({
@@ -39,6 +41,45 @@ export function useGeneVariants(
     skip: () => !geneSymbol.value,
     cachePolicy: 'cache-first',
   });
+
+  // Log API request/response tracking
+  watch(
+    () => geneSymbol.value,
+    (symbol) => {
+      if (symbol) {
+        logger.debug('Fetching gene variants', {
+          gene: symbol,
+          dataset: getDatasetId(version.value),
+          referenceGenome: getReferenceGenome(version.value),
+        });
+      }
+    }
+  );
+
+  watch(
+    () => data.value,
+    (response) => {
+      if (response?.gene) {
+        logger.info('Gene variants loaded', {
+          gene: geneSymbol.value,
+          variantCount: response.gene.variants?.length ?? 0,
+          clinvarCount: response.gene.clinvar_variants?.length ?? 0,
+        });
+      }
+    }
+  );
+
+  watch(
+    () => error.value,
+    (err) => {
+      if (err) {
+        logger.error('Gene variants request failed', {
+          gene: geneSymbol.value,
+          error: err.message,
+        });
+      }
+    }
+  );
 
   const gene = computed(() => data.value?.gene ?? null);
   const variants = computed(() => gene.value?.variants ?? []);
