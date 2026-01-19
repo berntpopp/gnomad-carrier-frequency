@@ -144,46 +144,48 @@ Plans:
 
 ---
 
-### Phase 9: ClinGen + Documentation
+### Phase 9: ClinGen + Documentation ✓
 
 **Goal:** User receives clinical validation warnings and can access comprehensive help
 
 **Dependencies:** Phase 6 (app shell for help navigation)
 
 **Requirements:**
-- CLIN-01: App fetches ClinGen gene-disease validity data
-- CLIN-02: ClinGen data cached with 30-day expiry
-- CLIN-03: User can manually refresh ClinGen cache in settings
-- CLIN-04: Non-blocking warning displayed if gene not AR-associated
-- CLIN-05: Gene constraint scores (pLI/LOEUF) displayed from gnomAD
-- CLIN-06: Warning displayed for genes with low exome coverage
-- DOC-01: README.md describes project purpose and features
-- DOC-02: README.md includes technology tags/badges
-- DOC-03: Methodology page explains carrier frequency calculation
-- DOC-04: Methodology page explains Hardy-Weinberg principles
-- DOC-05: Help/FAQ page with expandable accordion sections
-- DOC-06: FAQ addresses common questions about gnomAD data
-- DOC-07: Contextual help tooltips on key UI elements
-- DOC-08: Data sources attributed (gnomAD, ClinVar versions)
-- DOC-09: Clinical disclaimer displayed appropriately
+- CLIN-01: App fetches ClinGen gene-disease validity data ✓
+- CLIN-02: ClinGen data cached with 30-day expiry ✓
+- CLIN-03: User can manually refresh ClinGen cache in settings ✓
+- CLIN-04: Non-blocking warning displayed if gene not AR-associated ✓
+- CLIN-05: Gene constraint scores (pLI/LOEUF) displayed from gnomAD ✓
+- CLIN-06: Warning displayed for genes with low exome coverage ✓
+- DOC-01: README.md describes project purpose and features ✓
+- DOC-02: README.md includes technology tags/badges ✓
+- DOC-03: Methodology page explains carrier frequency calculation ✓
+- DOC-04: Methodology page explains Hardy-Weinberg principles ✓
+- DOC-05: Help/FAQ page with expandable accordion sections ✓
+- DOC-06: FAQ addresses common questions about gnomAD data ✓
+- DOC-07: Contextual help tooltips on key UI elements ✓
+- DOC-08: Data sources attributed (gnomAD, ClinVar versions) ✓
+- DOC-09: Clinical disclaimer displayed appropriately ✓
 
-**Plans:** 7 plans
+**Plans:** 7 plans (complete)
 
 Plans:
-- [ ] 09-01-PLAN.md - ClinGen infrastructure (types, store, composable for CSV fetch/cache)
-- [ ] 09-02-PLAN.md - Gene constraint query and GeneConstraintCard component
-- [ ] 09-03-PLAN.md - ClingenWarning component integration (StepGene, StepResults)
-- [ ] 09-04-PLAN.md - Disclaimer banner, app store, settings ClinGen management
-- [ ] 09-05-PLAN.md - Methodology and FAQ dialogs with content files
-- [ ] 09-06-PLAN.md - About and DataSources dialogs, README documentation
-- [ ] 09-07-PLAN.md - Contextual tooltips and coverage warning
+- [x] 09-01-PLAN.md - ClinGen infrastructure (types, store, composable for JSON API fetch/cache)
+- [x] 09-02-PLAN.md - Gene constraint query and GeneConstraintCard component
+- [x] 09-03-PLAN.md - ClingenWarning component integration (StepGene, StepResults)
+- [x] 09-04-PLAN.md - Disclaimer banner, app store, settings ClinGen management
+- [x] 09-05-PLAN.md - Methodology and FAQ dialogs with content files
+- [x] 09-06-PLAN.md - About and DataSources dialogs, README documentation
+- [x] 09-07-PLAN.md - Contextual tooltips and coverage warning
 
 **Success Criteria:**
-1. User sees non-blocking warning banner when gene is not AR-associated per ClinGen
-2. User can view gene constraint scores (pLI/LOEUF) during gene selection
-3. User can access Help/FAQ page from navigation with expandable accordion sections
-4. User can see methodology explanation including Hardy-Weinberg derivation
-5. User sees clinical disclaimer and data source attribution in app
+1. ✓ User sees non-blocking warning banner when gene is not AR-associated per ClinGen
+2. ✓ User can view gene constraint scores (pLI/LOEUF) during gene selection
+3. ✓ User can access Help/FAQ page from navigation with expandable accordion sections
+4. ✓ User can see methodology explanation including Hardy-Weinberg derivation
+5. ✓ User sees clinical disclaimer and data source attribution in app
+
+**Completed:** 2026-01-19
 
 ---
 
@@ -231,8 +233,8 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 19/TBD | In Progress (Phase 8 complete) | - |
+| v1.1 Release-Ready | 5-10 | 19/TBD | In Progress (Phase 9 complete) | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 9 planned)*
+*Last updated: 2026-01-19 (Phase 9 complete)*

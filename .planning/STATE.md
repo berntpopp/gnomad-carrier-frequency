@@ -63,7 +63,7 @@ v1.1 Release-Ready: [#########-] ~90% - Phase 9 complete
 |----------|-----------|------|
 | Settings store first | Other features depend on settings infrastructure | 2026-01-19 |
 | 6 phases from requirements | Natural delivery boundaries from research | 2026-01-19 |
-| ClinGen via CSV, not REST | Public download endpoint is CORS-enabled | 2026-01-19 |
+| ClinGen via JSON API | https://search.clinicalgenome.org/api/validity?queryParams is CORS-enabled | 2026-01-19 |
 | Theme storage key 'carrier-freq-theme' | Namespaced key avoids conflicts with other apps | 2026-01-19 |
 | Title in content area | App bar has app name, page content has descriptive header | 2026-01-19 |
 | SVG favicon with CSS dark mode | Modern browsers support @media prefers-color-scheme in SVG | 2026-01-19 |

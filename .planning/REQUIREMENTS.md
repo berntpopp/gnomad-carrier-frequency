@@ -19,32 +19,32 @@ Requirements for release-ready polish. Each maps to roadmap phases.
 
 ### Variant Table
 
-- [ ] **VAR-01**: User can open modal showing contributing variants
-- [ ] **VAR-02**: Variant modal displays variant ID, consequence, allele frequency, ClinVar status
-- [ ] **VAR-03**: Variant table columns are sortable
-- [ ] **VAR-04**: User can click population row to see population-specific variants
-- [ ] **VAR-05**: Population drill-down shows variant frequencies for that population
+- [x] **VAR-01**: User can open modal showing contributing variants
+- [x] **VAR-02**: Variant modal displays variant ID, consequence, allele frequency, ClinVar status
+- [x] **VAR-03**: Variant table columns are sortable
+- [x] **VAR-04**: User can click population row to see population-specific variants
+- [x] **VAR-05**: Population drill-down shows variant frequencies for that population
 
 ### Filtering Configuration
 
-- [ ] **FILT-01**: User can see current filter criteria displayed
-- [ ] **FILT-02**: User can toggle LoF HC filter on/off
-- [ ] **FILT-03**: User can toggle missense inclusion on/off
-- [ ] **FILT-04**: User can toggle ClinVar P/LP filter on/off
-- [ ] **FILT-05**: User can adjust ClinVar star threshold (0-4)
-- [ ] **FILT-06**: Filter defaults stored in settings
-- [ ] **FILT-07**: User can override filter defaults per calculation
-- [ ] **FILT-08**: User can reset filters to defaults
-- [ ] **FILT-09**: Filter changes show real-time variant count feedback
+- [x] **FILT-01**: User can see current filter criteria displayed
+- [x] **FILT-02**: User can toggle LoF HC filter on/off
+- [x] **FILT-03**: User can toggle missense inclusion on/off
+- [x] **FILT-04**: User can toggle ClinVar P/LP filter on/off
+- [x] **FILT-05**: User can adjust ClinVar star threshold (0-4)
+- [x] **FILT-06**: Filter defaults stored in settings
+- [x] **FILT-07**: User can override filter defaults per calculation
+- [x] **FILT-08**: User can reset filters to defaults
+- [x] **FILT-09**: Filter changes show real-time variant count feedback
 
 ### ClinGen Integration
 
-- [ ] **CLIN-01**: App fetches ClinGen gene-disease validity data
-- [ ] **CLIN-02**: ClinGen data cached with 30-day expiry
-- [ ] **CLIN-03**: User can manually refresh ClinGen cache in settings
-- [ ] **CLIN-04**: Non-blocking warning displayed if gene not AR-associated
-- [ ] **CLIN-05**: Gene constraint scores (pLI/LOEUF) displayed from gnomAD
-- [ ] **CLIN-06**: Warning displayed for genes with low exome coverage
+- [x] **CLIN-01**: App fetches ClinGen gene-disease validity data
+- [x] **CLIN-02**: ClinGen data cached with 30-day expiry
+- [x] **CLIN-03**: User can manually refresh ClinGen cache in settings
+- [x] **CLIN-04**: Non-blocking warning displayed if gene not AR-associated
+- [x] **CLIN-05**: Gene constraint scores (pLI/LOEUF) displayed from gnomAD
+- [x] **CLIN-06**: Warning displayed for genes with low exome coverage
 
 ### Data Export
 
@@ -77,15 +77,15 @@ Requirements for release-ready polish. Each maps to roadmap phases.
 
 ### Documentation
 
-- [ ] **DOC-01**: README.md describes project purpose and features
-- [ ] **DOC-02**: README.md includes technology tags/badges
-- [ ] **DOC-03**: Methodology page explains carrier frequency calculation
-- [ ] **DOC-04**: Methodology page explains Hardy-Weinberg principles
-- [ ] **DOC-05**: Help/FAQ page with expandable accordion sections
-- [ ] **DOC-06**: FAQ addresses common questions about gnomAD data
-- [ ] **DOC-07**: Contextual help tooltips on key UI elements
-- [ ] **DOC-08**: Data sources attributed (gnomAD, ClinVar versions)
-- [ ] **DOC-09**: Clinical disclaimer displayed appropriately
+- [x] **DOC-01**: README.md describes project purpose and features
+- [x] **DOC-02**: README.md includes technology tags/badges
+- [x] **DOC-03**: Methodology page explains carrier frequency calculation
+- [x] **DOC-04**: Methodology page explains Hardy-Weinberg principles
+- [x] **DOC-05**: Help/FAQ page with expandable accordion sections
+- [x] **DOC-06**: FAQ addresses common questions about gnomAD data
+- [x] **DOC-07**: Contextual help tooltips on key UI elements
+- [x] **DOC-08**: Data sources attributed (gnomAD, ClinVar versions)
+- [x] **DOC-09**: Clinical disclaimer displayed appropriately
 
 ### SEO & Accessibility
 
@@ -98,8 +98,8 @@ Requirements for release-ready polish. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Version number in package.json follows semver
-- [ ] **INFRA-02**: Version displayed in app UI
+- [x] **INFRA-01**: Version number in package.json follows semver
+- [x] **INFRA-02**: Version displayed in app UI
 - [ ] **INFRA-03**: Build time improved with vite-plugin-checker
 - [ ] **INFRA-04**: Lint/typecheck runs in parallel
 - [x] **INFRA-05**: Lighthouse performance score >= 90
@@ -153,26 +153,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SHELL-05 | Phase 5 | Complete |
 | SHELL-06 | Phase 6 | Complete |
 | SHELL-07 | Phase 6 | Complete |
-| VAR-01 | Phase 8 | Pending |
-| VAR-02 | Phase 8 | Pending |
-| VAR-03 | Phase 8 | Pending |
-| VAR-04 | Phase 8 | Pending |
-| VAR-05 | Phase 8 | Pending |
-| FILT-01 | Phase 8 | Pending |
-| FILT-02 | Phase 8 | Pending |
-| FILT-03 | Phase 8 | Pending |
-| FILT-04 | Phase 8 | Pending |
-| FILT-05 | Phase 8 | Pending |
-| FILT-06 | Phase 8 | Pending |
-| FILT-07 | Phase 8 | Pending |
-| FILT-08 | Phase 8 | Pending |
-| FILT-09 | Phase 8 | Pending |
-| CLIN-01 | Phase 9 | Pending |
-| CLIN-02 | Phase 9 | Pending |
-| CLIN-03 | Phase 9 | Pending |
-| CLIN-04 | Phase 9 | Pending |
-| CLIN-05 | Phase 9 | Pending |
-| CLIN-06 | Phase 9 | Pending |
+| VAR-01 | Phase 8 | Complete |
+| VAR-02 | Phase 8 | Complete |
+| VAR-03 | Phase 8 | Complete |
+| VAR-04 | Phase 8 | Complete |
+| VAR-05 | Phase 8 | Complete |
+| FILT-01 | Phase 8 | Complete |
+| FILT-02 | Phase 8 | Complete |
+| FILT-03 | Phase 8 | Complete |
+| FILT-04 | Phase 8 | Complete |
+| FILT-05 | Phase 8 | Complete |
+| FILT-06 | Phase 8 | Complete |
+| FILT-07 | Phase 8 | Complete |
+| FILT-08 | Phase 8 | Complete |
+| FILT-09 | Phase 8 | Complete |
+| CLIN-01 | Phase 9 | Complete |
+| CLIN-02 | Phase 9 | Complete |
+| CLIN-03 | Phase 9 | Complete |
+| CLIN-04 | Phase 9 | Complete |
+| CLIN-05 | Phase 9 | Complete |
+| CLIN-06 | Phase 9 | Complete |
 | EXP-01 | Phase 10 | Pending |
 | EXP-02 | Phase 10 | Pending |
 | EXP-03 | Phase 10 | Pending |
@@ -193,15 +193,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOG-06 | Phase 10 | Pending |
 | LOG-07 | Phase 10 | Pending |
 | LOG-08 | Phase 10 | Pending |
-| DOC-01 | Phase 9 | Pending |
-| DOC-02 | Phase 9 | Pending |
-| DOC-03 | Phase 9 | Pending |
-| DOC-04 | Phase 9 | Pending |
-| DOC-05 | Phase 9 | Pending |
-| DOC-06 | Phase 9 | Pending |
-| DOC-07 | Phase 9 | Pending |
-| DOC-08 | Phase 9 | Pending |
-| DOC-09 | Phase 9 | Pending |
+| DOC-01 | Phase 9 | Complete |
+| DOC-02 | Phase 9 | Complete |
+| DOC-03 | Phase 9 | Complete |
+| DOC-04 | Phase 9 | Complete |
+| DOC-05 | Phase 9 | Complete |
+| DOC-06 | Phase 9 | Complete |
+| DOC-07 | Phase 9 | Complete |
+| DOC-08 | Phase 9 | Complete |
+| DOC-09 | Phase 9 | Complete |
 | SEO-01 | Phase 7 | Complete |
 | SEO-02 | Phase 7 | Complete |
 | SEO-03 | Phase 7 | Complete |
@@ -223,4 +223,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 (Phase 7 complete)*
+*Last updated: 2026-01-19 (Phase 9 complete)*
