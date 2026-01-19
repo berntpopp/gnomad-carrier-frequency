@@ -3,8 +3,9 @@
     v-model="modelValue"
     max-width="600"
     persistent
+    @update:model-value="(val) => val ? onDialogOpen() : undefined"
   >
-    <v-card>
+    <v-card ref="dialogCard">
       <v-card-title class="d-flex align-center">
         <span>Settings</span>
         <v-spacer />
@@ -47,13 +48,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
+import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 
 const modelValue = defineModel<boolean>();
 
 const activeTab = ref('general');
+const dialogCard = ref<HTMLElement | null>(null);
+
+const { activate, deactivate } = useFocusTrap(dialogCard, {
+  immediate: false,
+  allowOutsideClick: true,
+  escapeDeactivates: true,
+  returnFocusOnDeactivate: true,
+});
+
+async function onDialogOpen() {
+  await nextTick();
+  activate();
+}
 
 function close() {
+  deactivate();
   modelValue.value = false;
 }
 
