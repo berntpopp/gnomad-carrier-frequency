@@ -32,14 +32,12 @@ import DisclaimerBanner from '@/components/DisclaimerBanner.vue';
 import SettingsDialog from '@/components/SettingsDialog.vue';
 import LogViewerPanel from '@/components/LogViewerPanel.vue';
 import WizardStepper from '@/components/wizard/WizardStepper.vue';
-import { useLogger } from '@/composables';
 import { useLogStore } from '@/stores/useLogStore';
 
 const showSettings = ref(false);
 const showLogViewer = ref(false);
 
-// App startup logging
-const logger = useLogger('app');
+// App startup
 const logStore = useLogStore();
 
 onMounted(() => {
@@ -47,13 +45,6 @@ onMounted(() => {
   if (logStore.settings.autoClearOnStart) {
     logStore.clearAll();
   }
-
-  // Log app startup with version info
-  logger.info('Application started', {
-    version: import.meta.env.VITE_APP_VERSION || 'unknown',
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent,
-  });
 });
 </script>
 
