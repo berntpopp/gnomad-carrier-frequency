@@ -101,7 +101,7 @@
 
 <script setup lang="ts">
 import { watch } from 'vue';
-import { useWizard, useCarrierFrequency } from '@/composables';
+import { useWizard, useCarrierFrequency, useAppAnnouncer } from '@/composables';
 import StepGene from './StepGene.vue';
 import StepStatus from './StepStatus.vue';
 import StepFrequency from './StepFrequency.vue';
@@ -127,8 +127,23 @@ const {
   refetch,
 } = useCarrierFrequency();
 
+// Screen reader announcements
+const {
+  announceStep,
+  announceCalculation,
+  announceError,
+  announceLoading,
+  announceGeneSelection,
+} = useAppAnnouncer();
+
+// Step names for announcements
+const stepNames = ['Gene', 'Status', 'Frequency', 'Results'];
+
 // Handle gene selection completion
 function onGeneComplete() {
+  if (state.gene) {
+    announceGeneSelection(state.gene.symbol);
+  }
   nextStep();
 }
 
@@ -139,5 +154,43 @@ watch(
     setGeneSymbol(newGene?.symbol ?? null);
   },
   { immediate: true }
+);
+
+// Announce step changes to screen readers
+watch(
+  () => state.currentStep,
+  (newStep, oldStep) => {
+    if (newStep !== oldStep && newStep >= 1 && newStep <= 4) {
+      announceStep(newStep, stepNames[newStep - 1]);
+
+      // Announce results when reaching step 4
+      if (newStep === 4 && globalFrequency.value !== null) {
+        const ratio = `1 in ${Math.round(1 / globalFrequency.value)}`;
+        announceCalculation(ratio, 'global');
+      }
+    }
+  }
+);
+
+// Announce loading state changes
+watch(
+  isLoading,
+  (loading, wasLoading) => {
+    if (loading && !wasLoading) {
+      announceLoading('variant data');
+    } else if (!loading && wasLoading && !hasError.value) {
+      announceLoading('Variant data', true);
+    }
+  }
+);
+
+// Announce errors
+watch(
+  hasError,
+  (error) => {
+    if (error && errorMessage.value) {
+      announceError(errorMessage.value);
+    }
+  }
 );
 </script>
