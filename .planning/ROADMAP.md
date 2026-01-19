@@ -3,9 +3,97 @@
 ## Milestones
 
 - **v1.0 MVP** --- Phases 1-4 (shipped 2026-01-19) -> [Archive](milestones/v1.0-ROADMAP.md)
-- **v1.1 Release-Ready** --- Phases 5-10 (complete)
+- **v1.1 Release-Ready** --- Phases 5-10 (shipped 2026-01-19)
+- **v1.2 Sharing & Collaboration** --- Phases 11+ (in progress)
 
-## v1.1 Release-Ready
+## v1.2 Sharing & Collaboration
+
+Enable reproducible and shareable calculations through URL-based state management, offline-capable PWA support, and manual variant curation.
+
+### Phase 11: URL State Sharing
+
+**Goal:** User can share calculation URLs that reproduce exact parameters and results
+
+**Dependencies:** Phase 10 (full feature set to share)
+
+**Requirements:**
+- URL-01: URL query parameters encode wizard state (gene, filters, settings)
+- URL-02: Opening shared URL restores complete calculation state
+- URL-03: URL updates as user progresses through wizard
+- URL-04: Copy link button available in results step
+- URL-05: Shared URLs work across browser sessions
+- URL-06: Invalid/partial URLs gracefully degrade to defaults
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 11 to break down)
+
+**Success Criteria:**
+1. User can copy a shareable link from the results page
+2. Opening a shared link restores gene, filters, and frequency source
+3. URL updates reflect current wizard state without page reload
+4. Invalid URL parameters don't crash the app
+
+---
+
+### Phase 12: PWA
+
+**Goal:** User can install app on device and use offline with cached data
+
+**Dependencies:** Phase 11 (URL state for deep linking)
+
+**Requirements:**
+- PWA-01: App has valid web manifest with icons and metadata
+- PWA-02: Service worker caches app shell and static assets
+- PWA-03: App is installable on desktop and mobile
+- PWA-04: Offline fallback page displays when network unavailable
+- PWA-05: Previously fetched gene data available offline
+- PWA-06: Install prompt shown to eligible users
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 12 to break down)
+
+**Success Criteria:**
+1. User can install app via browser install prompt
+2. Installed app launches in standalone window
+3. App loads without network after initial visit
+4. Cached gene queries work offline
+
+---
+
+### Phase 13: Variant Exclusion
+
+**Goal:** User can manually exclude specific variants from carrier frequency calculations
+
+**Dependencies:** Phase 8 (variant table infrastructure)
+
+**Requirements:**
+- EXCL-01: User can exclude individual variants via checkbox/toggle in variant table
+- EXCL-02: User can exclude all variants at once via "select all" control
+- EXCL-03: Excluded variants visually marked in table (strikethrough/dimmed)
+- EXCL-04: Carrier frequency recalculates in real-time when variants excluded
+- EXCL-05: Results page shows note when variants have been excluded
+- EXCL-06: Export includes excluded variants marked as "excluded" with reason field
+- EXCL-07: Exclusion state persists during session (not across sessions)
+- EXCL-08: User can restore excluded variants individually or all at once
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 13 to break down)
+
+**Success Criteria:**
+1. User can click to exclude a variant and see frequency update immediately
+2. Excluded variants remain visible but clearly marked as excluded
+3. Results summary indicates how many variants were manually excluded
+4. Exported data distinguishes excluded variants from included ones
+
+---
+
+## v1.1 Release-Ready (Archived)
 
 Polish for wider distribution: app shell, filtering configuration, ClinGen integration, data export, template editing, browser logging, documentation, and accessibility improvements.
 
@@ -247,8 +335,9 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 27/27 | Complete | - |
+| v1.1 Release-Ready | 5-10 | 27/27 | Complete | 2026-01-19 |
+| v1.2 Sharing & Collaboration | 11+ | 0/? | In Progress | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 10 complete)*
+*Last updated: 2026-01-19 (Phase 13 added)*

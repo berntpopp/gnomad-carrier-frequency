@@ -13,19 +13,20 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 ## Current Position
 
-**Milestone:** v1.1 Release-Ready
-**Phase:** 10 - Export + Templates + Logging - COMPLETE
-**Plan:** 8 of 8 (all plans complete)
-**Status:** Complete
+**Milestone:** v1.2 Sharing & Collaboration
+**Phase:** 11 - URL State Sharing - NOT PLANNED
+**Plan:** 0 of ? (run /gsd:plan-phase 11 to create plans)
+**Status:** Ready to plan
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [##########] 100% - COMPLETE 2026-01-19
+v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
+v1.2 Sharing:       [          ]   0% - Phase 11 added
 ```
 
-**Overall:** All phases complete (27/27 plans across v1.0 + v1.1)
+**Overall:** 27/27 plans complete for v1.0+v1.1, starting v1.2
 
 ---
 
@@ -121,12 +122,21 @@ v1.1 Release-Ready: [##########] 100% - COMPLETE 2026-01-19
 | Module-level logApi helper | Try/catch wrapped for non-composable contexts in client.ts | 2026-01-19 |
 | Watch-based logging | Track reactive state changes via watchers for separation of concerns | 2026-01-19 |
 
+### Roadmap Evolution
+
+- Phase 11 added: URL State Sharing - shareable/reproducible calculation links (2026-01-19)
+- Phase 12 added: PWA - installable app with offline support (2026-01-19)
+- Phase 13 added: Variant Exclusion - manual variant exclusion from calculations (2026-01-19)
+
 ### Blockers
 
-None - v1.1 complete.
+None.
 
 ### TODOs
 
+- [ ] Run `/gsd:plan-phase 11` to create URL State Sharing plans
+- [ ] Run `/gsd:plan-phase 12` to create PWA plans
+- [ ] Run `/gsd:plan-phase 13` to create Variant Exclusion plans
 - [x] Run `/gsd:plan-phase 5` to create Foundation plans
 - [x] Execute 05-01-PLAN.md (theme + version infrastructure)
 - [x] Execute 05-02-PLAN.md (settings UI integration)
@@ -167,10 +177,13 @@ None - v1.1 complete.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 10 Plan 08 - Final Integration (logging throughout app)
-**Status:** v1.1 COMPLETE
+**Completed:** Added Phase 11 - URL State Sharing to v1.2 milestone
+**Status:** v1.2 ready to plan
 
 ### Handoff Notes
+
+v1.2 milestone created for sharing features:
+- Phase 11: URL State Sharing - shareable/reproducible calculation URLs
 
 v1.1 roadmap derived from requirements and research:
 - Phase 5: Foundation (settings store, theme, version display) - COMPLETE
