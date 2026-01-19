@@ -1,0 +1,140 @@
+{
+  "language": "en",
+  "perspectives": {
+    "affected": {
+      "label": "Affected Patient",
+      "sections": {
+        "geneIntro": {
+          "id": "geneIntro",
+          "label": "Gene Introduction",
+          "template": "A pathogenic variant in the {{gene}} gene was identified in the patient."
+        },
+        "inheritance": {
+          "id": "inheritance",
+          "label": "Inheritance Pattern",
+          "template": "The {{gene}} gene follows autosomal recessive inheritance. The patient's parents are most likely heterozygous carriers."
+        },
+        "carrierFrequency": {
+          "id": "carrierFrequency",
+          "label": "Carrier Frequency",
+          "template": "Based on an estimated carrier frequency of {{carrierFrequencyRatio}} {{source}}"
+        },
+        "recurrenceRisk": {
+          "id": "recurrenceRisk",
+          "label": "Recurrence Risk",
+          "template": "the risk for a {{gene}}-associated condition in the patient's offspring would be approximately {{recurrenceRiskPercent}} ({{recurrenceRiskRatio}})."
+        },
+        "populationContext": {
+          "id": "populationContext",
+          "label": "Population Context",
+          "template": "Carrier frequency may vary between different populations."
+        },
+        "founderEffect": {
+          "id": "founderEffect",
+          "label": "Founder Effect",
+          "template": "Certain populations may have elevated carrier frequencies due to founder effects."
+        },
+        "sourceCitation": {
+          "id": "sourceCitation",
+          "label": "Source Citation",
+          "template": "Carrier frequency data was obtained from {{source}} (accessed {{accessDate}})."
+        },
+        "recommendation": {
+          "id": "recommendation",
+          "label": "Recommendation",
+          "template": "Other family members may also have an increased risk of being carriers. Genetic testing for the identified variant can be offered to relatives."
+        }
+      }
+    },
+    "carrier": {
+      "label": "Healthy Carrier",
+      "sections": {
+        "geneIntro": {
+          "id": "geneIntro",
+          "label": "Gene Introduction",
+          "template": "A heterozygous pathogenic variant in the {{gene}} gene was identified in the individual. This person is a carrier for a {{gene}}-associated condition."
+        },
+        "inheritance": {
+          "id": "inheritance",
+          "label": "Inheritance Pattern",
+          "template": "The {{gene}} gene follows autosomal recessive inheritance. Carriers are typically unaffected."
+        },
+        "carrierFrequency": {
+          "id": "carrierFrequency",
+          "label": "Carrier Frequency",
+          "template": "Based on an estimated carrier frequency of {{carrierFrequencyRatio}} {{source}}"
+        },
+        "recurrenceRisk": {
+          "id": "recurrenceRisk",
+          "label": "Recurrence Risk",
+          "template": "if the partner is also a carrier, the risk for a {{gene}}-associated condition in offspring would be 25%. The probability that a partner is also a carrier equals the carrier frequency of {{carrierFrequencyRatio}}. This results in a combined risk of approximately {{recurrenceRiskPercent}} ({{recurrenceRiskRatio}})."
+        },
+        "populationContext": {
+          "id": "populationContext",
+          "label": "Population Context",
+          "template": "Carrier frequency may vary between different populations."
+        },
+        "founderEffect": {
+          "id": "founderEffect",
+          "label": "Founder Effect",
+          "template": "Certain populations may have elevated carrier frequencies due to founder effects."
+        },
+        "sourceCitation": {
+          "id": "sourceCitation",
+          "label": "Source Citation",
+          "template": "Carrier frequency data was obtained from {{source}} (accessed {{accessDate}})."
+        },
+        "recommendation": {
+          "id": "recommendation",
+          "label": "Recommendation",
+          "template": "Partner testing to determine carrier status may be considered. Genetic testing for the identified variant can be offered to family members."
+        }
+      }
+    },
+    "familyMember": {
+      "label": "Family Member",
+      "sections": {
+        "geneIntro": {
+          "id": "geneIntro",
+          "label": "Gene Introduction",
+          "template": "A pathogenic variant in the {{gene}} gene has been identified in the family."
+        },
+        "inheritance": {
+          "id": "inheritance",
+          "label": "Inheritance Pattern",
+          "template": "The {{gene}} gene follows autosomal recessive inheritance. Relatives of affected individuals or carriers have an increased risk of being carriers themselves."
+        },
+        "carrierFrequency": {
+          "id": "carrierFrequency",
+          "label": "Carrier Frequency",
+          "template": "The estimated carrier frequency in the general population is {{carrierFrequencyRatio}} {{source}}."
+        },
+        "recurrenceRisk": {
+          "id": "recurrenceRisk",
+          "label": "Recurrence Risk",
+          "template": "If carrier status is confirmed and the partner is also a carrier, the risk for a {{gene}}-associated condition in offspring would be 25%. The combined risk with unknown partner status is approximately {{recurrenceRiskPercent}} ({{recurrenceRiskRatio}})."
+        },
+        "populationContext": {
+          "id": "populationContext",
+          "label": "Population Context",
+          "template": "Carrier frequency may vary between different populations."
+        },
+        "founderEffect": {
+          "id": "founderEffect",
+          "label": "Founder Effect",
+          "template": "Certain populations may have elevated carrier frequencies due to founder effects."
+        },
+        "sourceCitation": {
+          "id": "sourceCitation",
+          "label": "Source Citation",
+          "template": "Carrier frequency data was obtained from {{source}} (accessed {{accessDate}})."
+        },
+        "recommendation": {
+          "id": "recommendation",
+          "label": "Recommendation",
+          "template": "Targeted testing for the family variant can be offered to determine carrier status."
+        }
+      }
+    }
+  }
+}
