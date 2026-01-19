@@ -15,18 +15,18 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.2 Sharing & Collaboration
 **Phase:** 12 - PWA - IN PROGRESS
-**Plan:** 1 of 3 complete
-**Status:** Plan 12-01 complete, ready for 12-02
+**Plan:** 2 of 3 complete
+**Status:** Plan 12-02 complete, ready for 12-03
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
-v1.2 Sharing:       [#####     ]  50% - Phase 12 in progress (2/3 phases, 3/5 plans)
+v1.2 Sharing:       [######    ]  60% - Phase 12 in progress (2/3 phases, 4/5 plans)
 ```
 
-**Overall:** 30/32 plans complete for v1.0+v1.1+v1.2
+**Overall:** 31/32 plans complete for v1.0+v1.1+v1.2
 
 ---
 
@@ -131,6 +131,9 @@ v1.2 Sharing:       [#####     ]  50% - Phase 12 in progress (2/3 phases, 3/5 pl
 | registerType: 'prompt' | Per CONTEXT.md, user decides when to update (never auto-update) | 2026-01-19 |
 | Maskable icon with RequiForm background | #a09588 background, white text for contrast in safe zone | 2026-01-19 |
 | Separate cache names per API | gnomad-api-cache and clingen-api-cache for independent management | 2026-01-19 |
+| useOnline from VueUse for network detection | Leverages existing VueUse dependency for reliable network detection | 2026-01-19 |
+| Subtle vs prominent offline indicators | OfflineIndicator chip subtle, OfflineFallback alert prominent per context | 2026-01-19 |
+| Auto-dismiss back-online notification | 3 second timeout balances visibility with non-intrusiveness | 2026-01-19 |
 
 ### Roadmap Evolution
 
@@ -149,7 +152,7 @@ None.
 - [x] Execute 11-02-PLAN.md (share UI)
 - [x] Run `/gsd:plan-phase 12` to create PWA plans
 - [x] Execute 12-01-PLAN.md (PWA infrastructure)
-- [ ] Execute 12-02-PLAN.md (PWA UI)
+- [x] Execute 12-02-PLAN.md (PWA UI)
 - [ ] Execute 12-03-PLAN.md (install prompt)
 - [ ] Run `/gsd:plan-phase 13` to create Variant Exclusion plans
 - [x] Run `/gsd:plan-phase 5` to create Foundation plans
@@ -192,17 +195,18 @@ None.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 12 Plan 01 - PWA Infrastructure
-**Status:** Phase 12 in progress (1/3 plans)
+**Completed:** Phase 12 Plan 02 - PWA UI
+**Status:** Phase 12 in progress (2/3 plans)
 
 ### Handoff Notes
 
-v1.2 Phase 12 Plan 01 complete:
-- vite-plugin-pwa configured with web manifest
-- Workbox service worker with NetworkFirst caching for gnomAD/ClinGen APIs
-- PWA icons generated from SVG favicon (192, 512, maskable, apple-touch-icon)
-- TypeScript declarations for BeforeInstallPromptEvent
-- Build produces manifest.webmanifest and sw.js
+v1.2 Phase 12 Plan 02 complete:
+- usePwaInstall composable for install prompt management
+- useNetworkStatus composable for network connectivity detection
+- OfflineIndicator chip in AppBar when offline
+- OfflineFallback alert in StepGene when offline
+- Install App section in Settings dialog
+- Back online snackbar notification
 
 v1.1 roadmap derived from requirements and research:
 - Phase 5: Foundation (settings store, theme, version display) - COMPLETE
@@ -273,3 +277,4 @@ v1.1 roadmap derived from requirements and research:
 *11-02 complete: 2026-01-19*
 *Phase 11 complete: 2026-01-19*
 *12-01 complete: 2026-01-19*
+*12-02 complete: 2026-01-19*
