@@ -15,7 +15,7 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.2 Sharing & Collaboration
 **Phase:** 13 - Variant Exclusion - IN PROGRESS
-**Plan:** 3 of ? complete (plan count TBD)
+**Plan:** 4 of ? complete (plan count TBD)
 **Status:** Phase 13 in progress
 
 ### Progress
@@ -23,10 +23,10 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
-v1.2 Sharing:       [########  ]  90% - Phase 13 in progress (2/3 phases, 8/? plans)
+v1.2 Sharing:       [########  ]  90% - Phase 13 in progress (2/3 phases, 9/? plans)
 ```
 
-**Overall:** 35 plans complete for v1.0+v1.1+v1.2 (Phases 11-13)
+**Overall:** 36 plans complete for v1.0+v1.1+v1.2 (Phases 11-13)
 
 ---
 
@@ -137,6 +137,9 @@ v1.2 Sharing:       [########  ]  90% - Phase 13 in progress (2/3 phases, 8/? pl
 | ComputedRef<T> for typed computed refs | Match project conventions in composable interfaces | 2026-01-20 |
 | Singleton exclusion state pattern | Module-level reactive state shared across components | 2026-01-20 |
 | Four predefined exclusion reasons | likely_benign, low_quality, population_specific, other | 2026-01-20 |
+| lz-string for URL compression | Efficient encoding keeps exclusion data compact in shareable URLs | 2026-01-20 |
+| 1500 char exclusion URL limit | Conservative MAX_EXCLUSION_URL_LENGTH leaves buffer for other params | 2026-01-20 |
+| exclWarn flag for truncated exclusions | Graceful degradation when exclusions too large for URL | 2026-01-20 |
 | Dynamic slot syntax for header columns | #[\`header.xxx\`] syntax required for ESLint vue/valid-v-slot compliance | 2026-01-20 |
 | Checkbox inclusion semantics | Checked = included, unchecked = excluded (intuitive selection) | 2026-01-20 |
 | 500ms debounce for exclusion | Prevents jittery recalculation during rapid checkbox toggling | 2026-01-20 |
@@ -165,6 +168,7 @@ None.
 - [x] Execute 13-01-PLAN.md (exclusion infrastructure)
 - [x] Execute 13-02-PLAN.md (exclusion UI)
 - [x] Execute 13-03-PLAN.md (frequency recalculation integration)
+- [x] Execute 13-04-PLAN.md (export and URL integration)
 - [x] Run `/gsd:plan-phase 5` to create Foundation plans
 - [x] Execute 05-01-PLAN.md (theme + version infrastructure)
 - [x] Execute 05-02-PLAN.md (settings UI integration)
@@ -205,10 +209,18 @@ None.
 ### Last Session
 
 **Date:** 2026-01-20
-**Completed:** Phase 13 Plan 03 - Frequency Recalculation Integration
-**Status:** Phase 13 in progress (3/? plans)
+**Completed:** Phase 13 Plan 04 - Export and URL Integration
+**Status:** Phase 13 in progress (4/? plans)
 
 ### Handoff Notes
+
+v1.2 Phase 13 Plan 04 complete:
+- Extended ExportVariant with excluded and exclusionReason fields (EXCL-06)
+- Created exclusion-url.ts with lz-string compression utilities
+- Extended useUrlState to sync exclusion state bidirectionally with URL
+- Updated StepResults and VariantModal to pass exclusion data to export
+- Exports now include exclusion status and reason for all variants
+- Shared URLs preserve exclusion state via excl parameter
 
 v1.2 Phase 13 Plan 03 complete:
 - Debounced exclusion filtering in useCarrierFrequency (500ms)
@@ -312,3 +324,4 @@ v1.1 roadmap derived from requirements and research:
 *13-01 complete: 2026-01-20*
 *13-02 complete: 2026-01-20*
 *13-03 complete: 2026-01-20*
+*13-04 complete: 2026-01-20*
