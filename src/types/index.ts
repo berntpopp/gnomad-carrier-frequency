@@ -49,3 +49,5 @@ export type {
   LoeufInterpretation,
 } from './constraint';
 export { getLoeufInterpretation, getPliInterpretation } from './constraint';
+
+export type { LogLevel, LogEntry, LogSettings, LogStats } from './log';
