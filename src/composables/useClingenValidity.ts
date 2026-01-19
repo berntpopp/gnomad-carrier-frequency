@@ -1,9 +1,14 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue';
 import { useClingenStore } from '@/stores/useClingenStore';
-import type { ClingenEntry, ClingenValidityResult } from '@/types';
+import type {
+  ClingenEntry,
+  ClingenValidityResult,
+  ClingenApiResponse,
+  ClingenApiRow,
+} from '@/types';
 
-const CLINGEN_CSV_URL =
-  'https://search.clinicalgenome.org/kb/gene-validity/download';
+const CLINGEN_API_URL =
+  'https://search.clinicalgenome.org/api/validity?queryParams';
 
 export interface UseClingenValidityReturn {
   // State
@@ -23,57 +28,33 @@ export interface UseClingenValidityReturn {
 }
 
 /**
- * Parse ClinGen CSV text into typed entries
- * CSV structure: GENE SYMBOL, GENE ID (HGNC), DISEASE LABEL, DISEASE ID (MONDO), MOI, SOP, CLASSIFICATION, ONLINE REPORT, CLASSIFICATION DATE, GCEP, ...
+ * Transform ClinGen API row to normalized entry
  */
-function parseClingenCSV(csvText: string): ClingenEntry[] {
-  const lines = csvText.split('\n');
-
-  // Skip header row, filter empty lines
-  return lines
-    .slice(1)
-    .filter((line) => line.trim().length > 0)
-    .map((line) => {
-      // Handle CSV with potential quoted fields
-      const values = parseCSVLine(line);
-      return {
-        geneSymbol: values[0]?.trim().toUpperCase() ?? '',
-        hgncId: values[1]?.trim() ?? '',
-        diseaseLabel: values[2]?.trim() ?? '',
-        mondoId: values[3]?.trim() ?? '',
-        moi: values[4]?.trim() ?? '',
-        classification: values[5]?.trim() ?? '',
-        onlineReport: values[7]?.trim() ?? '',
-        classificationDate: values[8]?.trim() ?? '',
-        gcep: values[9]?.trim() ?? '',
-      };
-    })
-    .filter((entry) => entry.geneSymbol.length > 0);
+function transformApiRow(row: ClingenApiRow): ClingenEntry {
+  return {
+    geneSymbol: row.symbol?.toUpperCase() ?? '',
+    hgncId: row.hgnc_id ?? '',
+    diseaseLabel: row.disease_name ?? '',
+    mondoId: row.mondo ?? '',
+    moi: row.moi ?? '',
+    classification: row.classification ?? '',
+    expertPanel: row.ep ?? '',
+    classificationDate: row.released ?? '',
+    permId: row.perm_id ?? '',
+  };
 }
 
 /**
- * Parse a single CSV line, handling quoted fields
+ * Parse ClinGen API JSON response into typed entries
  */
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current);
-      current = '';
-    } else {
-      current += char;
-    }
+function parseClingenApiResponse(response: ClingenApiResponse): ClingenEntry[] {
+  if (!response.rows || !Array.isArray(response.rows)) {
+    return [];
   }
 
-  result.push(current); // Push last field
-  return result;
+  return response.rows
+    .map(transformApiRow)
+    .filter((entry) => entry.geneSymbol.length > 0);
 }
 
 export function useClingenValidity(): UseClingenValidityReturn {
@@ -90,17 +71,17 @@ export function useClingenValidity(): UseClingenValidityReturn {
     store.setError(''); // Clear previous errors
 
     try {
-      const response = await fetch(CLINGEN_CSV_URL);
+      const response = await fetch(CLINGEN_API_URL);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const csvText = await response.text();
-      const entries = parseClingenCSV(csvText);
+      const json = (await response.json()) as ClingenApiResponse;
+      const entries = parseClingenApiResponse(json);
 
       if (entries.length === 0) {
-        throw new Error('No valid entries parsed from ClinGen CSV');
+        throw new Error('No valid entries parsed from ClinGen API');
       }
 
       store.setData(entries);

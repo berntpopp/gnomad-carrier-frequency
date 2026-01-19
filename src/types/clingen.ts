@@ -1,24 +1,49 @@
 /**
  * ClinGen gene-disease validity types
  *
- * Provides type definitions for ClinGen CSV data, cache state,
+ * Provides type definitions for ClinGen API data, cache state,
  * and gene validity lookup results.
  */
 
 /**
- * Single ClinGen gene-disease validity entry
- * Maps to CSV columns from https://search.clinicalgenome.org/kb/gene-validity/download
+ * Raw API response row from ClinGen validity endpoint
+ * https://search.clinicalgenome.org/api/validity?queryParams
+ */
+export interface ClingenApiRow {
+  symbol: string;
+  hgnc_id: string;
+  disease_name: string;
+  mondo: string;
+  moi: string; // AD, AR, XL, SD, UD
+  classification: string; // Definitive, Moderate, Limited, Disputed, Refuted, No Known Disease Relationship
+  ep: string; // Expert panel
+  sop: string;
+  order: number;
+  perm_id: string;
+  released: string;
+  animal_model_only: boolean;
+}
+
+/**
+ * ClinGen API response structure
+ */
+export interface ClingenApiResponse {
+  rows: ClingenApiRow[];
+}
+
+/**
+ * Single ClinGen gene-disease validity entry (normalized from API)
  */
 export interface ClingenEntry {
-  geneSymbol: string; // Column 0: GENE SYMBOL
-  hgncId: string; // Column 1: GENE ID (HGNC)
-  diseaseLabel: string; // Column 2: DISEASE LABEL
-  mondoId: string; // Column 3: DISEASE ID (MONDO)
-  moi: string; // Column 4: MOI (Mode of Inheritance)
-  classification: string; // Column 5: CLASSIFICATION
-  onlineReport: string; // Column 7: ONLINE REPORT (URL)
-  classificationDate: string; // Column 8: CLASSIFICATION DATE
-  gcep: string; // Column 9: GCEP (expert panel)
+  geneSymbol: string;
+  hgncId: string;
+  diseaseLabel: string;
+  mondoId: string;
+  moi: string; // Mode of Inheritance (AD, AR, XL, SD, UD)
+  classification: string;
+  expertPanel: string;
+  classificationDate: string;
+  permId: string;
 }
 
 /**
