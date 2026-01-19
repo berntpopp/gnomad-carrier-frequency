@@ -71,35 +71,37 @@ Plans:
 
 ---
 
-### Phase 13: Variant Exclusion
+### Phase 13: Variant Exclusion ✓
 
 **Goal:** User can manually exclude specific variants from carrier frequency calculations
 
 **Dependencies:** Phase 8 (variant table infrastructure)
 
 **Requirements:**
-- EXCL-01: User can exclude individual variants via checkbox/toggle in variant table
-- EXCL-02: User can exclude all variants at once via "select all" control
-- EXCL-03: Excluded variants visually marked in table (strikethrough/dimmed)
-- EXCL-04: Carrier frequency recalculates in real-time when variants excluded
-- EXCL-05: Results page shows note when variants have been excluded
-- EXCL-06: Export includes excluded variants marked as "excluded" with reason field
-- EXCL-07: Exclusion state persists during session (not across sessions)
-- EXCL-08: User can restore excluded variants individually or all at once
+- EXCL-01: User can exclude individual variants via checkbox/toggle in variant table ✓
+- EXCL-02: User can exclude all variants at once via "select all" control ✓
+- EXCL-03: Excluded variants visually marked in table (strikethrough/dimmed) ✓
+- EXCL-04: Carrier frequency recalculates in real-time when variants excluded ✓
+- EXCL-05: Results page shows note when variants have been excluded ✓
+- EXCL-06: Export includes excluded variants marked as "excluded" with reason field ✓
+- EXCL-07: Exclusion state persists during session (not across sessions) ✓
+- EXCL-08: User can restore excluded variants individually or all at once ✓
 
-**Plans:** 4 plans
+**Plans:** 4 plans (complete)
 
 Plans:
-- [ ] 13-01-PLAN.md - Exclusion infrastructure (types, config, useExclusionState composable)
-- [ ] 13-02-PLAN.md - VariantTable integration (checkboxes, visual styling, bulk actions)
-- [ ] 13-03-PLAN.md - Frequency recalculation (debounced updates, exclusion note in results)
-- [ ] 13-04-PLAN.md - Export and URL extension (exclusion fields, lz-string compression)
+- [x] 13-01-PLAN.md - Exclusion infrastructure (types, config, useExclusionState composable)
+- [x] 13-02-PLAN.md - VariantTable integration (checkboxes, visual styling, bulk actions)
+- [x] 13-03-PLAN.md - Frequency recalculation (debounced updates, exclusion note in results)
+- [x] 13-04-PLAN.md - Export and URL extension (exclusion fields, lz-string compression)
 
 **Success Criteria:**
-1. User can click to exclude a variant and see frequency update immediately
-2. Excluded variants remain visible but clearly marked as excluded
-3. Results summary indicates how many variants were manually excluded
-4. Exported data distinguishes excluded variants from included ones
+1. ✓ User can click to exclude a variant and see frequency update immediately
+2. ✓ Excluded variants remain visible but clearly marked as excluded
+3. ✓ Results summary indicates how many variants were manually excluded
+4. ✓ Exported data distinguishes excluded variants from included ones
+
+**Completed:** 2026-01-20
 
 ---
 
@@ -346,8 +348,8 @@ Plans:
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
 | v1.1 Release-Ready | 5-10 | 27/27 | Complete | 2026-01-19 |
-| v1.2 Sharing & Collaboration | 11+ | 5/9 | In Progress | - |
+| v1.2 Sharing & Collaboration | 11-13 | 9/9 | Complete | 2026-01-20 |
 
 ---
 
-*Last updated: 2026-01-20 (Phase 13 planned)*
+*Last updated: 2026-01-20 (Phase 13 complete)*

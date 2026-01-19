@@ -106,7 +106,40 @@ Requirements for release-ready polish. Each maps to roadmap phases.
 - [x] **INFRA-06**: Lighthouse accessibility score >= 95
 - [x] **INFRA-07**: Lighthouse SEO score >= 95
 
-## v1.2+ Requirements
+## v1.2 Requirements
+
+Requirements for sharing and collaboration features.
+
+### URL State Sharing
+
+- [x] **URL-01**: URL query parameters encode wizard state (gene, filters, settings)
+- [x] **URL-02**: Opening shared URL restores complete calculation state
+- [x] **URL-03**: URL updates as user progresses through wizard
+- [x] **URL-04**: Copy link button available in results step
+- [x] **URL-05**: Shared URLs work across browser sessions
+- [x] **URL-06**: Invalid/partial URLs gracefully degrade to defaults
+
+### PWA
+
+- [x] **PWA-01**: App has valid web manifest with icons and metadata
+- [x] **PWA-02**: Service worker caches app shell and static assets
+- [x] **PWA-03**: App is installable on desktop and mobile
+- [x] **PWA-04**: Offline fallback page displays when network unavailable
+- [x] **PWA-05**: Previously fetched gene data available offline
+- [x] **PWA-06**: Install prompt shown to eligible users
+
+### Variant Exclusion
+
+- [x] **EXCL-01**: User can exclude individual variants via checkbox/toggle in variant table
+- [x] **EXCL-02**: User can exclude all variants at once via "select all" control
+- [x] **EXCL-03**: Excluded variants visually marked in table (strikethrough/dimmed)
+- [x] **EXCL-04**: Carrier frequency recalculates in real-time when variants excluded
+- [x] **EXCL-05**: Results page shows note when variants have been excluded
+- [x] **EXCL-06**: Export includes excluded variants marked as "excluded" with reason field
+- [x] **EXCL-07**: Exclusion state persists during session (not across sessions)
+- [x] **EXCL-08**: User can restore excluded variants individually or all at once
+
+## v1.3+ Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
 
@@ -215,12 +248,33 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-05 | Phase 7 | Complete |
 | INFRA-06 | Phase 7 | Complete |
 | INFRA-07 | Phase 7 | Complete |
+| URL-01 | Phase 11 | Complete |
+| URL-02 | Phase 11 | Complete |
+| URL-03 | Phase 11 | Complete |
+| URL-04 | Phase 11 | Complete |
+| URL-05 | Phase 11 | Complete |
+| URL-06 | Phase 11 | Complete |
+| PWA-01 | Phase 12 | Complete |
+| PWA-02 | Phase 12 | Complete |
+| PWA-03 | Phase 12 | Complete |
+| PWA-04 | Phase 12 | Complete |
+| PWA-05 | Phase 12 | Complete |
+| PWA-06 | Phase 12 | Complete |
+| EXCL-01 | Phase 13 | Complete |
+| EXCL-02 | Phase 13 | Complete |
+| EXCL-03 | Phase 13 | Complete |
+| EXCL-04 | Phase 13 | Complete |
+| EXCL-05 | Phase 13 | Complete |
+| EXCL-06 | Phase 13 | Complete |
+| EXCL-07 | Phase 13 | Complete |
+| EXCL-08 | Phase 13 | Complete |
 
 **Coverage:**
-- v1.1 requirements: 69 total
-- Mapped to phases: 69
+- v1.1 requirements: 69 total (all complete)
+- v1.2 requirements: 20 total (all complete)
+- Total: 89 requirements
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 (Phase 9 complete)*
+*Last updated: 2026-01-20 (Phase 13 complete)*

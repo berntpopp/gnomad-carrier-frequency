@@ -7,23 +7,23 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.2 Sharing & Collaboration - Phase 13 in progress
+**Current focus:** v1.2 Sharing & Collaboration - COMPLETE
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.2 Sharing & Collaboration
-**Phase:** 13 - Variant Exclusion - IN PROGRESS
-**Plan:** 4 of ? complete (plan count TBD)
-**Status:** Phase 13 in progress
+**Phase:** 13 - Variant Exclusion - COMPLETE
+**Plan:** 4 of 4 complete
+**Status:** v1.2 milestone complete
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
-v1.2 Sharing:       [########  ]  90% - Phase 13 in progress (2/3 phases, 9/? plans)
+v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 ```
 
 **Overall:** 36 plans complete for v1.0+v1.1+v1.2 (Phases 11-13)
@@ -43,6 +43,24 @@ v1.2 Sharing:       [########  ]  90% - Phase 13 in progress (2/3 phases, 9/? pl
 - 69 requirements
 - Full feature set: settings, theming, accessibility, filtering, ClinGen integration, export, templates, logging
 - Deployed: https://berntpopp.github.io/gnomad-carrier-frequency/
+
+**v1.2 Sharing & Collaboration** (2026-01-20)
+- 3 phases, 9 plans total
+- URL state sharing, PWA support, variant exclusion
+- Deployed: https://berntpopp.github.io/gnomad-carrier-frequency/
+
+---
+
+## v1.2 Milestone Summary
+
+**Phases:** 3 (Phases 11-13)
+**Requirements:** 20 total
+
+| Phase | Name | Requirements | Status |
+|-------|------|--------------|--------|
+| 11 | URL State Sharing | 6 | Complete (2/2 plans) |
+| 12 | PWA | 6 | Complete (3/3 plans) |
+| 13 | Variant Exclusion | 8 | Complete (4/4 plans) |
 
 ---
 
@@ -209,8 +227,8 @@ None.
 ### Last Session
 
 **Date:** 2026-01-20
-**Completed:** Phase 13 Plan 04 - Export and URL Integration
-**Status:** Phase 13 in progress (4/? plans)
+**Completed:** Phase 13 - Variant Exclusion (all 4 plans)
+**Status:** v1.2 milestone complete
 
 ### Handoff Notes
 
@@ -325,3 +343,5 @@ v1.1 roadmap derived from requirements and research:
 *13-02 complete: 2026-01-20*
 *13-03 complete: 2026-01-20*
 *13-04 complete: 2026-01-20*
+*Phase 13 complete: 2026-01-20*
+*v1.2 complete: 2026-01-20*
