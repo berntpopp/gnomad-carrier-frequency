@@ -15,17 +15,17 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.1 Release-Ready
 **Phase:** 10 - Export + Templates + Logging - IN PROGRESS
-**Plan:** 7 of 8 complete
+**Plan:** 8 of 8 (plan 05, 08 pending)
 **Status:** In progress
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [#########-] ~98% - Phase 10 plan 7 complete
+v1.1 Release-Ready: [#########-] ~98% - Phase 10 plan 6 complete
 ```
 
-**Overall:** Phase 10 in progress (7/8 plans complete)
+**Overall:** Phase 10 in progress (6/8 plans complete, plans 05 and 08 pending)
 
 ---
 
@@ -51,7 +51,7 @@ v1.1 Release-Ready: [#########-] ~98% - Phase 10 plan 7 complete
 | 7 | SEO + Accessibility | 9 | Complete (4/4 plans) |
 | 8 | Filtering + Variant Display | 14 | Complete (4/4 plans) |
 | 9 | ClinGen + Documentation | 15 | Complete (7/7 plans) |
-| 10 | Export + Templates + Logging | 22 | In Progress (7/8 plans) |
+| 10 | Export + Templates + Logging | 22 | In Progress (6/8 plans, 05+08 pending) |
 
 ---
 
@@ -107,6 +107,9 @@ v1.1 Release-Ready: [#########-] ~98% - Phase 10 plan 7 complete
 | overlay.initialIsOpen: false | Show badge but don't auto-open for non-intrusive DX | 2026-01-19 |
 | SheetJS xlsx for Excel export | Mature library, browser-native, multi-sheet workbook support | 2026-01-19 |
 | Blob URL download pattern | Browser-native file download without server dependency | 2026-01-19 |
+| Console icon for log viewer | Footer access via mdi-console icon | 2026-01-19 |
+| Right-side temporary drawer for logs | 450px width, temporary overlay panel | 2026-01-19 |
+| Level checkboxes for log filtering | DEBUG hidden by default, INFO/WARN/ERROR visible | 2026-01-19 |
 
 ### Blockers
 
@@ -142,10 +145,10 @@ None currently.
 - [x] Execute 10-02-PLAN.md (log viewer UI)
 - [x] Execute 10-03-PLAN.md (export infrastructure)
 - [x] Execute 10-04-PLAN.md (template infrastructure)
-- [ ] Execute 10-05-PLAN.md
-- [ ] Execute 10-06-PLAN.md
+- [ ] Execute 10-05-PLAN.md (template editor UI)
+- [x] Execute 10-06-PLAN.md (log viewer UI)
 - [x] Execute 10-07-PLAN.md (vite-plugin-checker)
-- [ ] Execute 10-08-PLAN.md
+- [ ] Execute 10-08-PLAN.md (final integration)
 
 ---
 
@@ -154,8 +157,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 10 Plan 07 - Vite Plugin Checker
-**Next:** Execute 10-08-PLAN.md (final integration)
+**Completed:** Phase 10 Plan 06 - Log Viewer UI
+**Next:** Execute 10-05-PLAN.md (template editor UI) or 10-08-PLAN.md (final integration)
 
 ### Handoff Notes
 
@@ -165,7 +168,7 @@ v1.1 roadmap derived from requirements and research:
 - Phase 7: SEO + Accessibility - COMPLETE (4/4 plans)
 - Phase 8: Filtering + Variant Display (configurable filters, variant modal) - COMPLETE
 - Phase 9: ClinGen + Documentation (clinical validation, help content) - COMPLETE
-- Phase 10: Export + Templates + Logging (data export, template editor, debug tools) - IN PROGRESS (7/8)
+- Phase 10: Export + Templates + Logging (data export, template editor, debug tools) - IN PROGRESS (6/8)
 
 Key pitfalls from research:
 - ClinVar "conflicting" over-excludes valid variants (Phase 8 - handled)
@@ -189,11 +192,11 @@ Key pitfalls from research:
 
 **Phase 10 deliverables (in progress):**
 - Plan 01: Logging infrastructure (types, store, composable) - COMPLETE
-- Plan 02: Log viewer UI - COMPLETE
+- Plan 02: Log viewer UI integration - COMPLETE
 - Plan 03: Export infrastructure - COMPLETE
 - Plan 04: Template infrastructure (variables, parser, store) - COMPLETE
 - Plan 05: Template editor UI - PENDING
-- Plan 06: Export UI integration - PENDING
+- Plan 06: Log viewer UI - COMPLETE
 - Plan 07: Vite plugin checker (parallel TypeScript/ESLint) - COMPLETE
 - Plan 08: Final integration - PENDING
 
@@ -227,4 +230,5 @@ Key pitfalls from research:
 *10-02 complete: 2026-01-19*
 *10-03 complete: 2026-01-19*
 *10-04 complete: 2026-01-19*
+*10-06 complete: 2026-01-19*
 *10-07 complete: 2026-01-19*
