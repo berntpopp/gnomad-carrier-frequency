@@ -6,7 +6,7 @@
 
 **Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
 
-**Current Focus:** Phase 3 In Progress - Template system foundation complete, building text generation
+**Current Focus:** Phase 3 Gap Closure Complete - Status granularity and patient sex added
 
 **Key Constraints:**
 - Stack: npm, Vue 3, Vuetify 3, Vite, TypeScript
@@ -19,20 +19,20 @@
 ## Current Position
 
 **Milestone:** v1 MVP
-**Phase:** Phase 3 - German Text (3 of 4) - COMPLETE
-**Plan:** 03-03 complete (3/3)
-**Status:** Phase 3 complete
+**Phase:** Phase 3 - German Text (3 of 4) - COMPLETE (including gap closure)
+**Plan:** 03-04 complete (gap closure)
+**Status:** Phase 3 complete with all gaps closed
 
 ### Progress
 
 ```
 Phase 1: Foundation     [##########] 5/5 plans COMPLETE
 Phase 2: Wizard UI      [##########] 3/3 plans COMPLETE
-Phase 3: German Text    [##########] 3/3 plans COMPLETE
+Phase 3: German Text    [##########] 4/4 plans COMPLETE (3 + 1 gap closure)
 Phase 4: Deploy         [..........] Validation only
 ```
 
-**Overall:** `[###########] 100%` (11/11 plans complete)
+**Overall:** `[###########] 100%` (12/12 plans complete)
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 11 |
+| Plans Completed | 12 |
 | Phases Completed | 3 |
 | Requirements Done | Phase 1-3 complete |
-| Session Count | 11 |
+| Session Count | 12 |
 
 ---
 
@@ -81,6 +81,9 @@ Phase 4: Deploy         [..........] Validation only
 | Pinia options API | Options API over setup API for persistence plugin compatibility | 2026-01-19 |
 | Browser language detection | Defaults to English unless browser language is German | 2026-01-19 |
 | Locale-aware formatting | German comma (0,25%), English period (0.25%) for percentages | 2026-01-19 |
+| 4-option IndexPatientStatus | heterozygous, homozygous, compound_het_confirmed, compound_het_assumed | 2026-01-19 |
+| Patient sex German-only | PatientSex selector visible only in German mode; English uses neutral | 2026-01-19 |
+| Status intro in generator | buildStatusIntro builds status-specific text programmatically | 2026-01-19 |
 
 ### Technical Notes
 
@@ -100,10 +103,12 @@ Phase 4: Deploy         [..........] Validation only
 - Source attribution: gnomAD v4 / Literature (PMID: xxx) / Default assumption
 - Template files: src/config/templates/de.json, en.json
 - Template renderer: renderTemplate(template, context) in src/utils/template-renderer.ts
-- Text types: Perspective, GenderStyle, TemplateContext in src/types/text.ts
+- Text types: Perspective, GenderStyle, PatientSex, TemplateContext in src/types/text.ts
 - Pinia store: useTemplateStore in src/stores/useTemplateStore.ts
 - Text composable: useTextGenerator in src/composables/useTextGenerator.ts
 - localStorage key: carrier-freq-templates (for persistence)
+- IndexPatientStatus: 4 options (heterozygous, homozygous, compound_het_confirmed, compound_het_assumed)
+- PatientSex: 3 options (male, female, neutral) for German grammatical gender
 
 ### Blockers
 
@@ -125,6 +130,7 @@ Phase 4: Deploy         [..........] Validation only
 - [x] Execute 03-01 (template system foundation)
 - [x] Execute 03-02 (Pinia store and text generator composable)
 - [x] Execute 03-03 (text generator UI integration)
+- [x] Execute 03-04 (gap closure: status granularity and patient sex)
 - [ ] Plan Phase 4 (Deploy)
 - [ ] Execute Phase 4 plans
 
@@ -135,45 +141,52 @@ Phase 4: Deploy         [..........] Validation only
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Plan 03-03 (Text Output UI Integration) - Phase 3 Complete
+**Completed:** Plan 03-04 (Gap Closure: Status Granularity and Patient Sex)
 **Next:** Plan Phase 4 (Deploy)
 
 ### Handoff Notes
 
-Plan 03-03 delivered the TextOutput component completing Phase 3:
+Plan 03-04 closed two gaps from Phase 3 verification:
 
-**TextOutput Component (src/components/wizard/TextOutput.vue):**
+**GAP-03-01: IndexPatientStatus Expansion**
 ```typescript
-// Props: result, frequencySource, indexStatus, literatureFrequency, literaturePmid, usingDefault
-// Features:
-// - Perspective selector (affected/carrier/familyMember)
-// - Section toggles via v-chip components
-// - Language switch (DE/EN)
-// - Gender style selector (German only)
-// - Live text preview with pre-wrap
-// - Copy button with 2-second "Kopiert!" feedback
+// Before
+export type IndexPatientStatus = 'heterozygous' | 'compound_het_homozygous';
+
+// After
+export type IndexPatientStatus =
+  | 'heterozygous'           // Carrier - one pathogenic allele
+  | 'homozygous'             // Affected - two copies same allele
+  | 'compound_het_confirmed' // Affected - two different alleles, confirmed
+  | 'compound_het_assumed';  // Affected - two different alleles, assumed
 ```
 
-**Integration in StepResults:**
-```vue
-<TextOutput
-  v-if="result"
-  :result="result"
-  :frequency-source="frequencySource"
-  ...
-/>
+StepStatus.vue now shows 4 radio options instead of a toggle switch.
+
+**GAP-03-02: PatientSex for German Grammar**
+```typescript
+export type PatientSex = 'male' | 'female' | 'neutral';
+
+// useTemplateStore patientForms getter returns:
+// male: der Patient / des Patienten / dem Patienten
+// female: die Patientin / der Patientin / der Patientin
+// neutral: der/die Patient*in / des/der Patient*in / dem/der Patient*in
 ```
 
-**Phase 3 Complete:**
-- 03-01: Template system foundation (types, renderer, JSON templates)
-- 03-02: Pinia store and text generator composable
-- 03-03: TextOutput UI component integration
+TextOutput.vue shows patient sex selector (German mode only).
 
-All TEXT-01 through TEXT-04 requirements satisfied.
+**buildStatusIntro Function:**
+Generates status-specific opening text using patient dative form.
 
-Ready for Phase 4: Deploy (validation and final deployment).
+All TEXT requirements now satisfied:
+- TEXT-01: German clinical text generation
+- TEXT-02: Config-driven templates
+- TEXT-03: Gender-inclusive language
+- TEXT-04: Status-specific and patient-sex-aware text
+
+Ready for Phase 4: Deploy (validation and deployment).
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 (Plan 03-03 complete, Phase 3 complete)*
+*Last updated: 2026-01-19 (Plan 03-04 complete, Phase 3 gaps closed)*
