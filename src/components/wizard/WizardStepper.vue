@@ -73,6 +73,8 @@
           :literature-frequency="state.literatureFrequency"
           :literature-pmid="state.literaturePmid"
           :using-default="usingDefault"
+          :variants="variants"
+          :clinvar-variants="clinvarVariants"
           @back="prevStep"
           @restart="resetWizard"
         />
@@ -125,6 +127,8 @@ const {
   hasError,
   errorMessage,
   refetch,
+  variants,
+  clinvarVariants,
 } = useCarrierFrequency();
 
 // Screen reader announcements

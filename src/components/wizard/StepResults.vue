@@ -33,9 +33,16 @@
           <span class="text-medium-emphasis">({{ recurrenceRisk?.percent }})</span>
         </div>
         <div class="text-body-2 mt-2 text-medium-emphasis">
-          Based on {{ result.qualifyingVariantCount }} qualifying variant(s)
+          Based on {{ filteredCount }} qualifying variant(s)
         </div>
       </v-card-text>
+
+      <!-- Filter Panel -->
+      <FilterPanel
+        v-model="filters"
+        :variant-count="filteredCount"
+        @reset="resetFilters"
+      />
     </v-card>
 
     <!-- Founder effect alert -->
@@ -143,10 +150,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, toRef } from 'vue';
 import { config, getGnomadVersion } from '@/config';
-import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource } from '@/types';
+import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant } from '@/types';
+import { useVariantFilters } from '@/composables';
 import TextOutput from './TextOutput.vue';
+import FilterPanel from '@/components/FilterPanel.vue';
 
 interface TableItem {
   label: string;
@@ -169,12 +178,24 @@ const props = defineProps<{
   literatureFrequency: number | null;
   literaturePmid: string | null;
   usingDefault: boolean;
+  variants: GnomadVariant[];
+  clinvarVariants: ClinVarVariant[];
 }>();
 
 defineEmits<{
   back: [];
   restart: [];
 }>();
+
+// Set up variant filtering
+const variantsRef = toRef(props, 'variants');
+const clinvarVariantsRef = toRef(props, 'clinvarVariants');
+
+const {
+  filters,
+  filteredCount,
+  resetFilters,
+} = useVariantFilters(variantsRef, clinvarVariantsRef);
 
 // Table headers - use numeric keys for proper sorting
 const headers = ref([

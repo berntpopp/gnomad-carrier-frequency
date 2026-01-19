@@ -37,6 +37,10 @@ export interface UseCarrierFrequencyReturn {
   hasFounderEffect: Ref<boolean>;
   usingDefault: Ref<boolean>;
 
+  // Raw variant data (for filtering UI)
+  variants: Ref<GnomadVariant[]>;
+  clinvarVariants: Ref<ClinVarVariant[]>;
+
   // Version
   currentVersion: Ref<GnomadVersion>;
 
@@ -210,6 +214,8 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     qualifyingVariantCount,
     hasFounderEffect,
     usingDefault,
+    variants: normalizedVariants,
+    clinvarVariants: normalizedClinvar,
     currentVersion,
     calculateRisk,
     refetch,
