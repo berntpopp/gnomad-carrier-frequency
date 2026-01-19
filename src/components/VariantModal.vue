@@ -9,8 +9,17 @@
   >
     <v-card>
       <v-card-title class="d-flex align-center justify-space-between">
-        <span>
+        <span class="d-flex align-center flex-wrap">
           {{ modalTitle }}
+          <v-chip
+            v-if="excludedInModal > 0"
+            color="warning"
+            size="small"
+            class="ml-2"
+            variant="tonal"
+          >
+            {{ excludedInModal }} excluded
+          </v-chip>
         </span>
         <v-btn
           icon="mdi-close"
@@ -34,6 +43,20 @@
       <v-divider />
 
       <v-card-actions class="pa-4">
+        <!-- Clear exclusions button - only show if any excluded -->
+        <v-btn
+          v-if="excludedInModal > 0"
+          variant="text"
+          color="warning"
+          size="small"
+          @click="includeAll"
+        >
+          <v-icon start>
+            mdi-refresh
+          </v-icon>
+          Clear exclusions
+        </v-btn>
+
         <!-- Export dropdown -->
         <v-menu>
           <template #activator="{ props: menuProps }">
@@ -89,6 +112,7 @@ import * as XLSX from 'xlsx';
 import VariantTable from './VariantTable.vue';
 import type { DisplayVariant } from '@/types';
 import { buildExportVariants, generateFilename } from '@/utils/export-utils';
+import { useExclusionState } from '@/composables';
 
 const props = defineProps<{
   /** v-model for dialog visibility */
@@ -108,6 +132,14 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: boolean];
 }>();
+
+// Get exclusion state composable
+const { excluded, includeAll } = useExclusionState();
+
+// Count of excluded variants in current modal view
+const excludedInModal = computed(() => {
+  return props.variants.filter(v => excluded.value.includes(v.variant_id)).length;
+});
 
 // Responsive breakpoint detection
 const { smAndDown, lgAndUp } = useDisplay();
