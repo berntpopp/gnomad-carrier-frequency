@@ -6,7 +6,7 @@
 
 **Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
 
-**Current Focus:** Phase 3 Complete and Verified - Ready for Phase 4 Deploy
+**Current Focus:** Phase 4 Deploy - ESLint and Build Configuration Complete
 
 **Key Constraints:**
 - Stack: npm, Vue 3, Vuetify 3, Vite, TypeScript
@@ -19,9 +19,9 @@
 ## Current Position
 
 **Milestone:** v1 MVP
-**Phase:** Phase 3 - German Text (3 of 4) - VERIFIED COMPLETE
-**Plan:** 03-04 complete (gap closure) - Phase verified
-**Status:** All 4 plans complete, 11/11 must-haves verified, ready for Phase 4
+**Phase:** Phase 4 - Deploy (4 of 4) - IN PROGRESS
+**Plan:** 04-01 complete (ESLint and build config)
+**Status:** Lint/typecheck/build scripts working, GitHub Pages base path configured
 
 ### Progress
 
@@ -29,10 +29,10 @@
 Phase 1: Foundation     [##########] 5/5 plans COMPLETE
 Phase 2: Wizard UI      [##########] 3/3 plans COMPLETE
 Phase 3: German Text    [##########] 4/4 plans COMPLETE (3 + 1 gap closure)
-Phase 4: Deploy         [..........] Validation only
+Phase 4: Deploy         [##........] 1/? plans (ESLint + build config done)
 ```
 
-**Overall:** `[###########] 100%` (12/12 plans complete)
+**Overall:** `[############] 100%` (13/13 plans complete)
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 12 |
-| Phases Completed | 3 |
-| Requirements Done | Phase 1-3 complete |
-| Session Count | 12 |
+| Plans Completed | 13 |
+| Phases Completed | 3 (Phase 4 in progress) |
+| Requirements Done | Phase 1-3 complete, Phase 4 build tooling done |
+| Session Count | 13 |
 
 ---
 
@@ -84,6 +84,8 @@ Phase 4: Deploy         [..........] Validation only
 | 4-option IndexPatientStatus | heterozygous, homozygous, compound_het_confirmed, compound_het_assumed | 2026-01-19 |
 | Patient sex German-only | PatientSex selector visible only in German mode; English uses neutral | 2026-01-19 |
 | Status intro in generator | buildStatusIntro builds status-specific text programmatically | 2026-01-19 |
+| ESLint 9 flat config | Modern flat config over deprecated .eslintrc files | 2026-01-19 |
+| GitHub Pages base path | /gnomad-carrier-frequency/ for subdirectory deployment | 2026-01-19 |
 
 ### Technical Notes
 
@@ -109,6 +111,9 @@ Phase 4: Deploy         [..........] Validation only
 - localStorage key: carrier-freq-templates (for persistence)
 - IndexPatientStatus: 4 options (heterozygous, homozygous, compound_het_confirmed, compound_het_assumed)
 - PatientSex: 3 options (male, female, neutral) for German grammatical gender
+- Build scripts: npm run lint, npm run typecheck, npm run build
+- ESLint config: eslint.config.js (flat config, not .eslintrc)
+- Build output: dist/ with base path /gnomad-carrier-frequency/
 
 ### Blockers
 
@@ -131,8 +136,8 @@ Phase 4: Deploy         [..........] Validation only
 - [x] Execute 03-02 (Pinia store and text generator composable)
 - [x] Execute 03-03 (text generator UI integration)
 - [x] Execute 03-04 (gap closure: status granularity and patient sex)
-- [ ] Plan Phase 4 (Deploy)
-- [ ] Execute Phase 4 plans
+- [x] Plan Phase 4 (Deploy)
+- [x] Execute 04-01 (ESLint and build configuration)
 
 ---
 
@@ -141,52 +146,33 @@ Phase 4: Deploy         [..........] Validation only
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 3 verified complete (11/11 must-haves)
-**Next:** Phase 4 - Deploy (validation and GitHub Pages deployment)
+**Completed:** Plan 04-01 (ESLint and build configuration)
+**Next:** Continue Phase 4 - CI/CD workflow or manual deployment
 
 ### Handoff Notes
 
-Plan 03-04 closed two gaps from Phase 3 verification:
+Plan 04-01 established build tooling for deployment:
 
-**GAP-03-01: IndexPatientStatus Expansion**
-```typescript
-// Before
-export type IndexPatientStatus = 'heterozygous' | 'compound_het_homozygous';
+**ESLint Configuration:**
+- Installed eslint@9 with Vue 3 + TypeScript plugins
+- Created `eslint.config.js` using modern flat config pattern
+- `npm run lint` passes with no errors
 
-// After
-export type IndexPatientStatus =
-  | 'heterozygous'           // Carrier - one pathogenic allele
-  | 'homozygous'             // Affected - two copies same allele
-  | 'compound_het_confirmed' // Affected - two different alleles, confirmed
-  | 'compound_het_assumed';  // Affected - two different alleles, assumed
-```
+**NPM Scripts Added:**
+- `lint`: Runs ESLint across entire project
+- `typecheck`: Runs vue-tsc type checking
 
-StepStatus.vue now shows 4 radio options instead of a toggle switch.
+**GitHub Pages Configuration:**
+- Added `base: '/gnomad-carrier-frequency/'` to vite.config.ts
+- Build output has correct asset paths for subdirectory deployment
+- `npm run build` produces dist/ folder ready for deployment
 
-**GAP-03-02: PatientSex for German Grammar**
-```typescript
-export type PatientSex = 'male' | 'female' | 'neutral';
+**Bug Fixed:**
+- Fixed unused variable TS6133 in template-renderer.ts (match -> _match)
 
-// useTemplateStore patientForms getter returns:
-// male: der Patient / des Patienten / dem Patienten
-// female: die Patientin / der Patientin / der Patientin
-// neutral: der/die Patient*in / des/der Patient*in / dem/der Patient*in
-```
-
-TextOutput.vue shows patient sex selector (German mode only).
-
-**buildStatusIntro Function:**
-Generates status-specific opening text using patient dative form.
-
-All TEXT requirements now satisfied:
-- TEXT-01: German clinical text generation
-- TEXT-02: Config-driven templates
-- TEXT-03: Gender-inclusive language
-- TEXT-04: Status-specific and patient-sex-aware text
-
-Ready for Phase 4: Deploy (validation and deployment).
+Ready for CI/CD setup or manual GitHub Pages deployment.
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 (Phase 3 verified complete, ready for Phase 4)*
+*Last updated: 2026-01-19 (Plan 04-01 complete)*
