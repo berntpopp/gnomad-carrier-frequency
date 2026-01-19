@@ -37,31 +37,33 @@ Plans:
 
 ---
 
-### Phase 6: App Shell (Navigation + Branding)
+### Phase 6: App Shell (Navigation + Branding) ✓
 
 **Goal:** User experiences professional app shell with branded logo, custom favicon, and settings access
 
 **Dependencies:** Phase 5 (settings infrastructure)
 
 **Requirements:**
-- SHELL-01: App displays logo in app bar
+- SHELL-01: App displays logo in app bar ✓
 - SHELL-02: App bar contains navigation menu (N/A - single page app, no menu needed)
-- SHELL-03: Settings accessible via gear icon in app bar
-- SHELL-06: App has custom favicon
-- SHELL-07: Logo and favicon follow consistent branding
+- SHELL-03: Settings accessible via gear icon in app bar ✓
+- SHELL-06: App has custom favicon ✓
+- SHELL-07: Logo and favicon follow consistent branding ✓
 
-**Plans:** 2 plans
+**Plans:** 2 plans (complete)
 
 Plans:
-- [ ] 06-01-PLAN.md - Branding assets and theme colors (favicon with dark mode, RequiForm palette)
-- [ ] 06-02-PLAN.md - UI component enhancements (AppBar logo/settings, AppFooter icons, SettingsDialog shell)
+- [x] 06-01-PLAN.md - Branding assets and theme colors (favicon with dark mode, RequiForm palette)
+- [x] 06-02-PLAN.md - UI component enhancements (AppBar logo/settings, AppFooter icons, SettingsDialog shell)
 
 **Success Criteria:**
-1. User sees logo in app bar on every page
-2. User can open settings dialog via gear icon in app bar
-3. Browser tab displays custom favicon
-4. Logo and favicon share consistent visual identity (gCFCalc branding)
-5. Footer displays GitHub and gnomAD attribution icons
+1. ✓ User sees logo in app bar on every page
+2. ✓ User can open settings dialog via gear icon in app bar
+3. ✓ Browser tab displays custom favicon
+4. ✓ Logo and favicon share consistent visual identity (gCFCalc branding)
+5. ✓ Footer displays GitHub and gnomAD attribution icons
+
+**Completed:** 2026-01-19
 
 ---
 
@@ -198,8 +200,8 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 4/TBD | In Progress (Phase 5 done, Phase 6 planned) | - |
+| v1.1 Release-Ready | 5-10 | 4/TBD | In Progress (Phase 6 done, Phase 7 next) | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 6 planned)*
+*Last updated: 2026-01-19 (Phase 6 complete)*
