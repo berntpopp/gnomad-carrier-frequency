@@ -146,15 +146,81 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SHELL-01 | TBD | Pending |
-| SHELL-02 | TBD | Pending |
-| ... | ... | ... |
+| SHELL-01 | Phase 6 | Pending |
+| SHELL-02 | Phase 6 | Pending |
+| SHELL-03 | Phase 6 | Pending |
+| SHELL-04 | Phase 5 | Pending |
+| SHELL-05 | Phase 5 | Pending |
+| SHELL-06 | Phase 6 | Pending |
+| SHELL-07 | Phase 6 | Pending |
+| VAR-01 | Phase 8 | Pending |
+| VAR-02 | Phase 8 | Pending |
+| VAR-03 | Phase 8 | Pending |
+| VAR-04 | Phase 8 | Pending |
+| VAR-05 | Phase 8 | Pending |
+| FILT-01 | Phase 8 | Pending |
+| FILT-02 | Phase 8 | Pending |
+| FILT-03 | Phase 8 | Pending |
+| FILT-04 | Phase 8 | Pending |
+| FILT-05 | Phase 8 | Pending |
+| FILT-06 | Phase 8 | Pending |
+| FILT-07 | Phase 8 | Pending |
+| FILT-08 | Phase 8 | Pending |
+| FILT-09 | Phase 8 | Pending |
+| CLIN-01 | Phase 9 | Pending |
+| CLIN-02 | Phase 9 | Pending |
+| CLIN-03 | Phase 9 | Pending |
+| CLIN-04 | Phase 9 | Pending |
+| CLIN-05 | Phase 9 | Pending |
+| CLIN-06 | Phase 9 | Pending |
+| EXP-01 | Phase 10 | Pending |
+| EXP-02 | Phase 10 | Pending |
+| EXP-03 | Phase 10 | Pending |
+| EXP-04 | Phase 10 | Pending |
+| TMPL-01 | Phase 10 | Pending |
+| TMPL-02 | Phase 10 | Pending |
+| TMPL-03 | Phase 10 | Pending |
+| TMPL-04 | Phase 10 | Pending |
+| TMPL-05 | Phase 10 | Pending |
+| TMPL-06 | Phase 10 | Pending |
+| TMPL-07 | Phase 10 | Pending |
+| TMPL-08 | Phase 10 | Pending |
+| LOG-01 | Phase 10 | Pending |
+| LOG-02 | Phase 10 | Pending |
+| LOG-03 | Phase 10 | Pending |
+| LOG-04 | Phase 10 | Pending |
+| LOG-05 | Phase 10 | Pending |
+| LOG-06 | Phase 10 | Pending |
+| LOG-07 | Phase 10 | Pending |
+| LOG-08 | Phase 10 | Pending |
+| DOC-01 | Phase 9 | Pending |
+| DOC-02 | Phase 9 | Pending |
+| DOC-03 | Phase 9 | Pending |
+| DOC-04 | Phase 9 | Pending |
+| DOC-05 | Phase 9 | Pending |
+| DOC-06 | Phase 9 | Pending |
+| DOC-07 | Phase 9 | Pending |
+| DOC-08 | Phase 9 | Pending |
+| DOC-09 | Phase 9 | Pending |
+| SEO-01 | Phase 7 | Pending |
+| SEO-02 | Phase 7 | Pending |
+| SEO-03 | Phase 7 | Pending |
+| SEO-04 | Phase 7 | Pending |
+| SEO-05 | Phase 7 | Pending |
+| SEO-06 | Phase 7 | Pending |
+| INFRA-01 | Phase 5 | Pending |
+| INFRA-02 | Phase 5 | Pending |
+| INFRA-03 | Phase 10 | Pending |
+| INFRA-04 | Phase 10 | Pending |
+| INFRA-05 | Phase 7 | Pending |
+| INFRA-06 | Phase 7 | Pending |
+| INFRA-07 | Phase 7 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 56 total
-- Mapped to phases: 0
-- Unmapped: 56 (pending roadmap)
+- v1.1 requirements: 69 total
+- Mapped to phases: 69
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 after initial definition*
+*Last updated: 2026-01-19 (traceability complete)*

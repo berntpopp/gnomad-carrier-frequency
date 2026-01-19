@@ -7,24 +7,25 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.0 Complete — Planning next milestone
+**Current focus:** v1.1 Release-Ready polish for wider distribution
 
 ---
 
 ## Current Position
 
-**Milestone:** v1.0 MVP — SHIPPED
-**Phase:** All phases complete
-**Plan:** All plans complete
-**Status:** Ready for next milestone
+**Milestone:** v1.1 Release-Ready
+**Phase:** 5 - Foundation (Settings + Theme)
+**Plan:** Not started
+**Status:** Roadmap created, awaiting plan-phase
 
 ### Progress
 
 ```
-v1.0 MVP: [##########] 100% — SHIPPED 2026-01-19
+v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
+v1.1 Release-Ready: [----------]   0% - Roadmap created
 ```
 
-**Overall:** v1.0 complete, ready for v1.1 planning
+**Overall:** v1.0 shipped, v1.1 roadmap ready for planning
 
 ---
 
@@ -38,30 +39,68 @@ v1.0 MVP: [##########] 100% — SHIPPED 2026-01-19
 
 ---
 
+## v1.1 Milestone Summary
+
+**Phases:** 6 (Phases 5-10)
+**Requirements:** 69 total
+
+| Phase | Name | Requirements | Status |
+|-------|------|--------------|--------|
+| 5 | Foundation | 4 | Pending |
+| 6 | App Shell | 5 | Pending |
+| 7 | SEO + Accessibility | 9 | Pending |
+| 8 | Filtering + Variant Display | 14 | Pending |
+| 9 | ClinGen + Documentation | 15 | Pending |
+| 10 | Export + Templates + Logging | 22 | Pending |
+
+---
+
+## Accumulated Context
+
+### Key Decisions (v1.1)
+
+| Decision | Rationale | Date |
+|----------|-----------|------|
+| Settings store first | Other features depend on settings infrastructure | 2026-01-19 |
+| 6 phases from requirements | Natural delivery boundaries from research | 2026-01-19 |
+| ClinGen via CSV, not REST | Public download endpoint is CORS-enabled | 2026-01-19 |
+
+### Blockers
+
+None currently.
+
+### TODOs
+
+- [ ] Run `/gsd:plan-phase 5` to create Foundation plans
+- [ ] ClinGen CSV schema may need exploration during Phase 9
+
+---
+
 ## Session Continuity
 
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** v1.0 milestone archived and tagged
-**Next:** Start v1.1 planning with `/gsd:new-milestone`
+**Completed:** v1.1 roadmap created with 6 phases covering 69 requirements
+**Next:** `/gsd:plan-phase 5` to start Foundation phase
 
 ### Handoff Notes
 
-v1.0 MVP is complete and archived:
-- Milestone audit passed (32/32 requirements, 4/4 phases, 12/12 integrations)
-- Archives created in `.planning/milestones/`
-- Git tag v1.0 created
-- PROJECT.md evolved with validated requirements
-- ROADMAP.md collapsed to one-line summary
+v1.1 roadmap derived from requirements and research:
+- Phase 5: Foundation (settings store, theme, version display)
+- Phase 6: App Shell (navigation, logo, favicon, settings access)
+- Phase 7: SEO + Accessibility (WCAG compliance, Lighthouse targets)
+- Phase 8: Filtering + Variant Display (configurable filters, variant modal)
+- Phase 9: ClinGen + Documentation (clinical validation, help content)
+- Phase 10: Export + Templates + Logging (data export, template editor, debug tools)
 
-Potential v1.1 features (from v2 requirements):
-- X-linked inheritance calculations
-- Batch processing for multiple genes
-- PDF export
-- At-risk couple calculation
+Key pitfalls from research:
+- ClinVar "conflicting" over-excludes valid variants (Phase 8)
+- ARIA live regions break with v-if (Phase 7)
+- XSS risk in template editor (Phase 10)
 
 ---
 
 *State initialized: 2026-01-18*
 *v1.0 shipped: 2026-01-19*
+*v1.1 roadmap: 2026-01-19*
