@@ -1,5 +1,6 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue';
 import { useClingenStore } from '@/stores/useClingenStore';
+import { useLogger } from './useLogger';
 import type { ClingenEntry, ClingenValidityResult } from '@/types';
 
 // ClinGen CSV download endpoint - CORS-enabled for browser access
@@ -78,16 +79,20 @@ function parseClingenCSV(csvText: string): ClingenEntry[] {
 
 export function useClingenValidity(): UseClingenValidityReturn {
   const store = useClingenStore();
+  const logger = useLogger('clingen');
   const isLoading = ref(false);
 
   const fetchData = async (): Promise<void> => {
     // Skip if cache is valid
     if (store.hasData && !store.isExpired) {
+      logger.debug('ClinGen cache hit', { entryCount: store.entryCount });
       return;
     }
 
     isLoading.value = true;
     store.setError(''); // Clear previous errors
+
+    logger.info('Fetching ClinGen data', { url: CLINGEN_CSV_URL });
 
     try {
       const response = await fetch(CLINGEN_CSV_URL);
@@ -104,23 +109,31 @@ export function useClingenValidity(): UseClingenValidityReturn {
       }
 
       store.setData(entries);
+      logger.info('ClinGen data loaded', { entryCount: entries.length });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Failed to fetch ClinGen data';
       store.setError(message);
-      console.error('[ClinGen] Fetch error:', message);
+      logger.error('ClinGen fetch failed', { error: message });
     } finally {
       isLoading.value = false;
     }
   };
 
   const refreshCache = async (): Promise<void> => {
+    logger.info('ClinGen cache refresh requested');
     store.clearCache();
     await fetchData();
   };
 
   const checkGene = (geneSymbol: string): ClingenValidityResult => {
-    return store.getGeneValidity(geneSymbol);
+    const result = store.getGeneValidity(geneSymbol);
+    logger.debug('ClinGen gene check', {
+      gene: geneSymbol,
+      hasValidity: result.hasValidity,
+      classification: result.classification,
+    });
+    return result;
   };
 
   return {
