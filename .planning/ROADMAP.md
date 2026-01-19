@@ -219,6 +219,18 @@ Plans:
 - INFRA-03: Build time improved with vite-plugin-checker
 - INFRA-04: Lint/typecheck runs in parallel
 
+**Plans:** 8 plans
+
+Plans:
+- [ ] 10-01-PLAN.md - Logging infrastructure (types, store with ring buffer, useLogger composable)
+- [ ] 10-02-PLAN.md - Export infrastructure (xlsx dependency, types, useExport composable)
+- [ ] 10-03-PLAN.md - Export UI (buttons in StepResults and VariantModal)
+- [ ] 10-04-PLAN.md - Template infrastructure (variable config, parser, store extensions)
+- [ ] 10-05-PLAN.md - Template editor UI (TemplateEditor, VariablePicker, Settings integration)
+- [ ] 10-06-PLAN.md - Log viewer UI (LogViewer panel, footer link, settings)
+- [ ] 10-07-PLAN.md - Build improvements (vite-plugin-checker for parallel checking)
+- [ ] 10-08-PLAN.md - Logging integration (wire logging into API, composables, app)
+
 **Success Criteria:**
 1. User can export calculation results as JSON or Excel file with full metadata
 2. User can edit clinical text templates with syntax highlighting for variables
@@ -233,8 +245,8 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 19/TBD | In Progress (Phase 9 complete) | - |
+| v1.1 Release-Ready | 5-10 | 27/27 | In Progress (Phase 9 complete) | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 9 complete)*
+*Last updated: 2026-01-19 (Phase 10 planned)*
