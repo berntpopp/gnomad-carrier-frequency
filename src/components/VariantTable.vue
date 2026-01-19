@@ -105,7 +105,9 @@
                 sm="6"
                 md="3"
               >
-                <div class="text-caption text-medium-emphasis">Transcript</div>
+                <div class="text-caption text-medium-emphasis">
+                  Transcript
+                </div>
                 <div class="text-body-2">
                   {{ item.transcriptId || '-' }}
                 </div>
@@ -115,7 +117,9 @@
                 sm="6"
                 md="3"
               >
-                <div class="text-caption text-medium-emphasis">Position</div>
+                <div class="text-caption text-medium-emphasis">
+                  Position
+                </div>
                 <div class="text-body-2">
                   {{ item.pos.toLocaleString() }}
                 </div>
@@ -125,7 +129,9 @@
                 sm="6"
                 md="3"
               >
-                <div class="text-caption text-medium-emphasis">Ref / Alt</div>
+                <div class="text-caption text-medium-emphasis">
+                  Ref / Alt
+                </div>
                 <div class="text-body-2 text-mono">
                   {{ item.ref }} / {{ item.alt }}
                 </div>
@@ -135,7 +141,9 @@
                 sm="6"
                 md="3"
               >
-                <div class="text-caption text-medium-emphasis">Allele Count / Number</div>
+                <div class="text-caption text-medium-emphasis">
+                  Allele Count / Number
+                </div>
                 <div class="text-body-2">
                   {{ item.alleleCount.toLocaleString() }} / {{ item.alleleNumber.toLocaleString() }}
                 </div>

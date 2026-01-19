@@ -4,7 +4,10 @@
     class="text-caption text-medium-emphasis justify-center ga-2"
   >
     <!-- GitHub -->
-    <v-tooltip text="Source code on GitHub" location="top">
+    <v-tooltip
+      text="Source code on GitHub"
+      location="top"
+    >
       <template #activator="{ props }">
         <v-btn
           v-bind="props"
@@ -16,7 +19,9 @@
           rel="noopener noreferrer"
           aria-label="Source code on GitHub"
         >
-          <v-icon size="small">mdi-github</v-icon>
+          <v-icon size="small">
+            mdi-github
+          </v-icon>
         </v-btn>
       </template>
     </v-tooltip>
@@ -38,7 +43,10 @@
     <!-- Data Sources Dialog -->
     <DataSourcesDialog>
       <template #activator="{ props }">
-        <v-tooltip text="Data sources" location="top">
+        <v-tooltip
+          text="Data sources"
+          location="top"
+        >
           <template #activator="{ props: tooltipProps }">
             <v-btn
               v-bind="{ ...props, ...tooltipProps }"
@@ -47,7 +55,9 @@
               size="small"
               aria-label="View data sources"
             >
-              <v-icon size="small">mdi-database</v-icon>
+              <v-icon size="small">
+                mdi-database
+              </v-icon>
             </v-btn>
           </template>
         </v-tooltip>
@@ -59,7 +69,10 @@
     <!-- Methodology Dialog -->
     <MethodologyDialog>
       <template #activator="{ props }">
-        <v-tooltip text="Methodology" location="top">
+        <v-tooltip
+          text="Methodology"
+          location="top"
+        >
           <template #activator="{ props: tooltipProps }">
             <v-btn
               v-bind="{ ...props, ...tooltipProps }"
@@ -68,7 +81,9 @@
               size="small"
               aria-label="View calculation methodology"
             >
-              <v-icon size="small">mdi-function-variant</v-icon>
+              <v-icon size="small">
+                mdi-function-variant
+              </v-icon>
             </v-btn>
           </template>
         </v-tooltip>
@@ -78,7 +93,10 @@
     <!-- FAQ Dialog -->
     <FaqDialog>
       <template #activator="{ props }">
-        <v-tooltip text="FAQ" location="top">
+        <v-tooltip
+          text="FAQ"
+          location="top"
+        >
           <template #activator="{ props: tooltipProps }">
             <v-btn
               v-bind="{ ...props, ...tooltipProps }"
@@ -87,7 +105,9 @@
               size="small"
               aria-label="View frequently asked questions"
             >
-              <v-icon size="small">mdi-help-circle-outline</v-icon>
+              <v-icon size="small">
+                mdi-help-circle-outline
+              </v-icon>
             </v-btn>
           </template>
         </v-tooltip>
@@ -97,7 +117,10 @@
     <!-- About Dialog -->
     <AboutDialog>
       <template #activator="{ props }">
-        <v-tooltip text="About" location="top">
+        <v-tooltip
+          text="About"
+          location="top"
+        >
           <template #activator="{ props: tooltipProps }">
             <v-btn
               v-bind="{ ...props, ...tooltipProps }"
@@ -106,7 +129,9 @@
               size="small"
               aria-label="About this application"
             >
-              <v-icon size="small">mdi-information-outline</v-icon>
+              <v-icon size="small">
+                mdi-information-outline
+              </v-icon>
             </v-btn>
           </template>
         </v-tooltip>
@@ -116,7 +141,10 @@
     <span class="mx-1">|</span>
 
     <!-- Disclaimer (reopen) -->
-    <v-tooltip text="View clinical disclaimer" location="top">
+    <v-tooltip
+      text="View clinical disclaimer"
+      location="top"
+    >
       <template #activator="{ props }">
         <v-btn
           v-bind="props"
@@ -126,7 +154,9 @@
           aria-label="View clinical disclaimer"
           @click="reopenDisclaimer"
         >
-          <v-icon size="small">mdi-alert-circle-outline</v-icon>
+          <v-icon size="small">
+            mdi-alert-circle-outline
+          </v-icon>
         </v-btn>
       </template>
     </v-tooltip>

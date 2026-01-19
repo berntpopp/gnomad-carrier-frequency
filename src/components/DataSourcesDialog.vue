@@ -12,7 +12,9 @@
 
     <v-card>
       <v-card-title class="d-flex align-center">
-        <v-icon start>mdi-database</v-icon>
+        <v-icon start>
+          mdi-database
+        </v-icon>
         Data Sources
         <v-spacer />
         <v-btn
@@ -37,7 +39,12 @@
           class="mb-3"
         >
           <v-card-title class="text-subtitle-1">
-            <v-icon start size="small">mdi-database</v-icon>
+            <v-icon
+              start
+              size="small"
+            >
+              mdi-database
+            </v-icon>
             gnomAD
           </v-card-title>
           <v-card-text>
@@ -65,7 +72,12 @@
               rel="noopener noreferrer"
             >
               Visit gnomAD
-              <v-icon end size="small">mdi-open-in-new</v-icon>
+              <v-icon
+                end
+                size="small"
+              >
+                mdi-open-in-new
+              </v-icon>
             </v-btn>
           </v-card-text>
         </v-card>
@@ -76,7 +88,12 @@
           class="mb-3"
         >
           <v-card-title class="text-subtitle-1">
-            <v-icon start size="small">mdi-medical-bag</v-icon>
+            <v-icon
+              start
+              size="small"
+            >
+              mdi-medical-bag
+            </v-icon>
             ClinVar
           </v-card-title>
           <v-card-text>
@@ -96,7 +113,12 @@
               rel="noopener noreferrer"
             >
               Visit ClinVar
-              <v-icon end size="small">mdi-open-in-new</v-icon>
+              <v-icon
+                end
+                size="small"
+              >
+                mdi-open-in-new
+              </v-icon>
             </v-btn>
           </v-card-text>
         </v-card>
@@ -107,7 +129,12 @@
           class="mb-3"
         >
           <v-card-title class="text-subtitle-1">
-            <v-icon start size="small">mdi-check-decagram</v-icon>
+            <v-icon
+              start
+              size="small"
+            >
+              mdi-check-decagram
+            </v-icon>
             ClinGen
           </v-card-title>
           <v-card-text>
@@ -141,7 +168,12 @@
               rel="noopener noreferrer"
             >
               Visit ClinGen
-              <v-icon end size="small">mdi-open-in-new</v-icon>
+              <v-icon
+                end
+                size="small"
+              >
+                mdi-open-in-new
+              </v-icon>
             </v-btn>
           </v-card-text>
         </v-card>

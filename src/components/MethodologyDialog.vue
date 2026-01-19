@@ -13,7 +13,9 @@
 
     <v-card>
       <v-card-title class="d-flex align-center">
-        <v-icon start>mdi-function-variant</v-icon>
+        <v-icon start>
+          mdi-function-variant
+        </v-icon>
         {{ methodology.title }}
         <v-spacer />
         <v-btn
@@ -32,8 +34,12 @@
           v-for="section in methodology.sections"
           :key="section.id"
         >
-          <h3 class="text-h6 mt-4 mb-2">{{ section.title }}</h3>
-          <p class="text-body-2 mb-3">{{ section.content }}</p>
+          <h3 class="text-h6 mt-4 mb-2">
+            {{ section.title }}
+          </h3>
+          <p class="text-body-2 mb-3">
+            {{ section.content }}
+          </p>
 
           <!-- Formula display -->
           <v-card
@@ -41,7 +47,9 @@
             variant="tonal"
             class="mb-4 pa-3"
           >
-            <div class="text-subtitle-2 mb-2">Genotype Frequencies:</div>
+            <div class="text-subtitle-2 mb-2">
+              Genotype Frequencies:
+            </div>
             <div
               v-for="item in section.formula.genotypes"
               :key="item.genotype"

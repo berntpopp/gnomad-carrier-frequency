@@ -2,7 +2,7 @@
   <v-app>
     <VueAnnouncer class="sr-only" />
     <DisclaimerBanner />
-    <AppBar @openSettings="showSettings = true" />
+    <AppBar @open-settings="showSettings = true" />
 
     <v-main>
       <v-container max-width="900">

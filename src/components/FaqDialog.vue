@@ -13,7 +13,9 @@
 
     <v-card>
       <v-card-title class="d-flex align-center">
-        <v-icon start>mdi-help-circle</v-icon>
+        <v-icon start>
+          mdi-help-circle
+        </v-icon>
         {{ faq.title }}
         <v-spacer />
         <v-btn
@@ -49,7 +51,9 @@
               :title="item.question"
             >
               <v-expansion-panel-text>
-                <p class="text-body-2">{{ item.answer }}</p>
+                <p class="text-body-2">
+                  {{ item.answer }}
+                </p>
               </v-expansion-panel-text>
             </v-expansion-panel>
           </template>

@@ -1,12 +1,19 @@
 <template>
-  <v-app-bar density="compact" :elevation="2">
+  <v-app-bar
+    density="compact"
+    :elevation="2"
+  >
     <v-app-bar-title class="text-body-1 font-weight-bold">
       gCFCalc
     </v-app-bar-title>
 
     <v-spacer />
 
-    <v-tooltip text="Toggle theme" location="bottom" aria-label="Toggle theme">
+    <v-tooltip
+      text="Toggle theme"
+      location="bottom"
+      aria-label="Toggle theme"
+    >
       <template #activator="{ props }">
         <v-btn
           v-bind="props"
@@ -21,7 +28,11 @@
       </template>
     </v-tooltip>
 
-    <v-tooltip text="Settings" location="bottom" aria-label="Settings">
+    <v-tooltip
+      text="Settings"
+      location="bottom"
+      aria-label="Settings"
+    >
       <template #activator="{ props }">
         <v-btn
           v-bind="props"

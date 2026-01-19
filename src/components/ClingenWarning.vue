@@ -26,7 +26,9 @@
       density="compact"
       class="mb-4"
     >
-      <template #title>ClinGen Data Unavailable</template>
+      <template #title>
+        ClinGen Data Unavailable
+      </template>
       <template #text>
         Unable to verify gene-disease validity. {{ error }}
       </template>
@@ -41,7 +43,12 @@
       class="mb-4"
     >
       <template #title>
-        <v-icon start size="small">mdi-check-circle</v-icon>
+        <v-icon
+          start
+          size="small"
+        >
+          mdi-check-circle
+        </v-icon>
         ClinGen AR Validated
       </template>
       <template #text>
@@ -49,7 +56,10 @@
           <strong>{{ geneSymbol }}</strong> has validated autosomal recessive gene-disease association(s):
         </div>
         <ul class="mt-1 mb-0">
-          <li v-for="entry in validity.arEntries" :key="entry.mondoId">
+          <li
+            v-for="entry in validity.arEntries"
+            :key="entry.mondoId"
+          >
             {{ entry.diseaseLabel }}
             <v-chip
               size="x-small"
@@ -72,7 +82,12 @@
       class="mb-4"
     >
       <template #title>
-        <v-icon start size="small">mdi-alert</v-icon>
+        <v-icon
+          start
+          size="small"
+        >
+          mdi-alert
+        </v-icon>
         No AR Association in ClinGen
       </template>
       <template #text>
@@ -85,7 +100,10 @@
         >
           Found associations:
           <ul class="mt-1 mb-0">
-            <li v-for="entry in validity.entries" :key="entry.mondoId">
+            <li
+              v-for="entry in validity.entries"
+              :key="entry.mondoId"
+            >
               {{ entry.diseaseLabel }} ({{ entry.moi }})
               <v-chip
                 size="x-small"
@@ -113,7 +131,12 @@
       class="mb-4"
     >
       <template #title>
-        <v-icon start size="small">mdi-information</v-icon>
+        <v-icon
+          start
+          size="small"
+        >
+          mdi-information
+        </v-icon>
         Gene Not in ClinGen
       </template>
       <template #text>

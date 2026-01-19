@@ -19,9 +19,15 @@
       </v-card-title>
 
       <v-tabs v-model="activeTab">
-        <v-tab value="general">General</v-tab>
-        <v-tab value="filters">Filters</v-tab>
-        <v-tab value="templates">Templates</v-tab>
+        <v-tab value="general">
+          General
+        </v-tab>
+        <v-tab value="filters">
+          Filters
+        </v-tab>
+        <v-tab value="templates">
+          Templates
+        </v-tab>
       </v-tabs>
 
       <v-card-text>
@@ -33,7 +39,12 @@
               class="mb-4"
             >
               <v-card-title class="text-subtitle-1">
-                <v-icon start size="small">mdi-alert-circle-outline</v-icon>
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-alert-circle-outline
+                </v-icon>
                 Clinical Disclaimer
               </v-card-title>
 
@@ -66,7 +77,12 @@
               class="mb-4"
             >
               <v-card-title class="text-subtitle-1">
-                <v-icon start size="small">mdi-database-sync</v-icon>
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-database-sync
+                </v-icon>
                 ClinGen Data Cache
               </v-card-title>
 
@@ -94,7 +110,12 @@
                     :loading="clingenLoading"
                     @click="refreshClingenCache"
                   >
-                    <v-icon start size="small">mdi-refresh</v-icon>
+                    <v-icon
+                      start
+                      size="small"
+                    >
+                      mdi-refresh
+                    </v-icon>
                     Refresh
                   </v-btn>
                 </div>
@@ -182,15 +203,27 @@
             </v-btn>
           </v-tabs-window-item>
           <v-tabs-window-item value="templates">
-            <p class="text-body-2">Template editing will appear here.</p>
+            <p class="text-body-2">
+              Template editing will appear here.
+            </p>
           </v-tabs-window-item>
         </v-tabs-window>
       </v-card-text>
 
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text" @click="close">Cancel</v-btn>
-        <v-btn color="primary" @click="save">Save</v-btn>
+        <v-btn
+          variant="text"
+          @click="close"
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          color="primary"
+          @click="save"
+        >
+          Save
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
