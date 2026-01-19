@@ -12,7 +12,10 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@vue-a11y/announcer": "^3.1.5",
     "@vueuse/core": "^12.7.0",
+    "@vueuse/integrations": "^14.1.0",
+    "focus-trap": "^7.8.0",
     "graphql": "^16.10.0",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",
