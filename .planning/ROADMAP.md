@@ -159,9 +159,9 @@ Plans:
 **Plans:** 3 plans in 3 waves
 
 Plans:
-- [ ] 04-01-PLAN.md — CI/Build configuration (ESLint, scripts, base path) [Wave 1]
-- [ ] 04-02-PLAN.md — GitHub Actions workflows (CI + Deploy) [Wave 2]
-- [ ] 04-03-PLAN.md — Deploy and validation (push, verify, validate calculations) [Wave 3]
+- [x] 04-01-PLAN.md — CI/Build configuration (ESLint, scripts, base path) [Wave 1]
+- [x] 04-02-PLAN.md — GitHub Actions workflows (CI + Deploy) [Wave 2]
+- [x] 04-03-PLAN.md — Deploy and validation (push, verify, validate calculations) [Wave 3]
 
 **Key Design Decisions:**
 - ESLint 9 flat config with Vue 3 + TypeScript support
@@ -187,9 +187,9 @@ Plans:
 | Phase 1: Foundation | Complete | 18/18 requirements |
 | Phase 2: Wizard UI | Complete | 10/10 requirements |
 | Phase 3: German Text | Complete | 4/4 requirements (gaps closed) |
-| Phase 4: Deploy | Planned | 3 plans ready |
+| Phase 4: Deploy | Complete | Validated and deployed |
 
-**Overall:** 32/32 requirements mapped (all phases 1-3 complete)
+**Overall:** 32/32 requirements delivered - v1 MVP COMPLETE
 
 ---
 
@@ -211,4 +211,4 @@ Plans:
 
 ---
 
-*Last updated: 2026-01-19 (Phase 4 planned - 3 plans in 3 waves)*
+*Last updated: 2026-01-19 (v1 MVP COMPLETE - deployed to GitHub Pages)*
