@@ -15,17 +15,17 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.1 Release-Ready
 **Phase:** 10 - Export + Templates + Logging - IN PROGRESS
-**Plan:** 4 of 6 complete
+**Plan:** 7 of 8 complete
 **Status:** In progress
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [#########-] ~97% - Phase 10 plan 4 complete
+v1.1 Release-Ready: [#########-] ~98% - Phase 10 plan 7 complete
 ```
 
-**Overall:** Phase 10 in progress (4/6 plans complete)
+**Overall:** Phase 10 in progress (7/8 plans complete)
 
 ---
 
@@ -51,7 +51,7 @@ v1.1 Release-Ready: [#########-] ~97% - Phase 10 plan 4 complete
 | 7 | SEO + Accessibility | 9 | Complete (4/4 plans) |
 | 8 | Filtering + Variant Display | 14 | Complete (4/4 plans) |
 | 9 | ClinGen + Documentation | 15 | Complete (7/7 plans) |
-| 10 | Export + Templates + Logging | 22 | In Progress (4/6 plans) |
+| 10 | Export + Templates + Logging | 22 | In Progress (7/8 plans) |
 
 ---
 
@@ -102,6 +102,9 @@ v1.1 Release-Ready: [#########-] ~97% - Phase 10 plan 4 complete
 | Variable categories | gene, frequency, risk, context, formatting for logical grouping in picker UI | 2026-01-19 |
 | Export format versioning | version field enables future compatibility checks | 2026-01-19 |
 | Per-language reset | Clears customizations when user is on that language | 2026-01-19 |
+| vueTsc: true for checker | Enable parallel TypeScript checking during development | 2026-01-19 |
+| useFlatConfig: true for ESLint | Support ESLint flat config format in vite-plugin-checker | 2026-01-19 |
+| overlay.initialIsOpen: false | Show badge but don't auto-open for non-intrusive DX | 2026-01-19 |
 
 ### Blockers
 
@@ -139,6 +142,8 @@ None currently.
 - [x] Execute 10-04-PLAN.md (template infrastructure)
 - [ ] Execute 10-05-PLAN.md
 - [ ] Execute 10-06-PLAN.md
+- [x] Execute 10-07-PLAN.md (vite-plugin-checker)
+- [ ] Execute 10-08-PLAN.md
 
 ---
 
@@ -147,8 +152,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 10 Plan 04 - Template Infrastructure
-**Next:** Execute 10-05-PLAN.md
+**Completed:** Phase 10 Plan 07 - Vite Plugin Checker
+**Next:** Execute 10-08-PLAN.md (final integration)
 
 ### Handoff Notes
 
@@ -158,7 +163,7 @@ v1.1 roadmap derived from requirements and research:
 - Phase 7: SEO + Accessibility - COMPLETE (4/4 plans)
 - Phase 8: Filtering + Variant Display (configurable filters, variant modal) - COMPLETE
 - Phase 9: ClinGen + Documentation (clinical validation, help content) - COMPLETE
-- Phase 10: Export + Templates + Logging (data export, template editor, debug tools) - IN PROGRESS (4/6)
+- Phase 10: Export + Templates + Logging (data export, template editor, debug tools) - IN PROGRESS (7/8)
 
 Key pitfalls from research:
 - ClinVar "conflicting" over-excludes valid variants (Phase 8 - handled)
@@ -186,7 +191,9 @@ Key pitfalls from research:
 - Plan 03: Export infrastructure - COMPLETE
 - Plan 04: Template infrastructure (variables, parser, store) - COMPLETE
 - Plan 05: Template editor UI - PENDING
-- Plan 06: Final integration - PENDING
+- Plan 06: Export UI integration - PENDING
+- Plan 07: Vite plugin checker (parallel TypeScript/ESLint) - COMPLETE
+- Plan 08: Final integration - PENDING
 
 ---
 
@@ -218,3 +225,4 @@ Key pitfalls from research:
 *10-02 complete: 2026-01-19*
 *10-03 complete: 2026-01-19*
 *10-04 complete: 2026-01-19*
+*10-07 complete: 2026-01-19*
