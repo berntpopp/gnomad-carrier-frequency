@@ -71,6 +71,20 @@ Plans:
 
 **Dependencies:** Phase 1 (calculation logic must work before wiring to UI)
 
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [ ] 02-01-PLAN.md — Wizard types and useWizard composable [Wave 1]
+- [ ] 02-02-PLAN.md — Step components (StepGene, StepStatus, StepFrequency) [Wave 2]
+- [ ] 02-03-PLAN.md — StepResults, WizardStepper, and App integration [Wave 3]
+
+**Key Design Decisions:**
+- Linear navigation only (must complete each step before proceeding)
+- Frequency source selection via tabs (gnomAD/Literature/Default)
+- Status toggle defaults to carrier (heterozygous)
+- Sortable results table with v-data-table
+- Changing gene resets all downstream steps
+
 **Requirements:**
 - UI-01: 4-step wizard flow: Gene -> Status -> Frequency -> Results
 - UI-02: Vuetify stepper component for navigation
@@ -133,8 +147,8 @@ Plans:
 
 | Phase | Status | Progress |
 |-------|--------|----------|
-| Phase 1: Foundation | ✓ Complete | 18/18 requirements |
-| Phase 2: Wizard UI | Pending | 0/10 requirements |
+| Phase 1: Foundation | Complete | 18/18 requirements |
+| Phase 2: Wizard UI | Planned | 0/10 requirements |
 | Phase 3: German Text | Pending | 0/4 requirements |
 | Phase 4: Deploy | Pending | Validation only |
 
@@ -160,4 +174,4 @@ Plans:
 
 ---
 
-*Last updated: 2026-01-18 (Phase 1 complete)*
+*Last updated: 2026-01-19 (Phase 2 planned)*
