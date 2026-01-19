@@ -103,42 +103,44 @@ Plans:
 
 ---
 
-### Phase 8: Filtering + Variant Display
+### Phase 8: Filtering + Variant Display ✓
 
 **Goal:** User can configure variant filters and inspect contributing variants
 
 **Dependencies:** Phase 5 (settings store for filter defaults)
 
 **Requirements:**
-- FILT-01: User can see current filter criteria displayed
-- FILT-02: User can toggle LoF HC filter on/off
-- FILT-03: User can toggle missense inclusion on/off
-- FILT-04: User can toggle ClinVar P/LP filter on/off
-- FILT-05: User can adjust ClinVar star threshold (0-4)
-- FILT-06: Filter defaults stored in settings
-- FILT-07: User can override filter defaults per calculation
-- FILT-08: User can reset filters to defaults
-- FILT-09: Filter changes show real-time variant count feedback
-- VAR-01: User can open modal showing contributing variants
-- VAR-02: Variant modal displays variant ID, consequence, allele frequency, ClinVar status
-- VAR-03: Variant table columns are sortable
-- VAR-04: User can click population row to see population-specific variants
-- VAR-05: Population drill-down shows variant frequencies for that population
+- FILT-01: User can see current filter criteria displayed ✓
+- FILT-02: User can toggle LoF HC filter on/off ✓
+- FILT-03: User can toggle missense inclusion on/off ✓
+- FILT-04: User can toggle ClinVar P/LP filter on/off ✓
+- FILT-05: User can adjust ClinVar star threshold (0-4) ✓
+- FILT-06: Filter defaults stored in settings ✓
+- FILT-07: User can override filter defaults per calculation ✓
+- FILT-08: User can reset filters to defaults ✓
+- FILT-09: Filter changes show real-time variant count feedback ✓
+- VAR-01: User can open modal showing contributing variants ✓
+- VAR-02: Variant modal displays variant ID, consequence, allele frequency, ClinVar status ✓
+- VAR-03: Variant table columns are sortable ✓
+- VAR-04: User can click population row to see population-specific variants ✓
+- VAR-05: Population drill-down shows variant frequencies for that population ✓
 
-**Plans:** 4 plans
+**Plans:** 4 plans (complete)
 
 Plans:
-- [ ] 08-01-PLAN.md - Filter infrastructure (types, store, configurable filter functions)
-- [ ] 08-02-PLAN.md - GraphQL query extension (HGVS fields, display variant types)
-- [ ] 08-03-PLAN.md - Filter UI components (composable, FilterPanel, Settings integration)
-- [ ] 08-04-PLAN.md - Variant modal (VariantTable, population drill-down)
+- [x] 08-01-PLAN.md - Filter infrastructure (types, store, configurable filter functions)
+- [x] 08-02-PLAN.md - GraphQL query extension (HGVS fields, display variant types)
+- [x] 08-03-PLAN.md - Filter UI components (composable, FilterPanel, Settings integration)
+- [x] 08-04-PLAN.md - Variant modal (VariantTable, population drill-down)
 
 **Success Criteria:**
-1. User can see which filters produced current results (displayed in UI)
-2. User can toggle individual filter criteria and see variant count update in real-time
-3. User can open variant detail modal and sort by any column
-4. User can drill down from population row to see that population's contributing variants
-5. Filter preferences persist across sessions when saved to settings
+1. ✓ User can see which filters produced current results (displayed in UI)
+2. ✓ User can toggle individual filter criteria and see variant count update in real-time
+3. ✓ User can open variant detail modal and sort by any column
+4. ✓ User can drill down from population row to see that population's contributing variants
+5. ✓ Filter preferences persist across sessions when saved to settings
+
+**Completed:** 2026-01-19
 
 ---
 
@@ -218,8 +220,8 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 12/TBD | In Progress (Phase 8 planned) | - |
+| v1.1 Release-Ready | 5-10 | 16/TBD | In Progress (Phase 8 complete) | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 8 planned)*
+*Last updated: 2026-01-19 (Phase 8 complete)*
