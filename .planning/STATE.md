@@ -14,18 +14,18 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 **Milestone:** v1.1 Release-Ready
-**Phase:** 7 - SEO + Accessibility
-**Plan:** 4 of 4 complete
-**Status:** Phase complete
+**Phase:** 8 - Filtering + Variant Display
+**Plan:** 2 of 4 complete
+**Status:** In progress
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [#####-----] ~50% - Phase 7 complete
+v1.1 Release-Ready: [######----] ~60% - Phase 8 in progress
 ```
 
-**Overall:** Phase 7 complete, ready for Phase 8
+**Overall:** Phase 8 plan 02 complete (HGVS + Display Types)
 
 ---
 
@@ -49,7 +49,7 @@ v1.1 Release-Ready: [#####-----] ~50% - Phase 7 complete
 | 5 | Foundation | 4 | Complete (2/2 plans) |
 | 6 | App Shell | 5 | Complete (2/2 plans) |
 | 7 | SEO + Accessibility | 9 | Complete (4/4 plans) |
-| 8 | Filtering + Variant Display | 14 | Pending |
+| 8 | Filtering + Variant Display | 14 | In progress (2/4 plans) |
 | 9 | ClinGen + Documentation | 15 | Pending |
 | 10 | Export + Templates + Logging | 22 | Pending |
 
@@ -78,6 +78,8 @@ v1.1 Release-Ready: [#####-----] ~50% - Phase 7 complete
 | allowOutsideClick for Vuetify | Focus trap allows overlay clicks to work with Vuetify dialogs | 2026-01-19 |
 | Perf warn, a11y/SEO error in Lighthouse | CI perf varies, a11y/SEO are stable and must be enforced | 2026-01-19 |
 | aria-label on tooltips and buttons | Ensures screen reader support regardless of Vuetify internals | 2026-01-19 |
+| HGVS fields nullable strings | gnomAD may not have HGVS annotation for all variants | 2026-01-19 |
+| DisplayVariant boolean flags | isLoF, isClinvarPathogenic, isMissense for efficient table filtering | 2026-01-19 |
 
 ### Blockers
 
@@ -95,7 +97,11 @@ None currently.
 - [x] Execute 07-02-PLAN.md (accessibility infrastructure)
 - [x] Execute 07-03-PLAN.md (component accessibility integration)
 - [x] Execute 07-04-PLAN.md (Lighthouse CI + accessibility audit)
-- [ ] Run `/gsd:plan-phase 8` to create Filtering + Variant Display plans
+- [x] Run `/gsd:plan-phase 8` to create Filtering + Variant Display plans
+- [x] Execute 08-01-PLAN.md (filter types + settings store extension)
+- [x] Execute 08-02-PLAN.md (HGVS fields + display types)
+- [ ] Execute 08-03-PLAN.md (filter UI + composable)
+- [ ] Execute 08-04-PLAN.md (variant modal component)
 - [ ] ClinGen CSV schema may need exploration during Phase 9
 
 ---
@@ -105,8 +111,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 7 Plan 04 - Lighthouse CI & Accessibility Audit
-**Next:** Plan Phase 8 (Filtering + Variant Display)
+**Completed:** Phase 8 Plan 02 - HGVS + Display Types
+**Next:** Execute 08-03-PLAN.md (Filter UI + Composable)
 
 ### Handoff Notes
 
@@ -114,7 +120,7 @@ v1.1 roadmap derived from requirements and research:
 - Phase 5: Foundation (settings store, theme, version display) - COMPLETE
 - Phase 6: App Shell (navigation, logo, favicon, settings access) - COMPLETE
 - Phase 7: SEO + Accessibility - COMPLETE (4/4 plans)
-- Phase 8: Filtering + Variant Display (configurable filters, variant modal)
+- Phase 8: Filtering + Variant Display (configurable filters, variant modal) - IN PROGRESS
 - Phase 9: ClinGen + Documentation (clinical validation, help content)
 - Phase 10: Export + Templates + Logging (data export, template editor, debug tools)
 
@@ -123,11 +129,11 @@ Key pitfalls from research:
 - ARIA live regions break with v-if (Phase 7 - solved with VueAnnouncer)
 - XSS risk in template editor (Phase 10)
 
-**Phase 7 deliverables:**
-- Plan 01: SEO meta tags, OG/Twitter cards, JSON-LD structured data - COMPLETE
-- Plan 02: VueAnnouncer plugin, useAppAnnouncer composable, focus-trap dependencies - COMPLETE
-- Plan 03: Wizard ARIA announcements, SettingsDialog focus trap - COMPLETE
-- Plan 04: Lighthouse CI workflow, heading hierarchy, tooltip aria-labels - COMPLETE
+**Phase 8 deliverables:**
+- Plan 01: Filter types and settings store extension - COMPLETE
+- Plan 02: HGVS fields + display types for variant modal - COMPLETE
+- Plan 03: Filter UI component + useVariantFilter composable - PENDING
+- Plan 04: Variant modal component with sortable table - PENDING
 
 ---
 
@@ -142,3 +148,5 @@ Key pitfalls from research:
 *07-02 complete: 2026-01-19*
 *07-03 complete: 2026-01-19*
 *07-04 complete: 2026-01-19*
+*08-01 complete: 2026-01-19*
+*08-02 complete: 2026-01-19*
