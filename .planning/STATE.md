@@ -14,18 +14,18 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 **Milestone:** v1.1 Release-Ready
-**Phase:** 8 - Filtering + Variant Display
-**Plan:** 3 of 4 complete
-**Status:** In progress
+**Phase:** 8 - Filtering + Variant Display - COMPLETE
+**Plan:** 4 of 4 complete
+**Status:** Phase complete
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [#######---] ~70% - Phase 8 in progress
+v1.1 Release-Ready: [########--] ~80% - Phase 8 complete
 ```
 
-**Overall:** Phase 8 plan 03 complete (Filter UI + Composable)
+**Overall:** Phase 8 complete (Filtering + Variant Display)
 
 ---
 
@@ -49,7 +49,7 @@ v1.1 Release-Ready: [#######---] ~70% - Phase 8 in progress
 | 5 | Foundation | 4 | Complete (2/2 plans) |
 | 6 | App Shell | 5 | Complete (2/2 plans) |
 | 7 | SEO + Accessibility | 9 | Complete (4/4 plans) |
-| 8 | Filtering + Variant Display | 14 | In progress (3/4 plans) |
+| 8 | Filtering + Variant Display | 14 | Complete (4/4 plans) |
 | 9 | ClinGen + Documentation | 15 | Pending |
 | 10 | Export + Templates + Logging | 22 | Pending |
 
@@ -82,6 +82,8 @@ v1.1 Release-Ready: [#######---] ~70% - Phase 8 in progress
 | DisplayVariant boolean flags | isLoF, isClinvarPathogenic, isMissense for efficient table filtering | 2026-01-19 |
 | Local filter state in composable | Per-calculation overrides without persisting to store | 2026-01-19 |
 | FrequencyResults.vue orphaned | Integration target changed to StepResults.vue (active component) | 2026-01-19 |
+| Dynamic v-slot for Vuetify data-table | #[\`item.xxx\`] syntax required for column slot names with dots | 2026-01-19 |
+| Population drill-down via row click | Cleaner UX than buttons; chevron provides visual affordance | 2026-01-19 |
 
 ### Blockers
 
@@ -103,7 +105,8 @@ None currently.
 - [x] Execute 08-01-PLAN.md (filter types + settings store extension)
 - [x] Execute 08-02-PLAN.md (HGVS fields + display types)
 - [x] Execute 08-03-PLAN.md (filter UI + composable)
-- [ ] Execute 08-04-PLAN.md (variant modal component)
+- [x] Execute 08-04-PLAN.md (variant modal component)
+- [ ] Run `/gsd:plan-phase 9` to create ClinGen + Documentation plans
 - [ ] ClinGen CSV schema may need exploration during Phase 9
 
 ---
@@ -113,8 +116,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 8 Plan 03 - Filter UI + Composable
-**Next:** Execute 08-04-PLAN.md (Variant Modal)
+**Completed:** Phase 8 Plan 04 - Variant Modal Component (Phase 8 COMPLETE)
+**Next:** Plan Phase 9 (ClinGen + Documentation)
 
 ### Handoff Notes
 
@@ -122,20 +125,25 @@ v1.1 roadmap derived from requirements and research:
 - Phase 5: Foundation (settings store, theme, version display) - COMPLETE
 - Phase 6: App Shell (navigation, logo, favicon, settings access) - COMPLETE
 - Phase 7: SEO + Accessibility - COMPLETE (4/4 plans)
-- Phase 8: Filtering + Variant Display (configurable filters, variant modal) - IN PROGRESS
-- Phase 9: ClinGen + Documentation (clinical validation, help content)
-- Phase 10: Export + Templates + Logging (data export, template editor, debug tools)
+- Phase 8: Filtering + Variant Display (configurable filters, variant modal) - COMPLETE
+- Phase 9: ClinGen + Documentation (clinical validation, help content) - PENDING
+- Phase 10: Export + Templates + Logging (data export, template editor, debug tools) - PENDING
 
 Key pitfalls from research:
-- ClinVar "conflicting" over-excludes valid variants (Phase 8)
+- ClinVar "conflicting" over-excludes valid variants (Phase 8 - handled)
 - ARIA live regions break with v-if (Phase 7 - solved with VueAnnouncer)
 - XSS risk in template editor (Phase 10)
 
-**Phase 8 deliverables:**
+**Phase 8 deliverables (all complete):**
 - Plan 01: Filter types and settings store extension - COMPLETE
 - Plan 02: HGVS fields + display types for variant modal - COMPLETE
 - Plan 03: Filter UI component + useVariantFilter composable - COMPLETE
-- Plan 04: Variant modal component with sortable table - PENDING
+- Plan 04: Variant modal component with sortable table - COMPLETE
+
+**Phase 9 scope:**
+- ClinGen gene validity integration
+- Help/documentation system
+- About dialog with citations
 
 ---
 
@@ -153,3 +161,5 @@ Key pitfalls from research:
 *08-01 complete: 2026-01-19*
 *08-02 complete: 2026-01-19*
 *08-03 complete: 2026-01-19*
+*08-04 complete: 2026-01-19*
+*Phase 8 complete: 2026-01-19*
