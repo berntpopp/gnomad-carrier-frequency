@@ -28,15 +28,17 @@ const vuetify = createVuetify({
       light: {
         dark: false,
         colors: {
-          primary: '#1976D2',
+          primary: '#a09588',
           secondary: '#424242',
+          surface: '#FFFFFF',
+          background: '#FAFAFA',
         }
       },
       dark: {
         dark: true,
         colors: {
-          primary: '#2196F3',
-          secondary: '#616161',
+          primary: '#BDBDBD',
+          secondary: '#757575',
         }
       }
     }
