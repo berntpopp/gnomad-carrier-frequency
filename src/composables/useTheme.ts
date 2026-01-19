@@ -23,7 +23,7 @@ export function useAppTheme() {
   watch(
     isDark,
     (dark) => {
-      vuetifyTheme.global.name.value = dark ? 'dark' : 'light';
+      vuetifyTheme.change(dark ? 'dark' : 'light');
     },
     { immediate: true }
   );
