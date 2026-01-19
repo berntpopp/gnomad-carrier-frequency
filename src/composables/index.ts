@@ -21,3 +21,6 @@ export type { UseAppAnnouncerReturn } from './useAppAnnouncer';
 
 export { useVariantFilters } from './useVariantFilters';
 export type { UseVariantFiltersReturn } from './useVariantFilters';
+
+export { useClingenValidity } from './useClingenValidity';
+export type { UseClingenValidityReturn } from './useClingenValidity';
