@@ -14,18 +14,18 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 **Milestone:** v1.1 Release-Ready
-**Phase:** 5 - Foundation (Settings + Theme)
-**Plan:** 2 of 2 complete
-**Status:** Phase complete
+**Phase:** 6 - App Shell (Navigation + Branding)
+**Plan:** 1 of 2 complete
+**Status:** In progress
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [##--------] ~17% - Phase 5 complete
+v1.1 Release-Ready: [###-------] ~25% - Phase 6 plan 1 complete
 ```
 
-**Overall:** Phase 5 complete, Phase 6 ready
+**Overall:** Phase 6 in progress, plan 06-01 complete
 
 ---
 
@@ -47,7 +47,7 @@ v1.1 Release-Ready: [##--------] ~17% - Phase 5 complete
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 5 | Foundation | 4 | Complete (2/2 plans) |
-| 6 | App Shell | 5 | Pending |
+| 6 | App Shell | 5 | In progress (1/2 plans) |
 | 7 | SEO + Accessibility | 9 | Pending |
 | 8 | Filtering + Variant Display | 14 | Pending |
 | 9 | ClinGen + Documentation | 15 | Pending |
@@ -66,6 +66,8 @@ v1.1 Release-Ready: [##--------] ~17% - Phase 5 complete
 | ClinGen via CSV, not REST | Public download endpoint is CORS-enabled | 2026-01-19 |
 | Theme storage key 'carrier-freq-theme' | Namespaced key avoids conflicts with other apps | 2026-01-19 |
 | Title in content area | App bar has app name, page content has descriptive header | 2026-01-19 |
+| SVG favicon with CSS dark mode | Modern browsers support @media prefers-color-scheme in SVG | 2026-01-19 |
+| RequiForm palette #a09588 | LaborBerlin-inspired muted taupe for professional clinical appearance | 2026-01-19 |
 
 ### Blockers
 
@@ -85,14 +87,14 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 5 Plan 02 - Settings UI Integration
-**Next:** Plan Phase 6 (App Shell)
+**Completed:** Phase 6 Plan 01 - Favicon and Theme Colors
+**Next:** Execute 06-02-PLAN.md (App Shell UI)
 
 ### Handoff Notes
 
 v1.1 roadmap derived from requirements and research:
 - Phase 5: Foundation (settings store, theme, version display) - COMPLETE
-- Phase 6: App Shell (navigation, logo, favicon, settings access)
+- Phase 6: App Shell (navigation, logo, favicon, settings access) - IN PROGRESS (1/2)
 - Phase 7: SEO + Accessibility (WCAG compliance, Lighthouse targets)
 - Phase 8: Filtering + Variant Display (configurable filters, variant modal)
 - Phase 9: ClinGen + Documentation (clinical validation, help content)
@@ -103,14 +105,12 @@ Key pitfalls from research:
 - ARIA live regions break with v-if (Phase 7)
 - XSS risk in template editor (Phase 10)
 
-**Phase 5 deliverables:**
-- useAppTheme composable at src/composables/useTheme.ts
-- Version injection via VITE_APP_VERSION
-- Vuetify dark theme configured
-- Theme persists to localStorage
-- AppBar with theme toggle at src/components/AppBar.vue
-- AppFooter with version display at src/components/AppFooter.vue
-- App shell integrated in src/App.vue
+**Phase 6 Plan 01 deliverables:**
+- public/favicon.svg with CSS dark mode media query
+- public/favicon.png as 32x32 fallback
+- public/apple-touch-icon.png as 180x180 iOS icon
+- Vuetify theme updated to RequiForm palette (#a09588 primary)
+- index.html updated with favicon link elements
 
 ---
 
@@ -119,3 +119,4 @@ Key pitfalls from research:
 *v1.1 roadmap: 2026-01-19*
 *05-01 complete: 2026-01-19*
 *05-02 complete: 2026-01-19*
+*06-01 complete: 2026-01-19*
