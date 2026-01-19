@@ -3,7 +3,7 @@
     app
     class="text-caption text-medium-emphasis justify-center ga-2"
   >
-    <v-tooltip text="Source code on GitHub" location="top">
+    <v-tooltip text="Source code on GitHub" location="top" aria-label="Source code on GitHub">
       <template #activator="{ props }">
         <v-btn
           v-bind="props"
@@ -13,6 +13,7 @@
           href="https://github.com/berntpopp/gnomad-carrier-frequency"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Source code on GitHub"
         >
           <v-icon size="small">mdi-github</v-icon>
         </v-btn>
@@ -32,7 +33,7 @@
 
     <span class="mx-2">|</span>
 
-    <v-tooltip text="gnomAD database" location="top">
+    <v-tooltip text="gnomAD database" location="top" aria-label="gnomAD database">
       <template #activator="{ props }">
         <v-btn
           v-bind="props"
@@ -42,6 +43,7 @@
           href="https://gnomad.broadinstitute.org/"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="gnomAD database"
         >
           <v-icon size="small">mdi-database</v-icon>
         </v-btn>

@@ -6,13 +6,14 @@
 
     <v-spacer />
 
-    <v-tooltip text="Toggle theme" location="bottom">
+    <v-tooltip text="Toggle theme" location="bottom" aria-label="Toggle theme">
       <template #activator="{ props }">
         <v-btn
           v-bind="props"
           icon
           variant="text"
           :title="tooltipText"
+          aria-label="Toggle theme"
           @click="toggleTheme()"
         >
           <v-icon>{{ themeIcon }}</v-icon>
@@ -20,13 +21,14 @@
       </template>
     </v-tooltip>
 
-    <v-tooltip text="Settings" location="bottom">
+    <v-tooltip text="Settings" location="bottom" aria-label="Settings">
       <template #activator="{ props }">
         <v-btn
           v-bind="props"
           icon
           variant="text"
           title="Settings"
+          aria-label="Settings"
           @click="emit('openSettings')"
         >
           <v-icon>mdi-cog</v-icon>
