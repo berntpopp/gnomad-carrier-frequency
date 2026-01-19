@@ -34,3 +34,10 @@ export type { FilterConfig, FilterDefaults } from './filter';
 export { FACTORY_FILTER_DEFAULTS } from './filter';
 
 export type { DisplayVariant, PopulationVariantFrequency } from './display';
+
+export type {
+  ClingenEntry,
+  ClingenCacheState,
+  ClingenValidityResult,
+} from './clingen';
+export { CLINGEN_CACHE_EXPIRY_MS } from './clingen';
