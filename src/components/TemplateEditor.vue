@@ -94,7 +94,8 @@ import { parseTemplate } from '@/utils/template-parser';
 import type { Perspective } from '@/types';
 
 const templateStore = useTemplateStore();
-const textareaRef = ref<InstanceType<typeof import('vuetify/components').VTextarea> | null>(null);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const textareaRef = ref<any>(null);
 
 // Selection state
 const selectedPerspective = ref<Perspective>('affected');
@@ -130,7 +131,7 @@ const sectionItems = computed(() => {
 watch(selectedPerspective, () => {
   const items = sectionItems.value;
   if (items.length > 0 && !items.find((i) => i.value === selectedSection.value)) {
-    selectedSection.value = items[0].value;
+    selectedSection.value = items[0]?.value ?? '';
   }
 });
 

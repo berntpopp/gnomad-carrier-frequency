@@ -155,7 +155,7 @@ export function useGeneSearch(): UseGeneSearchReturn {
 
     logger.info('Gene selected', {
       symbol: gene.symbol,
-      name: gene.name,
+      ensemblId: gene.ensembl_id,
     });
 
     // Fetch constraint data when gene is selected

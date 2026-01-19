@@ -130,8 +130,9 @@ export function useClingenValidity(): UseClingenValidityReturn {
     const result = store.getGeneValidity(geneSymbol);
     logger.debug('ClinGen gene check', {
       gene: geneSymbol,
-      hasValidity: result.hasValidity,
-      classification: result.classification,
+      found: result.found,
+      hasAutosomalRecessive: result.hasAutosomalRecessive,
+      entryCount: result.entries.length,
     });
     return result;
   };
