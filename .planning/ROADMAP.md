@@ -40,32 +40,34 @@ Plans:
 
 ---
 
-### Phase 12: PWA
+### Phase 12: PWA ✓
 
 **Goal:** User can install app on device and use offline with cached data
 
 **Dependencies:** Phase 11 (URL state for deep linking)
 
 **Requirements:**
-- PWA-01: App has valid web manifest with icons and metadata
-- PWA-02: Service worker caches app shell and static assets
-- PWA-03: App is installable on desktop and mobile
-- PWA-04: Offline fallback page displays when network unavailable
-- PWA-05: Previously fetched gene data available offline
-- PWA-06: Install prompt shown to eligible users
+- PWA-01: App has valid web manifest with icons and metadata ✓
+- PWA-02: Service worker caches app shell and static assets ✓
+- PWA-03: App is installable on desktop and mobile ✓
+- PWA-04: Offline fallback page displays when network unavailable ✓
+- PWA-05: Previously fetched gene data available offline ✓
+- PWA-06: Install prompt shown to eligible users ✓
 
-**Plans:** 3 plans
+**Plans:** 3 plans (complete)
 
 Plans:
-- [ ] 12-01-PLAN.md - PWA infrastructure (vite-plugin-pwa, icons, manifest, Workbox caching)
-- [ ] 12-02-PLAN.md - Install and offline UI (usePwaInstall, OfflineIndicator, Settings install section)
-- [ ] 12-03-PLAN.md - Service worker updates and cache management (usePwaUpdate, cache controls in Settings)
+- [x] 12-01-PLAN.md - PWA infrastructure (vite-plugin-pwa, icons, manifest, Workbox caching)
+- [x] 12-02-PLAN.md - Install and offline UI (usePwaInstall, OfflineIndicator, Settings install section)
+- [x] 12-03-PLAN.md - Service worker updates and cache management (usePwaUpdate, cache controls in Settings)
 
 **Success Criteria:**
-1. User can install app via browser install prompt
-2. Installed app launches in standalone window
-3. App loads without network after initial visit
-4. Cached gene queries work offline
+1. ✓ User can install app via browser install prompt
+2. ✓ Installed app launches in standalone window
+3. ✓ App loads without network after initial visit
+4. ✓ Cached gene queries work offline
+
+**Completed:** 2026-01-19
 
 ---
 
@@ -341,8 +343,8 @@ Plans:
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
 | v1.1 Release-Ready | 5-10 | 27/27 | Complete | 2026-01-19 |
-| v1.2 Sharing & Collaboration | 11+ | 5/? | In Progress | - |
+| v1.2 Sharing & Collaboration | 11+ | 5/8 | In Progress | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 12 planned)*
+*Last updated: 2026-01-19 (Phase 12 complete)*
