@@ -22,6 +22,10 @@ export interface CarrierFrequencyResult {
   gene: string;
   version: GnomadVersion;
   globalCarrierFrequency: number | null;
+  /** Total allele count across all pathogenic variants (global, not sum of populations) */
+  globalAlleleCount: number;
+  /** Total allele number (sample size) for global calculation */
+  globalAlleleNumber: number;
   populations: PopulationFrequency[];
   qualifyingVariantCount: number;
   minFrequency: number | null;

@@ -385,7 +385,7 @@ const tableItems = computed((): TableItem[] => {
 
   const items: TableItem[] = [];
 
-  // Global row first
+  // Global row first - use actual global totals, not derived from populations
   const globalCarrierFreq = effectiveFrequency.value;
   if (globalCarrierFreq !== null) {
     const { risk, riskString } = calculateRecurrenceRiskWithValue(globalCarrierFreq);
@@ -396,8 +396,8 @@ const tableItems = computed((): TableItem[] => {
       ratioDenominator: globalCarrierFreq > 0 ? Math.round(1 / globalCarrierFreq) : null,
       recurrenceRiskValue: risk,
       recurrenceRisk: riskString,
-      alleleCount: sumAlleleCount(props.result),
-      alleleNumber: maxAlleleNumber(props.result),
+      alleleCount: props.result.globalAlleleCount,
+      alleleNumber: props.result.globalAlleleNumber,
       isFounderEffect: false,
       isGlobal: true,
       notes: '',
@@ -436,17 +436,6 @@ function calculateRecurrenceRiskWithValue(freq: number): { risk: number; riskStr
   const risk = freq / divisor;
   const riskString = risk > 0 ? `1:${Math.round(1 / risk).toLocaleString()}` : 'N/A';
   return { risk, riskString };
-}
-
-// Helper: Sum allele counts
-function sumAlleleCount(result: CarrierFrequencyResult): number {
-  return result.populations.reduce((sum, pop) => sum + pop.alleleCount, 0);
-}
-
-// Helper: Max allele number
-function maxAlleleNumber(result: CarrierFrequencyResult): number | null {
-  const numbers = result.populations.map((p) => p.alleleNumber).filter((n) => n > 0);
-  return numbers.length ? Math.max(...numbers) : null;
 }
 
 // Row styling

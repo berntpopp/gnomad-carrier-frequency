@@ -144,7 +144,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     return aggregatePopulationFrequencies(pathogenicVariants.value, version.value);
   });
 
-  // Calculate global carrier frequency
+  // Calculate global statistics: carrier frequency, total AC, and representative AN
   //
   // Mathematical approach: Sum of allele frequencies
   // - Each variant has its own AN due to varying call rate
@@ -154,12 +154,24 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   // Formula: carrier_freq = 2 × Σ(variant_AF_i)
   // where variant_AF = (exome_AC + genome_AC) / (exome_AN + genome_AN)
   //
-  const globalCarrierFrequency = computed((): number | null => {
-    if (usingDefault.value) return defaultCarrierFrequency; // From config
-    if (!aggregatedPops.value) return null;
+  const globalStats = computed((): {
+    carrierFrequency: number | null;
+    totalAC: number;
+    maxAN: number;
+  } => {
+    if (usingDefault.value) {
+      return { carrierFrequency: defaultCarrierFrequency, totalAC: 0, maxAN: 0 };
+    }
+    if (!aggregatedPops.value || !pathogenicVariants.value.length) {
+      return { carrierFrequency: null, totalAC: 0, maxAN: 0 };
+    }
 
     // Sum allele frequencies across all pathogenic variants
+    // Also track total AC and max AN for display
     let sumAF = 0;
+    let totalAC = 0;
+    let maxExomeAN = 0;
+    let maxGenomeAN = 0;
 
     for (const variant of pathogenicVariants.value) {
       // Combine exome and genome for this variant (different sample sets)
@@ -171,15 +183,26 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
       const combinedAC = exomeAC + genomeAC;
       const combinedAN = exomeAN + genomeAN;
 
+      // Track totals
+      totalAC += combinedAC;
+      maxExomeAN = Math.max(maxExomeAN, exomeAN);
+      maxGenomeAN = Math.max(maxGenomeAN, genomeAN);
+
       // Calculate this variant's AF and add to sum
       if (combinedAN > 0) {
         sumAF += combinedAC / combinedAN;
       }
     }
 
-    if (sumAF === 0) return null;
-    return 2 * sumAF; // Carrier frequency = 2 × sum(AF)
+    return {
+      carrierFrequency: sumAF > 0 ? 2 * sumAF : null,
+      totalAC,
+      maxAN: maxExomeAN + maxGenomeAN,
+    };
   });
+
+  // Expose individual computed values for convenience
+  const globalCarrierFrequency = computed(() => globalStats.value.carrierFrequency);
 
   // Build population frequency array (uses config for labels/thresholds)
   const populations = computed((): PopulationFrequency[] => {
@@ -214,6 +237,8 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
       gene: geneSymbol.value,
       version: version.value,
       globalCarrierFrequency: globalCarrierFrequency.value,
+      globalAlleleCount: globalStats.value.totalAC,
+      globalAlleleNumber: globalStats.value.maxAN,
       populations: populations.value,
       qualifyingVariantCount: qualifyingVariantCount.value,
       minFrequency: freqs.length ? Math.min(...freqs) : null,
