@@ -11,6 +11,21 @@
       class="mb-4"
     />
 
+    <!-- Exclusion alert - shows when variants have been manually excluded -->
+    <v-alert
+      v-if="excludedCount > 0"
+      type="info"
+      variant="tonal"
+      class="mb-4"
+      density="compact"
+    >
+      <template #prepend>
+        <v-icon>mdi-filter-remove</v-icon>
+      </template>
+      {{ excludedCount }} variant(s) manually excluded from calculation.
+      Open the variant table to review or restore excluded variants.
+    </v-alert>
+
     <!-- Summary card -->
     <v-card
       v-if="result"
@@ -78,6 +93,13 @@
         </div>
         <div class="text-body-2 mt-2 text-medium-emphasis d-flex align-center flex-wrap">
           Based on {{ filteredCount }} qualifying variant(s)
+          <!-- Exclusion note when variants have been excluded -->
+          <span
+            v-if="excludedCount > 0"
+            class="ml-1 text-warning"
+          >
+            ({{ excludedCount }} manually excluded)
+          </span>
           <v-tooltip location="top">
             <template #activator="{ props: tooltipProps }">
               <v-icon
@@ -310,7 +332,7 @@ import { config, getGnomadVersion, getPopulationLabel } from '@/config';
 import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@/types';
 import type { ClinVarSubmission } from '@/api/queries';
 import { useFilterStore } from '@/stores/useFilterStore';
-import { useExport, useAppAnnouncer } from '@/composables';
+import { useExport, useAppAnnouncer, useExclusionState } from '@/composables';
 import { filterPathogenicVariantsConfigurable } from '@/utils/variant-filters';
 import { toDisplayVariants, filterVariantsByPopulation } from '@/utils/variant-display';
 import { buildExportData } from '@/utils/export-utils';
@@ -358,6 +380,9 @@ const emit = defineEmits<{
 
 // Get filter store for reset functionality
 const filterStore = useFilterStore();
+
+// Get exclusion state (singleton) for displaying excluded count
+const { excludedCount } = useExclusionState();
 
 // Set up export composable
 const { exportToJson, exportToExcel } = useExport();

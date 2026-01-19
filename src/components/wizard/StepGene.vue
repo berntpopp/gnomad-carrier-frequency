@@ -57,7 +57,7 @@ import GeneConstraintCard from '@/components/GeneConstraintCard.vue';
 import ClingenWarning from '@/components/ClingenWarning.vue';
 import OfflineFallback from '@/components/OfflineFallback.vue';
 import type { GeneSearchResult } from '@/api/queries/types';
-import { useGeneSearch, useNetworkStatus } from '@/composables';
+import { useGeneSearch, useNetworkStatus, useExclusionState } from '@/composables';
 import { useGnomadVersion } from '@/api';
 
 const { isOnline } = useNetworkStatus();
@@ -75,7 +75,14 @@ const { geneConstraint, constraintLoading } = useGeneSearch();
 const { version } = useGnomadVersion();
 const gnomadVersion = computed(() => version.value);
 
+// Get exclusion state to reset when gene changes
+const { resetForGene } = useExclusionState();
+
 const onGeneChange = (gene: GeneSearchResult | null) => {
+  // Reset exclusions when gene changes (EXCL-07)
+  if (gene?.symbol) {
+    resetForGene(gene.symbol);
+  }
   emit('update:modelValue', gene);
 };
 </script>
