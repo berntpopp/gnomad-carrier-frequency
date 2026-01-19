@@ -32,3 +32,5 @@ export type {
 
 export type { FilterConfig, FilterDefaults } from './filter';
 export { FACTORY_FILTER_DEFAULTS } from './filter';
+
+export type { DisplayVariant, PopulationVariantFrequency } from './display';
