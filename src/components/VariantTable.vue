@@ -20,6 +20,11 @@
       <span class="text-mono">{{ formatFrequency(item.alleleFrequency) }}</span>
     </template>
 
+    <!-- Carrier frequency column - 2 × AF -->
+    <template #[`item.carrierFrequency`]="{ item }">
+      <span class="text-mono">{{ formatCarrierFreq(item.alleleFrequency) }}</span>
+    </template>
+
     <!-- ClinVar status column - colored chip -->
     <template #[`item.clinvarStatus`]="{ item }">
       <v-chip
@@ -222,6 +227,7 @@ const headers = ref([
   { title: 'Variant ID', key: 'variant_id', sortable: true },
   { title: 'Consequence', key: 'consequence', sortable: true },
   { title: 'Allele Freq', key: 'alleleFrequency', sortable: true, align: 'end' as const },
+  { title: 'Carrier Freq', key: 'carrierFrequency', sortable: true, align: 'end' as const },
   { title: 'ClinVar', key: 'clinvarStatus', sortable: true },
   { title: 'Stars', key: 'goldStars', sortable: true, align: 'center' as const },
   { title: 'HGVS-c', key: 'hgvsc', sortable: false },
@@ -234,6 +240,18 @@ const sortBy = ref([{ key: 'alleleFrequency', order: 'desc' as const }]);
 // Use the utility function for frequency formatting
 function formatFrequency(freq: number | null): string {
   return formatAlleleFrequency(freq);
+}
+
+// Format carrier frequency (2 × AF)
+function formatCarrierFreq(alleleFreq: number | null): string {
+  if (alleleFreq === null || alleleFreq === 0) return '-';
+  const carrierFreq = 2 * alleleFreq;
+  // Show as percentage for readability
+  if (carrierFreq >= 0.01) {
+    return `${(carrierFreq * 100).toFixed(2)}%`;
+  }
+  // Scientific notation for small values
+  return `${(carrierFreq * 100).toExponential(2)}%`;
 }
 
 // Format ClinVar status for display (shorten long strings)
