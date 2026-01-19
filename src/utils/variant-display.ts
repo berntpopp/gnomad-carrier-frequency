@@ -146,7 +146,8 @@ export function getConsequenceLabel(consequenceTerms: string[]): string {
     return 'Unknown';
   }
   // Return first term, replacing underscores with spaces
-  return consequenceTerms[0].replace(/_/g, ' ');
+  const firstTerm = consequenceTerms[0];
+  return firstTerm ? firstTerm.replace(/_/g, ' ') : 'Unknown';
 }
 
 /**

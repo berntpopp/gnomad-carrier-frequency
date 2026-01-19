@@ -11,17 +11,17 @@
     class="elevation-0"
   >
     <!-- Consequence column -->
-    <template #item.consequence="{ item }">
+    <template #[`item.consequence`]="{ item }">
       <span class="text-body-2">{{ item.consequence }}</span>
     </template>
 
     <!-- Allele frequency column - scientific notation for small values -->
-    <template #item.alleleFrequency="{ item }">
+    <template #[`item.alleleFrequency`]="{ item }">
       <span class="text-mono">{{ formatFrequency(item.alleleFrequency) }}</span>
     </template>
 
     <!-- ClinVar status column - colored chip -->
-    <template #item.clinvarStatus="{ item }">
+    <template #[`item.clinvarStatus`]="{ item }">
       <v-chip
         v-if="item.clinvarStatus"
         :color="getClinvarColor(item.clinvarStatus)"
@@ -37,7 +37,7 @@
     </template>
 
     <!-- Gold stars column - star icons -->
-    <template #item.goldStars="{ item }">
+    <template #[`item.goldStars`]="{ item }">
       <div
         v-if="item.goldStars !== null"
         class="d-flex align-center"
@@ -58,7 +58,7 @@
     </template>
 
     <!-- HGVS-c column - truncate if long -->
-    <template #item.hgvsc="{ item }">
+    <template #[`item.hgvsc`]="{ item }">
       <span
         v-if="item.hgvsc"
         class="text-body-2 text-truncate d-inline-block"
@@ -74,7 +74,7 @@
     </template>
 
     <!-- HGVS-p column - truncate if long -->
-    <template #item.hgvsp="{ item }">
+    <template #[`item.hgvsp`]="{ item }">
       <span
         v-if="item.hgvsp"
         class="text-body-2 text-truncate d-inline-block"

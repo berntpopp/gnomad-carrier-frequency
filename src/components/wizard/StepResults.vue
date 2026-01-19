@@ -66,9 +66,22 @@
       class="elevation-1"
     >
       <template #item="{ item }">
-        <tr :class="getRowClass(item)">
+        <tr
+          :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
+          @click="!item.isGlobal && openPopulationModal(item.code)"
+        >
           <td>
-            {{ item.label }}
+            <div class="d-flex align-center">
+              {{ item.label }}
+              <v-icon
+                v-if="!item.isGlobal"
+                class="ml-1 population-chevron"
+                size="x-small"
+                color="grey"
+              >
+                mdi-chevron-right
+              </v-icon>
+            </div>
           </td>
           <td class="text-right">
             {{ formatPercent(item.carrierFrequency) }}
@@ -105,6 +118,21 @@
 
       <template #bottom />
     </v-data-table>
+
+    <!-- View all variants button -->
+    <div
+      v-if="filteredCount > 0"
+      class="mt-3"
+    >
+      <v-btn
+        variant="text"
+        color="primary"
+        prepend-icon="mdi-table"
+        @click="openAllVariantsModal"
+      >
+        View all variants ({{ filteredCount }})
+      </v-btn>
+    </div>
 
     <!-- Range info -->
     <div
@@ -146,19 +174,30 @@
         Start Over
       </v-btn>
     </div>
+
+    <!-- Variant Modal -->
+    <VariantModal
+      v-model="showVariantModal"
+      :variants="modalVariants"
+      :population-label="selectedPopulationLabel"
+      :population-code="selectedPopulationCode"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, toRef } from 'vue';
-import { config, getGnomadVersion } from '@/config';
-import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant } from '@/types';
+import { config, getGnomadVersion, getPopulationLabel } from '@/config';
+import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant } from '@/types';
 import { useVariantFilters } from '@/composables';
+import { toDisplayVariants, filterVariantsByPopulation } from '@/utils/variant-display';
 import TextOutput from './TextOutput.vue';
 import FilterPanel from '@/components/FilterPanel.vue';
+import VariantModal from '@/components/VariantModal.vue';
 
 interface TableItem {
   label: string;
+  code: string; // Population code for drill-down
   carrierFrequency: number | null;
   ratioDenominator: number | null; // Numeric for sorting (e.g., 25 for "1:25")
   recurrenceRiskValue: number | null; // Numeric for sorting
@@ -194,8 +233,44 @@ const clinvarVariantsRef = toRef(props, 'clinvarVariants');
 const {
   filters,
   filteredCount,
+  filteredVariants,
   resetFilters,
 } = useVariantFilters(variantsRef, clinvarVariantsRef);
+
+// Variant modal state
+const showVariantModal = ref(false);
+const selectedPopulationCode = ref<string | null>(null);
+
+// Computed label for selected population
+const selectedPopulationLabel = computed(() => {
+  if (!selectedPopulationCode.value) return null;
+  return getPopulationLabel(selectedPopulationCode.value);
+});
+
+// Compute variants to display in modal
+const modalVariants = computed((): DisplayVariant[] => {
+  if (!filteredVariants.value.length) return [];
+
+  // Filter to population if selected
+  const variantsToShow = selectedPopulationCode.value
+    ? filterVariantsByPopulation(filteredVariants.value, selectedPopulationCode.value)
+    : filteredVariants.value;
+
+  // Transform to display format
+  return toDisplayVariants(variantsToShow, props.clinvarVariants);
+});
+
+// Open modal showing all variants
+function openAllVariantsModal() {
+  selectedPopulationCode.value = null;
+  showVariantModal.value = true;
+}
+
+// Open modal for a specific population
+function openPopulationModal(populationCode: string) {
+  selectedPopulationCode.value = populationCode;
+  showVariantModal.value = true;
+}
 
 // Table headers - use numeric keys for proper sorting
 const headers = ref([
@@ -288,6 +363,7 @@ const tableItems = computed((): TableItem[] => {
     const { risk, riskString } = calculateRecurrenceRiskWithValue(globalCarrierFreq);
     items.push({
       label: 'Global',
+      code: '', // Global has no population code
       carrierFrequency: globalCarrierFreq,
       ratioDenominator: globalCarrierFreq > 0 ? Math.round(1 / globalCarrierFreq) : null,
       recurrenceRiskValue: risk,
@@ -308,6 +384,7 @@ const tableItems = computed((): TableItem[] => {
 
     items.push({
       label: pop.label,
+      code: pop.code, // Population code for drill-down
       carrierFrequency: pop.carrierFrequency,
       ratioDenominator: pop.carrierFrequency !== null && pop.carrierFrequency > 0
         ? Math.round(1 / pop.carrierFrequency)
@@ -362,3 +439,18 @@ function formatRatio(freq: number | null): string {
   return `1:${Math.round(1 / freq).toLocaleString()}`;
 }
 </script>
+
+<style scoped>
+.population-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.population-row:hover {
+  background-color: rgb(var(--v-theme-surface-variant)) !important;
+}
+
+.population-row:hover .population-chevron {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+</style>
