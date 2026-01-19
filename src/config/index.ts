@@ -87,3 +87,7 @@ export type {
   AppSettings,
   PopulationConfig,
 } from './types';
+
+// Re-export exclusion reasons config
+export { EXCLUSION_REASONS } from './exclusion-reasons';
+export type { ExclusionReasonOption } from './exclusion-reasons';

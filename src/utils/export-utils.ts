@@ -10,9 +10,10 @@ import type {
   ExportVariant,
   ExportMetadata,
   ExportData,
+  ExclusionReason,
 } from '@/types';
 import type { GnomadVersion } from '@/config';
-import { getGnomadVersion } from '@/config';
+import { getGnomadVersion, EXCLUSION_REASONS } from '@/config';
 import { config } from '@/config';
 
 /**
@@ -62,6 +63,24 @@ function formatRatio(freq: number | null): string {
 }
 
 /**
+ * Format exclusion reason for export display
+ */
+function formatExclusionReason(reason: ExclusionReason | undefined): string | null {
+  if (!reason) return null;
+
+  // Find the label for predefined reason
+  const predefined = EXCLUSION_REASONS.find((r) => r.value === reason.type);
+  const label = predefined?.label ?? reason.type;
+
+  // For 'other', append custom text if provided
+  if (reason.type === 'other' && reason.customText) {
+    return `${label}: ${reason.customText}`;
+  }
+
+  return label;
+}
+
+/**
  * Build ExportSummary from calculation result
  */
 export function buildExportSummary(result: CarrierFrequencyResult): ExportSummary {
@@ -98,22 +117,33 @@ export function buildExportPopulations(
 }
 
 /**
- * Build ExportVariant array from display variants
+ * Build ExportVariant array from display variants with exclusion data
  */
-export function buildExportVariants(variants: DisplayVariant[]): ExportVariant[] {
-  return variants.map((v) => ({
-    variantId: v.variant_id,
-    consequence: v.consequence,
-    alleleFrequency: v.alleleFrequency,
-    alleleFrequencyPercent: formatPercent(v.alleleFrequency),
-    alleleCount: v.alleleCount,
-    alleleNumber: v.alleleNumber,
-    hgvsC: v.hgvsc,
-    hgvsP: v.hgvsp,
-    clinvarStatus: v.clinvarStatus,
-    isLoF: v.isLoF,
-    isClinvarPathogenic: v.isClinvarPathogenic,
-  }));
+export function buildExportVariants(
+  variants: DisplayVariant[],
+  excludedIds?: Set<string>,
+  reasons?: Map<string, ExclusionReason>
+): ExportVariant[] {
+  return variants.map((v) => {
+    const isExcluded = excludedIds?.has(v.variant_id) ?? false;
+    const reason = reasons?.get(v.variant_id);
+
+    return {
+      variantId: v.variant_id,
+      consequence: v.consequence,
+      alleleFrequency: v.alleleFrequency,
+      alleleFrequencyPercent: formatPercent(v.alleleFrequency),
+      alleleCount: v.alleleCount,
+      alleleNumber: v.alleleNumber,
+      hgvsC: v.hgvsc,
+      hgvsP: v.hgvsp,
+      clinvarStatus: v.clinvarStatus,
+      isLoF: v.isLoF,
+      isClinvarPathogenic: v.isClinvarPathogenic,
+      excluded: isExcluded,
+      exclusionReason: isExcluded ? formatExclusionReason(reason) : null,
+    };
+  });
 }
 
 /**
@@ -139,12 +169,14 @@ export function buildExportMetadata(
 export function buildExportData(
   result: CarrierFrequencyResult,
   variants: DisplayVariant[],
-  filters: FilterConfig
+  filters: FilterConfig,
+  excludedIds?: Set<string>,
+  reasons?: Map<string, ExclusionReason>
 ): ExportData {
   return {
     summary: buildExportSummary(result),
     populations: buildExportPopulations(result.populations),
-    variants: buildExportVariants(variants),
+    variants: buildExportVariants(variants, excludedIds, reasons),
     metadata: buildExportMetadata(result.version, filters),
   };
 }

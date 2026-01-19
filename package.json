@@ -17,6 +17,7 @@
     "@vueuse/integrations": "^14.1.0",
     "focus-trap": "^7.8.0",
     "graphql": "^16.10.0",
+    "lz-string": "^1.5.0",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",
     "villus": "^3.3.4",

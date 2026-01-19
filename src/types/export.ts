@@ -59,6 +59,9 @@ export interface ExportVariant {
   clinvarStatus: string | null;
   isLoF: boolean;
   isClinvarPathogenic: boolean;
+  // Exclusion fields (EXCL-06)
+  excluded: boolean;
+  exclusionReason: string | null;
 }
 
 /**
