@@ -40,9 +40,18 @@ export function useTextGenerator(input: () => TextGeneratorInput) {
       recurrenceRiskPercent: formatPercentForLocale(recurrenceRisk, store.language),
       recurrenceRiskRatio: formatRatio(recurrenceRisk),
       source: formatSourceAttribution(data, store.language),
-      indexStatus: data.indexStatus === 'heterozygous' ? 'carrier' : 'affected',
+      indexStatus: data.indexStatus,
+      statusIntro: buildStatusIntro(
+        data.indexStatus,
+        data.result.gene,
+        store.patientForms.dative,
+        store.language
+      ),
       genderSuffix: store.genderSuffix,
       accessDate: formatAccessDate(store.language),
+      patientNominative: store.patientForms.nominative,
+      patientGenitive: store.patientForms.genitive,
+      patientDative: store.patientForms.dative,
     };
   });
 
@@ -98,8 +107,10 @@ export function useTextGenerator(input: () => TextGeneratorInput) {
     getSections,
     language: computed(() => store.language),
     genderStyle: computed(() => store.genderStyle),
+    patientSex: computed(() => store.patientSex),
     setLanguage: store.setLanguage,
     setGenderStyle: store.setGenderStyle,
+    setPatientSex: store.setPatientSex,
     toggleSection: store.toggleSection,
   };
 }
@@ -181,6 +192,37 @@ function formatSourceAttribution(data: TextGeneratorInput, lang: 'de' | 'en'): s
 
     default:
       return '';
+  }
+}
+
+function buildStatusIntro(
+  indexStatus: IndexPatientStatus,
+  gene: string,
+  patientDative: string,
+  lang: 'de' | 'en'
+): string {
+  if (lang === 'de') {
+    switch (indexStatus) {
+      case 'heterozygous':
+        return `Bei ${patientDative} wurde eine heterozygote pathogene Variante im ${gene}-Gen nachgewiesen.`;
+      case 'homozygous':
+        return `Bei ${patientDative} wurde eine pathogene Variante im ${gene}-Gen im homozygoten Zustand nachgewiesen.`;
+      case 'compound_het_confirmed':
+        return `Bei ${patientDative} wurden zwei pathogene Varianten im ${gene}-Gen im compound heterozygoten Zustand nachgewiesen.`;
+      case 'compound_het_assumed':
+        return `Bei ${patientDative} wurden zwei pathogene Varianten im ${gene}-Gen nachgewiesen. Aufgrund des passenden Phanotyps erscheint ein compound heterozygotes Vorliegen wahrscheinlich.`;
+    }
+  } else {
+    switch (indexStatus) {
+      case 'heterozygous':
+        return `A heterozygous pathogenic variant in the ${gene} gene was identified in the patient.`;
+      case 'homozygous':
+        return `A pathogenic variant in the ${gene} gene was identified in the homozygous state in the patient.`;
+      case 'compound_het_confirmed':
+        return `Two pathogenic variants in the ${gene} gene were identified in compound heterozygous state in the patient.`;
+      case 'compound_het_assumed':
+        return `Two pathogenic variants in the ${gene} gene were identified in the patient. Based on the clinical phenotype, compound heterozygous inheritance is presumed.`;
+    }
   }
 }
 

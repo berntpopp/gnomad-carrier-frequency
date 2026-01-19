@@ -15,6 +15,14 @@ export type Perspective = 'affected' | 'carrier' | 'familyMember';
 export type GenderStyle = '*' | ':' | '/' | 'traditional';
 
 /**
+ * Patient biological sex for German grammatical gender agreement
+ * - 'male': der Patient / des Patienten / dem Patienten
+ * - 'female': die Patientin / der Patientin / der Patientin
+ * - 'neutral': der/die Patient*in / des/der Patient*in / dem/der Patient*in
+ */
+export type PatientSex = 'male' | 'female' | 'neutral';
+
+/**
  * A single text section within a perspective
  */
 export interface TextSection {
@@ -62,8 +70,16 @@ export interface TemplateContext {
   /** Full source attribution string */
   source: string;
 
-  /** Human-readable index patient status */
-  indexStatus: 'carrier' | 'affected';
+  /** Index patient status - expanded for status-specific text */
+  indexStatus: 'heterozygous' | 'homozygous' | 'compound_het_confirmed' | 'compound_het_assumed';
+
+  /** Status-specific intro text (built by text generator) */
+  statusIntro: string;
+
+  /** Patient grammatical forms (German only) */
+  patientNominative?: string;
+  patientGenitive?: string;
+  patientDative?: string;
 
   /** Population name (optional, for population-specific text) */
   populationName?: string;

@@ -23,6 +23,7 @@ export type {
 export type {
   Perspective,
   GenderStyle,
+  PatientSex,
   TextSection,
   PerspectiveConfig,
   TemplateConfig,

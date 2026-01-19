@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { Perspective, GenderStyle, TemplateConfig } from '@/types';
+import type { Perspective, GenderStyle, PatientSex, TemplateConfig } from '@/types';
 import defaultDe from '@/config/templates/de.json';
 import defaultEn from '@/config/templates/en.json';
 
@@ -10,6 +10,7 @@ const templateEn = defaultEn as TemplateConfig;
 interface TemplateStoreState {
   language: 'de' | 'en';
   genderStyle: GenderStyle;
+  patientSex: PatientSex;
   enabledSections: Record<Perspective, string[]>; // Which sections are enabled per perspective
   customSections: Record<string, string>; // section key -> custom template override
 }
@@ -18,6 +19,7 @@ export const useTemplateStore = defineStore('templates', {
   state: (): TemplateStoreState => ({
     language: detectBrowserLanguage(),
     genderStyle: '*',
+    patientSex: 'male',
     enabledSections: {
       affected: ['geneIntro', 'inheritance', 'carrierFrequency', 'recurrenceRisk', 'recommendation'],
       carrier: ['geneIntro', 'inheritance', 'carrierFrequency', 'recurrenceRisk', 'recommendation'],
@@ -40,6 +42,29 @@ export const useTemplateStore = defineStore('templates', {
         default: return '*innen';
       }
     },
+
+    patientForms: (state): { nominative: string; genitive: string; dative: string } => {
+      switch (state.patientSex) {
+        case 'male':
+          return {
+            nominative: 'der Patient',
+            genitive: 'des Patienten',
+            dative: 'dem Patienten',
+          };
+        case 'female':
+          return {
+            nominative: 'die Patientin',
+            genitive: 'der Patientin',
+            dative: 'der Patientin',
+          };
+        case 'neutral':
+          return {
+            nominative: 'der/die Patient*in',
+            genitive: 'des/der Patient*in',
+            dative: 'dem/der Patient*in',
+          };
+      }
+    },
   },
 
   actions: {
@@ -49,6 +74,10 @@ export const useTemplateStore = defineStore('templates', {
 
     setGenderStyle(style: GenderStyle) {
       this.genderStyle = style;
+    },
+
+    setPatientSex(sex: PatientSex) {
+      this.patientSex = sex;
     },
 
     toggleSection(perspective: Perspective, sectionId: string) {
