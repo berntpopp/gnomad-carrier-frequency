@@ -1,5 +1,6 @@
-import { computed, ref, type Ref } from 'vue';
+import { computed, ref, watch, type Ref } from 'vue';
 import { useGeneVariants } from './useGeneVariants';
+import { useLogger } from './useLogger';
 import { filterPathogenicVariantsConfigurable } from '@/utils/variant-filters';
 import {
   aggregatePopulationFrequencies,
@@ -65,6 +66,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   const geneSymbol = ref<string | null>(null);
   const { version } = useGnomadVersion();
   const filterStore = useFilterStore();
+  const logger = useLogger('calculation');
 
   const setGeneSymbol = (symbol: string | null) => {
     geneSymbol.value = symbol?.toUpperCase() ?? null;
@@ -246,6 +248,43 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
       hasFounderEffect: hasFounderEffect.value,
     };
   });
+
+  // Log calculation lifecycle events
+  watch(
+    () => geneSymbol.value,
+    (symbol) => {
+      if (symbol) {
+        logger.info('Starting carrier frequency calculation', { gene: symbol });
+      }
+    }
+  );
+
+  watch(
+    () => result.value,
+    (calcResult) => {
+      if (calcResult) {
+        logger.info('Calculation complete', {
+          gene: calcResult.gene,
+          globalCarrierFrequency: calcResult.globalCarrierFrequency,
+          qualifyingVariants: calcResult.qualifyingVariantCount,
+          populations: calcResult.populations.length,
+          hasFounderEffect: calcResult.hasFounderEffect,
+        });
+      }
+    }
+  );
+
+  watch(
+    () => hasError.value,
+    (error) => {
+      if (error && geneSymbol.value) {
+        logger.error('Calculation failed', {
+          gene: geneSymbol.value,
+          error: errorMessage.value,
+        });
+      }
+    }
+  );
 
   // Recurrence risk calculation (CALC-02, CALC-03)
   const calculateRisk = (status: IndexPatientStatus) => {

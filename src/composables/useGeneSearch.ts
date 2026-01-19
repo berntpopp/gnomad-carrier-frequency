@@ -1,4 +1,4 @@
-import { computed, ref, type Ref } from 'vue';
+import { computed, ref, watch, type Ref } from 'vue';
 import { useQuery } from 'villus';
 import { useDebounceFn } from '@vueuse/core';
 import { GENE_SEARCH_QUERY, GENE_DETAILS_QUERY } from '@/api/queries/gene-search';
@@ -9,6 +9,7 @@ import type {
 } from '@/api/queries/types';
 import { config, getReferenceGenome } from '@/config';
 import { useGnomadVersion, graphqlClient } from '@/api';
+import { useLogger } from './useLogger';
 import type { GeneConstraint } from '@/types';
 
 // Get settings from config - NO HARDCODED VALUES
@@ -34,6 +35,7 @@ export interface UseGeneSearchReturn {
 
 export function useGeneSearch(): UseGeneSearchReturn {
   const { version } = useGnomadVersion();
+  const logger = useLogger('search');
 
   const searchTerm = ref('');
   const debouncedTerm = ref('');
@@ -74,10 +76,34 @@ export function useGeneSearch(): UseGeneSearchReturn {
     (data.value?.gene_search ?? []).slice(0, maxAutocompleteResults)
   );
 
+  // Log search operations
+  watch(
+    () => debouncedTerm.value,
+    (term) => {
+      if (term && term.length >= minSearchChars) {
+        logger.debug('Gene search', { query: term });
+      }
+    }
+  );
+
+  watch(
+    () => error.value,
+    (err) => {
+      if (err) {
+        logger.warn('Gene search failed', {
+          query: debouncedTerm.value,
+          error: err.message,
+        });
+      }
+    }
+  );
+
   // Fetch constraint data for a selected gene
   const fetchConstraint = async (symbol: string) => {
     sharedConstraintLoading.value = true;
     sharedGeneConstraint.value = null;
+
+    logger.debug('Fetching gene constraint', { gene: symbol });
 
     try {
       const { data: constraintData, error: queryError } =
@@ -90,7 +116,7 @@ export function useGeneSearch(): UseGeneSearchReturn {
         });
 
       if (queryError) {
-        console.error('[GeneSearch] Constraint query error:', queryError);
+        logger.warn('Constraint query error', { gene: symbol, error: String(queryError) });
         return;
       }
 
@@ -106,9 +132,17 @@ export function useGeneSearch(): UseGeneSearchReturn {
           lofZ: c.lof_z,
           flags: c.flags,
         };
+        logger.info('Gene constraint loaded', {
+          gene: symbol,
+          pLI: c.pLI,
+          loeuf: c.oe_lof_upper,
+        });
       }
     } catch (err) {
-      console.error('[GeneSearch] Constraint fetch error:', err);
+      logger.error('Constraint fetch error', {
+        gene: symbol,
+        error: err instanceof Error ? err.message : String(err),
+      });
     } finally {
       sharedConstraintLoading.value = false;
     }
@@ -118,6 +152,12 @@ export function useGeneSearch(): UseGeneSearchReturn {
     selectedGene.value = gene;
     searchTerm.value = gene.symbol;
     debouncedTerm.value = ''; // Stop searching
+
+    logger.info('Gene selected', {
+      symbol: gene.symbol,
+      name: gene.name,
+    });
+
     // Fetch constraint data when gene is selected
     fetchConstraint(gene.symbol);
   };
