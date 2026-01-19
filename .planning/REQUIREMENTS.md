@@ -149,8 +149,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SHELL-01 | Phase 6 | Pending |
 | SHELL-02 | Phase 6 | Pending |
 | SHELL-03 | Phase 6 | Pending |
-| SHELL-04 | Phase 5 | Pending |
-| SHELL-05 | Phase 5 | Pending |
+| SHELL-04 | Phase 5 | Complete |
+| SHELL-05 | Phase 5 | Complete |
 | SHELL-06 | Phase 6 | Pending |
 | SHELL-07 | Phase 6 | Pending |
 | VAR-01 | Phase 8 | Pending |
@@ -208,8 +208,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEO-04 | Phase 7 | Pending |
 | SEO-05 | Phase 7 | Pending |
 | SEO-06 | Phase 7 | Pending |
-| INFRA-01 | Phase 5 | Pending |
-| INFRA-02 | Phase 5 | Pending |
+| INFRA-01 | Phase 5 | Complete |
+| INFRA-02 | Phase 5 | Complete |
 | INFRA-03 | Phase 10 | Pending |
 | INFRA-04 | Phase 10 | Pending |
 | INFRA-05 | Phase 7 | Pending |

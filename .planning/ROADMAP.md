@@ -9,29 +9,31 @@
 
 Polish for wider distribution: app shell, filtering configuration, ClinGen integration, data export, template editing, browser logging, documentation, and accessibility improvements.
 
-### Phase 5: Foundation (Settings + Theme)
+### Phase 5: Foundation (Settings + Theme) ✓
 
 **Goal:** User can configure app preferences and theme persists across sessions
 
 **Dependencies:** None (foundation for other phases)
 
 **Requirements:**
-- SHELL-04: User can toggle dark/light theme
-- SHELL-05: Theme preference persists across sessions
-- INFRA-01: Version number in package.json follows semver
-- INFRA-02: Version displayed in app UI
+- SHELL-04: User can toggle dark/light theme ✓
+- SHELL-05: Theme preference persists across sessions ✓
+- INFRA-01: Version number in package.json follows semver ✓
+- INFRA-02: Version displayed in app UI ✓
 
-**Plans:** 2 plans
+**Plans:** 2 plans (complete)
 
 Plans:
-- [ ] 05-01-PLAN.md - Theme and version infrastructure (composable, Vuetify config, version injection)
-- [ ] 05-02-PLAN.md - UI components (AppBar with toggle, AppFooter with version, App.vue integration)
+- [x] 05-01-PLAN.md - Theme and version infrastructure (composable, Vuetify config, version injection)
+- [x] 05-02-PLAN.md - UI components (AppBar with toggle, AppFooter with version, App.vue integration)
 
 **Success Criteria:**
-1. User can toggle between dark and light theme via a visible control
-2. Theme preference survives browser refresh and new sessions
-3. App displays current version number in the UI
-4. Version follows semver format (e.g., 1.1.0)
+1. ✓ User can toggle between dark and light theme via a visible control
+2. ✓ Theme preference survives browser refresh and new sessions
+3. ✓ App displays current version number in the UI
+4. ✓ Version follows semver format (e.g., 1.1.0)
+
+**Completed:** 2026-01-19
 
 ---
 
@@ -190,8 +192,8 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 2/TBD | In Progress | - |
+| v1.1 Release-Ready | 5-10 | 2/TBD | In Progress (Phase 5 done) | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 5 planned)*
+*Last updated: 2026-01-19 (Phase 5 complete)*
