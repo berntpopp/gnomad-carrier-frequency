@@ -22,6 +22,8 @@ const isRestoringFromUrl = ref(false);
 export interface UseUrlStateReturn {
   /** Whether URL state initialization is complete */
   isInitialized: typeof isInitialized;
+  /** Whether URL state is currently being restored (show loading indicator) */
+  isRestoringFromUrl: typeof isRestoringFromUrl;
   /** Get current URL as shareable link */
   getShareableUrl: () => string;
 }
@@ -290,6 +292,7 @@ export function useUrlState(): UseUrlStateReturn {
 
   return {
     isInitialized,
+    isRestoringFromUrl,
     getShareableUrl: () => window.location.href,
   };
 }

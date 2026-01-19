@@ -16,7 +16,27 @@
           Calculate carrier frequency and recurrence risk from gnomAD population data.
         </p>
 
-        <WizardStepper />
+        <!-- Show loading state while restoring from URL -->
+        <div
+          v-if="isRestoringFromUrl"
+          class="d-flex flex-column align-center justify-center py-16"
+        >
+          <v-progress-circular
+            indeterminate
+            color="primary"
+            size="48"
+            class="mb-4"
+          />
+          <div class="text-h6 mb-2">
+            Loading shared calculation
+          </div>
+          <div class="text-body-2 text-medium-emphasis">
+            Restoring parameters from URL...
+          </div>
+        </div>
+
+        <!-- Show wizard when not restoring -->
+        <WizardStepper v-else />
       </v-container>
     </v-main>
 
@@ -46,7 +66,7 @@ const { resetWizard } = useWizard();
 
 // Initialize URL state synchronization
 // This handles restoring state from URL on mount and updating URL as state changes
-useUrlState();
+const { isRestoringFromUrl } = useUrlState();
 
 function handleReset() {
   resetWizard();
