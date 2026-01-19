@@ -16,6 +16,13 @@
 
     <GeneSearch @select="onGeneChange" />
 
+    <!-- ClinGen validation warning/confirmation -->
+    <ClingenWarning
+      v-if="modelValue"
+      :gene-symbol="modelValue.symbol"
+      class="mt-4"
+    />
+
     <!-- Gene Constraint Card - shows after gene selection -->
     <GeneConstraintCard
       v-if="modelValue"
@@ -41,6 +48,7 @@ import { computed } from 'vue';
 import GeneSearch from '@/components/GeneSearch.vue';
 import VersionSelector from '@/components/VersionSelector.vue';
 import GeneConstraintCard from '@/components/GeneConstraintCard.vue';
+import ClingenWarning from '@/components/ClingenWarning.vue';
 import type { GeneSearchResult } from '@/api/queries/types';
 import { useGeneSearch } from '@/composables';
 import { useGnomadVersion } from '@/api';
