@@ -87,10 +87,13 @@ Plans:
 - EXCL-07: Exclusion state persists during session (not across sessions)
 - EXCL-08: User can restore excluded variants individually or all at once
 
-**Plans:** 0 plans
+**Plans:** 4 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 13 to break down)
+- [ ] 13-01-PLAN.md - Exclusion infrastructure (types, config, useExclusionState composable)
+- [ ] 13-02-PLAN.md - VariantTable integration (checkboxes, visual styling, bulk actions)
+- [ ] 13-03-PLAN.md - Frequency recalculation (debounced updates, exclusion note in results)
+- [ ] 13-04-PLAN.md - Export and URL extension (exclusion fields, lz-string compression)
 
 **Success Criteria:**
 1. User can click to exclude a variant and see frequency update immediately
@@ -343,8 +346,8 @@ Plans:
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
 | v1.1 Release-Ready | 5-10 | 27/27 | Complete | 2026-01-19 |
-| v1.2 Sharing & Collaboration | 11+ | 5/8 | In Progress | - |
+| v1.2 Sharing & Collaboration | 11+ | 5/9 | In Progress | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 12 complete)*
+*Last updated: 2026-01-20 (Phase 13 planned)*
