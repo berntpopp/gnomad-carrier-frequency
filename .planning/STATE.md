@@ -6,7 +6,7 @@
 
 **Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
 
-**Current Focus:** Phase 4 Deploy - ESLint and Build Configuration Complete
+**Current Focus:** Phase 4 Deploy - CI/CD Workflows Complete
 
 **Key Constraints:**
 - Stack: npm, Vue 3, Vuetify 3, Vite, TypeScript
@@ -20,8 +20,8 @@
 
 **Milestone:** v1 MVP
 **Phase:** Phase 4 - Deploy (4 of 4) - IN PROGRESS
-**Plan:** 04-01 complete (ESLint and build config)
-**Status:** Lint/typecheck/build scripts working, GitHub Pages base path configured
+**Plan:** 04-02 complete (CI/CD workflows)
+**Status:** GitHub Actions CI + deploy workflows created, ready to push
 
 ### Progress
 
@@ -29,10 +29,10 @@
 Phase 1: Foundation     [##########] 5/5 plans COMPLETE
 Phase 2: Wizard UI      [##########] 3/3 plans COMPLETE
 Phase 3: German Text    [##########] 4/4 plans COMPLETE (3 + 1 gap closure)
-Phase 4: Deploy         [##........] 1/? plans (ESLint + build config done)
+Phase 4: Deploy         [####......] 2/? plans (CI/CD workflows done)
 ```
 
-**Overall:** `[############] 100%` (13/13 plans complete)
+**Overall:** `[############] 100%` (14/15 plans complete)
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [##........] 1/? plans (ESLint + build config done)
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 13 |
+| Plans Completed | 14 |
 | Phases Completed | 3 (Phase 4 in progress) |
-| Requirements Done | Phase 1-3 complete, Phase 4 build tooling done |
-| Session Count | 13 |
+| Requirements Done | Phase 1-3 complete, Phase 4 CI/CD done |
+| Session Count | 14 |
 
 ---
 
@@ -86,6 +86,8 @@ Phase 4: Deploy         [##........] 1/? plans (ESLint + build config done)
 | Status intro in generator | buildStatusIntro builds status-specific text programmatically | 2026-01-19 |
 | ESLint 9 flat config | Modern flat config over deprecated .eslintrc files | 2026-01-19 |
 | GitHub Pages base path | /gnomad-carrier-frequency/ for subdirectory deployment | 2026-01-19 |
+| Official GitHub Actions only | No third-party actions for security; actions/checkout, setup-node, deploy-pages | 2026-01-19 |
+| npm ci over npm install | Deterministic builds from lock file in CI | 2026-01-19 |
 
 ### Technical Notes
 
@@ -114,6 +116,8 @@ Phase 4: Deploy         [##........] 1/? plans (ESLint + build config done)
 - Build scripts: npm run lint, npm run typecheck, npm run build
 - ESLint config: eslint.config.js (flat config, not .eslintrc)
 - Build output: dist/ with base path /gnomad-carrier-frequency/
+- CI workflow: .github/workflows/ci.yml (lint + typecheck on all branches)
+- Deploy workflow: .github/workflows/deploy.yml (GitHub Pages on main push)
 
 ### Blockers
 
@@ -138,6 +142,7 @@ Phase 4: Deploy         [##........] 1/? plans (ESLint + build config done)
 - [x] Execute 03-04 (gap closure: status granularity and patient sex)
 - [x] Plan Phase 4 (Deploy)
 - [x] Execute 04-01 (ESLint and build configuration)
+- [x] Execute 04-02 (CI/CD workflows)
 
 ---
 
@@ -146,33 +151,33 @@ Phase 4: Deploy         [##........] 1/? plans (ESLint + build config done)
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Plan 04-01 (ESLint and build configuration)
-**Next:** Continue Phase 4 - CI/CD workflow or manual deployment
+**Completed:** Plan 04-02 (CI/CD workflows)
+**Next:** Push to GitHub, enable Pages in repository settings
 
 ### Handoff Notes
 
-Plan 04-01 established build tooling for deployment:
+Plan 04-02 created GitHub Actions workflows:
 
-**ESLint Configuration:**
-- Installed eslint@9 with Vue 3 + TypeScript plugins
-- Created `eslint.config.js` using modern flat config pattern
-- `npm run lint` passes with no errors
+**CI Workflow (`.github/workflows/ci.yml`):**
+- Runs lint and typecheck on all branch pushes
+- Runs on main branch PRs
+- Uses actions/checkout@v5, actions/setup-node@v6
+- Uses npm ci for deterministic builds
 
-**NPM Scripts Added:**
-- `lint`: Runs ESLint across entire project
-- `typecheck`: Runs vue-tsc type checking
+**Deploy Workflow (`.github/workflows/deploy.yml`):**
+- Runs on main branch pushes only
+- Builds and deploys to GitHub Pages
+- Uses official deploy-pages@v4 action
+- Proper permissions: pages:write, id-token:write
+- Concurrency group prevents conflicting deploys
 
-**GitHub Pages Configuration:**
-- Added `base: '/gnomad-carrier-frequency/'` to vite.config.ts
-- Build output has correct asset paths for subdirectory deployment
-- `npm run build` produces dist/ folder ready for deployment
-
-**Bug Fixed:**
-- Fixed unused variable TS6133 in template-renderer.ts (match -> _match)
-
-Ready for CI/CD setup or manual GitHub Pages deployment.
+**To enable GitHub Pages:**
+1. Push to GitHub
+2. Go to Settings > Pages
+3. Set Source to "GitHub Actions"
+4. First deploy will publish to https://{username}.github.io/gnomad-carrier-frequency/
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 (Plan 04-01 complete)*
+*Last updated: 2026-01-19 (Plan 04-02 complete)*
