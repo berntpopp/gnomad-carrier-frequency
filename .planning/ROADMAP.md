@@ -108,9 +108,26 @@ Plans:
 
 ## Phase 3: German Text
 
-**Goal:** Users can generate and copy German clinical documentation text.
+**Goal:** Users can generate and copy German (and English) clinical documentation text with configurable templates.
 
 **Dependencies:** Phase 2 (text generation depends on wizard state and calculations)
+
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [ ] 03-01-PLAN.md — Template system foundation (types, renderer, JSON templates) [Wave 1]
+- [ ] 03-02-PLAN.md — Pinia store and useTextGenerator composable [Wave 2]
+- [ ] 03-03-PLAN.md — TextOutput UI and StepResults integration [Wave 3]
+
+**Key Design Decisions:**
+- Config-driven templates with JSON (German + English)
+- Template interpolation: {{gene}}, {{carrierFrequency}}, etc.
+- 3 perspectives: affected patient, healthy carrier, family member
+- Toggleable sections for customizing output
+- Third-person clinical style (not addressing Sie/Du directly)
+- Gender-inclusive language configurable (*, :, /, traditional)
+- Pinia + localStorage for template persistence
+- VueUse useClipboard for copy functionality
 
 **Requirements:**
 - TEXT-01: German clinical text generated based on calculation results
@@ -149,7 +166,7 @@ Plans:
 |-------|--------|----------|
 | Phase 1: Foundation | Complete | 18/18 requirements |
 | Phase 2: Wizard UI | Complete | 10/10 requirements |
-| Phase 3: German Text | Pending | 0/4 requirements |
+| Phase 3: German Text | Planned | 0/4 requirements |
 | Phase 4: Deploy | Pending | Validation only |
 
 **Overall:** 28/32 requirements complete (87%)
@@ -174,4 +191,4 @@ Plans:
 
 ---
 
-*Last updated: 2026-01-19 (Phase 2 complete)*
+*Last updated: 2026-01-19 (Phase 3 planned)*
