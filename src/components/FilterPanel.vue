@@ -20,63 +20,148 @@
             cols="12"
             md="6"
           >
-            <v-switch
-              :model-value="modelValue.lofHcEnabled"
-              color="primary"
-              label="LoF High Confidence"
-              density="compact"
-              hide-details
-              @update:model-value="updateFilter('lofHcEnabled', $event)"
-            />
+            <div class="d-flex align-center">
+              <v-switch
+                :model-value="modelValue.lofHcEnabled"
+                color="primary"
+                label="LoF High Confidence"
+                density="compact"
+                hide-details
+                @update:model-value="updateFilter('lofHcEnabled', $event)"
+              />
+              <v-tooltip location="top">
+                <template #activator="{ props: tooltipProps }">
+                  <v-icon
+                    v-bind="tooltipProps"
+                    size="x-small"
+                    class="ml-1"
+                    aria-label="LoF High Confidence filter information"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                <span class="tooltip-text">
+                  <strong>Loss-of-Function High Confidence</strong><br>
+                  Includes predicted loss-of-function variants (nonsense, frameshift,
+                  splice site) that pass gnomAD quality filters. These variants typically
+                  result in no protein product.
+                </span>
+              </v-tooltip>
+            </div>
           </v-col>
 
           <v-col
             cols="12"
             md="6"
           >
-            <v-switch
-              :model-value="modelValue.missenseEnabled"
-              color="secondary"
-              label="Include Missense"
-              density="compact"
-              hide-details
-              @update:model-value="updateFilter('missenseEnabled', $event)"
-            />
+            <div class="d-flex align-center">
+              <v-switch
+                :model-value="modelValue.missenseEnabled"
+                color="secondary"
+                label="Include Missense"
+                density="compact"
+                hide-details
+                @update:model-value="updateFilter('missenseEnabled', $event)"
+              />
+              <v-tooltip location="top">
+                <template #activator="{ props: tooltipProps }">
+                  <v-icon
+                    v-bind="tooltipProps"
+                    size="x-small"
+                    class="ml-1"
+                    aria-label="Missense filter information"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                <span class="tooltip-text">
+                  <strong>Missense Variants</strong><br>
+                  Includes single amino acid substitutions. Not all missense variants
+                  are pathogenic. Enable this if ClinVar P/LP missense variants should
+                  be included in the calculation.
+                </span>
+              </v-tooltip>
+            </div>
           </v-col>
 
           <v-col
             cols="12"
             md="6"
           >
-            <v-switch
-              :model-value="modelValue.clinvarEnabled"
-              color="success"
-              label="ClinVar P/LP"
-              density="compact"
-              hide-details
-              @update:model-value="updateFilter('clinvarEnabled', $event)"
-            />
+            <div class="d-flex align-center">
+              <v-switch
+                :model-value="modelValue.clinvarEnabled"
+                color="success"
+                label="ClinVar P/LP"
+                density="compact"
+                hide-details
+                @update:model-value="updateFilter('clinvarEnabled', $event)"
+              />
+              <v-tooltip location="top">
+                <template #activator="{ props: tooltipProps }">
+                  <v-icon
+                    v-bind="tooltipProps"
+                    size="x-small"
+                    class="ml-1"
+                    aria-label="ClinVar filter information"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                <span class="tooltip-text">
+                  <strong>ClinVar Pathogenic/Likely Pathogenic</strong><br>
+                  Includes variants classified as Pathogenic or Likely Pathogenic
+                  in ClinVar. This captures known disease-causing variants that may
+                  not be predicted as LoF.
+                </span>
+              </v-tooltip>
+            </div>
           </v-col>
 
           <v-col
             cols="12"
             md="6"
           >
-            <v-slider
-              :model-value="modelValue.clinvarStarThreshold"
-              :disabled="!modelValue.clinvarEnabled"
-              :min="0"
-              :max="4"
-              :step="1"
-              :ticks="tickLabels"
-              show-ticks="always"
-              tick-size="4"
-              label="ClinVar Min Stars"
-              density="compact"
-              thumb-label
-              color="success"
-              @update:model-value="updateFilter('clinvarStarThreshold', $event)"
-            />
+            <div class="d-flex align-start">
+              <v-slider
+                :model-value="modelValue.clinvarStarThreshold"
+                :disabled="!modelValue.clinvarEnabled"
+                :min="0"
+                :max="4"
+                :step="1"
+                :ticks="tickLabels"
+                show-ticks="always"
+                tick-size="4"
+                label="ClinVar Min Stars"
+                density="compact"
+                thumb-label
+                color="success"
+                class="flex-grow-1"
+                @update:model-value="updateFilter('clinvarStarThreshold', $event)"
+              />
+              <v-tooltip location="top">
+                <template #activator="{ props: tooltipProps }">
+                  <v-icon
+                    v-bind="tooltipProps"
+                    size="x-small"
+                    class="ml-1 mt-3"
+                    aria-label="ClinVar review stars information"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                <span class="tooltip-text">
+                  <strong>ClinVar Review Stars</strong><br>
+                  Minimum number of review stars required. Higher stars indicate
+                  more evidence and expert review.<br>
+                  0: Any assertion<br>
+                  1: Single submitter<br>
+                  2: Multiple submitters with consensus<br>
+                  3: Reviewed by expert panel<br>
+                  4: Practice guideline
+                </span>
+              </v-tooltip>
+            </div>
           </v-col>
         </v-row>
 
@@ -138,3 +223,10 @@ function updateFilter<K extends keyof FilterConfig>(
   });
 }
 </script>
+
+<style scoped>
+.tooltip-text {
+  max-width: 280px;
+  display: inline-block;
+}
+</style>
