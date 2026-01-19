@@ -21,6 +21,12 @@ Polish for wider distribution: app shell, filtering configuration, ClinGen integ
 - INFRA-01: Version number in package.json follows semver
 - INFRA-02: Version displayed in app UI
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md - Theme and version infrastructure (composable, Vuetify config, version injection)
+- [ ] 05-02-PLAN.md - UI components (AppBar with toggle, AppFooter with version, App.vue integration)
+
 **Success Criteria:**
 1. User can toggle between dark and light theme via a visible control
 2. Theme preference survives browser refresh and new sessions
@@ -184,8 +190,8 @@ Polish for wider distribution: app shell, filtering configuration, ClinGen integ
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 0/TBD | Not Started | - |
+| v1.1 Release-Ready | 5-10 | 2/TBD | In Progress | - |
 
 ---
 
-*Last updated: 2026-01-19 (v1.1 roadmap created)*
+*Last updated: 2026-01-19 (Phase 5 planned)*
