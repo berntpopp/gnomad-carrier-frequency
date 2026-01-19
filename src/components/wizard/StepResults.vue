@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h3 class="text-h6 mb-4">
+    <h2 class="text-h6 mb-4">
       Results
-    </h3>
+    </h2>
 
     <!-- Summary card -->
     <v-card

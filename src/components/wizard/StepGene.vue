@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h3 class="text-h6 mb-4">
+    <h2 class="text-h6 mb-4">
       Select Gene
-    </h3>
+    </h2>
     <p class="text-body-2 text-medium-emphasis mb-4">
       Search for a gene symbol to calculate carrier frequency.
     </p>
