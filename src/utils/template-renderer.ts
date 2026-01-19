@@ -20,7 +20,7 @@ export function renderTemplate(
   template: string,
   context: Partial<TemplateContext>
 ): string {
-  return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+  return template.replace(/\{\{(\w+)\}\}/g, (_match, key) => {
     const value = context[key as keyof TemplateContext];
     if (value === undefined || value === null) {
       console.warn(`Template variable "${key}" is undefined`);
