@@ -14,18 +14,18 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 **Milestone:** v1.1 Release-Ready
-**Phase:** 9 - ClinGen + Documentation - COMPLETE
-**Plan:** 7 of 7 complete
-**Status:** Phase complete
+**Phase:** 10 - Export + Templates + Logging - IN PROGRESS
+**Plan:** 1 of 6 complete
+**Status:** In progress
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [#########-] ~90% - Phase 9 complete
+v1.1 Release-Ready: [#########-] ~92% - Phase 10 plan 1 complete
 ```
 
-**Overall:** Phase 9 complete, ready for Phase 10
+**Overall:** Phase 10 in progress (1/6 plans complete)
 
 ---
 
@@ -51,7 +51,7 @@ v1.1 Release-Ready: [#########-] ~90% - Phase 9 complete
 | 7 | SEO + Accessibility | 9 | Complete (4/4 plans) |
 | 8 | Filtering + Variant Display | 14 | Complete (4/4 plans) |
 | 9 | ClinGen + Documentation | 15 | Complete (7/7 plans) |
-| 10 | Export + Templates + Logging | 22 | Pending |
+| 10 | Export + Templates + Logging | 22 | In Progress (1/6 plans) |
 
 ---
 
@@ -96,6 +96,9 @@ v1.1 Release-Ready: [#########-] ~90% - Phase 9 complete
 | Separate coverage warning from quality flags | Coverage issues warrant distinct alert for clarity | 2026-01-19 |
 | Coverage detection via flag keywords | Check for coverage/no_constraint/no_lof in flags array | 2026-01-19 |
 | Consistent tooltip-text class | 280px max-width for readable tooltips across components | 2026-01-19 |
+| Ring buffer for log storage | Prune oldest entries when maxEntries exceeded for memory safety | 2026-01-19 |
+| Category-scoped logging | useLogger(category) pattern for domain-specific log filtering | 2026-01-19 |
+| carrier-freq-logs storage key | Namespaced localStorage key for log persistence | 2026-01-19 |
 
 ### Blockers
 
@@ -126,7 +129,13 @@ None currently.
 - [x] Execute 09-05-PLAN.md (Help system: methodology + FAQ)
 - [x] Execute 09-06-PLAN.md (About dialog, data sources, README)
 - [x] Execute 09-07-PLAN.md (Contextual help tooltips + coverage warning)
-- [ ] Run `/gsd:plan-phase 10` to create Export + Templates + Logging plans
+- [x] Run `/gsd:plan-phase 10` to create Export + Templates + Logging plans
+- [x] Execute 10-01-PLAN.md (logging infrastructure)
+- [ ] Execute 10-02-PLAN.md
+- [ ] Execute 10-03-PLAN.md
+- [ ] Execute 10-04-PLAN.md
+- [ ] Execute 10-05-PLAN.md
+- [ ] Execute 10-06-PLAN.md
 
 ---
 
@@ -135,8 +144,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 9 Plan 07 - Contextual Help Tooltips + Coverage Warning
-**Next:** Plan Phase 10 (Export + Templates + Logging)
+**Completed:** Phase 10 Plan 01 - Logging Infrastructure
+**Next:** Execute 10-02-PLAN.md
 
 ### Handoff Notes
 
@@ -146,7 +155,7 @@ v1.1 roadmap derived from requirements and research:
 - Phase 7: SEO + Accessibility - COMPLETE (4/4 plans)
 - Phase 8: Filtering + Variant Display (configurable filters, variant modal) - COMPLETE
 - Phase 9: ClinGen + Documentation (clinical validation, help content) - COMPLETE
-- Phase 10: Export + Templates + Logging (data export, template editor, debug tools) - PENDING
+- Phase 10: Export + Templates + Logging (data export, template editor, debug tools) - IN PROGRESS (1/6)
 
 Key pitfalls from research:
 - ClinVar "conflicting" over-excludes valid variants (Phase 8 - handled)
@@ -167,6 +176,14 @@ Key pitfalls from research:
 - Plan 05: Help system (methodology + FAQ) - COMPLETE
 - Plan 06: About dialog, data sources, README - COMPLETE
 - Plan 07: Contextual help tooltips + coverage warning - COMPLETE
+
+**Phase 10 deliverables (in progress):**
+- Plan 01: Logging infrastructure (types, store, composable) - COMPLETE
+- Plan 02: Log viewer UI - PENDING
+- Plan 03: Export infrastructure - PENDING
+- Plan 04: Export UI integration - PENDING
+- Plan 05: Template editor - PENDING
+- Plan 06: Final integration - PENDING
 
 ---
 
@@ -194,3 +211,4 @@ Key pitfalls from research:
 *09-06 complete: 2026-01-19*
 *09-07 complete: 2026-01-19*
 *Phase 9 complete: 2026-01-19*
+*10-01 complete: 2026-01-19*
