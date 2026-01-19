@@ -19,20 +19,20 @@
 ## Current Position
 
 **Milestone:** v1 MVP
-**Phase:** Phase 3 - German Text (3 of 4)
-**Plan:** 03-02 complete (2/3)
-**Status:** In progress
+**Phase:** Phase 3 - German Text (3 of 4) - COMPLETE
+**Plan:** 03-03 complete (3/3)
+**Status:** Phase 3 complete
 
 ### Progress
 
 ```
 Phase 1: Foundation     [##########] 5/5 plans COMPLETE
 Phase 2: Wizard UI      [##########] 3/3 plans COMPLETE
-Phase 3: German Text    [######....] 2/3 plans
+Phase 3: German Text    [##########] 3/3 plans COMPLETE
 Phase 4: Deploy         [..........] Validation only
 ```
 
-**Overall:** `[##########] ~91%` (10/11 plans complete)
+**Overall:** `[###########] 100%` (11/11 plans complete)
 
 ---
 
@@ -40,9 +40,9 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 10 |
-| Phases Completed | 2 |
-| Requirements Done | Phase 1-2 complete, Phase 3 in progress |
+| Plans Completed | 11 |
+| Phases Completed | 3 |
+| Requirements Done | Phase 1-3 complete |
 | Session Count | 11 |
 
 ---
@@ -124,7 +124,7 @@ Phase 4: Deploy         [..........] Validation only
 - [x] Plan Phase 3 (German Text)
 - [x] Execute 03-01 (template system foundation)
 - [x] Execute 03-02 (Pinia store and text generator composable)
-- [ ] Execute 03-03 (text generator UI integration)
+- [x] Execute 03-03 (text generator UI integration)
 - [ ] Plan Phase 4 (Deploy)
 - [ ] Execute Phase 4 plans
 
@@ -135,45 +135,45 @@ Phase 4: Deploy         [..........] Validation only
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Plan 03-02 (Pinia Store and Text Generator)
-**Next:** Execute 03-03 (text generator UI integration)
+**Completed:** Plan 03-03 (Text Output UI Integration) - Phase 3 Complete
+**Next:** Plan Phase 4 (Deploy)
 
 ### Handoff Notes
 
-Plan 03-02 delivered Pinia store and text generator composable:
+Plan 03-03 delivered the TextOutput component completing Phase 3:
 
-**Pinia Store (src/stores/useTemplateStore.ts):**
+**TextOutput Component (src/components/wizard/TextOutput.vue):**
 ```typescript
-// State: language, genderStyle, enabledSections, customSections
-// Getters: defaultTemplates (de/en), genderSuffix
-// Actions: setLanguage, setGenderStyle, toggleSection, etc.
-// Persistence: localStorage key 'carrier-freq-templates'
+// Props: result, frequencySource, indexStatus, literatureFrequency, literaturePmid, usingDefault
+// Features:
+// - Perspective selector (affected/carrier/familyMember)
+// - Section toggles via v-chip components
+// - Language switch (DE/EN)
+// - Gender style selector (German only)
+// - Live text preview with pre-wrap
+// - Copy button with 2-second "Kopiert!" feedback
 ```
 
-**Text Generator (src/composables/useTextGenerator.ts):**
-```typescript
-useTextGenerator(input: () => TextGeneratorInput)
-// Returns: templateContext, generateText, getSections
-// Plus: language, genderStyle, setLanguage, setGenderStyle, toggleSection
+**Integration in StepResults:**
+```vue
+<TextOutput
+  v-if="result"
+  :result="result"
+  :frequency-source="frequencySource"
+  ...
+/>
 ```
 
-**Key behaviors:**
-- Frequency source resolution: gnomAD -> globalCarrierFrequency; literature -> literatureFrequency; default -> config
-- Recurrence risk divisor: 4 (carrier), 2 (affected)
-- Locale formatting: German comma (0,25%), English period (0.25%)
-- Source attribution per type (gnomAD, PMID, default assumption)
+**Phase 3 Complete:**
+- 03-01: Template system foundation (types, renderer, JSON templates)
+- 03-02: Pinia store and text generator composable
+- 03-03: TextOutput UI component integration
 
-**Integration point:**
-```typescript
-import { useTextGenerator } from '@/composables';
-const { generateText, getSections, language } = useTextGenerator(() => ({
-  result, frequencySource, indexStatus, literatureFrequency, literaturePmid, usingDefault
-}));
-```
+All TEXT-01 through TEXT-04 requirements satisfied.
 
-Ready for 03-03: Create text output panel UI with perspective tabs and section toggles.
+Ready for Phase 4: Deploy (validation and final deployment).
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 (Plan 03-02 complete)*
+*Last updated: 2026-01-19 (Plan 03-03 complete, Phase 3 complete)*
