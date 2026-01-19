@@ -7,26 +7,26 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.2 Sharing & Collaboration - Phase 11 COMPLETE
+**Current focus:** v1.2 Sharing & Collaboration - Phase 12 in progress
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.2 Sharing & Collaboration
-**Phase:** 11 - URL State Sharing - COMPLETE
-**Plan:** 2 of 2 complete
-**Status:** Ready for Phase 12
+**Phase:** 12 - PWA - IN PROGRESS
+**Plan:** 1 of 3 complete
+**Status:** Plan 12-01 complete, ready for 12-02
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
-v1.2 Sharing:       [###       ]  33% - Phase 11 complete (1/3 phases)
+v1.2 Sharing:       [#####     ]  50% - Phase 12 in progress (2/3 phases, 3/5 plans)
 ```
 
-**Overall:** 29/29 plans complete for v1.0+v1.1+Phase 11
+**Overall:** 30/32 plans complete for v1.0+v1.1+v1.2
 
 ---
 
@@ -127,6 +127,10 @@ v1.2 Sharing:       [###       ]  33% - Phase 11 complete (1/3 phases)
 | URL singleton init state | Module-level refs prevent multiple initializations | 2026-01-19 |
 | VueUse useClipboard with legacy | Legacy fallback for older browsers without Clipboard API | 2026-01-19 |
 | Polite/assertive announcements | Copy success is polite (non-urgent), failure is assertive | 2026-01-19 |
+| NetworkFirst for API caching | APIs need fresh data when online, cached data acceptable offline | 2026-01-19 |
+| registerType: 'prompt' | Per CONTEXT.md, user decides when to update (never auto-update) | 2026-01-19 |
+| Maskable icon with RequiForm background | #a09588 background, white text for contrast in safe zone | 2026-01-19 |
+| Separate cache names per API | gnomad-api-cache and clingen-api-cache for independent management | 2026-01-19 |
 
 ### Roadmap Evolution
 
@@ -143,7 +147,10 @@ None.
 - [x] Run `/gsd:plan-phase 11` to create URL State Sharing plans
 - [x] Execute 11-01-PLAN.md (URL state infrastructure)
 - [x] Execute 11-02-PLAN.md (share UI)
-- [ ] Run `/gsd:plan-phase 12` to create PWA plans
+- [x] Run `/gsd:plan-phase 12` to create PWA plans
+- [x] Execute 12-01-PLAN.md (PWA infrastructure)
+- [ ] Execute 12-02-PLAN.md (PWA UI)
+- [ ] Execute 12-03-PLAN.md (install prompt)
 - [ ] Run `/gsd:plan-phase 13` to create Variant Exclusion plans
 - [x] Run `/gsd:plan-phase 5` to create Foundation plans
 - [x] Execute 05-01-PLAN.md (theme + version infrastructure)
@@ -185,16 +192,17 @@ None.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 11 - URL State Sharing (2/2 plans)
-**Status:** Phase 11 complete, ready for Phase 12 (PWA)
+**Completed:** Phase 12 Plan 01 - PWA Infrastructure
+**Status:** Phase 12 in progress (1/3 plans)
 
 ### Handoff Notes
 
-v1.2 Phase 11 complete:
-- URL state infrastructure with Zod validation
-- Bidirectional URL sync (wizard state ↔ URL params)
-- Copy link button with clipboard integration and visual feedback
-- Graceful degradation for invalid URLs
+v1.2 Phase 12 Plan 01 complete:
+- vite-plugin-pwa configured with web manifest
+- Workbox service worker with NetworkFirst caching for gnomAD/ClinGen APIs
+- PWA icons generated from SVG favicon (192, 512, maskable, apple-touch-icon)
+- TypeScript declarations for BeforeInstallPromptEvent
+- Build produces manifest.webmanifest and sw.js
 
 v1.1 roadmap derived from requirements and research:
 - Phase 5: Foundation (settings store, theme, version display) - COMPLETE
@@ -264,3 +272,4 @@ v1.1 roadmap derived from requirements and research:
 *11-01 complete: 2026-01-19*
 *11-02 complete: 2026-01-19*
 *Phase 11 complete: 2026-01-19*
+*12-01 complete: 2026-01-19*
