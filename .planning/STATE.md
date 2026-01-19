@@ -15,17 +15,17 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.1 Release-Ready
 **Phase:** 8 - Filtering + Variant Display
-**Plan:** 2 of 4 complete
+**Plan:** 3 of 4 complete
 **Status:** In progress
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [######----] ~60% - Phase 8 in progress
+v1.1 Release-Ready: [#######---] ~70% - Phase 8 in progress
 ```
 
-**Overall:** Phase 8 plan 02 complete (HGVS + Display Types)
+**Overall:** Phase 8 plan 03 complete (Filter UI + Composable)
 
 ---
 
@@ -49,7 +49,7 @@ v1.1 Release-Ready: [######----] ~60% - Phase 8 in progress
 | 5 | Foundation | 4 | Complete (2/2 plans) |
 | 6 | App Shell | 5 | Complete (2/2 plans) |
 | 7 | SEO + Accessibility | 9 | Complete (4/4 plans) |
-| 8 | Filtering + Variant Display | 14 | In progress (2/4 plans) |
+| 8 | Filtering + Variant Display | 14 | In progress (3/4 plans) |
 | 9 | ClinGen + Documentation | 15 | Pending |
 | 10 | Export + Templates + Logging | 22 | Pending |
 
@@ -80,6 +80,8 @@ v1.1 Release-Ready: [######----] ~60% - Phase 8 in progress
 | aria-label on tooltips and buttons | Ensures screen reader support regardless of Vuetify internals | 2026-01-19 |
 | HGVS fields nullable strings | gnomAD may not have HGVS annotation for all variants | 2026-01-19 |
 | DisplayVariant boolean flags | isLoF, isClinvarPathogenic, isMissense for efficient table filtering | 2026-01-19 |
+| Local filter state in composable | Per-calculation overrides without persisting to store | 2026-01-19 |
+| FrequencyResults.vue orphaned | Integration target changed to StepResults.vue (active component) | 2026-01-19 |
 
 ### Blockers
 
@@ -100,7 +102,7 @@ None currently.
 - [x] Run `/gsd:plan-phase 8` to create Filtering + Variant Display plans
 - [x] Execute 08-01-PLAN.md (filter types + settings store extension)
 - [x] Execute 08-02-PLAN.md (HGVS fields + display types)
-- [ ] Execute 08-03-PLAN.md (filter UI + composable)
+- [x] Execute 08-03-PLAN.md (filter UI + composable)
 - [ ] Execute 08-04-PLAN.md (variant modal component)
 - [ ] ClinGen CSV schema may need exploration during Phase 9
 
@@ -111,8 +113,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 8 Plan 02 - HGVS + Display Types
-**Next:** Execute 08-03-PLAN.md (Filter UI + Composable)
+**Completed:** Phase 8 Plan 03 - Filter UI + Composable
+**Next:** Execute 08-04-PLAN.md (Variant Modal)
 
 ### Handoff Notes
 
@@ -132,7 +134,7 @@ Key pitfalls from research:
 **Phase 8 deliverables:**
 - Plan 01: Filter types and settings store extension - COMPLETE
 - Plan 02: HGVS fields + display types for variant modal - COMPLETE
-- Plan 03: Filter UI component + useVariantFilter composable - PENDING
+- Plan 03: Filter UI component + useVariantFilter composable - COMPLETE
 - Plan 04: Variant modal component with sortable table - PENDING
 
 ---
@@ -150,3 +152,4 @@ Key pitfalls from research:
 *07-04 complete: 2026-01-19*
 *08-01 complete: 2026-01-19*
 *08-02 complete: 2026-01-19*
+*08-03 complete: 2026-01-19*
