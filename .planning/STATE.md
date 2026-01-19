@@ -142,8 +142,8 @@ None currently.
 - [x] Execute 09-07-PLAN.md (Contextual help tooltips + coverage warning)
 - [x] Run `/gsd:plan-phase 10` to create Export + Templates + Logging plans
 - [x] Execute 10-01-PLAN.md (logging infrastructure)
-- [x] Execute 10-02-PLAN.md (log viewer UI)
-- [x] Execute 10-03-PLAN.md (export infrastructure)
+- [x] Execute 10-02-PLAN.md (export infrastructure)
+- [x] Execute 10-03-PLAN.md (export UI integration)
 - [x] Execute 10-04-PLAN.md (template infrastructure)
 - [ ] Execute 10-05-PLAN.md (template editor UI)
 - [x] Execute 10-06-PLAN.md (log viewer UI)
@@ -192,13 +192,13 @@ Key pitfalls from research:
 
 **Phase 10 deliverables (in progress):**
 - Plan 01: Logging infrastructure (types, store, composable) - COMPLETE
-- Plan 02: Log viewer UI integration - COMPLETE
-- Plan 03: Export infrastructure - COMPLETE
+- Plan 02: Export infrastructure (SheetJS, utilities) - COMPLETE
+- Plan 03: Export UI integration (StepResults, VariantModal) - COMPLETE
 - Plan 04: Template infrastructure (variables, parser, store) - COMPLETE
 - Plan 05: Template editor UI - PENDING
 - Plan 06: Log viewer UI - COMPLETE
 - Plan 07: Vite plugin checker (parallel TypeScript/ESLint) - COMPLETE
-- Plan 08: Final integration - PENDING
+- Plan 08: Final integration (logging throughout app) - PENDING
 
 ---
 
