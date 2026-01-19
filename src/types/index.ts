@@ -19,3 +19,12 @@ export type {
   FrequencySource,
   WizardState,
 } from './wizard';
+
+export type {
+  Perspective,
+  GenderStyle,
+  TextSection,
+  PerspectiveConfig,
+  TemplateConfig,
+  TemplateContext,
+} from './text';
