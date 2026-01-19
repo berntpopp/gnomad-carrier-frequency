@@ -6,7 +6,7 @@
 
 **Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
 
-**Current Focus:** Phase 2 Wizard UI - Plan 01 complete, continuing with stepper components
+**Current Focus:** Phase 2 Wizard UI - Plan 02 complete, step input components ready
 
 **Key Constraints:**
 - Stack: npm, Vue 3, Vuetify 3, Vite, TypeScript
@@ -20,19 +20,19 @@
 
 **Milestone:** v1 MVP
 **Phase:** Phase 2 - Wizard UI (2 of 4)
-**Plan:** 02-01 complete (1/3)
+**Plan:** 02-02 complete (2/3)
 **Status:** In progress
 
 ### Progress
 
 ```
 Phase 1: Foundation     [##########] 5/5 plans COMPLETE
-Phase 2: Wizard UI      [###.......] 1/3 plans
+Phase 2: Wizard UI      [######....] 2/3 plans
 Phase 3: German Text    [..........] 0/? plans
 Phase 4: Deploy         [..........] Validation only
 ```
 
-**Overall:** `[######....] ~60%` (Phase 2 started)
+**Overall:** `[#######...] ~70%` (Phase 2 in progress)
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 6 |
+| Plans Completed | 7 |
 | Phases Completed | 1 |
-| Requirements Done | All Phase 1, 02-01 wizard state |
-| Session Count | 7 |
+| Requirements Done | All Phase 1, 02-01 wizard state, 02-02 step components |
+| Session Count | 8 |
 
 ---
 
@@ -71,6 +71,7 @@ Phase 4: Deploy         [..........] Validation only
 | Default to heterozygous | Wizard defaults indexStatus to 'heterozygous' (carrier) per user decision | 2026-01-19 |
 | Downstream reset on gene change | Changing gene resets steps 2-3 state but only after leaving step 1 | 2026-01-19 |
 | Literature validation | Requires frequency in (0, 1] AND non-empty PMID string | 2026-01-19 |
+| Step components via props | Step components receive state via props, emit events for updates | 2026-01-19 |
 
 ### Technical Notes
 
@@ -85,6 +86,7 @@ Phase 4: Deploy         [..........] Validation only
 - Config settings: founderEffectMultiplier=5, debounceMs=300, defaultCarrierFrequency=0.01
 - Dev environment: npm run dev (Vite), npm run build (vue-tsc + Vite)
 - Wizard state in reactive() composable with computed validation per step
+- Step components in src/components/wizard/
 
 ### Blockers
 
@@ -100,8 +102,8 @@ Phase 4: Deploy         [..........] Validation only
 - [x] Execute 01-05 (carrier frequency composable, test UI)
 - [x] Plan Phase 2 (Wizard UI)
 - [x] Execute 02-01 (wizard types and state composable)
-- [ ] Execute 02-02 (stepper component)
-- [ ] Execute 02-03 (step components)
+- [x] Execute 02-02 (step input components)
+- [ ] Execute 02-03 (results step and stepper integration)
 
 ---
 
@@ -110,47 +112,50 @@ Phase 4: Deploy         [..........] Validation only
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Plan 02-01 (Wizard Types and State Composable)
-**Next:** Plan 02-02 (Wizard Stepper Component)
+**Completed:** Plan 02-02 (Step Input Components)
+**Next:** Plan 02-03 (Results Step and Stepper Integration)
 
 ### Handoff Notes
 
-Phase 2 wizard UI in progress. Plan 02-01 delivered wizard state management.
+Phase 2 wizard UI in progress. Plan 02-02 delivered step input components.
 
-**New composable import:**
-```typescript
-import { useWizard } from '@/composables';
+**Step components created:**
+```
+src/components/wizard/
+├── StepGene.vue       # Gene selection with GeneSearch + VersionSelector
+├── StepStatus.vue     # Carrier/affected toggle with tooltip
+└── StepFrequency.vue  # gnomAD/Literature/Default tabs with validation
 ```
 
-**Wizard usage pattern:**
+**Step component patterns:**
 ```typescript
-const {
-  state,
-  canProceed,
-  step1Valid,
-  step2Valid,
-  step3Valid,
-  nextStep,
-  prevStep,
-  goToStep,
-  resetWizard,
-  setFrequencySource,
-} = useWizard();
+// Props-based state
+<StepGene
+  :model-value="state.gene"
+  @update:model-value="state.gene = $event"
+  @complete="nextStep"
+/>
 
-// State is reactive
-state.gene = selectedGene;
-state.indexStatus = 'heterozygous';
-state.frequencySource = 'gnomad';
+<StepStatus
+  :model-value="state.indexStatus"
+  @update:model-value="state.indexStatus = $event"
+  @complete="nextStep"
+  @back="prevStep"
+/>
 
-// Navigation
-if (canProceed.value) nextStep();
-goToStep(1); // Always allowed
-goToStep(2); // Only if step1Valid
-```
-
-**New type imports:**
-```typescript
-import type { WizardState, WizardStep, FrequencySource } from '@/types';
+<StepFrequency
+  :source="state.frequencySource"
+  :literature-frequency="state.literatureFrequency"
+  :literature-pmid="state.literaturePmid"
+  :gnomad-frequency="globalFrequency"
+  :gnomad-loading="isLoading"
+  :using-default="usingDefault"
+  @update:source="state.frequencySource = $event"
+  @update:literature-frequency="state.literatureFrequency = $event"
+  @update:literature-pmid="state.literaturePmid = $event"
+  @complete="nextStep"
+  @back="prevStep"
+/>
 ```
 
 All composables (useWizard, useCarrierFrequency, etc.) available from `@/composables` barrel.
@@ -158,4 +163,4 @@ All composables (useWizard, useCarrierFrequency, etc.) available from `@/composa
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 (Plan 02-01 complete)*
+*Last updated: 2026-01-19 (Plan 02-02 complete)*
