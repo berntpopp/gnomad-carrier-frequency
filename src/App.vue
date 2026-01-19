@@ -17,9 +17,10 @@
       </v-container>
     </v-main>
 
-    <AppFooter />
+    <AppFooter @open-log-viewer="showLogViewer = true" />
 
     <SettingsDialog v-model="showSettings" />
+    <LogViewerPanel v-model="showLogViewer" />
   </v-app>
 </template>
 
@@ -29,9 +30,11 @@ import AppBar from '@/components/AppBar.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import DisclaimerBanner from '@/components/DisclaimerBanner.vue';
 import SettingsDialog from '@/components/SettingsDialog.vue';
+import LogViewerPanel from '@/components/LogViewerPanel.vue';
 import WizardStepper from '@/components/wizard/WizardStepper.vue';
 
 const showSettings = ref(false);
+const showLogViewer = ref(false);
 </script>
 
 <style scoped>
