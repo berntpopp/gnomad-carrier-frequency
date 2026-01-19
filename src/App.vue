@@ -44,11 +44,56 @@
 
     <SettingsDialog v-model="showSettings" />
     <LogViewerPanel v-model="showLogViewer" />
+
+    <!-- PWA Update Notification -->
+    <v-snackbar
+      v-model="needRefresh"
+      :timeout="-1"
+      location="bottom"
+      color="primary"
+    >
+      A new version is available
+
+      <template #actions>
+        <v-btn
+          variant="text"
+          @click="dismissUpdate"
+        >
+          Later
+        </v-btn>
+        <v-btn
+          color="white"
+          variant="tonal"
+          @click="updateApp"
+        >
+          Update
+        </v-btn>
+      </template>
+    </v-snackbar>
+
+    <!-- PWA Offline Ready Notification (first install) -->
+    <v-snackbar
+      v-model="showOfflineReady"
+      :timeout="5000"
+      location="bottom"
+      color="success"
+    >
+      App ready for offline use
+
+      <template #actions>
+        <v-btn
+          variant="text"
+          @click="showOfflineReady = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import AppBar from '@/components/AppBar.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import DisclaimerBanner from '@/components/DisclaimerBanner.vue';
@@ -56,7 +101,7 @@ import SettingsDialog from '@/components/SettingsDialog.vue';
 import LogViewerPanel from '@/components/LogViewerPanel.vue';
 import WizardStepper from '@/components/wizard/WizardStepper.vue';
 import { useLogStore } from '@/stores/useLogStore';
-import { useWizard, useUrlState } from '@/composables';
+import { useWizard, useUrlState, usePwaUpdate } from '@/composables';
 
 const showSettings = ref(false);
 const showLogViewer = ref(false);
@@ -67,6 +112,19 @@ const { resetWizard } = useWizard();
 // Initialize URL state synchronization
 // This handles restoring state from URL on mount and updating URL as state changes
 const { isRestoringFromUrl } = useUrlState();
+
+// PWA update management
+const { needRefresh, offlineReady, updateApp, dismissUpdate } = usePwaUpdate();
+
+// Local state for offline-ready notification dismissal
+const showOfflineReady = ref(false);
+
+// Watch offlineReady to show notification
+watch(offlineReady, (value) => {
+  if (value) {
+    showOfflineReady.value = true;
+  }
+});
 
 function handleReset() {
   resetWizard();
