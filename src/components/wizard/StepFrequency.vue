@@ -5,6 +5,24 @@
     </h2>
     <p class="text-body-2 text-medium-emphasis mb-4">
       Choose the source for carrier frequency calculation.
+      <v-tooltip location="top">
+        <template #activator="{ props: tooltipProps }">
+          <v-icon
+            v-bind="tooltipProps"
+            size="x-small"
+            class="ml-1"
+            aria-label="Population selection information"
+          >
+            mdi-information-outline
+          </v-icon>
+        </template>
+        <span class="tooltip-text">
+          <strong>Population Selection</strong><br>
+          Select the population that best matches the patient's genetic ancestry.
+          gnomAD populations are based on genetic clustering, not self-reported ethnicity.
+          If ancestry is unknown, consider using global frequencies.
+        </span>
+      </v-tooltip>
     </p>
 
     <v-card variant="outlined">
@@ -243,3 +261,10 @@ const isCurrentSourceValid = computed(() => {
   }
 });
 </script>
+
+<style scoped>
+.tooltip-text {
+  max-width: 280px;
+  display: inline-block;
+}
+</style>

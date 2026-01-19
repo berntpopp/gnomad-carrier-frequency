@@ -28,19 +28,74 @@
       </v-card-title>
 
       <v-card-text>
-        <div class="text-h5">
+        <div class="text-h5 d-flex align-center flex-wrap">
           Global: {{ globalFrequency?.ratio }}
           <span class="text-body-2 text-medium-emphasis">
             ({{ globalFrequency?.percent }})
           </span>
+          <v-tooltip location="top">
+            <template #activator="{ props: tooltipProps }">
+              <v-icon
+                v-bind="tooltipProps"
+                size="x-small"
+                class="ml-1"
+                aria-label="Carrier frequency information"
+              >
+                mdi-information-outline
+              </v-icon>
+            </template>
+            <span class="tooltip-text">
+              <strong>Carrier Frequency (2pq)</strong><br>
+              The proportion of individuals who carry one copy of a pathogenic variant.
+              Carriers are typically unaffected but can pass the variant to offspring.
+              Calculated as approximately 2 times the sum of pathogenic allele frequencies.
+            </span>
+          </v-tooltip>
         </div>
-        <div class="text-body-1 mt-2">
+        <div class="text-body-1 mt-2 d-flex align-center flex-wrap">
           Recurrence Risk ({{ indexStatus === 'heterozygous' ? 'carrier' : 'affected' }}):
-          <strong>{{ recurrenceRisk?.ratio }}</strong>
-          <span class="text-medium-emphasis">({{ recurrenceRisk?.percent }})</span>
+          <strong class="ml-1">{{ recurrenceRisk?.ratio }}</strong>
+          <span class="text-medium-emphasis ml-1">({{ recurrenceRisk?.percent }})</span>
+          <v-tooltip location="top">
+            <template #activator="{ props: tooltipProps }">
+              <v-icon
+                v-bind="tooltipProps"
+                size="x-small"
+                class="ml-1"
+                aria-label="Recurrence risk information"
+              >
+                mdi-information-outline
+              </v-icon>
+            </template>
+            <span class="tooltip-text">
+              <strong>Recurrence Risk</strong><br>
+              For a carrier index patient: risk that offspring inherits
+              both a parental variant and a population variant (carrier freq / 4).<br>
+              For an affected index patient: risk that offspring is affected
+              (carrier freq / 2).
+            </span>
+          </v-tooltip>
         </div>
-        <div class="text-body-2 mt-2 text-medium-emphasis">
+        <div class="text-body-2 mt-2 text-medium-emphasis d-flex align-center flex-wrap">
           Based on {{ filteredCount }} qualifying variant(s)
+          <v-tooltip location="top">
+            <template #activator="{ props: tooltipProps }">
+              <v-icon
+                v-bind="tooltipProps"
+                size="x-small"
+                class="ml-1"
+                aria-label="Contributing variants information"
+              >
+                mdi-information-outline
+              </v-icon>
+            </template>
+            <span class="tooltip-text">
+              <strong>Contributing Variants</strong><br>
+              The number of pathogenic variants included in this calculation.
+              Click "View all variants" below to see details including variant IDs,
+              consequences, and individual allele frequencies.
+            </span>
+          </v-tooltip>
         </div>
       </v-card-text>
 
@@ -477,5 +532,10 @@ function formatRatio(freq: number | null): string {
 
 .population-row:hover .population-chevron {
   color: rgb(var(--v-theme-primary)) !important;
+}
+
+.tooltip-text {
+  max-width: 280px;
+  display: inline-block;
 }
 </style>
