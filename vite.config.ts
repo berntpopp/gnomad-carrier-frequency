@@ -1,11 +1,28 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import checker from 'vite-plugin-checker'
 import { fileURLToPath, URL } from 'node:url'
 import pkg from './package.json'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    checker({
+      // Enable vue-tsc for TypeScript checking
+      vueTsc: true,
+      // Enable ESLint checking
+      eslint: {
+        lintCommand: 'eslint "./src/**/*.{ts,vue}"',
+        useFlatConfig: true, // Use flat config format (eslint.config.js)
+      },
+      // Show overlay in browser for errors
+      overlay: {
+        initialIsOpen: false, // Don't auto-open, but show badge
+        position: 'br', // Bottom-right
+      },
+    }),
+  ],
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(pkg.version),
   },
