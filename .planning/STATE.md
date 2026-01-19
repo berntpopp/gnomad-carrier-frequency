@@ -6,7 +6,7 @@
 
 **Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
 
-**Current Focus:** Phase 2 Complete - Wizard UI fully functional, ready for Phase 3 German Text
+**Current Focus:** Phase 3 In Progress - Template system foundation complete, building text generation
 
 **Key Constraints:**
 - Stack: npm, Vue 3, Vuetify 3, Vite, TypeScript
@@ -19,20 +19,20 @@
 ## Current Position
 
 **Milestone:** v1 MVP
-**Phase:** Phase 2 - Wizard UI (2 of 4)
-**Plan:** 02-03 complete (3/3)
-**Status:** Phase complete
+**Phase:** Phase 3 - German Text (3 of 4)
+**Plan:** 03-01 complete (1/3)
+**Status:** In progress
 
 ### Progress
 
 ```
 Phase 1: Foundation     [##########] 5/5 plans COMPLETE
 Phase 2: Wizard UI      [##########] 3/3 plans COMPLETE
-Phase 3: German Text    [..........] 0/? plans
+Phase 3: German Text    [###.......] 1/3 plans
 Phase 4: Deploy         [..........] Validation only
 ```
 
-**Overall:** `[########..] ~80%` (Phase 2 complete)
+**Overall:** `[#########.] ~85%` (9/11 plans complete)
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 8 |
+| Plans Completed | 9 |
 | Phases Completed | 2 |
-| Requirements Done | All Phase 1, All Phase 2 (28/32) |
-| Session Count | 9 |
+| Requirements Done | Phase 1-2 complete, Phase 3 in progress |
+| Session Count | 10 |
 
 ---
 
@@ -75,6 +75,9 @@ Phase 4: Deploy         [..........] Validation only
 | Numeric sort columns | v-data-table uses numeric keys (ratioDenominator, recurrenceRiskValue) for proper sorting | 2026-01-19 |
 | Founder effect in Notes | Founder effect shown as text in Notes column, not separate column | 2026-01-19 |
 | Variants column removed | Same value for all populations; shown in summary card only | 2026-01-19 |
+| Simple template renderer | No micromustache/handlebars; 10-line regex function sufficient | 2026-01-19 |
+| Config-driven templates | JSON templates with {{variable}} syntax, Perspective-based variants | 2026-01-19 |
+| genderSuffix variable | German inclusive language via template variable, not hardcoded | 2026-01-19 |
 
 ### Technical Notes
 
@@ -92,6 +95,9 @@ Phase 4: Deploy         [..........] Validation only
 - Step components in src/components/wizard/
 - v-data-table with custom item slots for row styling
 - Source attribution: gnomAD v4 / Literature (PMID: xxx) / Default assumption
+- Template files: src/config/templates/de.json, en.json
+- Template renderer: renderTemplate(template, context) in src/utils/template-renderer.ts
+- Text types: Perspective, GenderStyle, TemplateContext in src/types/text.ts
 
 ### Blockers
 
@@ -109,8 +115,10 @@ Phase 4: Deploy         [..........] Validation only
 - [x] Execute 02-01 (wizard types and state composable)
 - [x] Execute 02-02 (step input components)
 - [x] Execute 02-03 (results step and stepper integration)
-- [ ] Plan Phase 3 (German Text)
-- [ ] Execute Phase 3 plans
+- [x] Plan Phase 3 (German Text)
+- [x] Execute 03-01 (template system foundation)
+- [ ] Execute 03-02 (Pinia store)
+- [ ] Execute 03-03 (text generator composable and UI)
 - [ ] Plan Phase 4 (Deploy)
 - [ ] Execute Phase 4 plans
 
@@ -121,58 +129,42 @@ Phase 4: Deploy         [..........] Validation only
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Plan 02-03 (Results Step and Stepper Integration) - Phase 2 complete
-**Next:** Plan Phase 3 (German Text)
+**Completed:** Plan 03-01 (Template System Foundation)
+**Next:** Execute 03-02 (Pinia store for template customization)
 
 ### Handoff Notes
 
-Phase 2 wizard UI is complete. All 10 Phase 2 requirements are implemented.
+Phase 3 template system foundation is complete. Plan 03-01 delivered:
 
-**Wizard components structure:**
-```
-src/components/wizard/
-├── StepGene.vue        # Gene selection with GeneSearch + VersionSelector
-├── StepStatus.vue      # Carrier/affected toggle with tooltip
-├── StepFrequency.vue   # gnomAD/Literature/Default tabs with validation
-├── StepResults.vue     # Sortable v-data-table with source attribution
-└── WizardStepper.vue   # Main container coordinating all steps
-```
+**Template types (src/types/text.ts):**
+- `Perspective`: 'affected' | 'carrier' | 'familyMember'
+- `GenderStyle`: '*' | ':' | '/' | 'traditional'
+- `TemplateContext`: All template variables for interpolation
 
-**Key patterns established:**
+**Template renderer (src/utils/template-renderer.ts):**
 ```typescript
-// Step components receive state via props
-<StepResults
-  :result="result"
-  :global-frequency="globalFrequency"
-  :index-status="state.indexStatus"
-  :frequency-source="state.frequencySource"
-  :literature-frequency="state.literatureFrequency"
-  :literature-pmid="state.literaturePmid"
-  :using-default="usingDefault"
-  @back="prevStep"
-  @restart="resetWizard"
-/>
-
-// WizardStepper coordinates two composables
-const { state, nextStep, prevStep, resetWizard } = useWizard();
-const { setGeneSymbol, result, globalFrequency, ... } = useCarrierFrequency();
+renderTemplate(template: string, context: Partial<TemplateContext>): string
+// Replaces {{variable}} with context values
+// Missing variables: empty string + console.warn
 ```
 
-**Phase 2 Requirements Coverage (10/10):**
-- UI-01: 4-step wizard flow (Gene -> Status -> Frequency -> Results)
-- UI-02: Vuetify stepper component
-- UI-03: User can navigate back to previous steps
-- UI-04: Results step shows all population frequencies in table format (sortable)
-- IDX-01: User selects index patient status (carrier OR affected)
-- IDX-02: Status selection captured (affects text in Phase 3)
-- SRC-01: User can use gnomAD-calculated carrier frequency
-- SRC-02: User can enter literature-based frequency with PMID citation
-- SRC-03: User can select default assumption (from config)
-- SRC-04: Source attribution shown in results
+**Template JSON files:**
+```
+src/config/templates/
+├── de.json   # German clinical templates (Heterozygotenfrequenz, etc.)
+└── en.json   # English templates with matching structure
+```
 
-All composables (useWizard, useCarrierFrequency, etc.) available from `@/composables` barrel.
+**Template structure (3 perspectives x 8 sections):**
+- Perspectives: affected, carrier, familyMember
+- Sections: geneIntro, inheritance, carrierFrequency, recurrenceRisk, populationContext, founderEffect, sourceCitation, recommendation
+
+**Variables used in templates:**
+gene, carrierFrequencyRatio, recurrenceRiskPercent, recurrenceRiskRatio, source, genderSuffix, accessDate
+
+Ready for 03-02: Install Pinia + persistence plugin, create template store.
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 (Phase 2 complete)*
+*Last updated: 2026-01-19 (Plan 03-01 complete)*
