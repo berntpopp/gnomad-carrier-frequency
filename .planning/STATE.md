@@ -15,18 +15,18 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.2 Sharing & Collaboration
 **Phase:** 13 - Variant Exclusion - IN PROGRESS
-**Plan:** 1 of ? complete (plan count TBD)
-**Status:** Phase 13 started
+**Plan:** 2 of ? complete (plan count TBD)
+**Status:** Phase 13 in progress
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
-v1.2 Sharing:       [########  ]  85% - Phase 13 started (2/3 phases, 6/? plans)
+v1.2 Sharing:       [########  ]  88% - Phase 13 in progress (2/3 phases, 7/? plans)
 ```
 
-**Overall:** 33 plans complete for v1.0+v1.1+v1.2 (Phases 11-13)
+**Overall:** 34 plans complete for v1.0+v1.1+v1.2 (Phases 11-13)
 
 ---
 
@@ -137,6 +137,8 @@ v1.2 Sharing:       [########  ]  85% - Phase 13 started (2/3 phases, 6/? plans)
 | ComputedRef<T> for typed computed refs | Match project conventions in composable interfaces | 2026-01-20 |
 | Singleton exclusion state pattern | Module-level reactive state shared across components | 2026-01-20 |
 | Four predefined exclusion reasons | likely_benign, low_quality, population_specific, other | 2026-01-20 |
+| Dynamic slot syntax for header columns | #[\`header.xxx\`] syntax required for ESLint vue/valid-v-slot compliance | 2026-01-20 |
+| Checkbox inclusion semantics | Checked = included, unchecked = excluded (intuitive selection) | 2026-01-20 |
 
 ### Roadmap Evolution
 
@@ -159,6 +161,7 @@ None.
 - [x] Execute 12-03-PLAN.md (install prompt)
 - [x] Run `/gsd:plan-phase 13` to create Variant Exclusion plans
 - [x] Execute 13-01-PLAN.md (exclusion infrastructure)
+- [x] Execute 13-02-PLAN.md (exclusion UI)
 - [x] Run `/gsd:plan-phase 5` to create Foundation plans
 - [x] Execute 05-01-PLAN.md (theme + version infrastructure)
 - [x] Execute 05-02-PLAN.md (settings UI integration)
@@ -199,10 +202,16 @@ None.
 ### Last Session
 
 **Date:** 2026-01-20
-**Completed:** Phase 13 Plan 01 - Exclusion Infrastructure
-**Status:** Phase 13 in progress (1/? plans)
+**Completed:** Phase 13 Plan 02 - Exclusion UI
+**Status:** Phase 13 in progress (2/? plans)
 
 ### Handoff Notes
+
+v1.2 Phase 13 Plan 02 complete:
+- Exclusion checkboxes in VariantTable (header + row level)
+- Visual styling for excluded variants (dimmed rows, strikethrough)
+- Exclusion count badge in VariantModal title
+- "Clear exclusions" button in modal actions
 
 v1.2 Phase 13 Plan 01 complete:
 - ExclusionState, ExclusionReason, PredefinedExclusionReason types
@@ -292,3 +301,4 @@ v1.1 roadmap derived from requirements and research:
 *12-03 complete: 2026-01-19*
 *Phase 12 complete: 2026-01-19*
 *13-01 complete: 2026-01-20*
+*13-02 complete: 2026-01-20*

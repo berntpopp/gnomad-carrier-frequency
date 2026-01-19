@@ -40,6 +40,12 @@ export const UrlStateSchema = z.object({
 
   /** Conflicting classification threshold percentage (50-100) */
   conflictThreshold: z.coerce.number().int().min(50).max(100).optional(),
+
+  /** Compressed excluded variant IDs (lz-string encoded) */
+  excl: z.string().optional(),
+
+  /** Warning flag if exclusions were truncated from URL (1=truncated) */
+  exclWarn: z.enum(['0', '1']).optional(),
 });
 
 /**

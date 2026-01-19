@@ -14,6 +14,8 @@ import type { UrlState } from '@/types';
 import { useWizard } from './useWizard';
 import { useFilterStore } from '@/stores/useFilterStore';
 import { useGeneSearch } from './useGeneSearch';
+import { useExclusionState } from './useExclusionState';
+import { encodeExclusions, decodeExclusions } from '@/utils/exclusion-url';
 
 // Module-level singleton state
 const isInitialized = ref(false);
@@ -49,6 +51,7 @@ export function useUrlState(): UseUrlStateReturn {
   const { state: wizardState } = useWizard();
   const filterStore = useFilterStore();
   const geneSearch = useGeneSearch();
+  const { excluded, setExclusions, excludedCount } = useExclusionState();
 
   /**
    * Restore application state from URL parameters
@@ -146,6 +149,21 @@ export function useUrlState(): UseUrlStateReturn {
       // Only go to step if we have the prerequisites
       if (urlState.step > 1 && wizardState.gene) {
         wizardState.currentStep = urlState.step as 1 | 2 | 3 | 4;
+      }
+
+      // Restore exclusions if present in URL
+      if (urlState.excl) {
+        const decodedExclusions = decodeExclusions(urlState.excl);
+        if (decodedExclusions.length > 0) {
+          setExclusions(decodedExclusions);
+        }
+      }
+
+      // Show warning if exclusions were truncated
+      if (urlState.exclWarn === '1') {
+        console.warn(
+          '[URL State] Some exclusions were not included in the shared URL due to length limits'
+        );
       }
     }
   }
@@ -256,6 +274,22 @@ export function useUrlState(): UseUrlStateReturn {
       delete params.conflicting;
       delete params.conflictThreshold;
     }
+
+    // Exclusion state
+    if (excludedCount.value > 0) {
+      const encoded = encodeExclusions(excluded.value);
+      if (encoded) {
+        params.excl = encoded;
+        delete params.exclWarn;
+      } else {
+        // Exclusions too large - set warning flag
+        delete params.excl;
+        params.exclWarn = '1';
+      }
+    } else {
+      delete params.excl;
+      delete params.exclWarn;
+    }
   }
 
   // Set up watchers to update URL when state changes
@@ -271,13 +305,15 @@ export function useUrlState(): UseUrlStateReturn {
     { deep: true }
   );
 
+  watch(excluded, () => updateUrlFromState(), { deep: true });
+
   // On mount, check for URL state and restore if present
   onMounted(async () => {
     // Only initialize once
     if (isInitialized.value) return;
 
     // Check if URL has any state parameters
-    const hasUrlState = ['gene', 'step', 'status', 'source', 'filters'].some(
+    const hasUrlState = ['gene', 'step', 'status', 'source', 'filters', 'excl'].some(
       (k) => params[k] !== undefined && params[k] !== null && params[k] !== ''
     );
 
