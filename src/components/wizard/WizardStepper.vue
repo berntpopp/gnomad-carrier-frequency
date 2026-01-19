@@ -165,8 +165,7 @@ watch(
 
       // Announce results when reaching step 4
       if (newStep === 4 && globalFrequency.value !== null) {
-        const ratio = `1 in ${Math.round(1 / globalFrequency.value)}`;
-        announceCalculation(ratio, 'global');
+        announceCalculation(globalFrequency.value.ratio, 'global');
       }
     }
   }

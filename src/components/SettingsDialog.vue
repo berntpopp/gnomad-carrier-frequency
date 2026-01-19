@@ -3,7 +3,7 @@
     v-model="modelValue"
     max-width="600"
     persistent
-    @update:model-value="(val) => val ? onDialogOpen() : undefined"
+    @update:model-value="(val: boolean) => val ? onDialogOpen() : undefined"
   >
     <v-card ref="dialogCard">
       <v-card-title class="d-flex align-center">
