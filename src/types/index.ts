@@ -41,3 +41,11 @@ export type {
   ClingenValidityResult,
 } from './clingen';
 export { CLINGEN_CACHE_EXPIRY_MS } from './clingen';
+
+export type {
+  GeneConstraint,
+  ConstraintInterpretation,
+  PliInterpretation,
+  LoeufInterpretation,
+} from './constraint';
+export { getLoeufInterpretation, getPliInterpretation } from './constraint';

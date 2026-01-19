@@ -63,3 +63,25 @@ export interface GeneData {
 export interface GeneVariantsResponse {
   gene: GeneData | null;
 }
+
+// Gene constraint data from gnomAD
+export interface GnomadConstraint {
+  exp_lof: number | null;
+  obs_lof: number | null;
+  oe_lof: number | null;
+  oe_lof_lower: number | null;
+  oe_lof_upper: number | null; // This is LOEUF
+  pLI: number | null;
+  lof_z: number | null;
+  flags: string[] | null;
+}
+
+export interface GeneDetailsResult {
+  gene_id: string;
+  symbol: string;
+  gnomad_constraint: GnomadConstraint | null;
+}
+
+export interface GeneDetailsResponse {
+  gene: GeneDetailsResult | null;
+}
