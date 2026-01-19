@@ -21,14 +21,41 @@
       item-value="variant_id"
       show-expand
       class="elevation-0"
+      :item-class="getRowClass"
     >
+      <!-- Header checkbox for bulk include/exclude -->
+      <template #[`header.include`]>
+        <v-checkbox-btn
+          :model-value="allIncluded"
+          :indeterminate="someExcluded"
+          density="compact"
+          hide-details
+          aria-label="Include all variants"
+          @update:model-value="handleHeaderToggle"
+        />
+      </template>
+
+      <!-- Row checkbox for individual exclusion -->
+      <template #[`item.include`]="{ item }">
+        <v-checkbox-btn
+          :model-value="!isExcluded(item.variant_id)"
+          density="compact"
+          hide-details
+          :aria-label="isExcluded(item.variant_id) ? 'Include variant' : 'Exclude variant'"
+          @update:model-value="() => toggleVariant(item.variant_id)"
+        />
+      </template>
+
       <!-- Variant ID column - links to gnomAD -->
       <template #[`item.variant_id`]="{ item }">
         <a
           :href="getGnomadUrl(item.variant_id)"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-primary text-decoration-none"
+          :class="[
+            'text-primary text-decoration-none',
+            { 'text-decoration-line-through text-medium-emphasis': isExcluded(item.variant_id) }
+          ]"
         >
           {{ item.variant_id }}
           <v-icon
@@ -262,12 +289,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import type { DisplayVariant } from '@/types';
 import { getClinvarColor, formatAlleleFrequency } from '@/utils/variant-display';
 import { getDatasetId, getReferenceGenome } from '@/config';
+import { useExclusionState } from '@/composables';
 
-defineProps<{
+const props = defineProps<{
   /** Variants to display in the table */
   variants: DisplayVariant[];
   /** Loading state */
@@ -276,8 +304,48 @@ defineProps<{
   populationCode?: string | null;
 }>();
 
+// Get exclusion state composable
+const {
+  excludeAll,
+  includeVariant,
+  toggleVariant,
+  isExcluded,
+} = useExclusionState();
+
+// All variants are included (none excluded)
+const allIncluded = computed(() => {
+  if (!props.variants.length) return true;
+  return props.variants.every(v => !isExcluded(v.variant_id));
+});
+
+// Some but not all variants are excluded
+const someExcluded = computed(() => {
+  if (!props.variants.length) return false;
+  const excludedInTable = props.variants.filter(v => isExcluded(v.variant_id));
+  return excludedInTable.length > 0 && excludedInTable.length < props.variants.length;
+});
+
+// Handle header checkbox toggle
+function handleHeaderToggle(include: boolean) {
+  if (include) {
+    // Include all variants in this table
+    for (const v of props.variants) {
+      includeVariant(v.variant_id);
+    }
+  } else {
+    // Exclude all variants in this table
+    excludeAll(props.variants.map(v => v.variant_id));
+  }
+}
+
+// Row class for excluded variant styling
+function getRowClass(item: DisplayVariant): string {
+  return isExcluded(item.variant_id) ? 'excluded-row' : '';
+}
+
 // Table headers with sorting configuration
 const headers = ref([
+  { title: '', key: 'include', sortable: false, width: '48px' },
   { title: 'Variant ID', key: 'variant_id', sortable: true },
   { title: 'Consequence', key: 'consequence', sortable: true },
   { title: 'Allele Freq', key: 'alleleFrequency', sortable: true, align: 'end' as const },
@@ -372,5 +440,19 @@ function formatClinvarStatus(status: string): string {
 <style scoped>
 .text-mono {
   font-family: monospace;
+}
+
+/* Excluded row styling */
+:deep(.excluded-row) {
+  opacity: 0.6;
+}
+
+:deep(.excluded-row) td {
+  color: rgba(var(--v-theme-on-surface), 0.6) !important;
+}
+
+/* Maintain hover for re-inclusion */
+:deep(.excluded-row:hover) {
+  opacity: 0.8;
 }
 </style>
