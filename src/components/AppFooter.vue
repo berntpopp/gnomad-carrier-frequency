@@ -1,5 +1,8 @@
 <template>
-  <v-footer app class="text-caption text-medium-emphasis justify-center">
+  <v-footer
+    app
+    class="text-caption text-medium-emphasis justify-center"
+  >
     <a
       :href="releasesUrl"
       target="_blank"
