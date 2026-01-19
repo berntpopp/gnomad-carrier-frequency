@@ -11,6 +11,10 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
+// Accessibility
+import VueAnnouncer from '@vue-a11y/announcer'
+import '@vue-a11y/announcer/dist/style.css'
+
 import App from './App.vue'
 import { graphqlClient } from '@/api'
 
@@ -46,7 +50,8 @@ const vuetify = createVuetify({
 })
 
 const app = createApp(App)
-app.use(pinia)  // Must be before other plugins that might use stores
+app.use(VueAnnouncer)  // Register before pinia for route announcements (if router added later)
+app.use(pinia)
 app.use(vuetify)
 app.use(graphqlClient)
 app.mount('#app')
