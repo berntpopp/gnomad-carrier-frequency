@@ -24,3 +24,6 @@ export type { UseVariantFiltersReturn } from './useVariantFilters';
 
 export { useClingenValidity } from './useClingenValidity';
 export type { UseClingenValidityReturn } from './useClingenValidity';
+
+export { useLogger } from './useLogger';
+export type { UseLoggerReturn } from './useLogger';
