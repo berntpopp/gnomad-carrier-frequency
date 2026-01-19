@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <AppBar />
+    <AppBar @openSettings="showSettings = true" />
 
     <v-main>
       <v-container max-width="900">
@@ -16,11 +16,17 @@
     </v-main>
 
     <AppFooter />
+
+    <SettingsDialog v-model="showSettings" />
   </v-app>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import AppBar from '@/components/AppBar.vue';
 import AppFooter from '@/components/AppFooter.vue';
+import SettingsDialog from '@/components/SettingsDialog.vue';
 import WizardStepper from '@/components/wizard/WizardStepper.vue';
+
+const showSettings = ref(false);
 </script>
