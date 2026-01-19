@@ -18,3 +18,6 @@ export type { UseAppThemeReturn } from './useTheme';
 
 export { useAppAnnouncer } from './useAppAnnouncer';
 export type { UseAppAnnouncerReturn } from './useAppAnnouncer';
+
+export { useVariantFilters } from './useVariantFilters';
+export type { UseVariantFiltersReturn } from './useVariantFilters';
