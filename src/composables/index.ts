@@ -6,3 +6,6 @@ export type { UseGeneVariantsReturn } from './useGeneVariants';
 
 export { useCarrierFrequency } from './useCarrierFrequency';
 export type { UseCarrierFrequencyReturn } from './useCarrierFrequency';
+
+export { useWizard } from './useWizard';
+export type { UseWizardReturn } from './useWizard';
