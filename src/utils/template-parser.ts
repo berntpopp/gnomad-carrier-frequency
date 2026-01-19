@@ -39,7 +39,7 @@ export function parseTemplate(template: string): TemplateSegment[] {
     // Variable
     segments.push({
       type: 'variable',
-      content: match[2], // Variable name without braces
+      content: match[2]!, // Variable name without braces (guaranteed by regex)
       raw: match[1], // Full {{variable}} string
     });
 
