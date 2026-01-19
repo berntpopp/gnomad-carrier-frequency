@@ -36,13 +36,17 @@ import SettingsDialog from '@/components/SettingsDialog.vue';
 import LogViewerPanel from '@/components/LogViewerPanel.vue';
 import WizardStepper from '@/components/wizard/WizardStepper.vue';
 import { useLogStore } from '@/stores/useLogStore';
-import { useWizard } from '@/composables';
+import { useWizard, useUrlState } from '@/composables';
 
 const showSettings = ref(false);
 const showLogViewer = ref(false);
 
 // Wizard reset
 const { resetWizard } = useWizard();
+
+// Initialize URL state synchronization
+// This handles restoring state from URL on mount and updating URL as state changes
+useUrlState();
 
 function handleReset() {
   resetWizard();
