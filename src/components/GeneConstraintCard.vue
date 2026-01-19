@@ -116,16 +116,47 @@
           </div>
         </div>
 
-        <!-- Quality flags warning -->
+        <!-- Low Coverage Warning - separate from constraint quality flags -->
         <v-alert
-          v-if="constraint.flags && constraint.flags.length > 0"
+          v-if="hasLowCoverage"
+          type="warning"
+          variant="tonal"
+          density="compact"
+          class="mt-3"
+        >
+          <template #title>
+            <div class="d-flex align-center">
+              <v-icon
+                start
+                size="small"
+              >
+                mdi-signal-off
+              </v-icon>
+              Low Exome Coverage
+            </div>
+          </template>
+          <template #text>
+            <div class="text-body-2">
+              This gene has regions with low sequencing coverage in gnomAD.
+              Carrier frequency estimates may be less reliable due to potential
+              undetected variants.
+            </div>
+            <div class="text-caption text-medium-emphasis mt-1">
+              Consider this limitation when interpreting results.
+            </div>
+          </template>
+        </v-alert>
+
+        <!-- Quality flags warning (non-coverage flags) -->
+        <v-alert
+          v-if="nonCoverageFlags.length > 0"
           type="warning"
           variant="tonal"
           density="compact"
           class="mt-3"
         >
           <div class="text-caption">
-            Quality flags: {{ constraint.flags.join(', ') }}
+            Quality flags: {{ nonCoverageFlags.join(', ') }}
           </div>
         </v-alert>
       </template>
@@ -158,6 +189,31 @@ const loeufInterpretation = computed(() =>
 const pliInterpretation = computed(() =>
   getPliInterpretation(props.constraint?.pLI ?? null)
 );
+
+// Check for coverage-related flags
+const hasLowCoverage = computed(() => {
+  const flags = props.constraint?.flags;
+  if (!flags || flags.length === 0) return false;
+
+  // gnomAD flags include: 'lof_too_many', 'no_lof_constraint', 'low_coverage', etc.
+  return flags.some(flag =>
+    flag.toLowerCase().includes('coverage') ||
+    flag.toLowerCase().includes('no_constraint') ||
+    flag.toLowerCase().includes('no_lof')
+  );
+});
+
+// Filter out coverage-related flags for the general quality flags display
+const nonCoverageFlags = computed(() => {
+  const flags = props.constraint?.flags;
+  if (!flags || flags.length === 0) return [];
+
+  return flags.filter(flag =>
+    !flag.toLowerCase().includes('coverage') &&
+    !flag.toLowerCase().includes('no_constraint') &&
+    !flag.toLowerCase().includes('no_lof')
+  );
+});
 </script>
 
 <style scoped>
