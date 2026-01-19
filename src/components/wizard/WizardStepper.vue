@@ -1,5 +1,8 @@
 <template>
-  <v-stepper v-model="state.currentStep" flat>
+  <v-stepper
+    v-model="state.currentStep"
+    flat
+  >
     <v-stepper-header>
       <v-stepper-item
         :complete="state.currentStep > 1"
@@ -85,7 +88,12 @@
     >
       {{ errorMessage }}
       <template #append>
-        <v-btn variant="text" @click="refetch">Retry</v-btn>
+        <v-btn
+          variant="text"
+          @click="refetch"
+        >
+          Retry
+        </v-btn>
       </template>
     </v-alert>
   </v-stepper>

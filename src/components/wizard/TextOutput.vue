@@ -1,14 +1,32 @@
 <template>
-  <v-card class="mt-4" variant="outlined">
+  <v-card
+    class="mt-4"
+    variant="outlined"
+  >
     <!-- Header row -->
     <v-card-title class="d-flex align-center flex-wrap ga-2 pb-0">
       <span>{{ labels.title }}</span>
       <v-spacer />
 
       <!-- Language toggle -->
-      <v-btn-toggle v-model="languageModel" mandatory density="compact" variant="outlined">
-        <v-btn value="de" size="small">DE</v-btn>
-        <v-btn value="en" size="small">EN</v-btn>
+      <v-btn-toggle
+        v-model="languageModel"
+        mandatory
+        density="compact"
+        variant="outlined"
+      >
+        <v-btn
+          value="de"
+          size="small"
+        >
+          DE
+        </v-btn>
+        <v-btn
+          value="en"
+          size="small"
+        >
+          EN
+        </v-btn>
       </v-btn-toggle>
 
       <!-- Gender style selector (German only) -->
@@ -38,7 +56,9 @@
     <v-card-text>
       <!-- Perspective selector -->
       <div class="mb-4">
-        <div class="text-body-2 text-medium-emphasis mb-2">{{ labels.perspective }}</div>
+        <div class="text-body-2 text-medium-emphasis mb-2">
+          {{ labels.perspective }}
+        </div>
         <v-btn-toggle
           v-model="selectedPerspective"
           mandatory
@@ -46,13 +66,22 @@
           color="primary"
           variant="outlined"
         >
-          <v-btn value="affected" size="small">
+          <v-btn
+            value="affected"
+            size="small"
+          >
             {{ labels.perspectives.affected }}
           </v-btn>
-          <v-btn value="carrier" size="small">
+          <v-btn
+            value="carrier"
+            size="small"
+          >
             {{ labels.perspectives.carrier }}
           </v-btn>
-          <v-btn value="familyMember" size="small">
+          <v-btn
+            value="familyMember"
+            size="small"
+          >
             {{ labels.perspectives.familyMember }}
           </v-btn>
         </v-btn-toggle>
@@ -60,7 +89,9 @@
 
       <!-- Section toggles -->
       <div class="mb-4">
-        <div class="text-body-2 text-medium-emphasis mb-2">{{ labels.sections }}</div>
+        <div class="text-body-2 text-medium-emphasis mb-2">
+          {{ labels.sections }}
+        </div>
         <div class="d-flex flex-wrap ga-2">
           <v-chip
             v-for="section in availableSections"
@@ -76,9 +107,15 @@
       </div>
 
       <!-- Text preview -->
-      <v-card variant="tonal" class="mb-4">
+      <v-card
+        variant="tonal"
+        class="mb-4"
+      >
         <v-card-text>
-          <pre class="text-body-2" style="white-space: pre-wrap; font-family: inherit; margin: 0;">{{ generatedText || labels.noText }}</pre>
+          <pre
+            class="text-body-2"
+            style="white-space: pre-wrap; font-family: inherit; margin: 0;"
+          >{{ generatedText || labels.noText }}</pre>
         </v-card-text>
       </v-card>
 

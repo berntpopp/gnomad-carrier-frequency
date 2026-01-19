@@ -1,28 +1,50 @@
 <template>
   <div>
-    <h3 class="text-h6 mb-4">Frequency Source</h3>
+    <h3 class="text-h6 mb-4">
+      Frequency Source
+    </h3>
     <p class="text-body-2 text-medium-emphasis mb-4">
       Choose the source for carrier frequency calculation.
     </p>
 
     <v-card variant="outlined">
-      <v-tabs v-model="activeTab" bg-color="primary">
-        <v-tab value="gnomad">gnomAD</v-tab>
-        <v-tab value="literature">Literature</v-tab>
-        <v-tab value="default">Default</v-tab>
+      <v-tabs
+        v-model="activeTab"
+        bg-color="primary"
+      >
+        <v-tab value="gnomad">
+          gnomAD
+        </v-tab>
+        <v-tab value="literature">
+          Literature
+        </v-tab>
+        <v-tab value="default">
+          Default
+        </v-tab>
       </v-tabs>
 
       <v-card-text>
         <v-window v-model="activeTab">
           <!-- gnomAD Tab -->
           <v-window-item value="gnomad">
-            <div v-if="gnomadLoading" class="d-flex align-center justify-center pa-4">
-              <v-progress-circular indeterminate color="primary" class="mr-4" />
+            <div
+              v-if="gnomadLoading"
+              class="d-flex align-center justify-center pa-4"
+            >
+              <v-progress-circular
+                indeterminate
+                color="primary"
+                class="mr-4"
+              />
               <span class="text-body-2">Calculating carrier frequency from gnomAD...</span>
             </div>
 
             <div v-else-if="usingDefault">
-              <v-alert type="info" variant="tonal" class="mb-4">
+              <v-alert
+                type="info"
+                variant="tonal"
+                class="mb-4"
+              >
                 No qualifying pathogenic variants found in gnomAD.
                 Using default carrier frequency assumption.
               </v-alert>
@@ -32,7 +54,11 @@
             </div>
 
             <div v-else-if="gnomadFrequency">
-              <v-alert type="success" variant="tonal" class="mb-4">
+              <v-alert
+                type="success"
+                variant="tonal"
+                class="mb-4"
+              >
                 Carrier frequency calculated from gnomAD data.
               </v-alert>
               <p class="text-body-1 mb-4">
@@ -43,7 +69,10 @@
             </div>
 
             <div v-else>
-              <v-alert type="warning" variant="tonal">
+              <v-alert
+                type="warning"
+                variant="tonal"
+              >
                 Unable to calculate carrier frequency. Please select a gene first.
               </v-alert>
             </div>
@@ -78,7 +107,11 @@
 
           <!-- Default Tab -->
           <v-window-item value="default">
-            <v-alert type="info" variant="tonal" class="mb-4">
+            <v-alert
+              type="info"
+              variant="tonal"
+              class="mb-4"
+            >
               Using default carrier frequency assumption: <strong>1:100 (1.00%)</strong>
             </v-alert>
             <p class="text-body-2">
@@ -91,7 +124,12 @@
     </v-card>
 
     <div class="d-flex justify-space-between mt-6">
-      <v-btn variant="text" @click="$emit('back')">Back</v-btn>
+      <v-btn
+        variant="text"
+        @click="$emit('back')"
+      >
+        Back
+      </v-btn>
       <v-btn
         color="primary"
         :disabled="!isCurrentSourceValid"

@@ -1,11 +1,23 @@
 <template>
-  <v-card v-if="result && !loading" class="mt-4">
+  <v-card
+    v-if="result && !loading"
+    class="mt-4"
+  >
     <v-card-title>
       {{ result.gene }} Carrier Frequency
-      <v-chip v-if="usingDefault" color="warning" size="small" class="ml-2">
+      <v-chip
+        v-if="usingDefault"
+        color="warning"
+        size="small"
+        class="ml-2"
+      >
         Default ({{ formatDefaultFreq }})
       </v-chip>
-      <v-chip color="info" size="small" class="ml-2">
+      <v-chip
+        color="info"
+        size="small"
+        class="ml-2"
+      >
         {{ versionConfig.displayName }}
       </v-chip>
     </v-card-title>
@@ -37,10 +49,18 @@
       <v-table density="compact">
         <thead>
           <tr>
-            <th>Population</th>
-            <th class="text-right">Carrier Frequency</th>
-            <th class="text-right">Ratio</th>
-            <th>Notes</th>
+            <th>
+              Population
+            </th>
+            <th class="text-right">
+              Carrier Frequency
+            </th>
+            <th class="text-right">
+              Ratio
+            </th>
+            <th>
+              Notes
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -85,10 +105,18 @@
     </v-card-text>
   </v-card>
 
-  <v-card v-else-if="loading" class="mt-4">
+  <v-card
+    v-else-if="loading"
+    class="mt-4"
+  >
     <v-card-text class="text-center py-8">
-      <v-progress-circular indeterminate color="primary" />
-      <div class="mt-2">Loading variant data...</div>
+      <v-progress-circular
+        indeterminate
+        color="primary"
+      />
+      <div class="mt-2">
+        Loading variant data...
+      </div>
     </v-card-text>
   </v-card>
 
@@ -100,7 +128,12 @@
   >
     {{ error }}
     <template #append>
-      <v-btn variant="text" @click="$emit('retry')">Retry</v-btn>
+      <v-btn
+        variant="text"
+        @click="$emit('retry')"
+      >
+        Retry
+      </v-btn>
     </template>
   </v-alert>
 </template>

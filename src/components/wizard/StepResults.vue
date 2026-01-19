@@ -1,12 +1,21 @@
 <template>
   <div>
-    <h3 class="text-h6 mb-4">Results</h3>
+    <h3 class="text-h6 mb-4">
+      Results
+    </h3>
 
     <!-- Summary card -->
-    <v-card v-if="result" class="mb-4">
+    <v-card
+      v-if="result"
+      class="mb-4"
+    >
       <v-card-title class="d-flex align-center flex-wrap">
         {{ result.gene }} - Carrier Frequency Results
-        <v-chip :color="sourceChipColor" size="small" class="ml-2">
+        <v-chip
+          :color="sourceChipColor"
+          size="small"
+          class="ml-2"
+        >
           {{ sourceAttribution }}
         </v-chip>
       </v-card-title>
@@ -51,26 +60,50 @@
     >
       <template #item="{ item }">
         <tr :class="getRowClass(item)">
-          <td>{{ item.label }}</td>
-          <td class="text-right">{{ formatPercent(item.carrierFrequency) }}</td>
-          <td class="text-right">{{ formatRatio(item.carrierFrequency) }}</td>
-          <td class="text-right">{{ item.recurrenceRisk }}</td>
-          <td class="text-right">{{ item.alleleCount }}</td>
-          <td class="text-right">{{ item.alleleNumber?.toLocaleString() ?? '-' }}</td>
           <td>
-            <v-chip v-if="item.notes" color="info" size="x-small">
-              <v-icon start size="x-small">mdi-star</v-icon>
+            {{ item.label }}
+          </td>
+          <td class="text-right">
+            {{ formatPercent(item.carrierFrequency) }}
+          </td>
+          <td class="text-right">
+            {{ formatRatio(item.carrierFrequency) }}
+          </td>
+          <td class="text-right">
+            {{ item.recurrenceRisk }}
+          </td>
+          <td class="text-right">
+            {{ item.alleleCount }}
+          </td>
+          <td class="text-right">
+            {{ item.alleleNumber?.toLocaleString() ?? '-' }}
+          </td>
+          <td>
+            <v-chip
+              v-if="item.notes"
+              color="info"
+              size="x-small"
+            >
+              <v-icon
+                start
+                size="x-small"
+              >
+                mdi-star
+              </v-icon>
               {{ item.notes }}
             </v-chip>
           </td>
         </tr>
       </template>
 
-      <template #bottom></template>
+      <template #bottom />
     </v-data-table>
 
     <!-- Range info -->
-    <div v-if="result" class="text-body-2 mt-4 text-medium-emphasis">
+    <div
+      v-if="result"
+      class="text-body-2 mt-4 text-medium-emphasis"
+    >
       Range across populations:
       {{ formatRatio(result.minFrequency) }}
       to
@@ -92,8 +125,17 @@
 
     <!-- Navigation buttons -->
     <div class="d-flex justify-space-between mt-6">
-      <v-btn variant="text" @click="$emit('back')">Back</v-btn>
-      <v-btn variant="outlined" color="primary" @click="$emit('restart')">
+      <v-btn
+        variant="text"
+        @click="$emit('back')"
+      >
+        Back
+      </v-btn>
+      <v-btn
+        variant="outlined"
+        color="primary"
+        @click="$emit('restart')"
+      >
         Start Over
       </v-btn>
     </div>

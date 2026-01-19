@@ -1,41 +1,66 @@
 <template>
   <div>
-    <h3 class="text-h6 mb-4">Index Patient Status</h3>
+    <h3 class="text-h6 mb-4">
+      Index Patient Status
+    </h3>
     <p class="text-body-2 text-medium-emphasis mb-4">
       Select the genetic status of the index patient.
     </p>
 
-    <v-card variant="outlined" class="pa-4 mb-4">
-      <v-radio-group v-model="statusModel" hide-details>
+    <v-card
+      variant="outlined"
+      class="pa-4 mb-4"
+    >
+      <v-radio-group
+        v-model="statusModel"
+        hide-details
+      >
         <v-radio value="heterozygous">
           <template #label>
             <div>
               <strong>Heterozygous carrier</strong>
-              <div class="text-caption text-medium-emphasis">One pathogenic allele detected</div>
+              <div class="text-caption text-medium-emphasis">
+                One pathogenic allele detected
+              </div>
             </div>
           </template>
         </v-radio>
-        <v-radio value="homozygous" class="mt-2">
+        <v-radio
+          value="homozygous"
+          class="mt-2"
+        >
           <template #label>
             <div>
               <strong>Homozygous affected</strong>
-              <div class="text-caption text-medium-emphasis">Two copies of same pathogenic allele</div>
+              <div class="text-caption text-medium-emphasis">
+                Two copies of same pathogenic allele
+              </div>
             </div>
           </template>
         </v-radio>
-        <v-radio value="compound_het_confirmed" class="mt-2">
+        <v-radio
+          value="compound_het_confirmed"
+          class="mt-2"
+        >
           <template #label>
             <div>
               <strong>Compound heterozygous (confirmed)</strong>
-              <div class="text-caption text-medium-emphasis">Two different pathogenic alleles, phase confirmed</div>
+              <div class="text-caption text-medium-emphasis">
+                Two different pathogenic alleles, phase confirmed
+              </div>
             </div>
           </template>
         </v-radio>
-        <v-radio value="compound_het_assumed" class="mt-2">
+        <v-radio
+          value="compound_het_assumed"
+          class="mt-2"
+        >
           <template #label>
             <div>
               <strong>Compound heterozygous (assumed)</strong>
-              <div class="text-caption text-medium-emphasis">Two pathogenic alleles, phase assumed by phenotype</div>
+              <div class="text-caption text-medium-emphasis">
+                Two pathogenic alleles, phase assumed by phenotype
+              </div>
             </div>
           </template>
         </v-radio>
@@ -43,8 +68,18 @@
     </v-card>
 
     <div class="d-flex justify-space-between mt-6">
-      <v-btn variant="text" @click="$emit('back')">Back</v-btn>
-      <v-btn color="primary" @click="$emit('complete')">Continue</v-btn>
+      <v-btn
+        variant="text"
+        @click="$emit('back')"
+      >
+        Back
+      </v-btn>
+      <v-btn
+        color="primary"
+        @click="$emit('complete')"
+      >
+        Continue
+      </v-btn>
     </div>
   </div>
 </template>

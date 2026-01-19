@@ -1,11 +1,16 @@
 <template>
   <div>
-    <h3 class="text-h6 mb-4">Select Gene</h3>
+    <h3 class="text-h6 mb-4">
+      Select Gene
+    </h3>
     <p class="text-body-2 text-medium-emphasis mb-4">
       Search for a gene symbol to calculate carrier frequency.
     </p>
 
-    <div class="mb-4" style="max-width: 300px">
+    <div
+      class="mb-4"
+      style="max-width: 300px"
+    >
       <VersionSelector />
     </div>
 
