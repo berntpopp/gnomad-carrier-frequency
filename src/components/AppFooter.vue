@@ -3,7 +3,8 @@
     app
     class="text-caption text-medium-emphasis justify-center ga-2"
   >
-    <v-tooltip text="Source code on GitHub" location="top" aria-label="Source code on GitHub">
+    <!-- GitHub -->
+    <v-tooltip text="Source code on GitHub" location="top">
       <template #activator="{ props }">
         <v-btn
           v-bind="props"
@@ -22,6 +23,7 @@
 
     <span class="mx-1">|</span>
 
+    <!-- Version -->
     <a
       :href="releasesUrl"
       target="_blank"
@@ -33,29 +35,31 @@
 
     <span class="mx-1">|</span>
 
-    <v-tooltip text="gnomAD database" location="top" aria-label="gnomAD database">
+    <!-- Data Sources Dialog -->
+    <DataSourcesDialog>
       <template #activator="{ props }">
-        <v-btn
-          v-bind="props"
-          icon
-          variant="text"
-          size="small"
-          href="https://gnomad.broadinstitute.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="gnomAD database"
-        >
-          <v-icon size="small">mdi-database</v-icon>
-        </v-btn>
+        <v-tooltip text="Data sources" location="top">
+          <template #activator="{ props: tooltipProps }">
+            <v-btn
+              v-bind="{ ...props, ...tooltipProps }"
+              icon
+              variant="text"
+              size="small"
+              aria-label="View data sources"
+            >
+              <v-icon size="small">mdi-database</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
       </template>
-    </v-tooltip>
+    </DataSourcesDialog>
 
     <span class="mx-1">|</span>
 
     <!-- Methodology Dialog -->
     <MethodologyDialog>
       <template #activator="{ props }">
-        <v-tooltip text="Calculation methodology" location="top">
+        <v-tooltip text="Methodology" location="top">
           <template #activator="{ props: tooltipProps }">
             <v-btn
               v-bind="{ ...props, ...tooltipProps }"
@@ -89,15 +93,61 @@
         </v-tooltip>
       </template>
     </FaqDialog>
+
+    <!-- About Dialog -->
+    <AboutDialog>
+      <template #activator="{ props }">
+        <v-tooltip text="About" location="top">
+          <template #activator="{ props: tooltipProps }">
+            <v-btn
+              v-bind="{ ...props, ...tooltipProps }"
+              icon
+              variant="text"
+              size="small"
+              aria-label="About this application"
+            >
+              <v-icon size="small">mdi-information-outline</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+      </template>
+    </AboutDialog>
+
+    <span class="mx-1">|</span>
+
+    <!-- Disclaimer (reopen) -->
+    <v-tooltip text="View clinical disclaimer" location="top">
+      <template #activator="{ props }">
+        <v-btn
+          v-bind="props"
+          icon
+          variant="text"
+          size="small"
+          aria-label="View clinical disclaimer"
+          @click="reopenDisclaimer"
+        >
+          <v-icon size="small">mdi-alert-circle-outline</v-icon>
+        </v-btn>
+      </template>
+    </v-tooltip>
   </v-footer>
 </template>
 
 <script setup lang="ts">
 import MethodologyDialog from '@/components/MethodologyDialog.vue';
 import FaqDialog from '@/components/FaqDialog.vue';
+import AboutDialog from '@/components/AboutDialog.vue';
+import DataSourcesDialog from '@/components/DataSourcesDialog.vue';
+import { useAppStore } from '@/stores/useAppStore';
 
 const version = import.meta.env.VITE_APP_VERSION;
 const releasesUrl = 'https://github.com/berntpopp/gnomad-carrier-frequency/releases';
+
+const appStore = useAppStore();
+
+const reopenDisclaimer = () => {
+  appStore.resetDisclaimer();
+};
 </script>
 
 <style scoped>
