@@ -14,18 +14,18 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 **Milestone:** v1.1 Release-Ready
-**Phase:** 9 - ClinGen + Documentation - IN PROGRESS
-**Plan:** 6 of 7 complete
-**Status:** In progress
+**Phase:** 9 - ClinGen + Documentation - COMPLETE
+**Plan:** 7 of 7 complete
+**Status:** Phase complete
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [########--] ~85% - Phase 9 in progress
+v1.1 Release-Ready: [#########-] ~90% - Phase 9 complete
 ```
 
-**Overall:** Phase 9 started (ClinGen + Documentation)
+**Overall:** Phase 9 complete, ready for Phase 10
 
 ---
 
@@ -50,7 +50,7 @@ v1.1 Release-Ready: [########--] ~85% - Phase 9 in progress
 | 6 | App Shell | 5 | Complete (2/2 plans) |
 | 7 | SEO + Accessibility | 9 | Complete (4/4 plans) |
 | 8 | Filtering + Variant Display | 14 | Complete (4/4 plans) |
-| 9 | ClinGen + Documentation | 15 | In Progress (6/7 plans) |
+| 9 | ClinGen + Documentation | 15 | Complete (7/7 plans) |
 | 10 | Export + Templates + Logging | 22 | Pending |
 
 ---
@@ -93,6 +93,9 @@ v1.1 Release-Ready: [########--] ~85% - Phase 9 in progress
 | Persistent disclaimer modal | Cannot dismiss without acknowledgment - ensures users read clinical disclaimer | 2026-01-19 |
 | carrier-freq-app storage key | Namespaced localStorage key for app-level state | 2026-01-19 |
 | DataSourcesDialog replaces gnomAD link | More comprehensive - shows all data sources and versions in one place | 2026-01-19 |
+| Separate coverage warning from quality flags | Coverage issues warrant distinct alert for clarity | 2026-01-19 |
+| Coverage detection via flag keywords | Check for coverage/no_constraint/no_lof in flags array | 2026-01-19 |
+| Consistent tooltip-text class | 280px max-width for readable tooltips across components | 2026-01-19 |
 
 ### Blockers
 
@@ -122,7 +125,8 @@ None currently.
 - [x] Execute 09-04-PLAN.md (Disclaimer banner and ClinGen settings)
 - [x] Execute 09-05-PLAN.md (Help system: methodology + FAQ)
 - [x] Execute 09-06-PLAN.md (About dialog, data sources, README)
-- [ ] Execute remaining Phase 9 plan (07)
+- [x] Execute 09-07-PLAN.md (Contextual help tooltips + coverage warning)
+- [ ] Run `/gsd:plan-phase 10` to create Export + Templates + Logging plans
 
 ---
 
@@ -131,8 +135,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 9 Plan 06 - About Dialog, Data Sources, README
-**Next:** Execute Phase 9 plan 07
+**Completed:** Phase 9 Plan 07 - Contextual Help Tooltips + Coverage Warning
+**Next:** Plan Phase 10 (Export + Templates + Logging)
 
 ### Handoff Notes
 
@@ -141,7 +145,7 @@ v1.1 roadmap derived from requirements and research:
 - Phase 6: App Shell (navigation, logo, favicon, settings access) - COMPLETE
 - Phase 7: SEO + Accessibility - COMPLETE (4/4 plans)
 - Phase 8: Filtering + Variant Display (configurable filters, variant modal) - COMPLETE
-- Phase 9: ClinGen + Documentation (clinical validation, help content) - PENDING
+- Phase 9: ClinGen + Documentation (clinical validation, help content) - COMPLETE
 - Phase 10: Export + Templates + Logging (data export, template editor, debug tools) - PENDING
 
 Key pitfalls from research:
@@ -155,14 +159,14 @@ Key pitfalls from research:
 - Plan 03: Filter UI component + useVariantFilter composable - COMPLETE
 - Plan 04: Variant modal component with sortable table - COMPLETE
 
-**Phase 9 deliverables (in progress):**
+**Phase 9 deliverables (all complete):**
 - Plan 01: ClinGen infrastructure (types, store, composable) - COMPLETE
 - Plan 02: Gene constraint display (pLI, LOEUF metrics) - COMPLETE
 - Plan 03: ClinGen warning UI (validation in gene/results steps) - COMPLETE
 - Plan 04: Disclaimer and ClinGen settings - COMPLETE
 - Plan 05: Help system (methodology + FAQ) - COMPLETE
 - Plan 06: About dialog, data sources, README - COMPLETE
-- Plan 07: TBD - PENDING
+- Plan 07: Contextual help tooltips + coverage warning - COMPLETE
 
 ---
 
@@ -188,3 +192,5 @@ Key pitfalls from research:
 *09-04 complete: 2026-01-19*
 *09-05 complete: 2026-01-19*
 *09-06 complete: 2026-01-19*
+*09-07 complete: 2026-01-19*
+*Phase 9 complete: 2026-01-19*
