@@ -3,20 +3,37 @@
 import { reactive, computed, watch } from 'vue';
 import type { WizardState, WizardStep, FrequencySource } from '@/types';
 
+// Singleton state - shared across all useWizard() calls
+const state = reactive<WizardState>({
+  currentStep: 1,
+  gene: null,
+  indexStatus: 'heterozygous', // User decision: default to carrier
+  frequencySource: 'gnomad',
+  literatureFrequency: null,
+  literaturePmid: null,
+});
+
+// Downstream reset watcher - runs once at module load
+// When gene changes and we're past step 1, reset downstream state
+watch(
+  () => state.gene,
+  (_newGene, oldGene) => {
+    if (oldGene !== null && state.currentStep > 1) {
+      state.currentStep = 1;
+      state.indexStatus = 'heterozygous';
+      state.frequencySource = 'gnomad';
+      state.literatureFrequency = null;
+      state.literaturePmid = null;
+    }
+  },
+);
+
 /**
  * Composable for managing the 4-step wizard flow.
  * Handles step navigation, validation, and downstream state reset.
+ * Uses singleton state to ensure consistent state across components.
  */
 export function useWizard() {
-  const state = reactive<WizardState>({
-    currentStep: 1,
-    gene: null,
-    indexStatus: 'heterozygous', // User decision: default to carrier
-    frequencySource: 'gnomad',
-    literatureFrequency: null,
-    literaturePmid: null,
-  });
-
   // Step validation computeds
   const step1Valid = computed(() => state.gene !== null);
 
@@ -64,21 +81,6 @@ export function useWizard() {
     3: step1Valid.value && step2Valid.value,
     4: step1Valid.value && step2Valid.value && step3Valid.value,
   }));
-
-  // Downstream reset: when gene changes and we're past step 1, reset
-  watch(
-    () => state.gene,
-    (_newGene, oldGene) => {
-      // Only reset if gene actually changed (not initial set) and we're past step 1
-      if (oldGene !== null && state.currentStep > 1) {
-        state.currentStep = 1;
-        state.indexStatus = 'heterozygous';
-        state.frequencySource = 'gnomad';
-        state.literatureFrequency = null;
-        state.literaturePmid = null;
-      }
-    },
-  );
 
   // Navigation methods
   function nextStep(): void {

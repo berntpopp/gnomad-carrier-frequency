@@ -2,7 +2,10 @@
   <v-app>
     <VueAnnouncer class="sr-only" />
     <DisclaimerBanner />
-    <AppBar @open-settings="showSettings = true" />
+    <AppBar
+      @open-settings="showSettings = true"
+      @reset="handleReset"
+    />
 
     <v-main>
       <v-container max-width="900">
@@ -33,9 +36,17 @@ import SettingsDialog from '@/components/SettingsDialog.vue';
 import LogViewerPanel from '@/components/LogViewerPanel.vue';
 import WizardStepper from '@/components/wizard/WizardStepper.vue';
 import { useLogStore } from '@/stores/useLogStore';
+import { useWizard } from '@/composables';
 
 const showSettings = ref(false);
 const showLogViewer = ref(false);
+
+// Wizard reset
+const { resetWizard } = useWizard();
+
+function handleReset() {
+  resetWizard();
+}
 
 // App startup
 const logStore = useLogStore();
