@@ -50,38 +50,67 @@ export function calculateRecurrenceRisk(
 
 /**
  * Aggregate population frequencies from multiple variants
- * Combines exome and genome data, tracks maximum AN per population
+ *
+ * Key insight: AN (allele number) is the sample size, which is CONSTANT for all
+ * variants in a given population/dataset. We must NOT sum AN across variants.
+ *
+ * Correct approach:
+ * - Sum AC across all variants (each variant contributes different alleles)
+ * - Take max AN for exome + max AN for genome (sample size is constant per dataset)
+ *
+ * Example for NFE population with 2 variants:
+ *   Variant 1: exome AC=100 AN=500k, genome AC=10 AN=50k
+ *   Variant 2: exome AC=50 AN=500k, genome AC=5 AN=50k
+ *   Total AC = 100+10+50+5 = 165
+ *   Total AN = 500k + 50k = 550k (NOT 1.1M by summing all)
  */
 export function aggregatePopulationFrequencies(
   variants: VariantFrequencyData[],
   version: GnomadVersion
-): Map<string, { totalAC: number; maxAN: number }> {
-  const result = new Map<string, { totalAC: number; maxAN: number }>();
+): Map<string, { totalAC: number; totalAN: number }> {
+  const result = new Map<
+    string,
+    { totalAC: number; maxExomeAN: number; maxGenomeAN: number }
+  >();
 
   // Get population codes from config for this version
   const populationCodes = getPopulationCodes(version);
 
   // Initialize all populations from config
   for (const pop of populationCodes) {
-    result.set(pop, { totalAC: 0, maxAN: 0 });
+    result.set(pop, { totalAC: 0, maxExomeAN: 0, maxGenomeAN: 0 });
   }
 
   for (const variant of variants) {
-    const allPopulations = [
-      ...(variant.exome?.populations ?? []),
-      ...(variant.genome?.populations ?? []),
-    ];
-
-    for (const pop of allPopulations) {
+    // Process exome populations - sum AC, track max AN
+    for (const pop of variant.exome?.populations ?? []) {
       if (populationCodes.includes(pop.id)) {
         const current = result.get(pop.id)!;
         current.totalAC += pop.ac;
-        current.maxAN = Math.max(current.maxAN, pop.an);
+        current.maxExomeAN = Math.max(current.maxExomeAN, pop.an);
+      }
+    }
+
+    // Process genome populations - sum AC, track max AN
+    for (const pop of variant.genome?.populations ?? []) {
+      if (populationCodes.includes(pop.id)) {
+        const current = result.get(pop.id)!;
+        current.totalAC += pop.ac;
+        current.maxGenomeAN = Math.max(current.maxGenomeAN, pop.an);
       }
     }
   }
 
-  return result;
+  // Convert to final format: totalAN = maxExomeAN + maxGenomeAN
+  const finalResult = new Map<string, { totalAC: number; totalAN: number }>();
+  for (const [code, data] of result) {
+    finalResult.set(code, {
+      totalAC: data.totalAC,
+      totalAN: data.maxExomeAN + data.maxGenomeAN,
+    });
+  }
+
+  return finalResult;
 }
 
 /**
@@ -89,14 +118,14 @@ export function aggregatePopulationFrequencies(
  * Applies founder effect and low sample size detection using config thresholds
  */
 export function buildPopulationFrequencies(
-  aggregated: Map<string, { totalAC: number; maxAN: number }>,
+  aggregated: Map<string, { totalAC: number; totalAN: number }>,
   globalCarrierFrequency: number | null,
   version: GnomadVersion
 ): PopulationFrequency[] {
   const results: PopulationFrequency[] = [];
 
   for (const [code, data] of aggregated) {
-    const af = calculateAlleleFrequency(data.totalAC, data.maxAN);
+    const af = calculateAlleleFrequency(data.totalAC, data.totalAN);
     const carrierFreq = af !== null ? 2 * af : null;
 
     // Use thresholds from config
@@ -110,8 +139,8 @@ export function buildPopulationFrequencies(
       label: getPopulationLabel(code, version), // Label from config
       carrierFrequency: carrierFreq,
       alleleCount: data.totalAC,
-      alleleNumber: data.maxAN,
-      isLowSampleSize: data.maxAN < lowSampleSizeThreshold, // Threshold from config
+      alleleNumber: data.totalAN,
+      isLowSampleSize: data.totalAN < lowSampleSizeThreshold, // Threshold from config
       isFounderEffect,
     });
   }

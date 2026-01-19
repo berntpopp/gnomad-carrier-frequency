@@ -145,26 +145,36 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   });
 
   // Calculate global carrier frequency
+  // AN (sample size) is CONSTANT across variants, so we must NOT sum AN per variant.
+  // Correct: sum all AC, use max AN (per dataset) then combine exome+genome
   const globalCarrierFrequency = computed((): number | null => {
     if (usingDefault.value) return defaultCarrierFrequency; // From config
     if (!aggregatedPops.value) return null;
 
-    // Sum all pathogenic AFs for global
+    // Track totals: sum AC across variants, max AN per dataset
     let totalAC = 0;
-    let maxAN = 0;
+    let maxExomeAN = 0;
+    let maxGenomeAN = 0;
+
     for (const variant of pathogenicVariants.value) {
+      // Sum AC from both exome and genome (each variant contributes alleles)
       const exomeAC = variant.exome?.ac ?? 0;
       const genomeAC = variant.genome?.ac ?? 0;
       totalAC += exomeAC + genomeAC;
 
+      // Track max AN per dataset (sample size is constant, take max to handle call rate variation)
       const exomeAN = variant.exome?.an ?? 0;
       const genomeAN = variant.genome?.an ?? 0;
-      maxAN = Math.max(maxAN, exomeAN, genomeAN);
+      maxExomeAN = Math.max(maxExomeAN, exomeAN);
+      maxGenomeAN = Math.max(maxGenomeAN, genomeAN);
     }
 
-    if (maxAN === 0) return null;
-    const globalAF = totalAC / maxAN;
-    return 2 * globalAF; // Carrier frequency = 2 x AF
+    // Combined AN = exome sample size + genome sample size
+    const totalAN = maxExomeAN + maxGenomeAN;
+    if (totalAN === 0) return null;
+
+    const globalAF = totalAC / totalAN;
+    return 2 * globalAF; // Carrier frequency = 2 × AF
   });
 
   // Build population frequency array (uses config for labels/thresholds)
