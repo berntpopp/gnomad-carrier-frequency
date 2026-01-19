@@ -1,0 +1,94 @@
+{
+  "title": "Frequently Asked Questions",
+  "categories": [
+    {
+      "id": "gnomad-data",
+      "title": "gnomAD Data",
+      "questions": [
+        {
+          "id": "what-is-gnomad",
+          "question": "What is gnomAD?",
+          "answer": "The Genome Aggregation Database (gnomAD) is a resource developed by the Broad Institute that aggregates exome and genome sequencing data from large-scale sequencing projects. It provides allele frequency information from over 140,000 individuals (v4), making it the largest publicly available reference for population allele frequencies."
+        },
+        {
+          "id": "gnomad-versions",
+          "question": "What gnomAD versions are available?",
+          "answer": "This calculator supports gnomAD v4.1 (latest, GRCh38) and v2.1.1 (legacy, GRCh37). Version 4 includes more samples and uses the updated GRCh38 reference genome. Version 2.1.1 may still be preferred for some clinical workflows that use GRCh37."
+        },
+        {
+          "id": "population-categories",
+          "question": "How are populations defined in gnomAD?",
+          "answer": "gnomAD uses genetic ancestry-based population categories including: African/African American (afr), Admixed American (amr), Ashkenazi Jewish (asj), East Asian (eas), Finnish (fin), Non-Finnish European (nfe), Middle Eastern (mid), South Asian (sas), and remaining individuals. These are based on principal component analysis of genetic data, not self-reported ethnicity."
+        },
+        {
+          "id": "allele-frequency",
+          "question": "What does allele frequency mean?",
+          "answer": "Allele frequency is the proportion of chromosomes in a population that carry a specific variant. For autosomal genes, each individual has two copies, so 1000 individuals contribute 2000 alleles. An allele frequency of 0.01 means 1% of chromosomes carry that variant."
+        }
+      ]
+    },
+    {
+      "id": "calculations",
+      "title": "Calculations",
+      "questions": [
+        {
+          "id": "carrier-vs-affected",
+          "question": "What is the difference between carrier frequency and affected frequency?",
+          "answer": "Carrier frequency (2pq \u2248 2q) represents the proportion of individuals who carry one copy of a pathogenic variant but are unaffected. Affected frequency (q\u00b2) represents the proportion of individuals who carry two pathogenic variants and are affected by the condition. For rare recessive conditions, carrier frequency is much higher than affected frequency."
+        },
+        {
+          "id": "recurrence-risk",
+          "question": "How is recurrence risk calculated?",
+          "answer": "For autosomal recessive conditions, if both parents are carriers, each child has a 25% (1 in 4) chance of being affected. If one parent is affected and one is a carrier, the risk is 50%. The calculator shows carrier frequency to help estimate the probability that a partner is a carrier."
+        },
+        {
+          "id": "why-sum-af",
+          "question": "Why do you sum allele frequencies instead of using a single variant?",
+          "answer": "Most genes have multiple pathogenic variants that can cause the same condition. Summing the frequencies of all known pathogenic variants gives a more accurate estimate of total disease allele frequency. Using only one variant would underestimate carrier frequency."
+        }
+      ]
+    },
+    {
+      "id": "usage",
+      "title": "Using the Calculator",
+      "questions": [
+        {
+          "id": "which-population",
+          "question": "Which population should I use?",
+          "answer": "Select the population that best matches your patient's genetic ancestry. If ancestry is unknown or mixed, consider using 'Global' frequencies. For specific ethnic backgrounds, use the corresponding gnomAD population. Note that self-reported ethnicity may not always match genetic ancestry."
+        },
+        {
+          "id": "filter-settings",
+          "question": "What do the filter settings mean?",
+          "answer": "LoF HC (Loss-of-Function High Confidence): Includes predicted loss-of-function variants. Missense: Includes missense variants (may increase carrier frequency estimates). ClinVar P/LP: Includes variants classified as Pathogenic or Likely Pathogenic in ClinVar. Star threshold: Minimum ClinVar review stars required (higher = more evidence)."
+        },
+        {
+          "id": "no-variants",
+          "question": "Why does the calculator show no variants for my gene?",
+          "answer": "This can happen if: (1) No pathogenic variants are annotated for this gene in ClinVar, (2) The gene is not well-covered in gnomAD, (3) Your filter settings are too restrictive. Try enabling missense variants or lowering the ClinVar star threshold."
+        }
+      ]
+    },
+    {
+      "id": "limitations",
+      "title": "Limitations",
+      "questions": [
+        {
+          "id": "clinical-use",
+          "question": "Can I use these results for clinical decisions?",
+          "answer": "This tool is intended for research and educational purposes. Results should be verified by a clinical laboratory before use in patient care. The calculator provides estimates based on population data and may not reflect individual patient risk accurately."
+        },
+        {
+          "id": "founder-effects",
+          "question": "What about founder effects?",
+          "answer": "Founder effects can cause certain pathogenic variants to be much more common in specific populations than the general population (e.g., CFTR F508del in Europeans, HBB sickle cell variant in African populations). gnomAD population-specific frequencies help account for this, but localized populations within these groups may still have different frequencies."
+        },
+        {
+          "id": "missing-variants",
+          "question": "Why might pathogenic variants be missing?",
+          "answer": "Not all pathogenic variants are annotated in ClinVar or gnomAD. Novel variants, variants in difficult-to-sequence regions, or variants not yet reported in the literature may be missing. The calculated carrier frequency is a minimum estimate based on known variants."
+        }
+      ]
+    }
+  ]
+}
