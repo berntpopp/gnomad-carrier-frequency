@@ -6,7 +6,7 @@
 
 **Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
 
-**Current Focus:** Phase 2 Wizard UI - Plan 02 complete, step input components ready
+**Current Focus:** Phase 2 Complete - Wizard UI fully functional, ready for Phase 3 German Text
 
 **Key Constraints:**
 - Stack: npm, Vue 3, Vuetify 3, Vite, TypeScript
@@ -20,19 +20,19 @@
 
 **Milestone:** v1 MVP
 **Phase:** Phase 2 - Wizard UI (2 of 4)
-**Plan:** 02-02 complete (2/3)
-**Status:** In progress
+**Plan:** 02-03 complete (3/3)
+**Status:** Phase complete
 
 ### Progress
 
 ```
 Phase 1: Foundation     [##########] 5/5 plans COMPLETE
-Phase 2: Wizard UI      [######....] 2/3 plans
+Phase 2: Wizard UI      [##########] 3/3 plans COMPLETE
 Phase 3: German Text    [..........] 0/? plans
 Phase 4: Deploy         [..........] Validation only
 ```
 
-**Overall:** `[#######...] ~70%` (Phase 2 in progress)
+**Overall:** `[########..] ~80%` (Phase 2 complete)
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 7 |
-| Phases Completed | 1 |
-| Requirements Done | All Phase 1, 02-01 wizard state, 02-02 step components |
-| Session Count | 8 |
+| Plans Completed | 8 |
+| Phases Completed | 2 |
+| Requirements Done | All Phase 1, All Phase 2 (28/32) |
+| Session Count | 9 |
 
 ---
 
@@ -72,6 +72,9 @@ Phase 4: Deploy         [..........] Validation only
 | Downstream reset on gene change | Changing gene resets steps 2-3 state but only after leaving step 1 | 2026-01-19 |
 | Literature validation | Requires frequency in (0, 1] AND non-empty PMID string | 2026-01-19 |
 | Step components via props | Step components receive state via props, emit events for updates | 2026-01-19 |
+| Numeric sort columns | v-data-table uses numeric keys (ratioDenominator, recurrenceRiskValue) for proper sorting | 2026-01-19 |
+| Founder effect in Notes | Founder effect shown as text in Notes column, not separate column | 2026-01-19 |
+| Variants column removed | Same value for all populations; shown in summary card only | 2026-01-19 |
 
 ### Technical Notes
 
@@ -87,6 +90,8 @@ Phase 4: Deploy         [..........] Validation only
 - Dev environment: npm run dev (Vite), npm run build (vue-tsc + Vite)
 - Wizard state in reactive() composable with computed validation per step
 - Step components in src/components/wizard/
+- v-data-table with custom item slots for row styling
+- Source attribution: gnomAD v4 / Literature (PMID: xxx) / Default assumption
 
 ### Blockers
 
@@ -103,7 +108,11 @@ Phase 4: Deploy         [..........] Validation only
 - [x] Plan Phase 2 (Wizard UI)
 - [x] Execute 02-01 (wizard types and state composable)
 - [x] Execute 02-02 (step input components)
-- [ ] Execute 02-03 (results step and stepper integration)
+- [x] Execute 02-03 (results step and stepper integration)
+- [ ] Plan Phase 3 (German Text)
+- [ ] Execute Phase 3 plans
+- [ ] Plan Phase 4 (Deploy)
+- [ ] Execute Phase 4 plans
 
 ---
 
@@ -112,55 +121,58 @@ Phase 4: Deploy         [..........] Validation only
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Plan 02-02 (Step Input Components)
-**Next:** Plan 02-03 (Results Step and Stepper Integration)
+**Completed:** Plan 02-03 (Results Step and Stepper Integration) - Phase 2 complete
+**Next:** Plan Phase 3 (German Text)
 
 ### Handoff Notes
 
-Phase 2 wizard UI in progress. Plan 02-02 delivered step input components.
+Phase 2 wizard UI is complete. All 10 Phase 2 requirements are implemented.
 
-**Step components created:**
+**Wizard components structure:**
 ```
 src/components/wizard/
-├── StepGene.vue       # Gene selection with GeneSearch + VersionSelector
-├── StepStatus.vue     # Carrier/affected toggle with tooltip
-└── StepFrequency.vue  # gnomAD/Literature/Default tabs with validation
+├── StepGene.vue        # Gene selection with GeneSearch + VersionSelector
+├── StepStatus.vue      # Carrier/affected toggle with tooltip
+├── StepFrequency.vue   # gnomAD/Literature/Default tabs with validation
+├── StepResults.vue     # Sortable v-data-table with source attribution
+└── WizardStepper.vue   # Main container coordinating all steps
 ```
 
-**Step component patterns:**
+**Key patterns established:**
 ```typescript
-// Props-based state
-<StepGene
-  :model-value="state.gene"
-  @update:model-value="state.gene = $event"
-  @complete="nextStep"
-/>
-
-<StepStatus
-  :model-value="state.indexStatus"
-  @update:model-value="state.indexStatus = $event"
-  @complete="nextStep"
-  @back="prevStep"
-/>
-
-<StepFrequency
-  :source="state.frequencySource"
+// Step components receive state via props
+<StepResults
+  :result="result"
+  :global-frequency="globalFrequency"
+  :index-status="state.indexStatus"
+  :frequency-source="state.frequencySource"
   :literature-frequency="state.literatureFrequency"
   :literature-pmid="state.literaturePmid"
-  :gnomad-frequency="globalFrequency"
-  :gnomad-loading="isLoading"
   :using-default="usingDefault"
-  @update:source="state.frequencySource = $event"
-  @update:literature-frequency="state.literatureFrequency = $event"
-  @update:literature-pmid="state.literaturePmid = $event"
-  @complete="nextStep"
   @back="prevStep"
+  @restart="resetWizard"
 />
+
+// WizardStepper coordinates two composables
+const { state, nextStep, prevStep, resetWizard } = useWizard();
+const { setGeneSymbol, result, globalFrequency, ... } = useCarrierFrequency();
 ```
+
+**Phase 2 Requirements Coverage (10/10):**
+- UI-01: 4-step wizard flow (Gene -> Status -> Frequency -> Results)
+- UI-02: Vuetify stepper component
+- UI-03: User can navigate back to previous steps
+- UI-04: Results step shows all population frequencies in table format (sortable)
+- IDX-01: User selects index patient status (carrier OR affected)
+- IDX-02: Status selection captured (affects text in Phase 3)
+- SRC-01: User can use gnomAD-calculated carrier frequency
+- SRC-02: User can enter literature-based frequency with PMID citation
+- SRC-03: User can select default assumption (from config)
+- SRC-04: Source attribution shown in results
 
 All composables (useWizard, useCarrierFrequency, etc.) available from `@/composables` barrel.
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 (Plan 02-02 complete)*
+*Last updated: 2026-01-19 (Phase 2 complete)*
