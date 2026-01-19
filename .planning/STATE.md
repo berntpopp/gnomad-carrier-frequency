@@ -92,6 +92,7 @@ v1.1 Release-Ready: [########--] ~85% - Phase 9 in progress
 | Help content in JSON | Structured documentation for potential i18n support | 2026-01-19 |
 | Persistent disclaimer modal | Cannot dismiss without acknowledgment - ensures users read clinical disclaimer | 2026-01-19 |
 | carrier-freq-app storage key | Namespaced localStorage key for app-level state | 2026-01-19 |
+| DataSourcesDialog replaces gnomAD link | More comprehensive - shows all data sources and versions in one place | 2026-01-19 |
 
 ### Blockers
 
@@ -130,8 +131,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** Phase 9 Plan 04 - Disclaimer and ClinGen Settings
-**Next:** Execute Phase 9 plans 05-07
+**Completed:** Phase 9 Plan 06 - About Dialog, Data Sources, README
+**Next:** Execute Phase 9 plan 07
 
 ### Handoff Notes
 
@@ -160,7 +161,8 @@ Key pitfalls from research:
 - Plan 03: ClinGen warning UI (validation in gene/results steps) - COMPLETE
 - Plan 04: Disclaimer and ClinGen settings - COMPLETE
 - Plan 05: Help system (methodology + FAQ) - COMPLETE
-- Plan 06-07: About dialog, data sources - PENDING
+- Plan 06: About dialog, data sources, README - COMPLETE
+- Plan 07: TBD - PENDING
 
 ---
 
@@ -185,3 +187,4 @@ Key pitfalls from research:
 *09-03 complete: 2026-01-19*
 *09-04 complete: 2026-01-19*
 *09-05 complete: 2026-01-19*
+*09-06 complete: 2026-01-19*
