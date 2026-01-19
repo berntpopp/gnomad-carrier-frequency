@@ -10,6 +10,11 @@ gaps:
     severity: high
     description: "Current implementation only has binary carrier/affected toggle. Clinical use requires differentiation between homozygous and compound heterozygous (confirmed vs assumed)."
     requirements_affected: ["IDX-01", "TEXT-01"]
+  - id: GAP-03-02
+    title: "Patient sex/gender for German grammar"
+    severity: high
+    description: "German clinical text requires grammatical gender agreement (der Patient vs die Patientin). No sex selector exists."
+    requirements_affected: ["TEXT-01"]
 human_verification:
   - test: "Complete wizard flow and verify German text generation"
     expected: "Text shows correct German clinical terminology, numbers with comma format"
@@ -173,6 +178,37 @@ Clinical practice requires differentiation:
 
 ---
 
+### GAP-03-02: Patient Sex/Gender for German Grammar
+
+**Reported by:** User during UAT
+**Severity:** High
+**Requirements affected:** TEXT-01
+
+**Issue:**
+German clinical text requires grammatical gender agreement for patient references. Current implementation has no sex/gender selector.
+
+| Patient Sex | Nominative | Genitive | Dative |
+|-------------|------------|----------|--------|
+| Male | der Patient | des Patienten | dem Patienten |
+| Female | die Patientin | der Patientin | der Patientin |
+| Neutral/Unknown | der/die Patient*in | des/der Patient*in | dem/der Patient*in |
+
+**Examples in clinical text:**
+- "Bei **dem Patienten** wurde..." vs "Bei **der Patientin** wurde..."
+- "Die Eltern **des Patienten**..." vs "Die Eltern **der Patientin**..."
+- "Nachkommen **des Patienten**..." vs "Nachkommen **der Patientin**..."
+
+**Changes required:**
+1. **src/types/text.ts** — Add PatientSex type ('male' | 'female' | 'neutral')
+2. **src/stores/useTemplateStore.ts** — Add patientSex to store state
+3. **src/components/wizard/TextOutput.vue** — Add sex selector (DE only)
+4. **src/config/templates/de.json** — Use {{patientNominative}}, {{patientGenitive}}, {{patientDative}} variables
+5. **src/composables/useTextGenerator.ts** — Generate correct forms based on sex
+
+**Resolution:** Run `/gsd:plan-phase 3 --gaps` to create gap closure plan
+
+---
+
 *Verified: 2026-01-19T08:15:00Z*
-*Updated: 2026-01-19T08:30:00Z (gap added during human review)*
+*Updated: 2026-01-19T08:35:00Z (gaps added during human review)*
 *Verifier: Claude (gsd-verifier)*
