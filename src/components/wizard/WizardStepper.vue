@@ -161,7 +161,10 @@ watch(
   () => state.currentStep,
   (newStep, oldStep) => {
     if (newStep !== oldStep && newStep >= 1 && newStep <= 4) {
-      announceStep(newStep, stepNames[newStep - 1]);
+      const stepName = stepNames[newStep - 1];
+      if (stepName) {
+        announceStep(newStep, stepName);
+      }
 
       // Announce results when reaching step 4
       if (newStep === 4 && globalFrequency.value !== null) {
