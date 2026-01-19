@@ -34,6 +34,41 @@
       <v-divider />
 
       <v-card-actions class="pa-4">
+        <!-- Export dropdown -->
+        <v-menu>
+          <template #activator="{ props: menuProps }">
+            <v-btn
+              v-bind="menuProps"
+              variant="text"
+              color="secondary"
+              size="small"
+              :disabled="variants.length === 0"
+            >
+              <v-icon start>
+                mdi-download
+              </v-icon>
+              Export
+              <v-icon end>
+                mdi-chevron-down
+              </v-icon>
+            </v-btn>
+          </template>
+          <v-list density="compact">
+            <v-list-item @click="handleVariantExport('json')">
+              <template #prepend>
+                <v-icon>mdi-code-json</v-icon>
+              </template>
+              <v-list-item-title>JSON</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="handleVariantExport('xlsx')">
+              <template #prepend>
+                <v-icon>mdi-file-excel</v-icon>
+              </template>
+              <v-list-item-title>Excel</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+
         <v-spacer />
         <v-btn
           color="primary"
@@ -50,8 +85,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useDisplay } from 'vuetify';
+import * as XLSX from 'xlsx';
 import VariantTable from './VariantTable.vue';
 import type { DisplayVariant } from '@/types';
+import { buildExportVariants, generateFilename } from '@/utils/export-utils';
 
 const props = defineProps<{
   /** v-model for dialog visibility */
@@ -64,6 +101,8 @@ const props = defineProps<{
   populationCode?: string | null;
   /** Loading state */
   loading?: boolean;
+  /** Gene symbol for export filename */
+  gene?: string;
 }>();
 
 const emit = defineEmits<{
@@ -87,4 +126,49 @@ const modalTitle = computed(() => {
   }
   return 'All Contributing Variants';
 });
+
+/**
+ * Download a blob as a file
+ */
+function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Export variants handler for JSON or Excel format
+ */
+function handleVariantExport(format: 'json' | 'xlsx') {
+  if (!props.variants.length) return;
+
+  const exportVariants = buildExportVariants(props.variants);
+  const gene = props.gene || 'variants';
+  const population = props.populationCode || undefined;
+  const filename = generateFilename(gene, population) + '_variants';
+
+  if (format === 'json') {
+    const data = {
+      variants: exportVariants,
+      populationCode: props.populationCode,
+      populationLabel: props.populationLabel,
+      exportDate: new Date().toISOString(),
+      variantCount: exportVariants.length,
+    };
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    downloadBlob(blob, filename + '.json');
+  } else {
+    // Excel export with single Variants sheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(exportVariants);
+    XLSX.utils.book_append_sheet(wb, ws, 'Variants');
+    XLSX.writeFile(wb, filename + '.xlsx');
+  }
+}
 </script>

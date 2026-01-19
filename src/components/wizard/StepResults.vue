@@ -275,6 +275,7 @@
       :variants="modalVariants"
       :population-label="selectedPopulationLabel"
       :population-code="selectedPopulationCode"
+      :gene="result?.gene"
     />
   </div>
 </template>
