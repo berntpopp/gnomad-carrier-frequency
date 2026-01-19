@@ -51,3 +51,11 @@ export type {
 export { getLoeufInterpretation, getPliInterpretation } from './constraint';
 
 export type { LogLevel, LogEntry, LogSettings, LogStats } from './log';
+
+export type {
+  ExportMetadata,
+  ExportSummary,
+  ExportPopulation,
+  ExportVariant,
+  ExportData,
+} from './export';
