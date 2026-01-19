@@ -15,17 +15,17 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.1 Release-Ready
 **Phase:** 5 - Foundation (Settings + Theme)
-**Plan:** Not started
-**Status:** Roadmap created, awaiting plan-phase
+**Plan:** 1 of 2 complete
+**Status:** In progress
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
-v1.1 Release-Ready: [----------]   0% - Roadmap created
+v1.1 Release-Ready: [#---------]  ~8% - Phase 5 in progress
 ```
 
-**Overall:** v1.0 shipped, v1.1 roadmap ready for planning
+**Overall:** Phase 5 Plan 01 complete, Plan 02 ready
 
 ---
 
@@ -46,7 +46,7 @@ v1.1 Release-Ready: [----------]   0% - Roadmap created
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 5 | Foundation | 4 | Pending |
+| 5 | Foundation | 4 | 1/2 plans complete |
 | 6 | App Shell | 5 | Pending |
 | 7 | SEO + Accessibility | 9 | Pending |
 | 8 | Filtering + Variant Display | 14 | Pending |
@@ -64,6 +64,7 @@ v1.1 Release-Ready: [----------]   0% - Roadmap created
 | Settings store first | Other features depend on settings infrastructure | 2026-01-19 |
 | 6 phases from requirements | Natural delivery boundaries from research | 2026-01-19 |
 | ClinGen via CSV, not REST | Public download endpoint is CORS-enabled | 2026-01-19 |
+| Theme storage key 'carrier-freq-theme' | Namespaced key avoids conflicts with other apps | 2026-01-19 |
 
 ### Blockers
 
@@ -71,7 +72,9 @@ None currently.
 
 ### TODOs
 
-- [ ] Run `/gsd:plan-phase 5` to create Foundation plans
+- [x] Run `/gsd:plan-phase 5` to create Foundation plans
+- [x] Execute 05-01-PLAN.md (theme + version infrastructure)
+- [ ] Execute 05-02-PLAN.md (settings UI integration)
 - [ ] ClinGen CSV schema may need exploration during Phase 9
 
 ---
@@ -81,8 +84,8 @@ None currently.
 ### Last Session
 
 **Date:** 2026-01-19
-**Completed:** v1.1 roadmap created with 6 phases covering 69 requirements
-**Next:** `/gsd:plan-phase 5` to start Foundation phase
+**Completed:** Phase 5 Plan 01 - Theme and Version Infrastructure
+**Next:** Execute 05-02-PLAN.md (settings UI integration)
 
 ### Handoff Notes
 
@@ -99,8 +102,15 @@ Key pitfalls from research:
 - ARIA live regions break with v-if (Phase 7)
 - XSS risk in template editor (Phase 10)
 
+**Phase 5 Plan 01 delivered:**
+- useAppTheme composable at src/composables/useTheme.ts
+- Version injection via VITE_APP_VERSION
+- Vuetify dark theme configured
+- Theme persists to localStorage
+
 ---
 
 *State initialized: 2026-01-18*
 *v1.0 shipped: 2026-01-19*
 *v1.1 roadmap: 2026-01-19*
+*05-01 complete: 2026-01-19*
