@@ -2,7 +2,11 @@
 
 import type { GnomadVersion } from '@/config';
 
-export type IndexPatientStatus = 'heterozygous' | 'compound_het_homozygous';
+export type IndexPatientStatus =
+  | 'heterozygous'           // Carrier - one pathogenic allele
+  | 'homozygous'             // Affected - two copies same allele
+  | 'compound_het_confirmed' // Affected - two different alleles, confirmed
+  | 'compound_het_assumed';  // Affected - two different alleles, assumed by phenotype
 
 export interface PopulationFrequency {
   code: string; // Dynamic from config, not hardcoded
