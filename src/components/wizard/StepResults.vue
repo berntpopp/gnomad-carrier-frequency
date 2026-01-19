@@ -186,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { config, getGnomadVersion, getPopulationLabel } from '@/config';
 import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@/types';
 import { useFilterStore } from '@/stores/useFilterStore';
@@ -232,26 +232,14 @@ const emit = defineEmits<{
 // Get filter store for reset functionality
 const filterStore = useFilterStore();
 
-// Local copy of filters for v-model binding with FilterPanel
-const filters = ref<FilterConfig>({ ...props.filterConfig });
-
-// Watch for external filterConfig changes (e.g., from store reset)
-watch(
-  () => props.filterConfig,
-  (newConfig) => {
-    filters.value = { ...newConfig };
-  },
-  { deep: true }
-);
-
-// Watch local filter changes and emit to parent
-watch(
-  filters,
-  (newFilters) => {
+// Use a computed getter/setter for filters to avoid infinite loop
+// The prop is the source of truth; changes emit to parent
+const filters = computed({
+  get: () => props.filterConfig,
+  set: (newFilters: FilterConfig) => {
     emit('update:filterConfig', { ...newFilters });
   },
-  { deep: true }
-);
+});
 
 // Compute filtered variants based on current filter settings
 const filteredVariants = computed(() => {
@@ -259,7 +247,7 @@ const filteredVariants = computed(() => {
   return filterPathogenicVariantsConfigurable(
     props.variants,
     props.clinvarVariants,
-    filters.value
+    props.filterConfig
   );
 });
 
@@ -269,12 +257,12 @@ const filteredCount = computed(() => filteredVariants.value.length);
 // Reset local filters to store defaults
 function resetFilters() {
   const defaults = filterStore.defaults;
-  filters.value = {
+  emit('update:filterConfig', {
     lofHcEnabled: defaults.lofHcEnabled,
     missenseEnabled: defaults.missenseEnabled,
     clinvarEnabled: defaults.clinvarEnabled,
     clinvarStarThreshold: defaults.clinvarStarThreshold,
-  };
+  });
 }
 
 // Variant modal state
