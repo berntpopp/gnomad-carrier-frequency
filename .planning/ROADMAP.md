@@ -125,6 +125,14 @@ Plans:
 - VAR-04: User can click population row to see population-specific variants
 - VAR-05: Population drill-down shows variant frequencies for that population
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 08-01-PLAN.md - Filter infrastructure (types, store, configurable filter functions)
+- [ ] 08-02-PLAN.md - GraphQL query extension (HGVS fields, display variant types)
+- [ ] 08-03-PLAN.md - Filter UI components (composable, FilterPanel, Settings integration)
+- [ ] 08-04-PLAN.md - Variant modal (VariantTable, population drill-down)
+
 **Success Criteria:**
 1. User can see which filters produced current results (displayed in UI)
 2. User can toggle individual filter criteria and see variant count update in real-time
@@ -210,8 +218,8 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 8/TBD | In Progress (Phase 7 complete) | - |
+| v1.1 Release-Ready | 5-10 | 12/TBD | In Progress (Phase 8 planned) | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 7 complete)*
+*Last updated: 2026-01-19 (Phase 8 planned)*
