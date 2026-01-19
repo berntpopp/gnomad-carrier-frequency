@@ -120,7 +120,8 @@ None currently.
 - [x] Execute 09-03-PLAN.md (ClinGen warning UI)
 - [x] Execute 09-04-PLAN.md (Disclaimer banner and ClinGen settings)
 - [x] Execute 09-05-PLAN.md (Help system: methodology + FAQ)
-- [ ] Execute remaining Phase 9 plans (06, 07)
+- [x] Execute 09-06-PLAN.md (About dialog, data sources, README)
+- [ ] Execute remaining Phase 9 plan (07)
 
 ---
 
@@ -183,3 +184,4 @@ Key pitfalls from research:
 *09-02 complete: 2026-01-19*
 *09-03 complete: 2026-01-19*
 *09-04 complete: 2026-01-19*
+*09-05 complete: 2026-01-19*
