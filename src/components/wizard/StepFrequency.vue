@@ -51,7 +51,7 @@
 
           <!-- Literature Tab -->
           <v-window-item value="literature">
-            <v-form ref="literatureForm" v-model="literatureFormValid">
+            <v-form v-model="literatureFormValid">
               <v-text-field
                 v-model="localFrequency"
                 label="Carrier Frequency"
@@ -130,7 +130,6 @@ const localFrequency = ref<string>(
 );
 const localPmid = ref<string>(props.literaturePmid ?? '');
 const literatureFormValid = ref(false);
-const literatureForm = ref<{ validate: () => Promise<{ valid: boolean }> } | null>(null);
 
 // Tab state bound to source
 const activeTab = computed({

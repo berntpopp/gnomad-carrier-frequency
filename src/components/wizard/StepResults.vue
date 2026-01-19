@@ -59,9 +59,9 @@
           <td class="text-right">{{ item.alleleCount }}</td>
           <td class="text-right">{{ item.alleleNumber?.toLocaleString() ?? '-' }}</td>
           <td>
-            <v-chip v-if="item.isFounderEffect" color="info" size="x-small">
+            <v-chip v-if="item.notes" color="info" size="x-small">
               <v-icon start size="x-small">mdi-star</v-icon>
-              Founder
+              {{ item.notes }}
             </v-chip>
           </td>
         </tr>
@@ -96,12 +96,15 @@ import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource } from
 interface TableItem {
   label: string;
   carrierFrequency: number | null;
-  recurrenceRisk: string;
+  ratioDenominator: number | null; // Numeric for sorting (e.g., 25 for "1:25")
+  recurrenceRiskValue: number | null; // Numeric for sorting
+  recurrenceRisk: string; // Formatted for display
   variantCount: number;
   alleleCount: number;
   alleleNumber: number | null;
   isFounderEffect: boolean;
   isGlobal: boolean;
+  notes: string; // Founder effect text
 }
 
 const props = defineProps<{
@@ -119,16 +122,16 @@ defineEmits<{
   restart: [];
 }>();
 
-// Table headers
+// Table headers - use numeric keys for proper sorting
 const headers = ref([
   { title: 'Population', key: 'label', sortable: true },
   { title: 'Carrier Freq (%)', key: 'carrierFrequency', sortable: true, align: 'end' as const },
-  { title: 'Ratio', key: 'ratio', sortable: false, align: 'end' as const },
-  { title: 'Recurrence Risk', key: 'recurrenceRisk', sortable: true, align: 'end' as const },
+  { title: 'Ratio', key: 'ratioDenominator', sortable: true, align: 'end' as const },
+  { title: 'Recurrence Risk', key: 'recurrenceRiskValue', sortable: true, align: 'end' as const },
   { title: 'Variants', key: 'variantCount', sortable: true, align: 'end' as const },
   { title: 'AC', key: 'alleleCount', sortable: true, align: 'end' as const },
   { title: 'AN', key: 'alleleNumber', sortable: true, align: 'end' as const },
-  { title: 'Notes', key: 'notes', sortable: false },
+  { title: 'Notes', key: 'notes', sortable: true },
 ]);
 
 // Default sort by carrier frequency descending
@@ -208,45 +211,54 @@ const tableItems = computed((): TableItem[] => {
   // Global row first
   const globalCarrierFreq = effectiveFrequency.value;
   if (globalCarrierFreq !== null) {
-    const globalRisk = calculateRecurrenceRisk(globalCarrierFreq);
+    const { risk, riskString } = calculateRecurrenceRiskWithValue(globalCarrierFreq);
     items.push({
       label: 'Global',
       carrierFrequency: globalCarrierFreq,
-      recurrenceRisk: globalRisk,
+      ratioDenominator: globalCarrierFreq > 0 ? Math.round(1 / globalCarrierFreq) : null,
+      recurrenceRiskValue: risk,
+      recurrenceRisk: riskString,
       variantCount: props.result.qualifyingVariantCount,
       alleleCount: sumAlleleCount(props.result),
       alleleNumber: maxAlleleNumber(props.result),
       isFounderEffect: false,
       isGlobal: true,
+      notes: '',
     });
   }
 
   // Population rows
   for (const pop of props.result.populations) {
-    const popRisk = pop.carrierFrequency !== null
-      ? calculateRecurrenceRisk(pop.carrierFrequency)
-      : '-';
+    const { risk, riskString } = pop.carrierFrequency !== null
+      ? calculateRecurrenceRiskWithValue(pop.carrierFrequency)
+      : { risk: null, riskString: '-' };
 
     items.push({
       label: pop.label,
       carrierFrequency: pop.carrierFrequency,
-      recurrenceRisk: popRisk,
+      ratioDenominator: pop.carrierFrequency !== null && pop.carrierFrequency > 0
+        ? Math.round(1 / pop.carrierFrequency)
+        : null,
+      recurrenceRiskValue: risk,
+      recurrenceRisk: riskString,
       variantCount: props.result.qualifyingVariantCount, // Same for all
       alleleCount: pop.alleleCount,
       alleleNumber: pop.alleleNumber,
       isFounderEffect: pop.isFounderEffect,
       isGlobal: false,
+      notes: pop.isFounderEffect ? 'Founder effect' : '',
     });
   }
 
   return items;
 });
 
-// Helper: Calculate recurrence risk string for a given frequency
-function calculateRecurrenceRisk(freq: number): string {
+// Helper: Calculate recurrence risk with both numeric value and formatted string
+function calculateRecurrenceRiskWithValue(freq: number): { risk: number; riskString: string } {
   const divisor = props.indexStatus === 'heterozygous' ? 4 : 2;
   const risk = freq / divisor;
-  return risk > 0 ? `1:${Math.round(1 / risk).toLocaleString()}` : 'N/A';
+  const riskString = risk > 0 ? `1:${Math.round(1 / risk).toLocaleString()}` : 'N/A';
+  return { risk, riskString };
 }
 
 // Helper: Sum allele counts

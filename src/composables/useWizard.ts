@@ -68,7 +68,7 @@ export function useWizard() {
   // Downstream reset: when gene changes and we're past step 1, reset
   watch(
     () => state.gene,
-    (newGene, oldGene) => {
+    (_newGene, oldGene) => {
       // Only reset if gene actually changed (not initial set) and we're past step 1
       if (oldGene !== null && state.currentStep > 1) {
         state.currentStep = 1;

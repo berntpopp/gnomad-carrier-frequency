@@ -48,7 +48,7 @@ export function useGeneVariants(
   const hasError = computed(
     () =>
       !!error.value ||
-      (data.value !== undefined && gene.value === null && !isFetching.value)
+      (geneSymbol.value !== null && data.value !== undefined && gene.value === null && !isFetching.value)
   );
 
   const errorMessage = computed(() => {
