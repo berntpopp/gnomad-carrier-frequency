@@ -9,13 +9,13 @@ Requirements for release-ready polish. Each maps to roadmap phases.
 
 ### App Shell & Navigation
 
-- [ ] **SHELL-01**: App displays logo in app bar
-- [ ] **SHELL-02**: App bar contains navigation menu
-- [ ] **SHELL-03**: Settings accessible via gear icon in app bar
-- [ ] **SHELL-04**: User can toggle dark/light theme
-- [ ] **SHELL-05**: Theme preference persists across sessions
-- [ ] **SHELL-06**: App has custom favicon
-- [ ] **SHELL-07**: Logo and favicon follow consistent branding
+- [x] **SHELL-01**: App displays logo in app bar
+- [x] **SHELL-02**: App bar contains navigation menu (N/A - single page app)
+- [x] **SHELL-03**: Settings accessible via gear icon in app bar
+- [x] **SHELL-04**: User can toggle dark/light theme
+- [x] **SHELL-05**: Theme preference persists across sessions
+- [x] **SHELL-06**: App has custom favicon
+- [x] **SHELL-07**: Logo and favicon follow consistent branding
 
 ### Variant Table
 
@@ -89,12 +89,12 @@ Requirements for release-ready polish. Each maps to roadmap phases.
 
 ### SEO & Accessibility
 
-- [ ] **SEO-01**: Page has descriptive meta description
-- [ ] **SEO-02**: Heading elements in sequential order
-- [ ] **SEO-03**: Color contrast meets WCAG 2.1 AA (4.5:1 ratio)
-- [ ] **SEO-04**: ARIA live regions announce dynamic content changes
-- [ ] **SEO-05**: Focus management for modal dialogs
-- [ ] **SEO-06**: Keyboard navigation works throughout app
+- [x] **SEO-01**: Page has descriptive meta description
+- [x] **SEO-02**: Heading elements in sequential order
+- [x] **SEO-03**: Color contrast meets WCAG 2.1 AA (4.5:1 ratio)
+- [x] **SEO-04**: ARIA live regions announce dynamic content changes
+- [x] **SEO-05**: Focus management for modal dialogs
+- [x] **SEO-06**: Keyboard navigation works throughout app
 
 ### Infrastructure
 
@@ -102,9 +102,9 @@ Requirements for release-ready polish. Each maps to roadmap phases.
 - [ ] **INFRA-02**: Version displayed in app UI
 - [ ] **INFRA-03**: Build time improved with vite-plugin-checker
 - [ ] **INFRA-04**: Lint/typecheck runs in parallel
-- [ ] **INFRA-05**: Lighthouse performance score >= 90
-- [ ] **INFRA-06**: Lighthouse accessibility score >= 95
-- [ ] **INFRA-07**: Lighthouse SEO score >= 95
+- [x] **INFRA-05**: Lighthouse performance score >= 90
+- [x] **INFRA-06**: Lighthouse accessibility score >= 95
+- [x] **INFRA-07**: Lighthouse SEO score >= 95
 
 ## v1.2+ Requirements
 
@@ -146,13 +146,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SHELL-01 | Phase 6 | Pending |
-| SHELL-02 | Phase 6 | Pending |
-| SHELL-03 | Phase 6 | Pending |
+| SHELL-01 | Phase 6 | Complete |
+| SHELL-02 | Phase 6 | Complete (N/A) |
+| SHELL-03 | Phase 6 | Complete |
 | SHELL-04 | Phase 5 | Complete |
 | SHELL-05 | Phase 5 | Complete |
-| SHELL-06 | Phase 6 | Pending |
-| SHELL-07 | Phase 6 | Pending |
+| SHELL-06 | Phase 6 | Complete |
+| SHELL-07 | Phase 6 | Complete |
 | VAR-01 | Phase 8 | Pending |
 | VAR-02 | Phase 8 | Pending |
 | VAR-03 | Phase 8 | Pending |
@@ -202,19 +202,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOC-07 | Phase 9 | Pending |
 | DOC-08 | Phase 9 | Pending |
 | DOC-09 | Phase 9 | Pending |
-| SEO-01 | Phase 7 | Pending |
-| SEO-02 | Phase 7 | Pending |
-| SEO-03 | Phase 7 | Pending |
-| SEO-04 | Phase 7 | Pending |
-| SEO-05 | Phase 7 | Pending |
-| SEO-06 | Phase 7 | Pending |
+| SEO-01 | Phase 7 | Complete |
+| SEO-02 | Phase 7 | Complete |
+| SEO-03 | Phase 7 | Complete |
+| SEO-04 | Phase 7 | Complete |
+| SEO-05 | Phase 7 | Complete |
+| SEO-06 | Phase 7 | Complete |
 | INFRA-01 | Phase 5 | Complete |
 | INFRA-02 | Phase 5 | Complete |
 | INFRA-03 | Phase 10 | Pending |
 | INFRA-04 | Phase 10 | Pending |
-| INFRA-05 | Phase 7 | Pending |
-| INFRA-06 | Phase 7 | Pending |
-| INFRA-07 | Phase 7 | Pending |
+| INFRA-05 | Phase 7 | Complete |
+| INFRA-06 | Phase 7 | Complete |
+| INFRA-07 | Phase 7 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 69 total
@@ -223,4 +223,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 (traceability complete)*
+*Last updated: 2026-01-19 (Phase 7 complete)*

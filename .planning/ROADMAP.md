@@ -67,37 +67,39 @@ Plans:
 
 ---
 
-### Phase 7: SEO + Accessibility
+### Phase 7: SEO + Accessibility ✓
 
 **Goal:** App meets WCAG 2.1 AA and achieves Lighthouse scores >= 90/95/95
 
 **Dependencies:** Phase 6 (app shell structure)
 
 **Requirements:**
-- SEO-01: Page has descriptive meta description
-- SEO-02: Heading elements in sequential order
-- SEO-03: Color contrast meets WCAG 2.1 AA (4.5:1 ratio)
-- SEO-04: ARIA live regions announce dynamic content changes
-- SEO-05: Focus management for modal dialogs
-- SEO-06: Keyboard navigation works throughout app
-- INFRA-05: Lighthouse performance score >= 90
-- INFRA-06: Lighthouse accessibility score >= 95
-- INFRA-07: Lighthouse SEO score >= 95
+- SEO-01: Page has descriptive meta description ✓
+- SEO-02: Heading elements in sequential order ✓
+- SEO-03: Color contrast meets WCAG 2.1 AA (4.5:1 ratio) ✓
+- SEO-04: ARIA live regions announce dynamic content changes ✓
+- SEO-05: Focus management for modal dialogs ✓
+- SEO-06: Keyboard navigation works throughout app ✓
+- INFRA-05: Lighthouse performance score >= 90 ✓
+- INFRA-06: Lighthouse accessibility score >= 95 ✓
+- INFRA-07: Lighthouse SEO score >= 95 ✓
 
-**Plans:** 4 plans
+**Plans:** 4 plans (complete)
 
 Plans:
-- [ ] 07-01-PLAN.md - SEO meta tags, OG tags, structured data, preview image
-- [ ] 07-02-PLAN.md - Accessibility infrastructure (announcer, focus-trap, sr-only class)
-- [ ] 07-03-PLAN.md - Component accessibility integration (wizard announcements, dialog focus trap)
-- [ ] 07-04-PLAN.md - Lighthouse CI workflow, heading audit, keyboard navigation verification
+- [x] 07-01-PLAN.md - SEO meta tags, OG tags, structured data, preview image
+- [x] 07-02-PLAN.md - Accessibility infrastructure (announcer, focus-trap, sr-only class)
+- [x] 07-03-PLAN.md - Component accessibility integration (wizard announcements, dialog focus trap)
+- [x] 07-04-PLAN.md - Lighthouse CI workflow, heading audit, keyboard navigation verification
 
 **Success Criteria:**
-1. User can navigate entire app using only keyboard (Tab, Enter, Escape)
-2. Screen reader announces calculation results and errors without page refresh
-3. All text meets 4.5:1 contrast ratio (verifiable via Lighthouse)
-4. Lighthouse scores meet thresholds: Performance >= 90, Accessibility >= 95, SEO >= 95
-5. Modal dialogs trap focus and return focus on close
+1. ✓ User can navigate entire app using only keyboard (Tab, Enter, Escape)
+2. ✓ Screen reader announces calculation results and errors without page refresh
+3. ✓ All text meets 4.5:1 contrast ratio (verifiable via Lighthouse)
+4. ✓ Lighthouse scores meet thresholds: Performance >= 90, Accessibility >= 95, SEO >= 95
+5. ✓ Modal dialogs trap focus and return focus on close
+
+**Completed:** 2026-01-19
 
 ---
 
@@ -208,8 +210,8 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 8/TBD | In Progress (Phase 7 planned) | - |
+| v1.1 Release-Ready | 5-10 | 8/TBD | In Progress (Phase 7 complete) | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 7 planned)*
+*Last updated: 2026-01-19 (Phase 7 complete)*
