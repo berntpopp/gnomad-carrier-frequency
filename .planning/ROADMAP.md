@@ -167,6 +167,17 @@ Plans:
 - DOC-08: Data sources attributed (gnomAD, ClinVar versions)
 - DOC-09: Clinical disclaimer displayed appropriately
 
+**Plans:** 7 plans
+
+Plans:
+- [ ] 09-01-PLAN.md - ClinGen infrastructure (types, store, composable for CSV fetch/cache)
+- [ ] 09-02-PLAN.md - Gene constraint query and GeneConstraintCard component
+- [ ] 09-03-PLAN.md - ClingenWarning component integration (StepGene, StepResults)
+- [ ] 09-04-PLAN.md - Disclaimer banner, app store, settings ClinGen management
+- [ ] 09-05-PLAN.md - Methodology and FAQ dialogs with content files
+- [ ] 09-06-PLAN.md - About and DataSources dialogs, README documentation
+- [ ] 09-07-PLAN.md - Contextual tooltips and coverage warning
+
 **Success Criteria:**
 1. User sees non-blocking warning banner when gene is not AR-associated per ClinGen
 2. User can view gene constraint scores (pLI/LOEUF) during gene selection
@@ -220,8 +231,8 @@ Plans:
 | Milestone | Phases | Plans | Status | Shipped |
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
-| v1.1 Release-Ready | 5-10 | 16/TBD | In Progress (Phase 8 complete) | - |
+| v1.1 Release-Ready | 5-10 | 19/TBD | In Progress (Phase 8 complete) | - |
 
 ---
 
-*Last updated: 2026-01-19 (Phase 8 complete)*
+*Last updated: 2026-01-19 (Phase 9 planned)*
