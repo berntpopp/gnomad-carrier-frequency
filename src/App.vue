@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <VueAnnouncer class="sr-only" />
+    <DisclaimerBanner />
     <AppBar @openSettings="showSettings = true" />
 
     <v-main>
@@ -26,6 +27,7 @@
 import { ref } from 'vue';
 import AppBar from '@/components/AppBar.vue';
 import AppFooter from '@/components/AppFooter.vue';
+import DisclaimerBanner from '@/components/DisclaimerBanner.vue';
 import SettingsDialog from '@/components/SettingsDialog.vue';
 import WizardStepper from '@/components/wizard/WizardStepper.vue';
 

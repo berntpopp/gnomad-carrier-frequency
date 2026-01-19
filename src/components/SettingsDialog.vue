@@ -27,7 +27,94 @@
       <v-card-text>
         <v-tabs-window v-model="activeTab">
           <v-tabs-window-item value="general">
-            <p class="text-body-2">General settings will appear here.</p>
+            <!-- Clinical Disclaimer Section -->
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
+              <v-card-title class="text-subtitle-1">
+                <v-icon start size="small">mdi-alert-circle-outline</v-icon>
+                Clinical Disclaimer
+              </v-card-title>
+
+              <v-card-text>
+                <div class="d-flex align-center justify-space-between">
+                  <div class="text-body-2">
+                    <span v-if="appStore.disclaimerAcknowledged">
+                      Acknowledged on {{ appStore.acknowledgedDate }}
+                    </span>
+                    <span v-else>
+                      Not yet acknowledged
+                    </span>
+                  </div>
+
+                  <v-btn
+                    v-if="appStore.disclaimerAcknowledged"
+                    variant="text"
+                    size="small"
+                    @click="appStore.resetDisclaimer()"
+                  >
+                    Show Again
+                  </v-btn>
+                </div>
+              </v-card-text>
+            </v-card>
+
+            <!-- ClinGen Cache Management Section -->
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
+              <v-card-title class="text-subtitle-1">
+                <v-icon start size="small">mdi-database-sync</v-icon>
+                ClinGen Data Cache
+              </v-card-title>
+
+              <v-card-text>
+                <div class="d-flex align-center justify-space-between mb-2">
+                  <div>
+                    <div class="text-body-2">
+                      <strong>Status:</strong>
+                      <v-chip
+                        :color="clingenExpired ? 'warning' : 'success'"
+                        size="x-small"
+                        class="ml-2"
+                      >
+                        {{ clingenExpired ? 'Expired' : 'Valid' }}
+                      </v-chip>
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      {{ clingenEntryCount }} entries | Last updated: {{ clingenCacheAge }}
+                    </div>
+                  </div>
+
+                  <v-btn
+                    variant="outlined"
+                    size="small"
+                    :loading="clingenLoading"
+                    @click="refreshClingenCache"
+                  >
+                    <v-icon start size="small">mdi-refresh</v-icon>
+                    Refresh
+                  </v-btn>
+                </div>
+
+                <v-alert
+                  v-if="clingenError"
+                  type="error"
+                  variant="tonal"
+                  density="compact"
+                  class="mt-2"
+                >
+                  {{ clingenError }}
+                </v-alert>
+
+                <div class="text-caption text-medium-emphasis mt-2">
+                  ClinGen data is used to validate gene-disease associations.
+                  Cache expires after 30 days and refreshes automatically.
+                </div>
+              </v-card-text>
+            </v-card>
           </v-tabs-window-item>
           <v-tabs-window-item value="filters">
             <p class="text-body-2 text-medium-emphasis mb-4">
@@ -113,12 +200,24 @@
 import { ref, nextTick } from 'vue';
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
 import { useFilterStore } from '@/stores/useFilterStore';
+import { useAppStore } from '@/stores/useAppStore';
+import { useClingenValidity } from '@/composables';
 
 const modelValue = defineModel<boolean>();
 
 const activeTab = ref('general');
 const dialogCard = ref<HTMLElement | null>(null);
 const filterStore = useFilterStore();
+const appStore = useAppStore();
+
+const {
+  isLoading: clingenLoading,
+  error: clingenError,
+  isExpired: clingenExpired,
+  cacheAge: clingenCacheAge,
+  entryCount: clingenEntryCount,
+  refreshCache: refreshClingenCache,
+} = useClingenValidity();
 
 const tickLabels = {
   0: '0',
