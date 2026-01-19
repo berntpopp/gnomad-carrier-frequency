@@ -6,7 +6,7 @@
 
 **Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
 
-**Current Focus:** Phase 1 complete - ready for Phase 2 (Wizard UI)
+**Current Focus:** Phase 2 Wizard UI - Plan 01 complete, continuing with stepper components
 
 **Key Constraints:**
 - Stack: npm, Vue 3, Vuetify 3, Vite, TypeScript
@@ -19,20 +19,20 @@
 ## Current Position
 
 **Milestone:** v1 MVP
-**Phase:** Phase 1 - Foundation COMPLETE
-**Plan:** 01-05 complete (5/5)
-**Status:** Phase complete
+**Phase:** Phase 2 - Wizard UI (2 of 4)
+**Plan:** 02-01 complete (1/3)
+**Status:** In progress
 
 ### Progress
 
 ```
 Phase 1: Foundation     [##########] 5/5 plans COMPLETE
-Phase 2: Wizard UI      [..........] 0/? plans
+Phase 2: Wizard UI      [###.......] 1/3 plans
 Phase 3: German Text    [..........] 0/? plans
 Phase 4: Deploy         [..........] Validation only
 ```
 
-**Overall:** `[#####.....] ~50%` (Phase 1 complete)
+**Overall:** `[######....] ~60%` (Phase 2 started)
 
 ---
 
@@ -40,10 +40,10 @@ Phase 4: Deploy         [..........] Validation only
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 5 |
+| Plans Completed | 6 |
 | Phases Completed | 1 |
-| Requirements Done | All Phase 1 requirements |
-| Session Count | 6 |
+| Requirements Done | All Phase 1, 02-01 wizard state |
+| Session Count | 7 |
 
 ---
 
@@ -68,6 +68,9 @@ Phase 4: Deploy         [..........] Validation only
 | Cache-first variants | Variant queries use cache-first to avoid redundant fetches | 2026-01-18 |
 | Type normalization layer | API types converted to internal types for filter compatibility | 2026-01-18 |
 | Global AF calculation | Combined exome+genome AC summed, divided by max AN | 2026-01-18 |
+| Default to heterozygous | Wizard defaults indexStatus to 'heterozygous' (carrier) per user decision | 2026-01-19 |
+| Downstream reset on gene change | Changing gene resets steps 2-3 state but only after leaving step 1 | 2026-01-19 |
+| Literature validation | Requires frequency in (0, 1] AND non-empty PMID string | 2026-01-19 |
 
 ### Technical Notes
 
@@ -81,6 +84,7 @@ Phase 4: Deploy         [..........] Validation only
 - Reference values: CFTR ~1:25 NFE, HEXA elevated in ASJ
 - Config settings: founderEffectMultiplier=5, debounceMs=300, defaultCarrierFrequency=0.01
 - Dev environment: npm run dev (Vite), npm run build (vue-tsc + Vite)
+- Wizard state in reactive() composable with computed validation per step
 
 ### Blockers
 
@@ -94,8 +98,10 @@ Phase 4: Deploy         [..........] Validation only
 - [x] Execute 01-03 (types, calc functions, GraphQL client)
 - [x] Execute 01-04 (GraphQL queries, composables)
 - [x] Execute 01-05 (carrier frequency composable, test UI)
-- [ ] Plan Phase 2 (Wizard UI)
-- [ ] Execute Phase 2
+- [x] Plan Phase 2 (Wizard UI)
+- [x] Execute 02-01 (wizard types and state composable)
+- [ ] Execute 02-02 (stepper component)
+- [ ] Execute 02-03 (step components)
 
 ---
 
@@ -103,51 +109,53 @@ Phase 4: Deploy         [..........] Validation only
 
 ### Last Session
 
-**Date:** 2026-01-18
-**Completed:** Plan 01-05 (Carrier Frequency Composable and Test UI) - Phase 1 COMPLETE
-**Next:** Plan Phase 2 (Wizard UI)
+**Date:** 2026-01-19
+**Completed:** Plan 02-01 (Wizard Types and State Composable)
+**Next:** Plan 02-02 (Wizard Stepper Component)
 
 ### Handoff Notes
 
-Phase 1 Foundation is complete. The application is now functional for testing carrier frequency calculations.
+Phase 2 wizard UI in progress. Plan 02-01 delivered wizard state management.
 
-**Composable imports:**
+**New composable import:**
 ```typescript
-import { useGeneSearch, useGeneVariants, useCarrierFrequency } from '@/composables';
+import { useWizard } from '@/composables';
 ```
 
-**Primary usage pattern:**
+**Wizard usage pattern:**
 ```typescript
 const {
-  setGeneSymbol,
-  result,
-  globalFrequency,
-  usingDefault,
-  isLoading,
-  errorMessage,
-  currentVersion,
-  refetch,
-  calculateRisk,
-} = useCarrierFrequency();
+  state,
+  canProceed,
+  step1Valid,
+  step2Valid,
+  step3Valid,
+  nextStep,
+  prevStep,
+  goToStep,
+  resetWizard,
+  setFrequencySource,
+} = useWizard();
 
-// Set gene to trigger calculation
-setGeneSymbol('CFTR');
+// State is reactive
+state.gene = selectedGene;
+state.indexStatus = 'heterozygous';
+state.frequencySource = 'gnomad';
 
-// Access results
-console.log(result.value?.globalCarrierFrequency); // ~0.04 for CFTR
-console.log(globalFrequency.value?.ratio); // "1:25"
+// Navigation
+if (canProceed.value) nextStep();
+goToStep(1); // Always allowed
+goToStep(2); // Only if step1Valid
 ```
 
-**Component imports:**
+**New type imports:**
 ```typescript
-import VersionSelector from '@/components/VersionSelector.vue';
-import GeneSearch from '@/components/GeneSearch.vue';
-import FrequencyResults from '@/components/FrequencyResults.vue';
+import type { WizardState, WizardStep, FrequencySource } from '@/types';
 ```
 
-All config values come from config module. Zero hardcoded values in src/composables/ or src/components/.
+All composables (useWizard, useCarrierFrequency, etc.) available from `@/composables` barrel.
 
 ---
 
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-18 (Phase 1 complete)*
+*Last updated: 2026-01-19 (Plan 02-01 complete)*
