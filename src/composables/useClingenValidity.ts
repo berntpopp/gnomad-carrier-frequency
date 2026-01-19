@@ -7,17 +7,17 @@ import type {
   ClingenApiRow,
 } from '@/types';
 
-// ClinGen API URL - use Vite proxy in development, CORS proxy in production
-const CLINGEN_TARGET_URL =
+// ClinGen API URL - use Vite proxy in development, direct in production
+const CLINGEN_API_URL =
   'https://search.clinicalgenome.org/api/validity?queryParams';
 
 function getClingenApiUrl(): string {
   if (import.meta.env.DEV) {
-    // Development: use Vite proxy
+    // Development: use Vite proxy to avoid CORS
     return '/api/clingen/validity?queryParams';
   }
-  // Production: use corsproxy.io (free CORS proxy service)
-  return `https://corsproxy.io/?${encodeURIComponent(CLINGEN_TARGET_URL)}`;
+  // Production: try direct fetch (may work from GitHub Pages domain)
+  return CLINGEN_API_URL;
 }
 
 export interface UseClingenValidityReturn {
