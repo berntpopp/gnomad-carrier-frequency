@@ -118,7 +118,7 @@ Plans:
 - [x] 03-01-PLAN.md — Template system foundation (types, renderer, JSON templates) [Wave 1]
 - [x] 03-02-PLAN.md — Pinia store and useTextGenerator composable [Wave 2]
 - [x] 03-03-PLAN.md — TextOutput UI and StepResults integration [Wave 3]
-- [ ] 03-04-PLAN.md — Gap closure: affected status granularity + patient sex for German grammar [Wave 1]
+- [x] 03-04-PLAN.md — Gap closure: affected status granularity + patient sex for German grammar [Wave 1]
 
 **Key Design Decisions:**
 - Config-driven templates with JSON (German + English)
@@ -173,10 +173,10 @@ Plans:
 |-------|--------|----------|
 | Phase 1: Foundation | Complete | 18/18 requirements |
 | Phase 2: Wizard UI | Complete | 10/10 requirements |
-| Phase 3: German Text | Gap Closure | 4/4 requirements (gaps being closed) |
+| Phase 3: German Text | Complete | 4/4 requirements (gaps closed) |
 | Phase 4: Deploy | Pending | Validation only |
 
-**Overall:** 32/32 requirements mapped (gap closure in progress)
+**Overall:** 32/32 requirements mapped (all phases 1-3 complete)
 
 ---
 
@@ -198,4 +198,4 @@ Plans:
 
 ---
 
-*Last updated: 2026-01-19 (Phase 3 gap closure plan added)*
+*Last updated: 2026-01-19 (Phase 3 complete with gap closure)*
