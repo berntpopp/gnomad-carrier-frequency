@@ -145,36 +145,40 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   });
 
   // Calculate global carrier frequency
-  // AN (sample size) is CONSTANT across variants, so we must NOT sum AN per variant.
-  // Correct: sum all AC, use max AN (per dataset) then combine exome+genome
+  //
+  // Mathematical approach: Sum of allele frequencies
+  // - Each variant has its own AN due to varying call rate
+  // - For exome+genome (different cohorts): combine AC and AN → variant AF
+  // - For multiple variants (same cohort): sum the AFs
+  //
+  // Formula: carrier_freq = 2 × Σ(variant_AF_i)
+  // where variant_AF = (exome_AC + genome_AC) / (exome_AN + genome_AN)
+  //
   const globalCarrierFrequency = computed((): number | null => {
     if (usingDefault.value) return defaultCarrierFrequency; // From config
     if (!aggregatedPops.value) return null;
 
-    // Track totals: sum AC across variants, max AN per dataset
-    let totalAC = 0;
-    let maxExomeAN = 0;
-    let maxGenomeAN = 0;
+    // Sum allele frequencies across all pathogenic variants
+    let sumAF = 0;
 
     for (const variant of pathogenicVariants.value) {
-      // Sum AC from both exome and genome (each variant contributes alleles)
+      // Combine exome and genome for this variant (different sample sets)
       const exomeAC = variant.exome?.ac ?? 0;
       const genomeAC = variant.genome?.ac ?? 0;
-      totalAC += exomeAC + genomeAC;
-
-      // Track max AN per dataset (sample size is constant, take max to handle call rate variation)
       const exomeAN = variant.exome?.an ?? 0;
       const genomeAN = variant.genome?.an ?? 0;
-      maxExomeAN = Math.max(maxExomeAN, exomeAN);
-      maxGenomeAN = Math.max(maxGenomeAN, genomeAN);
+
+      const combinedAC = exomeAC + genomeAC;
+      const combinedAN = exomeAN + genomeAN;
+
+      // Calculate this variant's AF and add to sum
+      if (combinedAN > 0) {
+        sumAF += combinedAC / combinedAN;
+      }
     }
 
-    // Combined AN = exome sample size + genome sample size
-    const totalAN = maxExomeAN + maxGenomeAN;
-    if (totalAN === 0) return null;
-
-    const globalAF = totalAC / totalAN;
-    return 2 * globalAF; // Carrier frequency = 2 × AF
+    if (sumAF === 0) return null;
+    return 2 * sumAF; // Carrier frequency = 2 × sum(AF)
   });
 
   // Build population frequency array (uses config for labels/thresholds)

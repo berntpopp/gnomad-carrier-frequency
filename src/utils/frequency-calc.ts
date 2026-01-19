@@ -51,26 +51,27 @@ export function calculateRecurrenceRisk(
 /**
  * Aggregate population frequencies from multiple variants
  *
- * Key insight: AN (allele number) is the sample size, which is CONSTANT for all
- * variants in a given population/dataset. We must NOT sum AN across variants.
+ * Mathematical approach: Sum of allele frequencies per population
  *
- * Correct approach:
- * - Sum AC across all variants (each variant contributes different alleles)
- * - Take max AN for exome + max AN for genome (sample size is constant per dataset)
+ * Why sum AFs instead of sum(AC)/sum(AN)?
+ * - AN varies per variant due to call rate (coverage/quality differences)
+ * - Summing AN would incorrectly weight variants
+ * - Summing AFs correctly handles varying sample sizes
  *
- * Example for NFE population with 2 variants:
- *   Variant 1: exome AC=100 AN=500k, genome AC=10 AN=50k
- *   Variant 2: exome AC=50 AN=500k, genome AC=5 AN=50k
- *   Total AC = 100+10+50+5 = 165
- *   Total AN = 500k + 50k = 550k (NOT 1.1M by summing all)
+ * For each population:
+ * 1. For each variant: variant_AF = (exome_AC + genome_AC) / (exome_AN + genome_AN)
+ * 2. Sum AFs across variants: total_AF = Σ(variant_AF_i)
+ * 3. Carrier frequency = 2 × total_AF
+ *
+ * We also track max AN for display purposes (to show representative sample size).
  */
 export function aggregatePopulationFrequencies(
   variants: VariantFrequencyData[],
   version: GnomadVersion
-): Map<string, { totalAC: number; totalAN: number }> {
+): Map<string, { sumAF: number; totalAC: number; maxAN: number }> {
   const result = new Map<
     string,
-    { totalAC: number; maxExomeAN: number; maxGenomeAN: number }
+    { sumAF: number; totalAC: number; maxExomeAN: number; maxGenomeAN: number }
   >();
 
   // Get population codes from config for this version
@@ -78,35 +79,57 @@ export function aggregatePopulationFrequencies(
 
   // Initialize all populations from config
   for (const pop of populationCodes) {
-    result.set(pop, { totalAC: 0, maxExomeAN: 0, maxGenomeAN: 0 });
+    result.set(pop, { sumAF: 0, totalAC: 0, maxExomeAN: 0, maxGenomeAN: 0 });
   }
 
   for (const variant of variants) {
-    // Process exome populations - sum AC, track max AN
-    for (const pop of variant.exome?.populations ?? []) {
-      if (populationCodes.includes(pop.id)) {
-        const current = result.get(pop.id)!;
-        current.totalAC += pop.ac;
-        current.maxExomeAN = Math.max(current.maxExomeAN, pop.an);
-      }
-    }
+    // Build a map of population data for this variant
+    const exomePops = new Map(
+      (variant.exome?.populations ?? []).map((p) => [p.id, p])
+    );
+    const genomePops = new Map(
+      (variant.genome?.populations ?? []).map((p) => [p.id, p])
+    );
 
-    // Process genome populations - sum AC, track max AN
-    for (const pop of variant.genome?.populations ?? []) {
-      if (populationCodes.includes(pop.id)) {
-        const current = result.get(pop.id)!;
-        current.totalAC += pop.ac;
-        current.maxGenomeAN = Math.max(current.maxGenomeAN, pop.an);
+    // For each population, calculate this variant's contribution
+    for (const popCode of populationCodes) {
+      const exomePop = exomePops.get(popCode);
+      const genomePop = genomePops.get(popCode);
+
+      const exomeAC = exomePop?.ac ?? 0;
+      const genomeAC = genomePop?.ac ?? 0;
+      const exomeAN = exomePop?.an ?? 0;
+      const genomeAN = genomePop?.an ?? 0;
+
+      const combinedAC = exomeAC + genomeAC;
+      const combinedAN = exomeAN + genomeAN;
+
+      const current = result.get(popCode)!;
+
+      // Sum AC for display
+      current.totalAC += combinedAC;
+
+      // Track max AN per dataset for display
+      current.maxExomeAN = Math.max(current.maxExomeAN, exomeAN);
+      current.maxGenomeAN = Math.max(current.maxGenomeAN, genomeAN);
+
+      // Sum AF for this variant's contribution to the population
+      if (combinedAN > 0) {
+        current.sumAF += combinedAC / combinedAN;
       }
     }
   }
 
-  // Convert to final format: totalAN = maxExomeAN + maxGenomeAN
-  const finalResult = new Map<string, { totalAC: number; totalAN: number }>();
+  // Convert to final format
+  const finalResult = new Map<
+    string,
+    { sumAF: number; totalAC: number; maxAN: number }
+  >();
   for (const [code, data] of result) {
     finalResult.set(code, {
+      sumAF: data.sumAF,
       totalAC: data.totalAC,
-      totalAN: data.maxExomeAN + data.maxGenomeAN,
+      maxAN: data.maxExomeAN + data.maxGenomeAN,
     });
   }
 
@@ -116,17 +139,20 @@ export function aggregatePopulationFrequencies(
 /**
  * Build PopulationFrequency results from aggregated data
  * Applies founder effect and low sample size detection using config thresholds
+ *
+ * Uses pre-computed sumAF from aggregation (mathematically correct for varying AN)
+ * Carrier frequency = 2 × sumAF
  */
 export function buildPopulationFrequencies(
-  aggregated: Map<string, { totalAC: number; totalAN: number }>,
+  aggregated: Map<string, { sumAF: number; totalAC: number; maxAN: number }>,
   globalCarrierFrequency: number | null,
   version: GnomadVersion
 ): PopulationFrequency[] {
   const results: PopulationFrequency[] = [];
 
   for (const [code, data] of aggregated) {
-    const af = calculateAlleleFrequency(data.totalAC, data.totalAN);
-    const carrierFreq = af !== null ? 2 * af : null;
+    // Carrier frequency = 2 × sum(AF) - already computed correctly in aggregation
+    const carrierFreq = data.sumAF > 0 ? 2 * data.sumAF : null;
 
     // Use thresholds from config
     const isFounderEffect =
@@ -139,8 +165,8 @@ export function buildPopulationFrequencies(
       label: getPopulationLabel(code, version), // Label from config
       carrierFrequency: carrierFreq,
       alleleCount: data.totalAC,
-      alleleNumber: data.totalAN,
-      isLowSampleSize: data.totalAN < lowSampleSizeThreshold, // Threshold from config
+      alleleNumber: data.maxAN, // Display max AN as representative sample size
+      isLowSampleSize: data.maxAN < lowSampleSizeThreshold, // Threshold from config
       isFounderEffect,
     });
   }
