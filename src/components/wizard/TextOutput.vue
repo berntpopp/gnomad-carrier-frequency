@@ -3,58 +3,61 @@
     class="mt-4"
     variant="outlined"
   >
-    <!-- Header row -->
-    <v-card-title class="d-flex align-center flex-wrap ga-2 pb-0">
+    <!-- Header row - stacks vertically on mobile -->
+    <v-card-title class="d-flex flex-column flex-sm-row align-start align-sm-center ga-2 pb-0">
       <span>{{ labels.title }}</span>
-      <v-spacer />
+      <v-spacer class="d-none d-sm-flex" />
 
-      <!-- Language toggle -->
-      <v-btn-toggle
-        v-model="languageModel"
-        mandatory
-        density="compact"
-        variant="outlined"
-      >
-        <v-btn
-          value="de"
-          size="small"
+      <!-- Controls container - wraps on mobile -->
+      <div class="d-flex flex-wrap align-center ga-2">
+        <!-- Language toggle -->
+        <v-btn-toggle
+          v-model="languageModel"
+          mandatory
+          density="compact"
+          variant="outlined"
         >
-          DE
-        </v-btn>
-        <v-btn
-          value="en"
-          size="small"
-        >
-          EN
-        </v-btn>
-      </v-btn-toggle>
+          <v-btn
+            value="de"
+            size="small"
+          >
+            DE
+          </v-btn>
+          <v-btn
+            value="en"
+            size="small"
+          >
+            EN
+          </v-btn>
+        </v-btn-toggle>
 
-      <!-- Gender style selector (German only) -->
-      <v-select
-        v-if="language === 'de'"
-        v-model="genderStyleModel"
-        :items="genderStyleOptions"
-        density="compact"
-        variant="outlined"
-        hide-details
-        style="max-width: 160px"
-      />
+        <!-- Gender style selector (German only) -->
+        <v-select
+          v-if="language === 'de'"
+          v-model="genderStyleModel"
+          :items="genderStyleOptions"
+          density="compact"
+          variant="outlined"
+          hide-details
+          style="max-width: 160px"
+        />
 
-      <!-- Patient sex selector (German only) -->
-      <v-select
-        v-if="language === 'de'"
-        v-model="patientSexModel"
-        :items="patientSexOptions"
-        :label="labels.patientSex"
-        density="compact"
-        variant="outlined"
-        hide-details
-        style="max-width: 200px"
-      />
+        <!-- Patient sex selector (German only) -->
+        <v-select
+          v-if="language === 'de'"
+          v-model="patientSexModel"
+          :items="patientSexOptions"
+          :label="labels.patientSex"
+          density="compact"
+          variant="outlined"
+          hide-details
+          style="max-width: 200px"
+        />
+      </div>
     </v-card-title>
 
     <v-card-text>
-      <!-- Perspective selector -->
+      <!-- Perspective selector - wraps on mobile -->
       <div class="mb-4">
         <div class="text-body-2 text-medium-emphasis mb-2">
           {{ labels.perspective }}
@@ -62,25 +65,29 @@
         <v-btn-toggle
           v-model="selectedPerspective"
           mandatory
-          density="compact"
+          :density="smAndDown ? 'default' : 'compact'"
           color="primary"
           variant="outlined"
+          class="flex-wrap"
         >
           <v-btn
             value="affected"
-            size="small"
+            :size="smAndDown ? 'default' : 'small'"
+            :min-height="smAndDown ? 44 : undefined"
           >
             {{ labels.perspectives.affected }}
           </v-btn>
           <v-btn
             value="carrier"
-            size="small"
+            :size="smAndDown ? 'default' : 'small'"
+            :min-height="smAndDown ? 44 : undefined"
           >
             {{ labels.perspectives.carrier }}
           </v-btn>
           <v-btn
             value="familyMember"
-            size="small"
+            :size="smAndDown ? 'default' : 'small'"
+            :min-height="smAndDown ? 44 : undefined"
           >
             {{ labels.perspectives.familyMember }}
           </v-btn>
@@ -98,7 +105,8 @@
             :key="section.id"
             :variant="section.enabled ? 'elevated' : 'outlined'"
             :color="section.enabled ? 'primary' : undefined"
-            size="small"
+            :size="smAndDown ? 'default' : 'small'"
+            :class="{ 'touch-chip': smAndDown }"
             @click="toggleSection(selectedPerspective, section.id)"
           >
             {{ section.label }}
@@ -119,11 +127,12 @@
         </v-card-text>
       </v-card>
 
-      <!-- Copy button -->
+      <!-- Copy button - touch-friendly on mobile -->
       <v-btn
         :color="copied ? 'success' : 'primary'"
         :prepend-icon="copied ? 'mdi-check' : 'mdi-content-copy'"
         :disabled="!generatedText"
+        :min-height="smAndDown ? 44 : undefined"
         variant="elevated"
         @click="copy(generatedText)"
       >
@@ -136,6 +145,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useClipboard } from '@vueuse/core';
+import { useDisplay } from 'vuetify';
 import { useTextGenerator } from '@/composables';
 import type {
   Perspective,
@@ -145,6 +155,9 @@ import type {
   IndexPatientStatus,
   CarrierFrequencyResult,
 } from '@/types';
+
+// Responsive breakpoint detection
+const { smAndDown } = useDisplay();
 
 const props = defineProps<{
   result: CarrierFrequencyResult | null;
@@ -275,3 +288,10 @@ const labels = computed(() =>
       }
 );
 </script>
+
+<style scoped>
+/* Touch-friendly chip minimum height for mobile */
+.touch-chip {
+  min-height: 36px;
+}
+</style>
