@@ -1,188 +1,250 @@
 <template>
   <v-footer
     app
-    class="text-caption text-medium-emphasis justify-center ga-2"
+    class="footer-container text-caption text-medium-emphasis"
   >
-    <!-- GitHub -->
-    <v-tooltip
-      text="Source code on GitHub"
-      location="top"
-    >
-      <template #activator="{ props }">
-        <v-btn
-          v-bind="props"
-          icon
-          variant="text"
-          size="small"
-          href="https://github.com/berntpopp/gnomad-carrier-frequency"
+    <div class="footer-content">
+      <!-- Primary row: GitHub, Version -->
+      <div class="footer-row footer-primary">
+        <!-- GitHub -->
+        <v-tooltip
+          text="Source code on GitHub"
+          location="top"
+        >
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              icon
+              variant="text"
+              size="small"
+              href="https://github.com/berntpopp/gnomad-carrier-frequency"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Source code on GitHub"
+            >
+              <v-icon size="small">
+                mdi-github
+              </v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+
+        <!-- Version -->
+        <a
+          :href="releasesUrl"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Source code on GitHub"
+          class="text-decoration-none text-inherit"
         >
-          <v-icon size="small">
-            mdi-github
-          </v-icon>
-        </v-btn>
-      </template>
-    </v-tooltip>
+          v{{ version }}
+        </a>
 
-    <span class="mx-1">|</span>
-
-    <!-- Version -->
-    <a
-      :href="releasesUrl"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="text-decoration-none text-inherit"
-    >
-      v{{ version }}
-    </a>
-
-    <span class="mx-1">|</span>
-
-    <!-- Data Sources Dialog -->
-    <DataSourcesDialog>
-      <template #activator="{ props }">
+        <!-- Disclaimer (reopen) -->
         <v-tooltip
-          text="Data sources"
+          text="View clinical disclaimer"
           location="top"
         >
-          <template #activator="{ props: tooltipProps }">
+          <template #activator="{ props }">
             <v-btn
-              v-bind="{ ...props, ...tooltipProps }"
+              v-bind="props"
               icon
               variant="text"
               size="small"
-              aria-label="View data sources"
+              aria-label="View clinical disclaimer"
+              @click="reopenDisclaimer"
             >
               <v-icon size="small">
-                mdi-database
+                mdi-alert-circle-outline
               </v-icon>
             </v-btn>
           </template>
         </v-tooltip>
-      </template>
-    </DataSourcesDialog>
+      </div>
 
-    <span class="mx-1">|</span>
+      <!-- Secondary row: Info buttons (hidden on very small screens, show on sm+) -->
+      <div class="footer-row footer-secondary d-none d-sm-flex">
+        <!-- Data Sources Dialog -->
+        <DataSourcesDialog>
+          <template #activator="{ props }">
+            <v-tooltip
+              text="Data sources"
+              location="top"
+            >
+              <template #activator="{ props: tooltipProps }">
+                <v-btn
+                  v-bind="{ ...props, ...tooltipProps }"
+                  icon
+                  variant="text"
+                  size="small"
+                  aria-label="View data sources"
+                >
+                  <v-icon size="small">
+                    mdi-database
+                  </v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+          </template>
+        </DataSourcesDialog>
 
-    <!-- Methodology Dialog -->
-    <MethodologyDialog>
-      <template #activator="{ props }">
+        <!-- Methodology Dialog -->
+        <MethodologyDialog>
+          <template #activator="{ props }">
+            <v-tooltip
+              text="Methodology"
+              location="top"
+            >
+              <template #activator="{ props: tooltipProps }">
+                <v-btn
+                  v-bind="{ ...props, ...tooltipProps }"
+                  icon
+                  variant="text"
+                  size="small"
+                  aria-label="View calculation methodology"
+                >
+                  <v-icon size="small">
+                    mdi-function-variant
+                  </v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+          </template>
+        </MethodologyDialog>
+
+        <!-- FAQ Dialog -->
+        <FaqDialog>
+          <template #activator="{ props }">
+            <v-tooltip
+              text="FAQ"
+              location="top"
+            >
+              <template #activator="{ props: tooltipProps }">
+                <v-btn
+                  v-bind="{ ...props, ...tooltipProps }"
+                  icon
+                  variant="text"
+                  size="small"
+                  aria-label="View frequently asked questions"
+                >
+                  <v-icon size="small">
+                    mdi-help-circle-outline
+                  </v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+          </template>
+        </FaqDialog>
+
+        <!-- About Dialog -->
+        <AboutDialog>
+          <template #activator="{ props }">
+            <v-tooltip
+              text="About"
+              location="top"
+            >
+              <template #activator="{ props: tooltipProps }">
+                <v-btn
+                  v-bind="{ ...props, ...tooltipProps }"
+                  icon
+                  variant="text"
+                  size="small"
+                  aria-label="About this application"
+                >
+                  <v-icon size="small">
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+          </template>
+        </AboutDialog>
+
+        <!-- Log Viewer -->
         <v-tooltip
-          text="Methodology"
+          text="View application logs"
           location="top"
         >
-          <template #activator="{ props: tooltipProps }">
+          <template #activator="{ props }">
             <v-btn
-              v-bind="{ ...props, ...tooltipProps }"
+              v-bind="props"
               icon
               variant="text"
               size="small"
-              aria-label="View calculation methodology"
+              aria-label="View application logs"
+              @click="emit('openLogViewer')"
             >
               <v-icon size="small">
-                mdi-function-variant
+                mdi-console
               </v-icon>
             </v-btn>
           </template>
         </v-tooltip>
-      </template>
-    </MethodologyDialog>
+      </div>
 
-    <!-- FAQ Dialog -->
-    <FaqDialog>
-      <template #activator="{ props }">
-        <v-tooltip
-          text="FAQ"
-          location="top"
-        >
-          <template #activator="{ props: tooltipProps }">
-            <v-btn
-              v-bind="{ ...props, ...tooltipProps }"
-              icon
-              variant="text"
-              size="small"
-              aria-label="View frequently asked questions"
-            >
-              <v-icon size="small">
-                mdi-help-circle-outline
-              </v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
-      </template>
-    </FaqDialog>
-
-    <!-- About Dialog -->
-    <AboutDialog>
-      <template #activator="{ props }">
-        <v-tooltip
-          text="About"
-          location="top"
-        >
-          <template #activator="{ props: tooltipProps }">
-            <v-btn
-              v-bind="{ ...props, ...tooltipProps }"
-              icon
-              variant="text"
-              size="small"
-              aria-label="About this application"
-            >
-              <v-icon size="small">
-                mdi-information-outline
-              </v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
-      </template>
-    </AboutDialog>
-
-    <span class="mx-1">|</span>
-
-    <!-- Log Viewer -->
-    <v-tooltip
-      text="View application logs"
-      location="top"
-    >
-      <template #activator="{ props }">
-        <v-btn
-          v-bind="props"
-          icon
-          variant="text"
-          size="small"
-          aria-label="View application logs"
-          @click="emit('openLogViewer')"
-        >
-          <v-icon size="small">
-            mdi-console
-          </v-icon>
-        </v-btn>
-      </template>
-    </v-tooltip>
-
-    <span class="mx-1">|</span>
-
-    <!-- Disclaimer (reopen) -->
-    <v-tooltip
-      text="View clinical disclaimer"
-      location="top"
-    >
-      <template #activator="{ props }">
-        <v-btn
-          v-bind="props"
-          icon
-          variant="text"
-          size="small"
-          aria-label="View clinical disclaimer"
-          @click="reopenDisclaimer"
-        >
-          <v-icon size="small">
-            mdi-alert-circle-outline
-          </v-icon>
-        </v-btn>
-      </template>
-    </v-tooltip>
+      <!-- Mobile menu button (visible only on xs screens) -->
+      <v-menu
+        location="top"
+        class="d-sm-none"
+      >
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            icon
+            variant="text"
+            size="small"
+            aria-label="More options"
+            class="d-sm-none"
+          >
+            <v-icon size="small">
+              mdi-dots-horizontal
+            </v-icon>
+          </v-btn>
+        </template>
+        <v-list density="compact">
+          <DataSourcesDialog>
+            <template #activator="{ props }">
+              <v-list-item
+                v-bind="props"
+                prepend-icon="mdi-database"
+                title="Data Sources"
+              />
+            </template>
+          </DataSourcesDialog>
+          <MethodologyDialog>
+            <template #activator="{ props }">
+              <v-list-item
+                v-bind="props"
+                prepend-icon="mdi-function-variant"
+                title="Methodology"
+              />
+            </template>
+          </MethodologyDialog>
+          <FaqDialog>
+            <template #activator="{ props }">
+              <v-list-item
+                v-bind="props"
+                prepend-icon="mdi-help-circle-outline"
+                title="FAQ"
+              />
+            </template>
+          </FaqDialog>
+          <AboutDialog>
+            <template #activator="{ props }">
+              <v-list-item
+                v-bind="props"
+                prepend-icon="mdi-information-outline"
+                title="About"
+              />
+            </template>
+          </AboutDialog>
+          <v-list-item
+            prepend-icon="mdi-console"
+            title="View Logs"
+            @click="emit('openLogViewer')"
+          />
+        </v-list>
+      </v-menu>
+    </div>
   </v-footer>
 </template>
 
@@ -210,5 +272,43 @@ const reopenDisclaimer = () => {
 <style scoped>
 .text-inherit {
   color: inherit;
+}
+
+.footer-container {
+  padding: 4px 8px;
+}
+
+.footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer-primary {
+  /* Always visible */
+}
+
+.footer-secondary {
+  /* Hidden on xs, visible on sm+ via Vuetify display classes */
+}
+
+/* Compact spacing on mobile */
+@media (max-width: 599px) {
+  .footer-container {
+    padding: 2px 4px;
+  }
+
+  .footer-content {
+    gap: 2px;
+  }
 }
 </style>
