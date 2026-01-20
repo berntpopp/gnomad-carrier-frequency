@@ -4,6 +4,7 @@
     :max-width="dialogMaxWidth"
     :fullscreen="smAndDown"
     persistent
+    aria-label="Settings"
     @update:model-value="(val: boolean) => val ? onDialogOpen() : undefined"
   >
     <v-card ref="dialogCard">

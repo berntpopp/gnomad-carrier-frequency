@@ -5,6 +5,7 @@
     :width="dialogWidth"
     max-width="1400"
     scrollable
+    aria-label="Variant Details"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <v-card>

@@ -3,6 +3,7 @@
     v-model="dialog"
     max-width="700"
     scrollable
+    aria-label="Frequently Asked Questions"
   >
     <template #activator="{ props }">
       <slot

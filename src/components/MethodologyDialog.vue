@@ -3,6 +3,7 @@
     v-model="dialog"
     max-width="700"
     scrollable
+    aria-label="Calculation Methodology"
   >
     <template #activator="{ props }">
       <slot

@@ -2,6 +2,7 @@
   <v-dialog
     v-model="dialog"
     max-width="500"
+    aria-label="Data Sources"
   >
     <template #activator="{ props }">
       <slot

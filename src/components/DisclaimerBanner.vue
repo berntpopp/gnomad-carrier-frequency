@@ -4,6 +4,7 @@
     max-width="600"
     persistent
     :scrim="true"
+    aria-label="Clinical Disclaimer"
   >
     <v-card>
       <v-card-title class="d-flex align-center">
