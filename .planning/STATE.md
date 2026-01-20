@@ -7,26 +7,26 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.2 Sharing & Collaboration - Phase 14 (Mobile Optimization)
+**Current focus:** v1.2 Sharing & Collaboration - Phase 15 (Search History)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.2 Sharing & Collaboration
-**Phase:** 14 - Mobile Optimization - Complete
-**Plan:** 3 of 3 complete
-**Status:** Phase 14 complete, ready for Phase 15
+**Phase:** 15 - Search History - In Progress
+**Plan:** 1 of 3 complete
+**Status:** 15-01 complete, continuing with 15-02
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
-v1.2 Sharing:       [#########-] 90% - Phase 14 complete
+v1.2 Sharing:       [#########-] 93% - Phase 15 plan 1/3 complete
 ```
 
-**Overall:** 39 plans complete for v1.0+v1.1+v1.2 (Phases 11-14)
+**Overall:** 40 plans complete for v1.0+v1.1+v1.2 (Phases 11-15)
 
 ---
 
@@ -62,7 +62,7 @@ v1.2 Sharing:       [#########-] 90% - Phase 14 complete
 | 12 | PWA | 6 | Complete (3/3 plans) |
 | 13 | Variant Exclusion | 8 | Complete (4/4 plans) |
 | 14 | Mobile Optimization | 8 | Complete (3/3 plans) |
-| 15 | Search History | 10 | Not Planned |
+| 15 | Search History | 10 | In Progress (1/3 plans) |
 
 ---
 
@@ -174,6 +174,9 @@ v1.2 Sharing:       [#########-] 90% - Phase 14 complete
 | 44px min-height for mobile touch targets | WCAG 2.5.8 (AAA) compliance for primary actions | 2026-01-20 |
 | Mobile density pattern | :density="smAndDown ? 'default' : 'compact'" for touch-friendly controls | 2026-01-20 |
 | Mobile slider tick labels | Hide tick labels on mobile to prevent overlap | 2026-01-20 |
+| History 50-entry default | Reasonable balance of utility vs storage per CONTEXT.md | 2026-01-20 |
+| carrier-freq-history localStorage key | Consistent with project convention (carrier-freq-*) | 2026-01-20 |
+| Duplicate detection 30s window | Same gene within 30s = skip save to prevent duplicates | 2026-01-20 |
 
 ### Roadmap Evolution
 
@@ -193,8 +196,10 @@ None.
 - [x] Execute 14-01-PLAN.md (responsive dialogs and navigation)
 - [x] Execute 14-02-PLAN.md (mobile table scrolling)
 - [x] Execute 14-03-PLAN.md (touch-friendly interactions)
-- [ ] Run `/gsd:plan-phase 15` to create Search History plans
-- [ ] Execute Phase 15 plans
+- [x] Run `/gsd:plan-phase 15` to create Search History plans
+- [x] Execute 15-01-PLAN.md (history infrastructure)
+- [ ] Execute 15-02-PLAN.md (history UI)
+- [ ] Execute 15-03-PLAN.md (restore functionality)
 - [x] Run `/gsd:plan-phase 11` to create URL State Sharing plans
 - [x] Execute 11-01-PLAN.md (URL state infrastructure)
 - [x] Execute 11-02-PLAN.md (share UI)
@@ -247,10 +252,19 @@ None.
 ### Last Session
 
 **Date:** 2026-01-20
-**Completed:** 14-03-PLAN.md (touch-friendly interactions)
-**Status:** Phase 14 complete (3/3 plans)
+**Completed:** 15-01-PLAN.md (history infrastructure)
+**Status:** Phase 15 in progress (1/3 plans)
 
 ### Handoff Notes
+
+v1.2 Phase 15 Plan 01 complete:
+- History types: HistoryEntry, HistorySettings, HistoryStoreState
+- History Pinia store with ring buffer (50-entry default)
+- groupedByDate getter for timeline UI
+- useHistoryAutoSave composable for automatic saving
+- Auto-save triggers on entering step 4 (results)
+- Duplicate detection: same gene within 30s = skip
+- Persistence: localStorage 'carrier-freq-history'
 
 v1.2 Phase 14 execution complete with post-checkpoint fixes:
 - Plan 14-01: Responsive dialogs (fullscreen on mobile), log panel width
@@ -408,3 +422,4 @@ v1.1 roadmap derived from requirements and research:
 *14-02 complete: 2026-01-20*
 *14-03 complete: 2026-01-20*
 *Phase 14 complete: 2026-01-20*
+*15-01 complete: 2026-01-20*
