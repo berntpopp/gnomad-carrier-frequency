@@ -26,6 +26,25 @@
       <v-spacer />
 
       <v-tooltip
+        text="Search history"
+        location="bottom"
+        aria-label="Search history"
+      >
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            icon
+            variant="text"
+            title="Search history"
+            aria-label="Search history"
+            @click="emit('openHistory')"
+          >
+            <v-icon>mdi-history</v-icon>
+          </v-btn>
+        </template>
+      </v-tooltip>
+
+      <v-tooltip
         text="Toggle theme"
         location="bottom"
         aria-label="Toggle theme"
@@ -94,6 +113,7 @@ const { showBackOnlineNotification, dismissBackOnlineNotification } = useNetwork
 
 const emit = defineEmits<{
   openSettings: [];
+  openHistory: [];
   reset: [];
 }>();
 </script>

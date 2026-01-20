@@ -48,3 +48,6 @@ export type { UseExclusionStateReturn } from './useExclusionState';
 
 export { useHistoryAutoSave } from './useHistoryAutoSave';
 export type { UseHistoryAutoSaveReturn } from './useHistoryAutoSave';
+
+export { useHistoryRestore } from './useHistoryRestore';
+export type { UseHistoryRestoreReturn } from './useHistoryRestore';

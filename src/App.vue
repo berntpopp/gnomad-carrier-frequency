@@ -4,6 +4,7 @@
     <DisclaimerBanner />
     <AppBar
       @open-settings="showSettings = true"
+      @open-history="showHistory = true"
       @reset="handleReset"
     />
 
@@ -44,6 +45,10 @@
 
     <SettingsDialog v-model="showSettings" />
     <LogViewerPanel v-model="showLogViewer" />
+    <HistoryDrawer
+      v-model="showHistory"
+      @restore="handleHistoryRestore"
+    />
 
     <!-- PWA Update Notification -->
     <v-snackbar
@@ -99,12 +104,14 @@ import AppFooter from '@/components/AppFooter.vue';
 import DisclaimerBanner from '@/components/DisclaimerBanner.vue';
 import SettingsDialog from '@/components/SettingsDialog.vue';
 import LogViewerPanel from '@/components/LogViewerPanel.vue';
+import HistoryDrawer from '@/components/HistoryDrawer.vue';
 import WizardStepper from '@/components/wizard/WizardStepper.vue';
 import { useLogStore } from '@/stores/useLogStore';
-import { useWizard, useUrlState, usePwaUpdate } from '@/composables';
+import { useWizard, useUrlState, usePwaUpdate, useHistoryAutoSave } from '@/composables';
 
 const showSettings = ref(false);
 const showLogViewer = ref(false);
+const showHistory = ref(false);
 
 // Wizard reset
 const { resetWizard } = useWizard();
@@ -129,6 +136,18 @@ watch(offlineReady, (value) => {
 function handleReset() {
   resetWizard();
 }
+
+/**
+ * Handle restoring a history entry (placeholder for Plan 03)
+ */
+function handleHistoryRestore(id: string) {
+  // Restoration logic implemented in Plan 03
+  console.log('Restore history entry:', id);
+}
+
+// Initialize history auto-save
+const { initialize: initHistoryAutoSave } = useHistoryAutoSave();
+initHistoryAutoSave();
 
 // App startup
 const logStore = useLogStore();
