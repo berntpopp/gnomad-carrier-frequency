@@ -208,7 +208,7 @@
       </v-data-table>
     </div>
 
-    <!-- View all variants, export, and share buttons -->
+    <!-- View all variants, export, and share buttons - touch-friendly on mobile -->
     <div
       v-if="filteredCount > 0"
       class="d-flex align-center flex-wrap gap-2 mt-3"
@@ -217,6 +217,7 @@
         variant="text"
         color="primary"
         prepend-icon="mdi-table"
+        :min-height="smAndDown ? 44 : undefined"
         @click="openAllVariantsModal"
       >
         View all variants ({{ filteredCount }})
@@ -230,6 +231,7 @@
             variant="outlined"
             color="secondary"
             prepend-icon="mdi-download"
+            :min-height="smAndDown ? 44 : undefined"
           >
             Export
             <v-icon end>
@@ -237,15 +239,17 @@
             </v-icon>
           </v-btn>
         </template>
-        <v-list density="compact">
+        <v-list :density="smAndDown ? 'default' : 'compact'">
           <v-list-item
             prepend-icon="mdi-code-json"
+            :min-height="smAndDown ? 44 : undefined"
             @click="handleExport('json')"
           >
             <v-list-item-title>Export as JSON</v-list-item-title>
           </v-list-item>
           <v-list-item
             prepend-icon="mdi-file-excel"
+            :min-height="smAndDown ? 44 : undefined"
             @click="handleExport('xlsx')"
           >
             <v-list-item-title>Export as Excel</v-list-item-title>
@@ -262,6 +266,7 @@
             :color="copied ? 'success' : 'primary'"
             :prepend-icon="copied ? 'mdi-check' : 'mdi-link'"
             :disabled="!clipboardSupported"
+            :min-height="smAndDown ? 44 : undefined"
             aria-label="Copy shareable link to clipboard"
             @click="copyShareLink"
           >
@@ -299,10 +304,11 @@
       :using-default="usingDefault"
     />
 
-    <!-- Navigation buttons -->
+    <!-- Navigation buttons - touch-friendly on mobile -->
     <div class="d-flex justify-space-between mt-6">
       <v-btn
         variant="text"
+        :min-height="smAndDown ? 44 : undefined"
         @click="$emit('back')"
       >
         Back
@@ -310,6 +316,7 @@
       <v-btn
         variant="outlined"
         color="primary"
+        :min-height="smAndDown ? 44 : undefined"
         @click="$emit('restart')"
       >
         Start Over
@@ -330,7 +337,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useClipboard } from '@vueuse/core';
+import { useDisplay } from 'vuetify';
 import { config, getGnomadVersion, getPopulationLabel } from '@/config';
+
+// Responsive breakpoint detection
+const { smAndDown } = useDisplay();
 import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@/types';
 import type { ClinVarSubmission } from '@/api/queries';
 import { useFilterStore } from '@/stores/useFilterStore';
