@@ -10,19 +10,20 @@
       density="compact"
       class="mb-2 mx-4"
     />
-    <v-data-table
-      :headers="headers"
-      :items="variants"
-      :loading="loading"
-      :sort-by="sortBy"
-      :search="search"
-      :items-per-page="10"
-      density="compact"
-      item-value="variant_id"
-      show-expand
-      class="elevation-0"
-      :item-class="getRowClass"
-    >
+    <div class="table-scroll-wrapper">
+      <v-data-table
+        :headers="headers"
+        :items="variants"
+        :loading="loading"
+        :sort-by="sortBy"
+        :search="search"
+        :items-per-page="10"
+        density="compact"
+        item-value="variant_id"
+        show-expand
+        class="elevation-0 variant-table"
+        :item-class="getRowClass"
+      >
       <!-- Header checkbox for bulk include/exclude -->
       <template #[`header.include`]>
         <v-checkbox-btn
@@ -285,6 +286,7 @@
         <v-skeleton-loader type="table-row@5" />
       </template>
     </v-data-table>
+    </div>
   </div>
 </template>
 
@@ -442,7 +444,54 @@ function formatClinvarStatus(status: string): string {
   font-family: monospace;
 }
 
-/* Excluded row styling */
+/* Horizontal scroll wrapper for mobile */
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+/* Freeze first column (checkbox) */
+:deep(.variant-table) th:first-child,
+:deep(.variant-table) td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: rgb(var(--v-theme-surface));
+}
+
+/* Freeze second column (variant ID) */
+:deep(.variant-table) th:nth-child(2),
+:deep(.variant-table) td:nth-child(2) {
+  position: sticky;
+  left: 48px; /* Width of checkbox column */
+  z-index: 2;
+  background: rgb(var(--v-theme-surface));
+}
+
+/* Add shadow to indicate scrollable content */
+:deep(.variant-table) th:nth-child(2)::after,
+:deep(.variant-table) td:nth-child(2)::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -8px;
+  bottom: 0;
+  width: 8px;
+  background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+  pointer-events: none;
+}
+
+/* Ensure expand column gets sticky too for consistency */
+:deep(.variant-table) th:last-child,
+:deep(.variant-table) td:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: rgb(var(--v-theme-surface));
+}
+
+/* Excluded row styling - override background for frozen columns */
 :deep(.excluded-row) {
   opacity: 0.6;
 }
@@ -451,8 +500,21 @@ function formatClinvarStatus(status: string): string {
   color: rgba(var(--v-theme-on-surface), 0.6) !important;
 }
 
+:deep(.excluded-row) td:first-child,
+:deep(.excluded-row) td:nth-child(2),
+:deep(.excluded-row) td:last-child {
+  background: rgb(var(--v-theme-surface));
+}
+
 /* Maintain hover for re-inclusion */
 :deep(.excluded-row:hover) {
   opacity: 0.8;
+}
+
+/* Expanded row background - ensure frozen cells inherit */
+:deep(.bg-grey-lighten-5) td:first-child,
+:deep(.bg-grey-lighten-5) td:nth-child(2),
+:deep(.bg-grey-lighten-5) td:last-child {
+  background: #fafafa; /* grey-lighten-5 */
 }
 </style>
