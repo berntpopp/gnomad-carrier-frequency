@@ -156,10 +156,12 @@ Plans:
 - HIST-09: History persists across browser sessions (localStorage)
 - HIST-10: History works offline (uses cached data)
 
-**Plans:** 0 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 15 to break down)
+- [ ] 15-01-PLAN.md - History infrastructure (types, useHistoryStore, useHistoryAutoSave)
+- [ ] 15-02-PLAN.md - History UI (HistoryPanel, HistoryDrawer, AppBar icon)
+- [ ] 15-03-PLAN.md - State restoration and settings (useHistoryRestore, Settings history section)
 
 **Success Criteria:**
 1. User can see list of previous calculations in a history panel/menu
@@ -412,8 +414,8 @@ Plans:
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
 | v1.1 Release-Ready | 5-10 | 27/27 | Complete | 2026-01-19 |
-| v1.2 Sharing & Collaboration | 11-15 | 12/12 | In Progress | - |
+| v1.2 Sharing & Collaboration | 11-15 | 15/15 | In Progress | - |
 
 ---
 
-*Last updated: 2026-01-20 (Phase 14 planned - 3 plans in 2 waves)*
+*Last updated: 2026-01-20 (Phase 15 planned - 3 plans in 2 waves)*
