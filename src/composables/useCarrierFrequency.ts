@@ -79,7 +79,13 @@ export interface UseCarrierFrequencyReturn {
   refetch: () => Promise<void>;
 }
 
+// Singleton instance for shared state across all callers
+let instance: UseCarrierFrequencyReturn | null = null;
+
 export function useCarrierFrequency(): UseCarrierFrequencyReturn {
+  // Return cached instance if already created (singleton pattern)
+  if (instance) return instance;
+
   const geneSymbol = ref<string | null>(null);
   const { version } = useGnomadVersion();
   const filterStore = useFilterStore();
@@ -352,7 +358,8 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     };
   };
 
-  return {
+  // Cache and return the singleton instance
+  instance = {
     geneSymbol,
     setGeneSymbol,
     isLoading,
@@ -379,4 +386,6 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     calculateRisk,
     refetch,
   };
+
+  return instance;
 }

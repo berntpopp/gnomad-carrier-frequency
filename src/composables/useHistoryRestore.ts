@@ -47,23 +47,13 @@ export function useHistoryRestore() {
       // This prevents accidental data loss when browsing history
       saveCurrentCalculation();
 
-      // Step 2: Restore gene
-      // Update wizard state with gene info
-      wizardState.gene = {
-        ensembl_id: entry.gene.ensembl_id,
-        symbol: entry.gene.symbol,
-      };
+      // Step 2: Clear gene first to avoid triggering the downstream reset watcher
+      // The watcher only resets if oldGene !== null AND currentStep > 1
+      // By clearing the gene first, we ensure a clean state transition
+      wizardState.gene = null;
 
-      // Reset exclusions for this gene first
-      resetForGene(entry.gene.symbol);
-
-      // Trigger gene search/selection which fetches variant data
-      geneSearch.selectGene(wizardState.gene);
-
-      // Set gene symbol in carrier frequency composable (triggers data fetch)
-      setGeneSymbol(entry.gene.symbol);
-
-      // Step 3: Restore wizard state
+      // Step 3: Restore wizard state BEFORE setting gene
+      // This prevents the gene watcher from overwriting these values
       wizardState.indexStatus = entry.indexStatus;
       wizardState.frequencySource = entry.frequencySource;
       wizardState.literatureFrequency = entry.literatureFrequency;
@@ -74,13 +64,27 @@ export function useHistoryRestore() {
       setFilterConfig({ ...entry.filterConfig });
 
       // Step 5: Restore exclusions
+      resetForGene(entry.gene.symbol);
       if (entry.excludedVariantIds.length > 0) {
         setExclusions(entry.excludedVariantIds);
       }
 
-      // Step 6: Navigate to results step
-      // Directly set currentStep to bypass validation since we're restoring valid state
+      // Step 6: Navigate to results step BEFORE setting gene
+      // This way when we set gene, the watcher won't reset (currentStep check passes)
       wizardState.currentStep = 4;
+
+      // Step 7: Now set the gene - the watcher won't reset because we're on step 4
+      // and setting from null doesn't trigger the reset (oldGene check)
+      wizardState.gene = {
+        ensembl_id: entry.gene.ensembl_id,
+        symbol: entry.gene.symbol,
+      };
+
+      // Trigger gene search/selection which fetches variant data
+      geneSearch.selectGene(wizardState.gene);
+
+      // Set gene symbol in carrier frequency composable (triggers data fetch)
+      setGeneSymbol(entry.gene.symbol);
 
       return true;
     } catch (error) {

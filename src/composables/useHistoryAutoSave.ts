@@ -6,6 +6,8 @@ import { useExclusionState } from './useExclusionState';
 
 // Track if already initialized (singleton pattern)
 let isInitialized = false;
+// Track if we've already saved for the current calculation (module-level for singleton)
+let lastSavedGene: string | null = null;
 
 /**
  * Composable that automatically saves completed calculations to history.
@@ -35,6 +37,25 @@ export function useHistoryAutoSave() {
         if (newStep === 4 && oldStep !== 4) {
           saveCurrentCalculation();
         }
+        // Reset tracking when leaving step 4
+        if (newStep !== 4) {
+          lastSavedGene = null;
+        }
+      }
+    );
+
+    // Also watch for result changes when on step 4
+    // This handles the case where step transitions before result is ready
+    watch(
+      () => result.value?.globalCarrierFrequency,
+      (newFreq) => {
+        if (
+          wizardState.currentStep === 4 &&
+          newFreq !== null &&
+          newFreq !== undefined
+        ) {
+          saveCurrentCalculation();
+        }
       }
     );
   }
@@ -42,13 +63,23 @@ export function useHistoryAutoSave() {
   function saveCurrentCalculation() {
     // Must have valid gene and result
     if (!wizardState.gene || !result.value) {
+      console.log('[HistoryAutoSave] Skip: no gene or result', { gene: wizardState.gene, result: result.value });
       return;
     }
 
     // Must have valid carrier frequency
     if (result.value.globalCarrierFrequency === null) {
+      console.log('[HistoryAutoSave] Skip: globalCarrierFrequency is null');
       return;
     }
+
+    // Skip if we already saved this gene in current session
+    if (lastSavedGene === wizardState.gene.symbol) {
+      console.log('[HistoryAutoSave] Skip: already saved', lastSavedGene);
+      return;
+    }
+
+    console.log('[HistoryAutoSave] Attempting save for', wizardState.gene.symbol);
 
     // Check for duplicate (same gene within 30 seconds)
     const mostRecent = historyStore.mostRecent;
@@ -57,9 +88,13 @@ export function useHistoryAutoSave() {
       const recentEnough = Date.now() - mostRecent.timestamp < 30000;
       if (sameGene && recentEnough) {
         // Skip duplicate save
+        lastSavedGene = wizardState.gene.symbol;
         return;
       }
     }
+
+    // Track that we saved this gene
+    lastSavedGene = wizardState.gene.symbol;
 
     // Build entry from current state
     historyStore.addEntry({
