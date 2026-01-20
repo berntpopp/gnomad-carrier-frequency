@@ -1,4 +1,5 @@
 import { watch, toRaw } from 'vue';
+import { watchDebounced } from '@vueuse/core';
 import { useHistoryStore } from '@/stores/useHistoryStore';
 import { useWizard } from './useWizard';
 import { useCarrierFrequency } from './useCarrierFrequency';
@@ -8,6 +9,8 @@ import { useExclusionState } from './useExclusionState';
 let isInitialized = false;
 // Track if we've already saved for the current calculation (module-level for singleton)
 let lastSavedGene: string | null = null;
+// Track the ID of the current session's entry (for updates)
+let currentEntryId: string | null = null;
 
 /**
  * Composable that automatically saves completed calculations to history.
@@ -40,6 +43,7 @@ export function useHistoryAutoSave() {
         // Reset tracking when leaving step 4
         if (newStep !== 4) {
           lastSavedGene = null;
+          currentEntryId = null;
         }
       }
     );
@@ -57,6 +61,30 @@ export function useHistoryAutoSave() {
           saveCurrentCalculation();
         }
       }
+    );
+
+    // Watch for filter config changes when on step 4 - update existing entry
+    // Debounced to avoid excessive updates during slider drags
+    watchDebounced(
+      () => ({ ...filterConfig.value }),
+      () => {
+        if (wizardState.currentStep === 4 && currentEntryId) {
+          updateCurrentEntry();
+        }
+      },
+      { debounce: 500, deep: true }
+    );
+
+    // Watch for exclusion changes when on step 4 - update existing entry
+    // Debounced to avoid excessive updates during rapid checkbox toggles
+    watchDebounced(
+      () => [...excluded.value],
+      () => {
+        if (wizardState.currentStep === 4 && currentEntryId) {
+          updateCurrentEntry();
+        }
+      },
+      { debounce: 500 }
     );
   }
 
@@ -106,6 +134,32 @@ export function useHistoryAutoSave() {
       frequencySource: wizardState.frequencySource,
       literatureFrequency: wizardState.literatureFrequency,
       literaturePmid: wizardState.literaturePmid,
+      filterConfig: { ...toRaw(filterConfig.value) },
+      excludedVariantIds: [...excluded.value],
+      results: {
+        globalCarrierFrequency: result.value.globalCarrierFrequency,
+        qualifyingVariantCount: result.value.qualifyingVariantCount,
+        gnomadVersion: currentVersion.value,
+      },
+    });
+
+    // Track the entry ID for subsequent updates
+    currentEntryId = historyStore.mostRecent?.id ?? null;
+    console.log('[HistoryAutoSave] Saved entry', currentEntryId);
+  }
+
+  /**
+   * Update the current entry with changed filter config or exclusions.
+   * Called when filters or exclusions change while on step 4.
+   */
+  function updateCurrentEntry() {
+    if (!currentEntryId || !result.value) {
+      return;
+    }
+
+    console.log('[HistoryAutoSave] Updating entry', currentEntryId, 'with filter/exclusion changes');
+
+    historyStore.updateEntry(currentEntryId, {
       filterConfig: { ...toRaw(filterConfig.value) },
       excludedVariantIds: [...excluded.value],
       results: {

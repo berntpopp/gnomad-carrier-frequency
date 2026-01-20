@@ -111,6 +111,20 @@ export const useHistoryStore = defineStore('history', {
     getEntry(id: string): HistoryEntry | undefined {
       return this.entries.find(e => e.id === id);
     },
+
+    /**
+     * Update an existing entry by ID (preserves timestamp and id)
+     * Used to update filter/exclusion changes without creating a new entry
+     */
+    updateEntry(id: string, updates: Partial<Omit<HistoryEntry, 'id' | 'timestamp'>>) {
+      const index = this.entries.findIndex(e => e.id === id);
+      if (index > -1) {
+        this.entries[index] = {
+          ...this.entries[index],
+          ...updates,
+        };
+      }
+    },
   },
 
   persist: {
