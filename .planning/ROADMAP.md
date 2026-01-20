@@ -105,34 +105,36 @@ Plans:
 
 ---
 
-### Phase 14: Mobile Optimization
+### Phase 14: Mobile Optimization ✓
 
 **Goal:** App provides optimal user experience on small screens (phones) with responsive layouts and touch-friendly interactions
 
 **Dependencies:** Phase 13 (all features complete to optimize)
 
 **Requirements:**
-- MOB-01: App layout adapts gracefully to viewport widths < 600px
-- MOB-02: Wizard steps display correctly on mobile without horizontal scrolling
-- MOB-03: Variant table is usable on small screens (horizontal scroll or responsive layout)
-- MOB-04: Settings dialog works on mobile viewport
-- MOB-05: Touch targets meet minimum 44x44px accessibility guidelines
-- MOB-06: Text remains readable without zooming on mobile
-- MOB-07: Modals and dialogs fit within mobile viewport
-- MOB-08: Copy/share functionality works on mobile browsers
+- MOB-01: App layout adapts gracefully to viewport widths < 600px ✓
+- MOB-02: Wizard steps display correctly on mobile without horizontal scrolling ✓
+- MOB-03: Variant table is usable on small screens (horizontal scroll or responsive layout) ✓
+- MOB-04: Settings dialog works on mobile viewport ✓
+- MOB-05: Touch targets meet minimum 44x44px accessibility guidelines ✓
+- MOB-06: Text remains readable without zooming on mobile ✓
+- MOB-07: Modals and dialogs fit within mobile viewport ✓
+- MOB-08: Copy/share functionality works on mobile browsers ✓
 
-**Plans:** 3 plans
+**Plans:** 3 plans (complete)
 
 Plans:
-- [ ] 14-01-PLAN.md - Responsive dialogs and stepper (fullscreen dialogs, alt-labels stepper, log panel width)
-- [ ] 14-02-PLAN.md - Data table optimization (horizontal scroll, frozen columns for VariantTable and StepResults)
-- [ ] 14-03-PLAN.md - Mobile polish (TextOutput controls, FilterPanel slider, touch targets, verification)
+- [x] 14-01-PLAN.md - Responsive dialogs and stepper (fullscreen dialogs, alt-labels stepper, log panel width)
+- [x] 14-02-PLAN.md - Data table optimization (horizontal scroll, frozen columns for VariantTable and StepResults)
+- [x] 14-03-PLAN.md - Mobile polish (TextOutput controls, FilterPanel slider, touch targets, verification)
 
 **Success Criteria:**
-1. User can complete full calculation workflow on a phone-sized screen
-2. All interactive elements are easily tappable without zoom
-3. Tables and data remain accessible (scrollable or responsive)
-4. No horizontal overflow on any screen size
+1. ✓ User can complete full calculation workflow on a phone-sized screen
+2. ✓ All interactive elements are easily tappable without zoom
+3. ✓ Tables and data remain accessible (scrollable or responsive)
+4. ✓ No horizontal overflow on any screen size
+
+**Completed:** 2026-01-20
 
 ---
 

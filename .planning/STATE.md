@@ -252,13 +252,18 @@ None.
 
 ### Handoff Notes
 
-v1.2 Phase 14 Plan 03 complete:
-- TextOutput controls stack vertically on mobile with flex wrapping
-- Perspective buttons and section chips have larger sizes on mobile
-- FilterPanel slider hides tick labels on mobile to prevent overlap
-- All switches use default density on mobile for touch-friendly interaction
-- All primary action buttons have 44px min-height touch targets on mobile
-- Pattern established: :min-height="smAndDown ? 44 : undefined"
+v1.2 Phase 14 execution complete with post-checkpoint fixes:
+- Plan 14-01: Responsive dialogs (fullscreen on mobile), log panel width
+- Plan 14-02: Horizontal scroll tables with frozen columns
+- Plan 14-03: Touch-friendly controls, 44px targets
+- Orchestrator fixes during verification:
+  - Stepper titles hidden on xs screens (numbers only)
+  - Footer uses overflow menu on mobile
+  - Log viewer drawer uses pixel width (Vuetify bug workaround)
+- Accessibility fixes (Lighthouse regression):
+  - aria-label added to all dialogs (7 components)
+  - aria-label added to all tooltips (6 components, Vuetify bug #21242 workaround)
+  - Lighthouse accessibility score restored: 0.96 (target: >= 0.95)
 
 v1.2 Phase 14 Plan 02 complete:
 - VariantTable wrapped in horizontal scroll container
