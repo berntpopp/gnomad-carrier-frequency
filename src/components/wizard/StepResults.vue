@@ -153,59 +153,59 @@
         items-per-page="-1"
         class="elevation-1 results-table"
       >
-      <template #item="{ item }">
-        <tr
-          :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
-          @click="!item.isGlobal && openPopulationModal(item.code)"
-        >
-          <td>
-            <div class="d-flex align-center">
-              {{ item.label }}
-              <v-icon
-                v-if="!item.isGlobal"
-                class="ml-1 population-chevron"
-                size="x-small"
-                color="grey"
-              >
-                mdi-chevron-right
-              </v-icon>
-            </div>
-          </td>
-          <td class="text-right">
-            {{ formatPercent(item.carrierFrequency) }}
-          </td>
-          <td class="text-right">
-            {{ formatRatio(item.carrierFrequency) }}
-          </td>
-          <td class="text-right">
-            {{ item.recurrenceRisk }}
-          </td>
-          <td class="text-right">
-            {{ item.alleleCount }}
-          </td>
-          <td class="text-right">
-            {{ item.alleleNumber?.toLocaleString() ?? '-' }}
-          </td>
-          <td>
-            <v-chip
-              v-if="item.notes"
-              color="info"
-              size="x-small"
-            >
-              <v-icon
-                start
+        <template #item="{ item }">
+          <tr
+            :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
+            @click="!item.isGlobal && openPopulationModal(item.code)"
+          >
+            <td>
+              <div class="d-flex align-center">
+                {{ item.label }}
+                <v-icon
+                  v-if="!item.isGlobal"
+                  class="ml-1 population-chevron"
+                  size="x-small"
+                  color="grey"
+                >
+                  mdi-chevron-right
+                </v-icon>
+              </div>
+            </td>
+            <td class="text-right">
+              {{ formatPercent(item.carrierFrequency) }}
+            </td>
+            <td class="text-right">
+              {{ formatRatio(item.carrierFrequency) }}
+            </td>
+            <td class="text-right">
+              {{ item.recurrenceRisk }}
+            </td>
+            <td class="text-right">
+              {{ item.alleleCount }}
+            </td>
+            <td class="text-right">
+              {{ item.alleleNumber?.toLocaleString() ?? '-' }}
+            </td>
+            <td>
+              <v-chip
+                v-if="item.notes"
+                color="info"
                 size="x-small"
               >
-                mdi-star
-              </v-icon>
-              {{ item.notes }}
-            </v-chip>
-          </td>
-        </tr>
-      </template>
+                <v-icon
+                  start
+                  size="x-small"
+                >
+                  mdi-star
+                </v-icon>
+                {{ item.notes }}
+              </v-chip>
+            </td>
+          </tr>
+        </template>
 
-      <template #bottom />
-    </v-data-table>
+        <template #bottom />
+      </v-data-table>
     </div>
 
     <!-- View all variants, export, and share buttons -->

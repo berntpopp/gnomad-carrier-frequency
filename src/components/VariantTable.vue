@@ -24,268 +24,268 @@
         class="elevation-0 variant-table"
         :item-class="getRowClass"
       >
-      <!-- Header checkbox for bulk include/exclude -->
-      <template #[`header.include`]>
-        <v-checkbox-btn
-          :model-value="allIncluded"
-          :indeterminate="someExcluded"
-          density="compact"
-          hide-details
-          aria-label="Include all variants"
-          @update:model-value="handleHeaderToggle"
-        />
-      </template>
-
-      <!-- Row checkbox for individual exclusion -->
-      <template #[`item.include`]="{ item }">
-        <v-checkbox-btn
-          :model-value="!isExcluded(item.variant_id)"
-          density="compact"
-          hide-details
-          :aria-label="isExcluded(item.variant_id) ? 'Include variant' : 'Exclude variant'"
-          @update:model-value="() => toggleVariant(item.variant_id)"
-        />
-      </template>
-
-      <!-- Variant ID column - links to gnomAD -->
-      <template #[`item.variant_id`]="{ item }">
-        <a
-          :href="getGnomadUrl(item.variant_id)"
-          target="_blank"
-          rel="noopener noreferrer"
-          :class="[
-            'text-primary text-decoration-none',
-            { 'text-decoration-line-through text-medium-emphasis': isExcluded(item.variant_id) }
-          ]"
-        >
-          {{ item.variant_id }}
-          <v-icon
-            size="x-small"
-            class="ml-1"
-          >mdi-open-in-new</v-icon>
-        </a>
-      </template>
-
-      <!-- Consequence column -->
-      <template #[`item.consequence`]="{ item }">
-        <span class="text-body-2">{{ item.consequence }}</span>
-      </template>
-
-      <!-- Allele frequency column - scientific notation for small values -->
-      <template #[`item.alleleFrequency`]="{ item }">
-        <span class="text-mono">{{ formatFrequency(item.alleleFrequency) }}</span>
-      </template>
-
-      <!-- Carrier frequency column - 2 × AF -->
-      <template #[`item.carrierFrequency`]="{ item }">
-        <span class="text-mono">{{ formatCarrierFreq(item.alleleFrequency) }}</span>
-      </template>
-
-      <!-- Ratio column - 1:X format based on carrier frequency -->
-      <template #[`item.ratio`]="{ item }">
-        <span class="text-mono text-body-2">
-          {{ formatRatio(item.alleleFrequency) }}
-        </span>
-      </template>
-
-      <!-- ClinVar status column - colored chip linking to ClinVar -->
-      <template #[`item.clinvarStatus`]="{ item }">
-        <v-chip
-          v-if="item.clinvarStatus"
-          :href="getClinvarUrl(item.clinvarVariationId, item.variant_id)"
-          target="_blank"
-          :color="getClinvarColor(item.clinvarStatus)"
-          size="x-small"
-          variant="tonal"
-          link
-        >
-          {{ formatClinvarStatus(item.clinvarStatus) }}
-          <v-icon
-            end
-            size="x-small"
-          >
-            mdi-open-in-new
-          </v-icon>
-        </v-chip>
-        <span
-          v-else
-          class="text-medium-emphasis"
-        >-</span>
-      </template>
-
-      <!-- Gold stars column - star icons -->
-      <template #[`item.goldStars`]="{ item }">
-        <div
-          v-if="item.goldStars !== null"
-          class="d-flex align-center"
-          :aria-label="`${item.goldStars} out of 4 review stars`"
-        >
-          <v-icon
-            v-for="n in 4"
-            :key="n"
-            :icon="n <= item.goldStars ? 'mdi-star' : 'mdi-star-outline'"
-            :color="n <= item.goldStars ? 'amber-darken-2' : 'grey-lighten-1'"
-            size="x-small"
+        <!-- Header checkbox for bulk include/exclude -->
+        <template #[`header.include`]>
+          <v-checkbox-btn
+            :model-value="allIncluded"
+            :indeterminate="someExcluded"
+            density="compact"
+            hide-details
+            aria-label="Include all variants"
+            @update:model-value="handleHeaderToggle"
           />
-        </div>
-        <span
-          v-else
-          class="text-medium-emphasis"
-        >-</span>
-      </template>
+        </template>
 
-      <!-- HGVS-c column - truncate if long -->
-      <template #[`item.hgvsc`]="{ item }">
-        <span
-          v-if="item.hgvsc"
-          class="text-body-2 text-truncate d-inline-block"
-          style="max-width: 150px"
-          :title="item.hgvsc"
-        >
-          {{ item.hgvsc }}
-        </span>
-        <span
-          v-else
-          class="text-medium-emphasis"
-        >-</span>
-      </template>
+        <!-- Row checkbox for individual exclusion -->
+        <template #[`item.include`]="{ item }">
+          <v-checkbox-btn
+            :model-value="!isExcluded(item.variant_id)"
+            density="compact"
+            hide-details
+            :aria-label="isExcluded(item.variant_id) ? 'Include variant' : 'Exclude variant'"
+            @update:model-value="() => toggleVariant(item.variant_id)"
+          />
+        </template>
 
-      <!-- HGVS-p column - truncate if long -->
-      <template #[`item.hgvsp`]="{ item }">
-        <span
-          v-if="item.hgvsp"
-          class="text-body-2 text-truncate d-inline-block"
-          style="max-width: 150px"
-          :title="item.hgvsp"
-        >
-          {{ item.hgvsp }}
-        </span>
-        <span
-          v-else
-          class="text-medium-emphasis"
-        >-</span>
-      </template>
+        <!-- Variant ID column - links to gnomAD -->
+        <template #[`item.variant_id`]="{ item }">
+          <a
+            :href="getGnomadUrl(item.variant_id)"
+            target="_blank"
+            rel="noopener noreferrer"
+            :class="[
+              'text-primary text-decoration-none',
+              { 'text-decoration-line-through text-medium-emphasis': isExcluded(item.variant_id) }
+            ]"
+          >
+            {{ item.variant_id }}
+            <v-icon
+              size="x-small"
+              class="ml-1"
+            >mdi-open-in-new</v-icon>
+          </a>
+        </template>
 
-      <!-- Expanded row - additional details -->
-      <template #expanded-row="{ columns, item }">
-        <tr class="bg-grey-lighten-5">
-          <td :colspan="columns.length">
-            <div class="pa-3">
-              <v-row dense>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="3"
-                >
-                  <div class="text-caption text-medium-emphasis">
-                    Transcript
-                  </div>
-                  <div class="text-body-2">
-                    {{ item.transcriptId || '-' }}
-                  </div>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="3"
-                >
-                  <div class="text-caption text-medium-emphasis">
-                    Position
-                  </div>
-                  <div class="text-body-2">
-                    {{ item.pos.toLocaleString() }}
-                  </div>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="3"
-                >
-                  <div class="text-caption text-medium-emphasis">
-                    Ref / Alt
-                  </div>
-                  <div class="text-body-2 text-mono">
-                    {{ item.ref }} / {{ item.alt }}
-                  </div>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="3"
-                >
-                  <div class="text-caption text-medium-emphasis">
-                    Allele Count / Number
-                  </div>
-                  <div class="text-body-2">
-                    {{ item.alleleCount.toLocaleString() }} / {{ item.alleleNumber.toLocaleString() }}
-                  </div>
-                </v-col>
-              </v-row>
+        <!-- Consequence column -->
+        <template #[`item.consequence`]="{ item }">
+          <span class="text-body-2">{{ item.consequence }}</span>
+        </template>
 
-              <!-- Flags row -->
-              <div class="d-flex flex-wrap ga-2 mt-2">
-                <v-chip
-                  v-if="item.isLoF"
-                  color="error"
-                  size="small"
-                  variant="tonal"
-                >
-                  <v-icon
-                    start
-                    size="x-small"
+        <!-- Allele frequency column - scientific notation for small values -->
+        <template #[`item.alleleFrequency`]="{ item }">
+          <span class="text-mono">{{ formatFrequency(item.alleleFrequency) }}</span>
+        </template>
+
+        <!-- Carrier frequency column - 2 × AF -->
+        <template #[`item.carrierFrequency`]="{ item }">
+          <span class="text-mono">{{ formatCarrierFreq(item.alleleFrequency) }}</span>
+        </template>
+
+        <!-- Ratio column - 1:X format based on carrier frequency -->
+        <template #[`item.ratio`]="{ item }">
+          <span class="text-mono text-body-2">
+            {{ formatRatio(item.alleleFrequency) }}
+          </span>
+        </template>
+
+        <!-- ClinVar status column - colored chip linking to ClinVar -->
+        <template #[`item.clinvarStatus`]="{ item }">
+          <v-chip
+            v-if="item.clinvarStatus"
+            :href="getClinvarUrl(item.clinvarVariationId, item.variant_id)"
+            target="_blank"
+            :color="getClinvarColor(item.clinvarStatus)"
+            size="x-small"
+            variant="tonal"
+            link
+          >
+            {{ formatClinvarStatus(item.clinvarStatus) }}
+            <v-icon
+              end
+              size="x-small"
+            >
+              mdi-open-in-new
+            </v-icon>
+          </v-chip>
+          <span
+            v-else
+            class="text-medium-emphasis"
+          >-</span>
+        </template>
+
+        <!-- Gold stars column - star icons -->
+        <template #[`item.goldStars`]="{ item }">
+          <div
+            v-if="item.goldStars !== null"
+            class="d-flex align-center"
+            :aria-label="`${item.goldStars} out of 4 review stars`"
+          >
+            <v-icon
+              v-for="n in 4"
+              :key="n"
+              :icon="n <= item.goldStars ? 'mdi-star' : 'mdi-star-outline'"
+              :color="n <= item.goldStars ? 'amber-darken-2' : 'grey-lighten-1'"
+              size="x-small"
+            />
+          </div>
+          <span
+            v-else
+            class="text-medium-emphasis"
+          >-</span>
+        </template>
+
+        <!-- HGVS-c column - truncate if long -->
+        <template #[`item.hgvsc`]="{ item }">
+          <span
+            v-if="item.hgvsc"
+            class="text-body-2 text-truncate d-inline-block"
+            style="max-width: 150px"
+            :title="item.hgvsc"
+          >
+            {{ item.hgvsc }}
+          </span>
+          <span
+            v-else
+            class="text-medium-emphasis"
+          >-</span>
+        </template>
+
+        <!-- HGVS-p column - truncate if long -->
+        <template #[`item.hgvsp`]="{ item }">
+          <span
+            v-if="item.hgvsp"
+            class="text-body-2 text-truncate d-inline-block"
+            style="max-width: 150px"
+            :title="item.hgvsp"
+          >
+            {{ item.hgvsp }}
+          </span>
+          <span
+            v-else
+            class="text-medium-emphasis"
+          >-</span>
+        </template>
+
+        <!-- Expanded row - additional details -->
+        <template #expanded-row="{ columns, item }">
+          <tr class="bg-grey-lighten-5">
+            <td :colspan="columns.length">
+              <div class="pa-3">
+                <v-row dense>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="3"
                   >
-                    mdi-alert-circle
-                  </v-icon>
-                  LoF HC
-                </v-chip>
-                <v-chip
-                  v-if="item.lof && item.lof !== 'HC'"
-                  color="warning"
-                  size="small"
-                  variant="tonal"
-                >
-                  LoF {{ item.lof }}
-                </v-chip>
-                <v-chip
-                  v-if="item.isMissense"
-                  color="secondary"
-                  size="small"
-                  variant="tonal"
-                >
-                  Missense
-                </v-chip>
-                <v-chip
-                  v-if="item.isClinvarPathogenic"
-                  color="error"
-                  size="small"
-                  variant="tonal"
-                >
-                  <v-icon
-                    start
-                    size="x-small"
+                    <div class="text-caption text-medium-emphasis">
+                      Transcript
+                    </div>
+                    <div class="text-body-2">
+                      {{ item.transcriptId || '-' }}
+                    </div>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="3"
                   >
-                    mdi-alert
-                  </v-icon>
-                  ClinVar P/LP
-                </v-chip>
+                    <div class="text-caption text-medium-emphasis">
+                      Position
+                    </div>
+                    <div class="text-body-2">
+                      {{ item.pos.toLocaleString() }}
+                    </div>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="3"
+                  >
+                    <div class="text-caption text-medium-emphasis">
+                      Ref / Alt
+                    </div>
+                    <div class="text-body-2 text-mono">
+                      {{ item.ref }} / {{ item.alt }}
+                    </div>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="3"
+                  >
+                    <div class="text-caption text-medium-emphasis">
+                      Allele Count / Number
+                    </div>
+                    <div class="text-body-2">
+                      {{ item.alleleCount.toLocaleString() }} / {{ item.alleleNumber.toLocaleString() }}
+                    </div>
+                  </v-col>
+                </v-row>
+
+                <!-- Flags row -->
+                <div class="d-flex flex-wrap ga-2 mt-2">
+                  <v-chip
+                    v-if="item.isLoF"
+                    color="error"
+                    size="small"
+                    variant="tonal"
+                  >
+                    <v-icon
+                      start
+                      size="x-small"
+                    >
+                      mdi-alert-circle
+                    </v-icon>
+                    LoF HC
+                  </v-chip>
+                  <v-chip
+                    v-if="item.lof && item.lof !== 'HC'"
+                    color="warning"
+                    size="small"
+                    variant="tonal"
+                  >
+                    LoF {{ item.lof }}
+                  </v-chip>
+                  <v-chip
+                    v-if="item.isMissense"
+                    color="secondary"
+                    size="small"
+                    variant="tonal"
+                  >
+                    Missense
+                  </v-chip>
+                  <v-chip
+                    v-if="item.isClinvarPathogenic"
+                    color="error"
+                    size="small"
+                    variant="tonal"
+                  >
+                    <v-icon
+                      start
+                      size="x-small"
+                    >
+                      mdi-alert
+                    </v-icon>
+                    ClinVar P/LP
+                  </v-chip>
+                </div>
               </div>
-            </div>
-          </td>
-        </tr>
-      </template>
+            </td>
+          </tr>
+        </template>
 
-      <!-- Empty state -->
-      <template #no-data>
-        <div class="text-center py-4 text-medium-emphasis">
-          No variants match the current filters
-        </div>
-      </template>
+        <!-- Empty state -->
+        <template #no-data>
+          <div class="text-center py-4 text-medium-emphasis">
+            No variants match the current filters
+          </div>
+        </template>
 
-      <!-- Loading state -->
-      <template #loading>
-        <v-skeleton-loader type="table-row@5" />
-      </template>
-    </v-data-table>
+        <!-- Loading state -->
+        <template #loading>
+          <v-skeleton-loader type="table-row@5" />
+        </template>
+      </v-data-table>
     </div>
   </div>
 </template>
