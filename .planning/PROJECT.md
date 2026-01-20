@@ -2,81 +2,67 @@
 
 ## What This Is
 
-A single-page application for genetic counselors to calculate carrier frequencies and recurrence risks for autosomal recessive conditions. Users enter a gene, select the index patient's status, and get population-specific carrier frequencies from gnomAD with calculated recurrence risks and ready-to-paste German clinical documentation text.
+A progressive web application for genetic counselors to calculate carrier frequencies and recurrence risks for autosomal recessive conditions. Users enter a gene, select the index patient's status, and get population-specific carrier frequencies from gnomAD with calculated recurrence risks and ready-to-paste German or English clinical documentation text. The app works offline, supports shareable URLs, and maintains a history of previous calculations.
 
 ## Core Value
 
 Accurate recurrence risk calculation from real gnomAD population data, with clinical documentation output that's ready to paste into patient letters.
 
-## Current Milestone: v1.1 Release-Ready
-
-**Goal:** Polish the tool for wider distribution with improved UX, clinical features, and documentation.
-
-**Target features:**
-- App shell with navigation, settings, dark/light theme
-- Variant table modal with per-population drill-down
-- Inheritance validation via ClinGen gene-disease validity (cached)
-- Configurable variant filtering (LoF, missense, ClinVar combinations)
-- Data export (JSON/Excel)
-- In-app template editor for clinical text
-- Browser-based logging for debugging
-- Documentation, README, SEO improvements
-- Lighthouse 90+ performance
-
 ## Current State
 
-**Version:** v1.0 MVP (shipped 2026-01-19)
+**Version:** v1.2 Sharing & Collaboration (shipped 2026-01-20)
 **Deployed:** https://berntpopp.github.io/gnomad-carrier-frequency/
-**Codebase:** 3,285 lines TypeScript/Vue
+**Codebase:** 12,956 lines TypeScript/Vue
 
-**Features delivered:**
+**Features delivered (v1.0-v1.2):**
 - gnomAD API integration (v4, v3, v2 support)
 - 4-step wizard: Gene → Status → Frequency → Results
 - Population-specific carrier frequencies with founder effect detection
-- German clinical text with 3 perspectives, 4 statuses, patient sex grammar
-- Copy-to-clipboard functionality
-- CI/CD with ESLint, TypeScript, automated deployment
+- German/English clinical text with 3 perspectives, 4 statuses, patient sex grammar
+- Professional app shell with dark/light theme, settings, branding
+- Configurable variant filtering (LoF, missense, ClinVar, star threshold)
+- ClinGen gene-disease validity warnings (cached)
+- Data export (JSON/Excel), template editor, browser logging
+- WCAG 2.1 AA accessibility, Lighthouse 95+ scores
+- **v1.2:** Shareable URLs with full state encoding
+- **v1.2:** Progressive Web App (installable, offline support)
+- **v1.2:** Manual variant exclusion with real-time recalculation
+- **v1.2:** Mobile-optimized UI (responsive dialogs, touch targets)
+- **v1.2:** Search history with auto-save and restore
 
 ## Requirements
 
-### Validated (v1.0)
+### Validated
 
 - ✓ Gene search input with gnomAD lookup — v1.0
-- ✓ Index patient status selection (4 options: heterozygous, homozygous, compound het confirmed/assumed) — v1.0
-- ✓ Carrier frequency from three sources: gnomAD estimate, literature citation, default assumption — v1.0
-- ✓ gnomAD query: fetch variants, filter for LoF HC or ClinVar pathogenic, calculate carrier frequency — v1.0
+- ✓ Index patient status selection (4 options) — v1.0
+- ✓ Carrier frequency from three sources — v1.0
+- ✓ gnomAD variant filtering (LoF HC, ClinVar pathogenic) — v1.0
 - ✓ Population-specific frequencies with founder effect detection — v1.0
-- ✓ Recurrence risk calculation: carrier_freq / 4 (het) or / 2 (hom/compound) — v1.0
-- ✓ German clinical text generation with perspective selection — v1.0
-- ✓ Copy-to-clipboard for clinical text — v1.0
+- ✓ Recurrence risk calculation — v1.0
+- ✓ Clinical text generation (German/English) — v1.0
+- ✓ Copy-to-clipboard functionality — v1.0
+- ✓ App shell with navigation, settings, theme toggle — v1.1
+- ✓ Variant table modal with drill-down — v1.1
+- ✓ ClinGen gene-disease validity integration — v1.1
+- ✓ Configurable variant filtering — v1.1
+- ✓ Data export (JSON/Excel) — v1.1
+- ✓ Template editor — v1.1
+- ✓ Browser-based logging — v1.1
+- ✓ Help/FAQ/Documentation — v1.1
+- ✓ Lighthouse 90+ scores — v1.1
+- ✓ URL state sharing — v1.2
+- ✓ PWA with offline support — v1.2
+- ✓ Manual variant exclusion — v1.2
+- ✓ Mobile optimization — v1.2
+- ✓ Search history — v1.2
 
-### Active (v1.1)
-
-- [ ] App shell with logo, menu, settings gear, dark/light theme
-- [ ] Variant table modal showing contributing variants
-- [ ] Per-population variant drill-down in modal
-- [ ] ClinGen gene-disease validity integration (cached monthly, manual refresh)
-- [ ] Inheritance validation warning for non-AR genes
-- [ ] Configurable variant filtering (LoF, missense, ClinVar P/LP combinations)
-- [ ] Filter defaults in settings, override per calculation
-- [ ] Data export: JSON and Excel formats
-- [ ] In-app template editor for German + English clinical text
-- [ ] Browser-based logging system (LogViewer pattern)
-- [ ] Logo and favicon
-- [ ] README.md with description and tags
-- [ ] Help/FAQ/Documentation page
-- [ ] SEO: meta description, contrast fixes, heading order
-- [ ] Semantic versioning
-- [ ] Build/lint/typecheck speed improvements
-- [ ] Lighthouse 90+ score
-
-### Deferred (v1.2+)
+### Active (v1.3+)
 
 - [ ] X-linked recessive inheritance calculation
 - [ ] X-linked dominant inheritance calculation
 - [ ] Bayesian residual risk for negative carrier test
 - [ ] Batch processing for multiple genes
-- [ ] Session history (recent calculations)
 - [ ] Export results to PDF
 - [ ] At-risk couple calculation (both partners)
 
@@ -92,7 +78,7 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 
 **gnomAD:** The Genome Aggregation Database provides population allele frequencies via GraphQL API. Relevant filters are LoF (loss of function) with "HC" (high confidence) annotation and ClinVar pathogenic classifications.
 
-**Tech Stack:** npm, Vue 3 (Composition API), Vuetify 3, Vite, TypeScript, villus (GraphQL), Pinia (state), VueUse (utilities)
+**Tech Stack:** npm, Vue 3 (Composition API), Vuetify 3, Vite 7, TypeScript 5.9, villus (GraphQL), Pinia (state + persistence), VueUse (utilities), Zod (validation), vite-plugin-pwa (PWA)
 
 ## Constraints
 
@@ -100,6 +86,7 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - **Deployment**: GitHub Pages via GitHub Actions
 - **No backend**: All API calls direct to gnomAD GraphQL from browser
 - **Single page**: Stepper-based wizard UI flow
+- **PWA**: Installable, offline-capable with service worker
 
 ## Key Decisions
 
@@ -113,6 +100,11 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 | Config-driven thresholds | Zero hardcoded values in src/ | ✓ Good |
 | 4-option IndexPatientStatus | Clinical accuracy for documentation | ✓ Good |
 | Patient sex for German grammar | Correct grammatical gender agreement | ✓ Good |
+| Zod for URL validation | Type-safe runtime validation with graceful fallbacks — v1.2 | ✓ Good |
+| NetworkFirst for API caching | Fresh data when online, cached offline — v1.2 | ✓ Good |
+| Singleton composables | Shared state across components (exclusions, history) — v1.2 | ✓ Good |
+| lz-string for URL compression | Compact exclusion encoding in shareable URLs — v1.2 | ✓ Good |
+| 50-entry history default | Balance of utility vs storage — v1.2 | ✓ Good |
 
 ---
-*Last updated: 2026-01-19 after v1.1 milestone start*
+*Last updated: 2026-01-20 after v1.2 milestone*
