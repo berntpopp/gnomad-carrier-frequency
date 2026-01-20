@@ -74,3 +74,9 @@ export type {
   ExclusionReason,
   ExclusionState,
 } from './exclusion';
+
+export type {
+  HistoryEntry,
+  HistorySettings,
+  HistoryStoreState,
+} from './history';
