@@ -25,7 +25,7 @@
                 :model-value="modelValue.lofHcEnabled"
                 color="primary"
                 label="LoF High Confidence"
-                density="compact"
+                :density="smAndDown ? 'default' : 'compact'"
                 hide-details
                 @update:model-value="updateFilter('lofHcEnabled', $event)"
               />
@@ -59,7 +59,7 @@
                 :model-value="modelValue.missenseEnabled"
                 color="secondary"
                 label="Include Missense"
-                density="compact"
+                :density="smAndDown ? 'default' : 'compact'"
                 hide-details
                 @update:model-value="updateFilter('missenseEnabled', $event)"
               />
@@ -93,7 +93,7 @@
                 :model-value="modelValue.clinvarEnabled"
                 color="success"
                 label="ClinVar P/LP"
-                density="compact"
+                :density="smAndDown ? 'default' : 'compact'"
                 hide-details
                 @update:model-value="updateFilter('clinvarEnabled', $event)"
               />
@@ -129,11 +129,11 @@
                 :min="0"
                 :max="4"
                 :step="1"
-                :ticks="tickLabels"
-                show-ticks="always"
+                :ticks="smAndDown ? undefined : tickLabels"
+                :show-ticks="showTickLabels"
                 tick-size="4"
                 label="ClinVar Min Stars"
-                density="compact"
+                :density="smAndDown ? 'default' : 'compact'"
                 thumb-label
                 color="success"
                 class="flex-grow-1"
@@ -173,7 +173,7 @@
                 :disabled="!modelValue.clinvarEnabled"
                 color="warning"
                 label="Include conflicting with majority P/LP"
-                density="compact"
+                :density="smAndDown ? 'default' : 'compact'"
                 hide-details
                 @update:model-value="updateFilter('clinvarIncludeConflicting', $event)"
               />
@@ -211,7 +211,7 @@
                 :max="100"
                 :step="5"
                 label="P/LP Threshold %"
-                density="compact"
+                :density="smAndDown ? 'default' : 'compact'"
                 thumb-label
                 color="warning"
                 class="flex-grow-1"
@@ -278,7 +278,8 @@
 
           <v-btn
             variant="text"
-            size="small"
+            :size="smAndDown ? 'default' : 'small'"
+            :min-height="smAndDown ? 44 : undefined"
             prepend-icon="mdi-refresh"
             @click="emit('reset')"
           >
@@ -292,6 +293,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { useDisplay } from 'vuetify';
 import FilterChips from './FilterChips.vue';
 import type { FilterConfig } from '@/types';
 
@@ -308,6 +310,9 @@ const emit = defineEmits<{
   reset: [];
 }>();
 
+// Responsive breakpoint detection
+const { smAndDown } = useDisplay();
+
 const panel = ref<number | undefined>(undefined);
 
 const isExpanded = computed(() => panel.value === 0);
@@ -316,6 +321,9 @@ const isExpanded = computed(() => panel.value === 0);
 const conflictingCount = computed(() => props.conflictingCount ?? 0);
 const isLoadingSubmissions = computed(() => props.isLoadingSubmissions ?? false);
 const submissionsProgress = computed(() => props.submissionsProgress ?? 0);
+
+// Show tick labels only on desktop to prevent overlap on mobile
+const showTickLabels = computed(() => !smAndDown.value ? 'always' : true);
 
 const tickLabels = {
   0: '0',
