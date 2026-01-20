@@ -107,7 +107,7 @@ import LogViewerPanel from '@/components/LogViewerPanel.vue';
 import HistoryDrawer from '@/components/HistoryDrawer.vue';
 import WizardStepper from '@/components/wizard/WizardStepper.vue';
 import { useLogStore } from '@/stores/useLogStore';
-import { useWizard, useUrlState, usePwaUpdate, useHistoryAutoSave } from '@/composables';
+import { useWizard, useUrlState, usePwaUpdate, useHistoryAutoSave, useHistoryRestore } from '@/composables';
 
 const showSettings = ref(false);
 const showLogViewer = ref(false);
@@ -137,12 +137,18 @@ function handleReset() {
   resetWizard();
 }
 
+// History restore
+const { restoreFromHistory } = useHistoryRestore();
+
 /**
- * Handle restoring a history entry (placeholder for Plan 03)
+ * Handle restoring a history entry
  */
-function handleHistoryRestore(id: string) {
-  // Restoration logic implemented in Plan 03
-  console.log('Restore history entry:', id);
+async function handleHistoryRestore(id: string) {
+  const success = await restoreFromHistory(id);
+  if (!success) {
+    // Entry may have been deleted or corrupted - silent fail is acceptable
+    console.warn('Failed to restore history entry:', id);
+  }
 }
 
 // Initialize history auto-save
