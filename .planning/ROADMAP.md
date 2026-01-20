@@ -105,6 +105,68 @@ Plans:
 
 ---
 
+### Phase 14: Mobile Optimization
+
+**Goal:** App provides optimal user experience on small screens (phones) with responsive layouts and touch-friendly interactions
+
+**Dependencies:** Phase 13 (all features complete to optimize)
+
+**Requirements:**
+- MOB-01: App layout adapts gracefully to viewport widths < 600px
+- MOB-02: Wizard steps display correctly on mobile without horizontal scrolling
+- MOB-03: Variant table is usable on small screens (horizontal scroll or responsive layout)
+- MOB-04: Settings dialog works on mobile viewport
+- MOB-05: Touch targets meet minimum 44x44px accessibility guidelines
+- MOB-06: Text remains readable without zooming on mobile
+- MOB-07: Modals and dialogs fit within mobile viewport
+- MOB-08: Copy/share functionality works on mobile browsers
+
+**Plans:** 3 plans
+
+Plans:
+- [ ] 14-01-PLAN.md - Responsive dialogs and stepper (fullscreen dialogs, alt-labels stepper, log panel width)
+- [ ] 14-02-PLAN.md - Data table optimization (horizontal scroll, frozen columns for VariantTable and StepResults)
+- [ ] 14-03-PLAN.md - Mobile polish (TextOutput controls, FilterPanel slider, touch targets, verification)
+
+**Success Criteria:**
+1. User can complete full calculation workflow on a phone-sized screen
+2. All interactive elements are easily tappable without zoom
+3. Tables and data remain accessible (scrollable or responsive)
+4. No horizontal overflow on any screen size
+
+---
+
+### Phase 15: Search History
+
+**Goal:** User can browse, restore, and manage previous calculation results without re-querying
+
+**Dependencies:** Phase 14 (mobile-optimized UI for history browsing)
+
+**Requirements:**
+- HIST-01: Completed calculations automatically saved to Pinia store with persistence
+- HIST-02: History entry includes gene, filters, results, variants, timestamp, and exclusions
+- HIST-03: History browser accessible from app bar (icon/menu)
+- HIST-04: User can click history entry to restore full calculation state
+- HIST-05: History list shows gene name, date, and key result (carrier frequency)
+- HIST-06: User can delete individual history entries
+- HIST-07: Automatic cleanup removes oldest entries when limit exceeded (configurable)
+- HIST-08: User can clear all history from settings
+- HIST-09: History persists across browser sessions (localStorage)
+- HIST-10: History works offline (uses cached data)
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 15 to break down)
+
+**Success Criteria:**
+1. User can see list of previous calculations in a history panel/menu
+2. Clicking a history entry instantly restores that calculation's results
+3. History entries show enough info to identify the calculation (gene, date, frequency)
+4. Oldest entries are automatically removed when storage limit is reached
+
+---
+
 ## v1.1 Release-Ready (Archived)
 
 Polish for wider distribution: app shell, filtering configuration, ClinGen integration, data export, template editing, browser logging, documentation, and accessibility improvements.
@@ -348,8 +410,8 @@ Plans:
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1-4 | 15/15 | Complete | 2026-01-19 |
 | v1.1 Release-Ready | 5-10 | 27/27 | Complete | 2026-01-19 |
-| v1.2 Sharing & Collaboration | 11-13 | 9/9 | Complete | 2026-01-20 |
+| v1.2 Sharing & Collaboration | 11-15 | 12/12 | In Progress | - |
 
 ---
 
-*Last updated: 2026-01-20 (Phase 13 complete)*
+*Last updated: 2026-01-20 (Phase 14 planned - 3 plans in 2 waves)*
