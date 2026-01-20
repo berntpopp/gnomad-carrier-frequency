@@ -15,7 +15,7 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Milestone:** v1.2 Sharing & Collaboration
 **Phase:** 14 - Mobile Optimization - In Progress
-**Plan:** 1 of 3 complete
+**Plan:** 2 of 3 complete
 **Status:** Executing Phase 14 plans
 
 ### Progress
@@ -26,7 +26,7 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [########--] 80% - Phase 14 in progress
 ```
 
-**Overall:** 37 plans complete for v1.0+v1.1+v1.2 (Phases 11-14)
+**Overall:** 38 plans complete for v1.0+v1.1+v1.2 (Phases 11-14)
 
 ---
 
@@ -61,7 +61,7 @@ v1.2 Sharing:       [########--] 80% - Phase 14 in progress
 | 11 | URL State Sharing | 6 | Complete (2/2 plans) |
 | 12 | PWA | 6 | Complete (3/3 plans) |
 | 13 | Variant Exclusion | 8 | Complete (4/4 plans) |
-| 14 | Mobile Optimization | 8 | In Progress (1/3 plans) |
+| 14 | Mobile Optimization | 8 | In Progress (2/3 plans) |
 | 15 | Search History | 10 | Not Planned |
 
 ---
@@ -168,6 +168,9 @@ v1.2 Sharing:       [########--] 80% - Phase 14 in progress
 | smAndDown threshold (< 960px) for mobile | Vuetify default covering xs and sm viewports | 2026-01-20 |
 | Fullscreen dialog on mobile | :fullscreen="smAndDown" for better mobile UX | 2026-01-20 |
 | Alt-labels stepper on mobile | Stacks labels below icons to prevent horizontal overflow | 2026-01-20 |
+| Always apply scroll wrapper | Simplifies code - horizontal scroll only activates when needed | 2026-01-20 |
+| CSS sticky for frozen columns | Pure CSS solution, theme-aware with CSS variables | 2026-01-20 |
+| Shadow pseudo-elements for scroll indicator | No JS required, indicates scrollable content | 2026-01-20 |
 
 ### Roadmap Evolution
 
@@ -185,8 +188,8 @@ None.
 
 - [x] Run `/gsd:plan-phase 14` to create Mobile Optimization plans
 - [x] Execute 14-01-PLAN.md (responsive dialogs and navigation)
-- [ ] Execute 14-02-PLAN.md (VariantTable mobile optimization)
-- [ ] Execute 14-03-PLAN.md (results tables responsive)
+- [x] Execute 14-02-PLAN.md (mobile table scrolling)
+- [ ] Execute 14-03-PLAN.md (touch-friendly interactions)
 - [ ] Run `/gsd:plan-phase 15` to create Search History plans
 - [ ] Execute Phase 15 plans
 - [x] Run `/gsd:plan-phase 11` to create URL State Sharing plans
@@ -241,10 +244,19 @@ None.
 ### Last Session
 
 **Date:** 2026-01-20
-**Completed:** 14-01-PLAN.md (responsive dialogs and navigation)
-**Status:** Phase 14 in progress (1/3 plans complete)
+**Completed:** 14-02-PLAN.md (mobile table scrolling)
+**Status:** Phase 14 in progress (2/3 plans complete)
 
 ### Handoff Notes
+
+v1.2 Phase 14 Plan 02 complete:
+- VariantTable wrapped in horizontal scroll container
+- Frozen columns: checkbox + variant ID (left), expand (right)
+- Shadow indicator on frozen column edge
+- StepResults population table wrapped in scroll container
+- Frozen Population column with shadow indicator
+- Row backgrounds handled for global/founder effect rows
+- CSS pattern established: sticky positioning + pseudo-elements
 
 v1.2 Phase 14 Plan 01 complete:
 - SettingsDialog uses fullscreen mode on mobile (< 960px) via useDisplay
@@ -377,3 +389,4 @@ v1.1 roadmap derived from requirements and research:
 *Phase 13 complete: 2026-01-20*
 *v1.2 complete: 2026-01-20*
 *14-01 complete: 2026-01-20*
+*14-02 complete: 2026-01-20*
