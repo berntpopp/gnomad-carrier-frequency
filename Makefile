@@ -1,6 +1,6 @@
 # gnomAD Carrier Frequency Calculator - Development Commands
 
-.PHONY: dev dev-host build preview install clean test test-ui typecheck typecheck-watch lint help
+.PHONY: dev dev-host build preview install clean test test-ui typecheck typecheck-watch lint lighthouse ci help
 
 # Default target
 help:
@@ -16,8 +16,11 @@ help:
 	@echo "  make preview        - Preview production build"
 	@echo ""
 	@echo "Quality:"
+	@echo "  make lint           - Run ESLint"
 	@echo "  make typecheck      - Run TypeScript type checking"
 	@echo "  make typecheck-watch - Run TypeScript type checking in watch mode"
+	@echo "  make lighthouse     - Run Lighthouse CI locally"
+	@echo "  make ci             - Run full CI pipeline locally (lint, typecheck, build, lighthouse)"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make test           - Run Playwright E2E tests"
@@ -53,6 +56,18 @@ typecheck:
 # TypeScript type checking in watch mode
 typecheck-watch:
 	npx vue-tsc --noEmit --watch
+
+# Run ESLint
+lint:
+	npm run lint
+
+# Run Lighthouse CI locally (requires build first)
+lighthouse: build
+	npm run lighthouse
+
+# Run full CI pipeline locally (matches GitHub Actions)
+ci:
+	npm run ci
 
 # Run Playwright E2E tests (headless)
 test:

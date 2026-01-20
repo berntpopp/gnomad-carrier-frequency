@@ -1,14 +1,16 @@
 {
   "name": "gnomad-carrier-frequency",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "lighthouse": "lhci autorun --config=lighthouserc.local.json",
+    "ci": "npm run lint && npm run typecheck && npm run build && npm run lighthouse"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
@@ -27,6 +29,7 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.15.1",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/eslint-config-typescript": "^14.6.0",
