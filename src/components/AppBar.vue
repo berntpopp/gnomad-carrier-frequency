@@ -8,6 +8,7 @@
         text="Calculate carrier frequency and recurrence risk from gnomAD population data."
         location="bottom"
         max-width="300"
+        aria-label="Application description"
       >
         <template #activator="{ props }">
           <v-app-bar-title

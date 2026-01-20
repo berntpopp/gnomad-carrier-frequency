@@ -29,7 +29,7 @@
                 hide-details
                 @update:model-value="updateFilter('lofHcEnabled', $event)"
               />
-              <v-tooltip location="top">
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -63,7 +63,7 @@
                 hide-details
                 @update:model-value="updateFilter('missenseEnabled', $event)"
               />
-              <v-tooltip location="top">
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -97,7 +97,7 @@
                 hide-details
                 @update:model-value="updateFilter('clinvarEnabled', $event)"
               />
-              <v-tooltip location="top">
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -139,7 +139,7 @@
                 class="flex-grow-1"
                 @update:model-value="updateFilter('clinvarStarThreshold', $event)"
               />
-              <v-tooltip location="top">
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -177,7 +177,7 @@
                 hide-details
                 @update:model-value="updateFilter('clinvarIncludeConflicting', $event)"
               />
-              <v-tooltip location="top">
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -217,7 +217,7 @@
                 class="flex-grow-1"
                 @update:model-value="updateFilter('clinvarConflictingThreshold', $event)"
               />
-              <v-tooltip location="top">
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"

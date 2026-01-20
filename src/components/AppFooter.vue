@@ -10,6 +10,7 @@
         <v-tooltip
           text="Source code on GitHub"
           location="top"
+          aria-label="Source code on GitHub"
         >
           <template #activator="{ props }">
             <v-btn
@@ -43,6 +44,7 @@
         <v-tooltip
           text="View clinical disclaimer"
           location="top"
+          aria-label="View clinical disclaimer"
         >
           <template #activator="{ props }">
             <v-btn
@@ -69,6 +71,7 @@
             <v-tooltip
               text="Data sources"
               location="top"
+              aria-label="Data sources"
             >
               <template #activator="{ props: tooltipProps }">
                 <v-btn
@@ -93,6 +96,7 @@
             <v-tooltip
               text="Methodology"
               location="top"
+              aria-label="Methodology"
             >
               <template #activator="{ props: tooltipProps }">
                 <v-btn
@@ -117,6 +121,7 @@
             <v-tooltip
               text="FAQ"
               location="top"
+              aria-label="Frequently asked questions"
             >
               <template #activator="{ props: tooltipProps }">
                 <v-btn
@@ -141,6 +146,7 @@
             <v-tooltip
               text="About"
               location="top"
+              aria-label="About this application"
             >
               <template #activator="{ props: tooltipProps }">
                 <v-btn
@@ -163,6 +169,7 @@
         <v-tooltip
           text="View application logs"
           location="top"
+          aria-label="View application logs"
         >
           <template #activator="{ props }">
             <v-btn

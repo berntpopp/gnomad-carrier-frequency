@@ -48,7 +48,7 @@
           <span class="text-body-2 text-medium-emphasis">
             ({{ globalFrequency?.percent }})
           </span>
-          <v-tooltip location="top">
+          <v-tooltip location="top" aria-label="Information">
             <template #activator="{ props: tooltipProps }">
               <v-icon
                 v-bind="tooltipProps"
@@ -71,7 +71,7 @@
           Recurrence Risk ({{ indexStatus === 'heterozygous' ? 'carrier' : 'affected' }}):
           <strong class="ml-1">{{ recurrenceRisk?.ratio }}</strong>
           <span class="text-medium-emphasis ml-1">({{ recurrenceRisk?.percent }})</span>
-          <v-tooltip location="top">
+          <v-tooltip location="top" aria-label="Information">
             <template #activator="{ props: tooltipProps }">
               <v-icon
                 v-bind="tooltipProps"
@@ -100,7 +100,7 @@
           >
             ({{ excludedCount }} manually excluded)
           </span>
-          <v-tooltip location="top">
+          <v-tooltip location="top" aria-label="Information">
             <template #activator="{ props: tooltipProps }">
               <v-icon
                 v-bind="tooltipProps"
@@ -258,7 +258,7 @@
       </v-menu>
 
       <!-- Copy link button -->
-      <v-tooltip location="top">
+      <v-tooltip location="top" aria-label="Information">
         <template #activator="{ props: tooltipProps }">
           <v-btn
             v-bind="tooltipProps"

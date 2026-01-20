@@ -5,7 +5,7 @@
     </h2>
     <p class="text-body-2 text-medium-emphasis mb-4">
       Choose the source for carrier frequency calculation.
-      <v-tooltip location="top">
+      <v-tooltip location="top" aria-label="Frequency source information">
         <template #activator="{ props: tooltipProps }">
           <v-icon
             v-bind="tooltipProps"
