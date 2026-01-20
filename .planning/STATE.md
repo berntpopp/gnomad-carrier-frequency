@@ -7,26 +7,26 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.2 Sharing & Collaboration - COMPLETE
+**Current focus:** v1.2 Sharing & Collaboration - Phase 14 (Mobile Optimization)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.2 Sharing & Collaboration
-**Phase:** 13 - Variant Exclusion - COMPLETE
-**Plan:** 4 of 4 complete
-**Status:** v1.2 milestone complete
+**Phase:** 14 - Mobile Optimization - In Progress
+**Plan:** 1 of 3 complete
+**Status:** Executing Phase 14 plans
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
-v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
+v1.2 Sharing:       [########--] 80% - Phase 14 in progress
 ```
 
-**Overall:** 36 plans complete for v1.0+v1.1+v1.2 (Phases 11-13)
+**Overall:** 37 plans complete for v1.0+v1.1+v1.2 (Phases 11-14)
 
 ---
 
@@ -53,14 +53,16 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 
 ## v1.2 Milestone Summary
 
-**Phases:** 3 (Phases 11-13)
-**Requirements:** 20 total
+**Phases:** 5 (Phases 11-15)
+**Requirements:** 38 total
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 11 | URL State Sharing | 6 | Complete (2/2 plans) |
 | 12 | PWA | 6 | Complete (3/3 plans) |
 | 13 | Variant Exclusion | 8 | Complete (4/4 plans) |
+| 14 | Mobile Optimization | 8 | In Progress (1/3 plans) |
+| 15 | Search History | 10 | Not Planned |
 
 ---
 
@@ -162,12 +164,18 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 | Checkbox inclusion semantics | Checked = included, unchecked = excluded (intuitive selection) | 2026-01-20 |
 | 500ms debounce for exclusion | Prevents jittery recalculation during rapid checkbox toggling | 2026-01-20 |
 | Separate totalPathogenicCount | Pre-exclusion count for transparency in UI display | 2026-01-20 |
+| useDisplay composable for responsive | Standard Vuetify approach for breakpoint detection | 2026-01-20 |
+| smAndDown threshold (< 960px) for mobile | Vuetify default covering xs and sm viewports | 2026-01-20 |
+| Fullscreen dialog on mobile | :fullscreen="smAndDown" for better mobile UX | 2026-01-20 |
+| Alt-labels stepper on mobile | Stacks labels below icons to prevent horizontal overflow | 2026-01-20 |
 
 ### Roadmap Evolution
 
 - Phase 11 added: URL State Sharing - shareable/reproducible calculation links (2026-01-19)
 - Phase 12 added: PWA - installable app with offline support (2026-01-19)
 - Phase 13 added: Variant Exclusion - manual variant exclusion from calculations (2026-01-19)
+- Phase 14 added: Mobile Optimization - responsive layouts for small screens (2026-01-20)
+- Phase 15 added: Search History - browse/restore previous calculations (2026-01-20)
 
 ### Blockers
 
@@ -175,6 +183,12 @@ None.
 
 ### TODOs
 
+- [x] Run `/gsd:plan-phase 14` to create Mobile Optimization plans
+- [x] Execute 14-01-PLAN.md (responsive dialogs and navigation)
+- [ ] Execute 14-02-PLAN.md (VariantTable mobile optimization)
+- [ ] Execute 14-03-PLAN.md (results tables responsive)
+- [ ] Run `/gsd:plan-phase 15` to create Search History plans
+- [ ] Execute Phase 15 plans
 - [x] Run `/gsd:plan-phase 11` to create URL State Sharing plans
 - [x] Execute 11-01-PLAN.md (URL state infrastructure)
 - [x] Execute 11-02-PLAN.md (share UI)
@@ -227,10 +241,27 @@ None.
 ### Last Session
 
 **Date:** 2026-01-20
-**Completed:** Phase 13 - Variant Exclusion (all 4 plans)
-**Status:** v1.2 milestone complete
+**Completed:** 14-01-PLAN.md (responsive dialogs and navigation)
+**Status:** Phase 14 in progress (1/3 plans complete)
 
 ### Handoff Notes
+
+v1.2 Phase 14 Plan 01 complete:
+- SettingsDialog uses fullscreen mode on mobile (< 960px) via useDisplay
+- LogViewerPanel uses 100% width on mobile, 450px on desktop
+- WizardStepper uses alt-labels on mobile for stacked step layout
+- All components use consistent useDisplay/smAndDown pattern
+
+Phases 14-15 added to roadmap:
+- Phase 14: Mobile Optimization - 8 requirements (MOB-01 through MOB-08)
+  - Mobile UI/UX audit completed with Playwright
+  - Critical issues: variant table unreadable (3/10), results table columns hidden (5/10)
+  - Research: card view pattern, horizontal scroll with frozen columns, Vuetify breakpoints
+- Phase 15: Search History - 10 requirements (HIST-01 through HIST-10)
+  - Pinia store persistence for calculation results
+  - History browser in app bar menu
+  - Automatic cleanup of oldest entries
+- Directories created: .planning/phases/14-mobile-optimization/, .planning/phases/15-search-history/
 
 v1.2 Phase 13 Plan 04 complete:
 - Extended ExportVariant with excluded and exclusionReason fields (EXCL-06)
@@ -345,3 +376,4 @@ v1.1 roadmap derived from requirements and research:
 *13-04 complete: 2026-01-20*
 *Phase 13 complete: 2026-01-20*
 *v1.2 complete: 2026-01-20*
+*14-01 complete: 2026-01-20*
