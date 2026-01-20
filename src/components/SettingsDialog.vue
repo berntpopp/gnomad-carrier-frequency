@@ -1,7 +1,8 @@
 <template>
   <v-dialog
     v-model="modelValue"
-    :max-width="activeTab === 'templates' ? 900 : 600"
+    :max-width="dialogMaxWidth"
+    :fullscreen="smAndDown"
     persistent
     @update:model-value="(val: boolean) => val ? onDialogOpen() : undefined"
   >
@@ -485,8 +486,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, nextTick, onMounted, computed } from 'vue';
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
+import { useDisplay } from 'vuetify';
 import { useFilterStore } from '@/stores/useFilterStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { useLogStore } from '@/stores/useLogStore';
@@ -494,6 +496,15 @@ import { useTemplateStore } from '@/stores/useTemplateStore';
 import { useClingenValidity, usePwaInstall } from '@/composables';
 import TemplateEditor from '@/components/TemplateEditor.vue';
 import VariablePicker from '@/components/VariablePicker.vue';
+
+// Responsive breakpoint detection
+const { smAndDown } = useDisplay();
+
+// Computed dialog max-width (undefined for fullscreen mode)
+const dialogMaxWidth = computed(() => {
+  if (smAndDown.value) return undefined;
+  return activeTab.value === 'templates' ? 900 : 600;
+});
 
 const modelValue = defineModel<boolean>();
 
