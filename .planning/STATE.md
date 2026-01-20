@@ -74,9 +74,18 @@ v1.2 milestone complete and archived:
 ### Next Steps
 
 Run `/gsd:new-milestone` to start v1.3:
-- Define requirements for X-linked inheritance, batch processing, PDF export
-- Create new ROADMAP.md and REQUIREMENTS.md
-- Plan phases for v1.3 features
+
+**Priority: Testing Infrastructure**
+- Current test coverage: 0%
+- Add Vitest for unit tests (composables, utilities, stores)
+- Add Vue Test Utils for component tests
+- Add Playwright for E2E tests (wizard flows, URL sharing, history)
+- CI integration with coverage reporting
+
+**Features**
+- X-linked inheritance calculations
+- Batch processing for multiple genes
+- PDF export
 
 ---
 

@@ -59,6 +59,15 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 
 ### Active (v1.3+)
 
+**Testing Infrastructure (Priority)**
+- [ ] Vitest setup with coverage reporting
+- [ ] Unit tests for composables (useCarrierFrequency, useExclusionState, useHistoryStore)
+- [ ] Unit tests for utilities (variant-filters, frequency calculations, template renderer)
+- [ ] Component tests with Vue Test Utils
+- [ ] Playwright E2E tests for critical flows (wizard completion, URL sharing, history)
+- [ ] CI integration for test coverage reporting
+
+**Features**
 - [ ] X-linked recessive inheritance calculation
 - [ ] X-linked dominant inheritance calculation
 - [ ] Bayesian residual risk for negative carrier test
