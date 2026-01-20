@@ -3,33 +3,34 @@
     v-model="state.currentStep"
     flat
     :alt-labels="smAndDown"
+    class="wizard-stepper"
   >
     <v-stepper-header>
       <v-stepper-item
         :complete="state.currentStep > 1"
         :value="1"
-        title="Gene"
-        subtitle="Search and select"
+        :title="xs ? '' : 'Gene'"
+        :subtitle="smAndDown ? undefined : 'Search and select'"
       />
       <v-divider />
       <v-stepper-item
         :complete="state.currentStep > 2"
         :value="2"
-        title="Status"
-        subtitle="Carrier or affected"
+        :title="xs ? '' : 'Status'"
+        :subtitle="smAndDown ? undefined : 'Carrier or affected'"
       />
       <v-divider />
       <v-stepper-item
         :complete="state.currentStep > 3"
         :value="3"
-        title="Frequency"
-        subtitle="Select source"
+        :title="xs ? '' : 'Freq'"
+        :subtitle="smAndDown ? undefined : 'Select source'"
       />
       <v-divider />
       <v-stepper-item
         :value="4"
-        title="Results"
-        subtitle="View calculations"
+        :title="xs ? '' : 'Results'"
+        :subtitle="smAndDown ? undefined : 'View calculations'"
       />
     </v-stepper-header>
 
@@ -118,7 +119,8 @@ import StepFrequency from './StepFrequency.vue';
 import StepResults from './StepResults.vue';
 
 // Responsive breakpoint detection for mobile-friendly stepper
-const { smAndDown } = useDisplay();
+// xs: < 600px (phones), sm: 600-960px (tablets)
+const { smAndDown, xs } = useDisplay();
 
 // Wizard state management
 const {
