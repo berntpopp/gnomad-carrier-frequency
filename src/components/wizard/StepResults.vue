@@ -143,15 +143,16 @@
     </v-alert>
 
     <!-- Sortable data table -->
-    <v-data-table
-      v-if="tableItems.length"
-      :items="tableItems"
-      :headers="headers"
-      :sort-by="sortBy"
-      density="compact"
-      items-per-page="-1"
-      class="elevation-1"
-    >
+    <div class="table-scroll-wrapper">
+      <v-data-table
+        v-if="tableItems.length"
+        :items="tableItems"
+        :headers="headers"
+        :sort-by="sortBy"
+        density="compact"
+        items-per-page="-1"
+        class="elevation-1 results-table"
+      >
       <template #item="{ item }">
         <tr
           :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
@@ -205,6 +206,7 @@
 
       <template #bottom />
     </v-data-table>
+    </div>
 
     <!-- View all variants, export, and share buttons -->
     <div
@@ -668,12 +670,64 @@ function formatRatio(freq: number | null): string {
 </script>
 
 <style scoped>
+/* Horizontal scroll wrapper for mobile */
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  margin: 0 -16px; /* Extend to card edges on mobile */
+  padding: 0 16px;
+}
+
+@media (min-width: 960px) {
+  .table-scroll-wrapper {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Freeze Population column (first column) */
+:deep(.results-table) th:first-child,
+:deep(.results-table) td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: rgb(var(--v-theme-surface));
+}
+
+/* Shadow indicator for scrollable content */
+:deep(.results-table) th:first-child::after,
+:deep(.results-table) td:first-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -8px;
+  bottom: 0;
+  width: 8px;
+  background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
+  pointer-events: none;
+}
+
+/* Global row background for frozen column */
+:deep(.bg-grey-lighten-4) td:first-child {
+  background: #f5f5f5; /* grey-lighten-4 */
+}
+
+/* Founder effect row background for frozen column */
+:deep(.bg-blue-lighten-5) td:first-child {
+  background: #e3f2fd; /* blue-lighten-5 */
+}
+
 .population-row {
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .population-row:hover {
+  background-color: rgb(var(--v-theme-surface-variant)) !important;
+}
+
+.population-row:hover td:first-child {
   background-color: rgb(var(--v-theme-surface-variant)) !important;
 }
 
