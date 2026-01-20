@@ -23,8 +23,11 @@ export const useHistoryStore = defineStore('history', {
     /**
      * Get most recent entry (for duplicate detection)
      */
-    mostRecent: (state): HistoryEntry | null =>
-      state.entries.length > 0 ? state.entries[0] : null,
+    mostRecent: (state): HistoryEntry | null => {
+      if (state.entries.length === 0) return null;
+      const entry = state.entries[0];
+      return entry ?? null;
+    },
 
     /**
      * Group entries by calendar date for timeline display

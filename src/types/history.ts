@@ -1,5 +1,6 @@
 import type { GnomadVersion } from '@/config';
-import type { IndexPatientStatus, FrequencySource } from './wizard';
+import type { IndexPatientStatus } from './frequency';
+import type { FrequencySource } from './wizard';
 import type { FilterConfig } from './filter';
 
 /**

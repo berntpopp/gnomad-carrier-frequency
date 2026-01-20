@@ -45,3 +45,6 @@ export type { UsePwaUpdateReturn } from './usePwaUpdate';
 
 export { useExclusionState } from './useExclusionState';
 export type { UseExclusionStateReturn } from './useExclusionState';
+
+export { useHistoryAutoSave } from './useHistoryAutoSave';
+export type { UseHistoryAutoSaveReturn } from './useHistoryAutoSave';
