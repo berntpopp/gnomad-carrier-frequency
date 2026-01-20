@@ -157,6 +157,11 @@ export function useHistoryAutoSave() {
       return;
     }
 
+    // Must have valid carrier frequency to update
+    if (result.value.globalCarrierFrequency === null) {
+      return;
+    }
+
     console.log('[HistoryAutoSave] Updating entry', currentEntryId, 'with filter/exclusion changes');
 
     historyStore.updateEntry(currentEntryId, {

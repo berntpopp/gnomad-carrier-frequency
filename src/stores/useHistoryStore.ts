@@ -119,10 +119,14 @@ export const useHistoryStore = defineStore('history', {
     updateEntry(id: string, updates: Partial<Omit<HistoryEntry, 'id' | 'timestamp'>>) {
       const index = this.entries.findIndex(e => e.id === id);
       if (index > -1) {
+        const existing = this.entries[index]!;
         this.entries[index] = {
-          ...this.entries[index],
+          ...existing,
           ...updates,
-        };
+          // Preserve id and timestamp from existing entry
+          id: existing.id,
+          timestamp: existing.timestamp,
+        } as HistoryEntry;
       }
     },
   },

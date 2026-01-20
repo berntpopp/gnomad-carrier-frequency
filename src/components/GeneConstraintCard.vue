@@ -12,7 +12,10 @@
         mdi-dna
       </v-icon>
       Gene Constraint
-      <v-tooltip location="top" aria-label="Gene constraint information">
+      <v-tooltip
+        location="top"
+        aria-label="Gene constraint information"
+      >
         <template #activator="{ props: tooltipProps }">
           <v-icon
             v-bind="tooltipProps"
