@@ -2,6 +2,7 @@
   <v-stepper
     v-model="state.currentStep"
     flat
+    :alt-labels="smAndDown"
   >
     <v-stepper-header>
       <v-stepper-item
@@ -109,11 +110,15 @@
 
 <script setup lang="ts">
 import { watch } from 'vue';
+import { useDisplay } from 'vuetify';
 import { useWizard, useCarrierFrequency, useAppAnnouncer } from '@/composables';
 import StepGene from './StepGene.vue';
 import StepStatus from './StepStatus.vue';
 import StepFrequency from './StepFrequency.vue';
 import StepResults from './StepResults.vue';
+
+// Responsive breakpoint detection for mobile-friendly stepper
+const { smAndDown } = useDisplay();
 
 // Wizard state management
 const {
