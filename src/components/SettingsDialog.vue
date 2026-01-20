@@ -193,6 +193,94 @@
               </v-card-text>
             </v-card>
 
+            <!-- History Settings Section -->
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
+              <v-card-title class="text-subtitle-1">
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-history
+                </v-icon>
+                Search History
+              </v-card-title>
+
+              <v-card-text>
+                <!-- Entry count and storage info -->
+                <div class="d-flex align-center justify-space-between mb-4">
+                  <div class="text-body-2">
+                    <strong>Entries:</strong> {{ historyStore.entryCount }}
+                  </div>
+                  <v-btn
+                    v-if="!historyStore.isEmpty"
+                    color="error"
+                    variant="text"
+                    size="small"
+                    @click="confirmClearHistory"
+                  >
+                    Clear History
+                  </v-btn>
+                </div>
+
+                <!-- Max entries slider -->
+                <v-slider
+                  v-model="historyMaxEntries"
+                  :min="10"
+                  :max="200"
+                  :step="10"
+                  label="Maximum entries"
+                  thumb-label
+                  class="mb-2"
+                  :density="smAndDown ? 'default' : 'compact'"
+                  :hide-details="smAndDown"
+                >
+                  <template #append>
+                    <span class="text-body-2 text-medium-emphasis">
+                      {{ historyMaxEntries }}
+                    </span>
+                  </template>
+                </v-slider>
+
+                <div class="text-caption text-medium-emphasis">
+                  Oldest entries are automatically removed when the limit is exceeded.
+                </div>
+              </v-card-text>
+            </v-card>
+
+            <!-- Clear History Confirmation Dialog -->
+            <v-dialog
+              v-model="showClearHistoryDialog"
+              max-width="400"
+              aria-label="Clear history confirmation"
+            >
+              <v-card>
+                <v-card-title>Clear Search History?</v-card-title>
+                <v-card-text>
+                  This will permanently delete all {{ historyStore.entryCount }} history entries.
+                  This action cannot be undone.
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer />
+                  <v-btn
+                    variant="text"
+                    @click="showClearHistoryDialog = false"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    color="error"
+                    variant="flat"
+                    @click="clearAllHistory"
+                  >
+                    Clear All
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+
             <!-- Data Cache Section -->
             <v-card
               variant="outlined"
@@ -494,6 +582,7 @@ import { useFilterStore } from '@/stores/useFilterStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { useLogStore } from '@/stores/useLogStore';
 import { useTemplateStore } from '@/stores/useTemplateStore';
+import { useHistoryStore } from '@/stores/useHistoryStore';
 import { useClingenValidity, usePwaInstall } from '@/composables';
 import TemplateEditor from '@/components/TemplateEditor.vue';
 import VariablePicker from '@/components/VariablePicker.vue';
@@ -515,6 +604,7 @@ const filterStore = useFilterStore();
 const appStore = useAppStore();
 const logStore = useLogStore();
 const templateStore = useTemplateStore();
+const historyStore = useHistoryStore();
 const templateEditorRef = ref<InstanceType<typeof TemplateEditor> | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
@@ -600,6 +690,23 @@ async function clearGeneDataCache(): Promise<void> {
 onMounted(() => {
   loadCacheInfo();
 });
+
+// History settings
+const showClearHistoryDialog = ref(false);
+
+const historyMaxEntries = computed({
+  get: () => historyStore.settings.maxEntries,
+  set: (value: number) => historyStore.setMaxEntries(value),
+});
+
+function confirmClearHistory() {
+  showClearHistoryDialog.value = true;
+}
+
+function clearAllHistory() {
+  historyStore.clearAll();
+  showClearHistoryDialog.value = false;
+}
 
 const tickLabels = {
   0: '0',
