@@ -28,6 +28,9 @@ key-files:
     - src/components/wizard/TextOutput.vue
     - src/components/FilterPanel.vue
     - src/components/wizard/StepResults.vue
+    - src/components/wizard/WizardStepper.vue (orchestrator fix)
+    - src/components/AppFooter.vue (orchestrator fix)
+    - src/components/LogViewerPanel.vue (orchestrator fix)
 
 key-decisions:
   - "Perspective buttons and section chips use larger sizes on mobile"
@@ -86,10 +89,26 @@ Each task was committed atomically:
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+**Post-checkpoint orchestrator fixes (during verification):**
+
+User testing via Playwright identified additional mobile issues:
+
+1. **Stepper text overlap** - Step titles "Gene", "Status", "Frequency", "Results" overlapped on 375px screens even with alt-labels. Fixed by hiding titles on xs screens (show only step numbers).
+
+2. **Footer icon overflow** - Footer icons didn't fit on mobile. Added "More options" overflow menu for secondary actions (Data Sources, Methodology, FAQ, About, View Logs).
+
+3. **Log viewer drawer not closing** - Vuetify v-navigation-drawer doesn't support percentage width values. Changed from `width="100%"` to pixel-based viewport width.
+
+**Additional commits:**
+- `0a41c8f` fix(14): hide stepper titles on xs screens to prevent overlap
+- `fb3d0d6` fix(14): add mobile-friendly footer with overflow menu
+- `7385f0b` fix(14): use pixel width for log viewer drawer on mobile
 
 ## Issues Encountered
-None
+**Resolved during verification:**
+- Stepper text overlap on xs screens → hide titles, show only numbers
+- Footer icon overflow → overflow menu pattern
+- Log viewer drawer stuck open → pixel width instead of percentage
 
 ## User Setup Required
 
