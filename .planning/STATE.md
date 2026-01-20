@@ -14,19 +14,19 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 **Milestone:** v1.2 Sharing & Collaboration
-**Phase:** 15 - Search History - In Progress
-**Plan:** 2 of 3 complete
-**Status:** 15-02 complete, continuing with 15-03
+**Phase:** 15 - Search History - Complete
+**Plan:** 3 of 3 complete
+**Status:** Phase 15 complete, v1.2 milestone complete
 
 ### Progress
 
 ```
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
-v1.2 Sharing:       [#########-] 96% - Phase 15 plan 2/3 complete
+v1.2 Sharing:       [##########] 100% - COMPLETE 2026-01-20
 ```
 
-**Overall:** 41 plans complete for v1.0+v1.1+v1.2 (Phases 11-15)
+**Overall:** 42 plans complete for v1.0+v1.1+v1.2 (Phases 11-15)
 
 ---
 
@@ -62,7 +62,7 @@ v1.2 Sharing:       [#########-] 96% - Phase 15 plan 2/3 complete
 | 12 | PWA | 6 | Complete (3/3 plans) |
 | 13 | Variant Exclusion | 8 | Complete (4/4 plans) |
 | 14 | Mobile Optimization | 8 | Complete (3/3 plans) |
-| 15 | Search History | 10 | In Progress (2/3 plans) |
+| 15 | Search History | 10 | Complete (3/3 plans) |
 
 ---
 
@@ -178,6 +178,8 @@ v1.2 Sharing:       [#########-] 96% - Phase 15 plan 2/3 complete
 | carrier-freq-history localStorage key | Consistent with project convention (carrier-freq-*) | 2026-01-20 |
 | Duplicate detection 30s window | Same gene within 30s = skip save to prevent duplicates | 2026-01-20 |
 | Instant delete no confirmation | Per CONTEXT.md - quick cleanup without friction | 2026-01-20 |
+| Auto-save before restore | Prevents data loss when user switches to history entry | 2026-01-20 |
+| Confirmation for clear all | Destructive action requires explicit confirmation | 2026-01-20 |
 | Frequency ratio format (1:N) | Intuitive clinical display for carrier frequency | 2026-01-20 |
 
 ### Roadmap Evolution
@@ -201,7 +203,7 @@ None.
 - [x] Run `/gsd:plan-phase 15` to create Search History plans
 - [x] Execute 15-01-PLAN.md (history infrastructure)
 - [x] Execute 15-02-PLAN.md (history UI)
-- [ ] Execute 15-03-PLAN.md (restore functionality)
+- [x] Execute 15-03-PLAN.md (restore functionality)
 - [x] Run `/gsd:plan-phase 11` to create URL State Sharing plans
 - [x] Execute 11-01-PLAN.md (URL state infrastructure)
 - [x] Execute 11-02-PLAN.md (share UI)
@@ -254,10 +256,16 @@ None.
 ### Last Session
 
 **Date:** 2026-01-20
-**Completed:** 15-02-PLAN.md (history UI)
-**Status:** Phase 15 in progress (2/3 plans)
+**Completed:** 15-03-PLAN.md (restore functionality)
+**Status:** Phase 15 complete, v1.2 milestone complete
 
 ### Handoff Notes
+
+v1.2 Phase 15 Plan 03 complete:
+- useHistoryRestore composable for state restoration from history entries
+- Auto-save current state before restore (prevents data loss)
+- History settings section in SettingsDialog (max entries, clear all)
+- Full restore wiring in App.vue via handleHistoryRestore
 
 v1.2 Phase 15 Plan 02 complete:
 - HistoryPanel component with date grouping and entry cards
@@ -433,3 +441,5 @@ v1.1 roadmap derived from requirements and research:
 *Phase 14 complete: 2026-01-20*
 *15-01 complete: 2026-01-20*
 *15-02 complete: 2026-01-20*
+*15-03 complete: 2026-01-20*
+*Phase 15 complete: 2026-01-20*
