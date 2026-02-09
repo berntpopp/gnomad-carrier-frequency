@@ -1,6 +1,6 @@
 # gnomAD Carrier Frequency Calculator - Development Commands
 
-.PHONY: dev dev-host build preview install clean test test-ui typecheck typecheck-watch lint lighthouse ci help
+.PHONY: dev dev-host build preview install clean test test-ui typecheck typecheck-watch lint lighthouse ci docs docs-dev docs-preview screenshots help
 
 # Default target
 help:
@@ -25,6 +25,12 @@ help:
 	@echo "Testing:"
 	@echo "  make test           - Run Playwright E2E tests"
 	@echo "  make test-ui        - Run Playwright tests with UI"
+	@echo ""
+	@echo "Documentation:"
+	@echo "  make docs           - Build VitePress documentation site"
+	@echo "  make docs-dev       - Start docs dev server"
+	@echo "  make docs-preview   - Preview docs production build"
+	@echo "  make screenshots    - Generate documentation screenshots (requires Phase 17)"
 	@echo ""
 	@echo "Cleanup:"
 	@echo "  make clean          - Remove build artifacts and node_modules"
@@ -76,6 +82,24 @@ test:
 # Run Playwright tests with UI
 test-ui:
 	npx playwright test --ui
+
+# Build VitePress documentation site
+docs:
+	npm run docs:build
+
+# Start docs dev server
+docs-dev:
+	npm run docs:dev
+
+# Preview docs production build
+docs-preview:
+	npm run docs:preview
+
+# Generate documentation screenshots (placeholder — implemented in Phase 17)
+screenshots:
+	@echo "Screenshot generation requires Phase 17 (Screenshot Automation)."
+	@echo "Run 'make screenshots' after Phase 17 is complete."
+	@exit 1
 
 # Clean build artifacts
 clean:
