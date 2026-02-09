@@ -95,11 +95,11 @@ docs-dev:
 docs-preview:
 	npm run docs:preview
 
-# Generate documentation screenshots (placeholder — implemented in Phase 17)
+# Generate documentation screenshots
 screenshots:
-	@echo "Screenshot generation requires Phase 17 (Screenshot Automation)."
-	@echo "Run 'make screenshots' after Phase 17 is complete."
-	@exit 1
+	@echo "Generating documentation screenshots..."
+	@npx tsx scripts/generate-screenshots.ts
+	@echo "Screenshots saved to docs/public/screenshots/"
 
 # Clean build artifacts
 clean:
