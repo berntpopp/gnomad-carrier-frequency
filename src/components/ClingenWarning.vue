@@ -1,5 +1,8 @@
 <template>
-  <div v-if="geneSymbol">
+  <div
+    v-if="geneSymbol"
+    data-testid="clingen-warning"
+  >
     <!-- Loading state -->
     <v-alert
       v-if="isLoading"

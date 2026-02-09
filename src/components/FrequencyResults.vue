@@ -2,6 +2,7 @@
   <v-card
     v-if="result && !loading"
     class="mt-4"
+    data-testid="frequency-results"
   >
     <v-card-title>
       {{ result.gene }} Carrier Frequency

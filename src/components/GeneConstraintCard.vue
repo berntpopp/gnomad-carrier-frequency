@@ -3,6 +3,7 @@
     v-if="constraint || loading"
     variant="outlined"
     class="mt-4"
+    data-testid="gene-constraint-card"
   >
     <v-card-title class="text-subtitle-1 d-flex align-center">
       <v-icon

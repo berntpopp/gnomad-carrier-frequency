@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="step-frequency">
     <h2 class="text-h6 mb-4">
       Frequency Source
     </h2>
@@ -33,7 +33,10 @@
         v-model="activeTab"
         bg-color="primary"
       >
-        <v-tab value="gnomad">
+        <v-tab
+          value="gnomad"
+          data-testid="freq-tab-gnomad"
+        >
           gnomAD
         </v-tab>
         <v-tab value="literature">
@@ -154,6 +157,7 @@
       <v-btn
         color="primary"
         :disabled="!isCurrentSourceValid"
+        data-testid="step-frequency-next-btn"
         @click="$emit('complete')"
       >
         Continue

@@ -15,6 +15,7 @@
     hide-no-data
     :error="!!error"
     :error-messages="error?.message"
+    data-testid="gene-search-input"
     @update:model-value="onSelect"
   >
     <template #item="{ item, props }">

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="step-status">
     <h2 class="text-h6 mb-4">
       Index Patient Status
     </h2>
@@ -15,7 +15,10 @@
         v-model="statusModel"
         hide-details
       >
-        <v-radio value="heterozygous">
+        <v-radio
+          value="heterozygous"
+          data-testid="status-option-heterozygous"
+        >
           <template #label>
             <div>
               <strong>Heterozygous carrier</strong>
@@ -76,6 +79,7 @@
       </v-btn>
       <v-btn
         color="primary"
+        data-testid="step-status-next-btn"
         @click="$emit('complete')"
       >
         Continue

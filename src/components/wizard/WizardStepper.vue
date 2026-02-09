@@ -4,6 +4,7 @@
     flat
     :alt-labels="smAndDown"
     class="wizard-stepper"
+    data-testid="wizard-stepper"
   >
     <v-stepper-header>
       <v-stepper-item
@@ -11,6 +12,7 @@
         :value="1"
         :title="xs ? '' : 'Gene'"
         :subtitle="smAndDown ? undefined : 'Search and select'"
+        data-testid="wizard-step-1"
       />
       <v-divider />
       <v-stepper-item
@@ -18,6 +20,7 @@
         :value="2"
         :title="xs ? '' : 'Status'"
         :subtitle="smAndDown ? undefined : 'Carrier or affected'"
+        data-testid="wizard-step-2"
       />
       <v-divider />
       <v-stepper-item
@@ -25,16 +28,18 @@
         :value="3"
         :title="xs ? '' : 'Freq'"
         :subtitle="smAndDown ? undefined : 'Select source'"
+        data-testid="wizard-step-3"
       />
       <v-divider />
       <v-stepper-item
         :value="4"
         :title="xs ? '' : 'Results'"
         :subtitle="smAndDown ? undefined : 'View calculations'"
+        data-testid="wizard-step-4"
       />
     </v-stepper-header>
 
-    <v-stepper-window>
+    <v-stepper-window data-testid="wizard-content">
       <v-stepper-window-item :value="1">
         <StepGene
           v-model="state.gene"
