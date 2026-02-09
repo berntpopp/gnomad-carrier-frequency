@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 
 **Milestone:** v1.3 Documentation Site
 **Phase:** 17 of 20 (Screenshot Automation) — IN PROGRESS
-**Plan:** 1 of 4 complete (17-02-PLAN.md done)
-**Status:** Phase 17 in progress. Test ID attributes added to 19 components.
-**Last activity:** 2026-02-09 -- Completed 17-02-PLAN.md (42 data-testid attributes added)
+**Plan:** 2 of 4 complete (17-01-PLAN.md done)
+**Status:** Phase 17 in progress. Screenshot infrastructure ready.
+**Last activity:** 2026-02-09 -- Completed 17-01-PLAN.md (Playwright + fixtures + script scaffold)
 
 ### Progress
 
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [███       ]  30% - Phase 17 started (3/10 plans)
+v1.3 Docs:          [████      ]  40% - Phase 17 in progress (4/10 plans)
 ```
 
-**Overall:** 61 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 62 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 61
-- v1.3 plans completed: 3
+- Total plans completed: 62
+- v1.3 plans completed: 4
 
 ---
 
@@ -58,6 +58,10 @@ Recent decisions affecting current work:
 - 17-02: data-testid on Vuetify components (stable selectors for Playwright, decoupled from CSS)
 - 17-02: kebab-case naming convention for testids (readable, collision-resistant)
 - 17-02: Settings/history buttons in AppBar not AppFooter (corrected plan assumption)
+- 17-01: Playwright Chromium-only for smaller install size
+- 17-01: 25-second fixed server wait on WSL2 (measured vs polling)
+- 17-01: domcontentloaded wait strategy (balance speed vs loaded state)
+- 17-01: Fixture-based gnomAD API mocking with realistic CFTR data
 
 ### Pending Todos
 
@@ -74,8 +78,8 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-09
-**Completed:** 17-02-PLAN.md (Test ID Attributes)
-**Status:** Phase 17 in progress — 42 testids added to 19 components in 11 minutes
+**Completed:** 17-01-PLAN.md (Screenshot Infrastructure)
+**Status:** Phase 17 in progress — Playwright + fixtures + script scaffold in 33 minutes
 
 ### Handoff Notes
 
