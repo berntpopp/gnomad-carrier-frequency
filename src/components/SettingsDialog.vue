@@ -5,6 +5,7 @@
     :fullscreen="smAndDown"
     persistent
     aria-label="Settings"
+    data-testid="settings-dialog"
     @update:model-value="(val: boolean) => val ? onDialogOpen() : undefined"
   >
     <v-card ref="dialogCard">
@@ -21,13 +22,22 @@
       </v-card-title>
 
       <v-tabs v-model="activeTab">
-        <v-tab value="general">
+        <v-tab
+          value="general"
+          data-testid="settings-tab-general"
+        >
           General
         </v-tab>
-        <v-tab value="filters">
+        <v-tab
+          value="filters"
+          data-testid="settings-tab-filters"
+        >
           Filters
         </v-tab>
-        <v-tab value="templates">
+        <v-tab
+          value="templates"
+          data-testid="settings-tab-templates"
+        >
           Templates
         </v-tab>
       </v-tabs>
