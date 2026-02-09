@@ -57,9 +57,40 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - ✓ Mobile optimization — v1.2
 - ✓ Search history — v1.2
 
-### Active (v1.3+)
+### Active (v1.3 — Documentation Site)
 
-**Testing Infrastructure (Priority)**
+**Documentation Infrastructure**
+- [ ] VitePress setup with navigation and sidebar
+- [ ] Landing page with hero, features, and call-to-action
+- [ ] PWA service worker denylist for /docs/ path
+
+**Automated Screenshots**
+- [ ] Playwright screenshot automation script
+- [ ] 12 screenshots covering all wizard steps, dark mode, mobile, settings
+- [ ] data-testid attributes on key UI elements
+- [ ] GitHub Actions workflow for screenshot updates on UI changes
+
+**Documentation Content**
+- [ ] Getting Started guide with step-by-step walkthrough
+- [ ] Use case: Carrier screening counseling
+- [ ] Use case: Recurrence risk / family planning
+- [ ] Use case: Clinical letter generation
+- [ ] Reference: Methodology (Hardy-Weinberg calculation)
+- [ ] Reference: Data sources (gnomAD, ClinVar, ClinGen)
+- [ ] Reference: Variant filter configuration
+- [ ] Reference: Clinical text template system
+- [ ] Citation page with CFF and BibTeX
+
+**CI/CD Integration**
+- [ ] Deploy workflow merging app + docs artifacts
+- [ ] Screenshot update workflow with auto-commit
+
+**README Streamlining**
+- [ ] Slim README to essentials with docs site link
+
+### Future (v1.4+)
+
+**Testing Infrastructure**
 - [ ] Vitest setup with coverage reporting
 - [ ] Unit tests for composables (useCarrierFrequency, useExclusionState, useHistoryStore)
 - [ ] Unit tests for utilities (variant-filters, frequency calculations, template renderer)
@@ -114,6 +145,9 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 | Singleton composables | Shared state across components (exclusions, history) — v1.2 | ✓ Good |
 | lz-string for URL compression | Compact exclusion encoding in shareable URLs — v1.2 | ✓ Good |
 | 50-entry history default | Balance of utility vs storage — v1.2 | ✓ Good |
+| VitePress for docs | Same Vite/Vue ecosystem, shared node_modules, used by Vue/Pinia/Vitest — v1.3 | — Pending |
+| Playwright for screenshots | Same Node/TS ecosystem, full control over wizard navigation — v1.3 | — Pending |
+| Merged deployment artifact | App at root, docs at /docs/, single GitHub Pages deployment — v1.3 | — Pending |
 
 ---
-*Last updated: 2026-01-20 after v1.2 milestone*
+*Last updated: 2026-02-09 after v1.3 milestone start*

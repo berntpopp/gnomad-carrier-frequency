@@ -4,19 +4,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-20)
+See: .planning/PROJECT.md (updated 2026-02-09)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** Planning next milestone (v1.3)
+**Current focus:** v1.3 Documentation Site
 
 ---
 
 ## Current Position
 
-**Milestone:** Ready for v1.3 planning
-**Phase:** Not started
-**Plan:** Not started
-**Status:** v1.2 complete, ready to plan next milestone
+**Milestone:** v1.3 Documentation Site
+**Phase:** Not started (defining requirements)
+**Plan:** —
+**Status:** Defining requirements
 
 ### Progress
 
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-01-20)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 (next):        [          ]   0% - Not started
+v1.3 Docs:          [          ]   0% - Defining requirements
 ```
 
 **Overall:** 57 plans complete across v1.0 + v1.1 + v1.2
@@ -57,35 +57,17 @@ v1.3 (next):        [          ]   0% - Not started
 
 ### Last Session
 
-**Date:** 2026-01-20
-**Completed:** v1.2 milestone archived
-**Status:** Ready for v1.3 milestone planning
+**Date:** 2026-02-09
+**Completed:** v1.3 milestone started
+**Status:** Defining requirements for Documentation Site
 
 ### Handoff Notes
 
-v1.2 milestone complete and archived:
-- MILESTONES.md updated with v1.2 entry
-- PROJECT.md evolved with v1.2 accomplishments
-- Archived: milestones/v1.2-ROADMAP.md, milestones/v1.2-REQUIREMENTS.md
-- ROADMAP.md and REQUIREMENTS.md deleted (fresh for next milestone)
-- Git tag v1.2 created
-- GitHub release v1.2 created
-
-### Next Steps
-
-Run `/gsd:new-milestone` to start v1.3:
-
-**Priority: Testing Infrastructure**
-- Current test coverage: 0%
-- Add Vitest for unit tests (composables, utilities, stores)
-- Add Vue Test Utils for component tests
-- Add Playwright for E2E tests (wizard flows, URL sharing, history)
-- CI integration with coverage reporting
-
-**Features**
-- X-linked inheritance calculations
-- Batch processing for multiple genes
-- PDF export
+v1.3 Documentation Site milestone started:
+- Scope: VitePress docs site, Playwright screenshot automation, content pages, CI/CD, README streamlining
+- DOCUMENTATION-PLAN.md exists with detailed research and architecture decisions
+- Testing infrastructure and features deferred to v1.4+
+- Branch: feature/v1.3-documentation
 
 ---
 
@@ -93,3 +75,4 @@ Run `/gsd:new-milestone` to start v1.3:
 *v1.0 shipped: 2026-01-19*
 *v1.1 shipped: 2026-01-19*
 *v1.2 shipped: 2026-01-20*
+*v1.3 started: 2026-02-09*
