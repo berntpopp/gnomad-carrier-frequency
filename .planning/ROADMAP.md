@@ -39,7 +39,7 @@
 - Decimal phases (e.g., 17.1): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 16: VitePress Setup** - Documentation infrastructure with navigation, theming, and landing page ✓
-- [ ] **Phase 17: Screenshot Automation** - Playwright-based screenshot generation covering all app states
+- [x] **Phase 17: Screenshot Automation** - Playwright-based screenshot generation covering all app states ✓
 - [ ] **Phase 18: Documentation Content** - Guide, use cases, reference, and about pages with embedded screenshots
 - [ ] **Phase 19: CI/CD Integration** - Unified deployment pipeline and screenshot update automation
 - [ ] **Phase 20: README Streamlining** - Slim README to essentials with docs site link
@@ -74,9 +74,9 @@ Plans:
   5. All screenshots show realistic data (CFTR gene with actual gnomAD results) rather than empty or error states
 **Plans:** 3 plans
 Plans:
-- [ ] 17-01-PLAN.md — Install Playwright/sharp/tsx, create API fixtures, build script scaffold with server lifecycle and route interception
-- [ ] 17-02-PLAN.md — Add data-testid attributes to all targeted Vue components
-- [ ] 17-03-PLAN.md — Add all 14 screenshot captures to script and update Makefile target
+- [x] 17-01-PLAN.md — Install Playwright/sharp/tsx, create API fixtures, build script scaffold with server lifecycle and route interception
+- [x] 17-02-PLAN.md — Add data-testid attributes to all targeted Vue components
+- [x] 17-03-PLAN.md — Add all 14 screenshot captures to script and update Makefile target
 
 ### Phase 18: Documentation Content
 **Goal**: All documentation pages are written with clinical accuracy, embedded screenshots, and cross-links forming a complete user guide
@@ -119,11 +119,11 @@ Phases execute in numeric order: 16 --> 17 --> 18 --> 19 --> 20
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 16. VitePress Setup | v1.3 | 2/2 | Complete | 2026-02-09 |
-| 17. Screenshot Automation | v1.3 | 0/3 | Planned | - |
+| 17. Screenshot Automation | v1.3 | 3/3 | Complete | 2026-02-09 |
 | 18. Documentation Content | v1.3 | 0/TBD | Not started | - |
 | 19. CI/CD Integration | v1.3 | 0/TBD | Not started | - |
 | 20. README Streamlining | v1.3 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-09 (Phase 17 planned)*
+*Last updated: 2026-02-09 (Phase 17 complete)*

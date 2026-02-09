@@ -19,28 +19,28 @@
 ### Build Automation
 
 - [x] **MAKE-01**: Makefile introduced with targets: `make screenshots`, `make docs`, `make docs-dev`, `make docs-preview`
-- [ ] **MAKE-02**: Makefile target `make screenshots` builds app, starts preview server, runs Playwright script, stops server
+- [x] **MAKE-02**: Makefile target `make screenshots` builds app, starts preview server, runs Playwright script, stops server
 - [x] **MAKE-03**: Makefile target `make docs` builds VitePress documentation site
 
 ### Screenshot Automation
 
-- [ ] **SHOT-01**: Playwright installed as dev dependency with screenshot generation script
-- [ ] **SHOT-02**: Screenshot: hero preview (Step 1 with gene selected, light, 1200x800)
-- [ ] **SHOT-03**: Screenshot: gene search autocomplete (typing "CFTR", dropdown visible)
-- [ ] **SHOT-04**: Screenshot: gene selected with ClinGen notice and gene constraint card
-- [ ] **SHOT-05**: Screenshot: patient status selection (Step 2 with heterozygous carrier selected)
-- [ ] **SHOT-06**: Screenshot: frequency source (Step 3 with gnomAD tab showing 1:17)
-- [ ] **SHOT-07**: Screenshot: results page (Step 4 with population table, filters, clinical text)
-- [ ] **SHOT-08**: Screenshot: clinical text output (German text with section chips visible)
-- [ ] **SHOT-09**: Screenshot: variant table modal (sortable columns, ClinVar links, star ratings)
-- [ ] **SHOT-10**: Screenshot: filter section expanded with chip toggles
-- [ ] **SHOT-11**: Screenshot: settings dialog (General tab with all sections visible)
-- [ ] **SHOT-12**: Screenshot: dark mode (results page in dark theme)
-- [ ] **SHOT-13**: Screenshot: mobile view (Step 4 results at 375x812)
-- [ ] **SHOT-14**: Screenshot: population drill-down (Ashkenazi Jewish variant table)
-- [ ] **SHOT-15**: Screenshot: search history panel open with entry
-- [ ] **SHOT-16**: `data-testid` attributes added to key UI elements for reliable screenshot targeting
-- [ ] **SHOT-17**: Clinical disclaimer auto-dismissed in screenshot script
+- [x] **SHOT-01**: Playwright installed as dev dependency with screenshot generation script
+- [x] **SHOT-02**: Screenshot: hero preview (Step 1 with gene selected, light, 1200x800)
+- [x] **SHOT-03**: Screenshot: gene search autocomplete (typing "CFTR", dropdown visible)
+- [x] **SHOT-04**: Screenshot: gene selected with ClinGen notice and gene constraint card
+- [x] **SHOT-05**: Screenshot: patient status selection (Step 2 with heterozygous carrier selected)
+- [x] **SHOT-06**: Screenshot: frequency source (Step 3 with gnomAD tab showing 1:17)
+- [x] **SHOT-07**: Screenshot: results page (Step 4 with population table, filters, clinical text)
+- [x] **SHOT-08**: Screenshot: clinical text output (German text with section chips visible)
+- [x] **SHOT-09**: Screenshot: variant table modal (sortable columns, ClinVar links, star ratings)
+- [x] **SHOT-10**: Screenshot: filter section expanded with chip toggles
+- [x] **SHOT-11**: Screenshot: settings dialog (General tab with all sections visible)
+- [x] **SHOT-12**: Screenshot: dark mode (results page in dark theme)
+- [x] **SHOT-13**: Screenshot: mobile view (Step 4 results at 375x812)
+- [x] **SHOT-14**: Screenshot: population drill-down (Ashkenazi Jewish variant table)
+- [x] **SHOT-15**: Screenshot: search history panel open with entry
+- [x] **SHOT-16**: `data-testid` attributes added to key UI elements for reliable screenshot targeting
+- [x] **SHOT-17**: Clinical disclaimer auto-dismissed in screenshot script
 
 ### Documentation Content — Guide
 
@@ -120,7 +120,7 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | MAKE-01 | Phase 16 | Complete |
-| MAKE-02 | Phase 17 | Pending |
+| MAKE-02 | Phase 17 | Complete |
 | MAKE-03 | Phase 16 | Complete |
 | VITE-01 | Phase 16 | Complete |
 | VITE-02 | Phase 16 | Complete |
@@ -130,23 +130,23 @@
 | VITE-06 | Phase 16 | Complete |
 | VITE-07 | Phase 16 | Complete |
 | VITE-08 | Phase 16 | Complete |
-| SHOT-01 | Phase 17 | Pending |
-| SHOT-02 | Phase 17 | Pending |
-| SHOT-03 | Phase 17 | Pending |
-| SHOT-04 | Phase 17 | Pending |
-| SHOT-05 | Phase 17 | Pending |
-| SHOT-06 | Phase 17 | Pending |
-| SHOT-07 | Phase 17 | Pending |
-| SHOT-08 | Phase 17 | Pending |
-| SHOT-09 | Phase 17 | Pending |
-| SHOT-10 | Phase 17 | Pending |
-| SHOT-11 | Phase 17 | Pending |
-| SHOT-12 | Phase 17 | Pending |
-| SHOT-13 | Phase 17 | Pending |
-| SHOT-14 | Phase 17 | Pending |
-| SHOT-15 | Phase 17 | Pending |
-| SHOT-16 | Phase 17 | Pending |
-| SHOT-17 | Phase 17 | Pending |
+| SHOT-01 | Phase 17 | Complete |
+| SHOT-02 | Phase 17 | Complete |
+| SHOT-03 | Phase 17 | Complete |
+| SHOT-04 | Phase 17 | Complete |
+| SHOT-05 | Phase 17 | Complete |
+| SHOT-06 | Phase 17 | Complete |
+| SHOT-07 | Phase 17 | Complete |
+| SHOT-08 | Phase 17 | Complete |
+| SHOT-09 | Phase 17 | Complete |
+| SHOT-10 | Phase 17 | Complete |
+| SHOT-11 | Phase 17 | Complete |
+| SHOT-12 | Phase 17 | Complete |
+| SHOT-13 | Phase 17 | Complete |
+| SHOT-14 | Phase 17 | Complete |
+| SHOT-15 | Phase 17 | Complete |
+| SHOT-16 | Phase 17 | Complete |
+| SHOT-17 | Phase 17 | Complete |
 | GUID-01 | Phase 18 | Pending |
 | GUID-02 | Phase 18 | Pending |
 | GUID-03 | Phase 18 | Pending |
@@ -179,4 +179,4 @@
 
 ---
 *Requirements defined: 2026-02-09*
-*Last updated: 2026-02-09 (Phase 16 complete: 10 requirements satisfied)*
+*Last updated: 2026-02-09 (Phase 17 complete: 28 requirements satisfied)*
