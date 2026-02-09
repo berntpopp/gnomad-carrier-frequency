@@ -38,7 +38,7 @@
 - Integer phases (16, 17, 18, 19, 20): Planned milestone work
 - Decimal phases (e.g., 17.1): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 16: VitePress Setup** - Documentation infrastructure with navigation, theming, and landing page
+- [x] **Phase 16: VitePress Setup** - Documentation infrastructure with navigation, theming, and landing page ✓
 - [ ] **Phase 17: Screenshot Automation** - Playwright-based screenshot generation covering all app states
 - [ ] **Phase 18: Documentation Content** - Guide, use cases, reference, and about pages with embedded screenshots
 - [ ] **Phase 19: CI/CD Integration** - Unified deployment pipeline and screenshot update automation
@@ -59,8 +59,8 @@
   6. Makefile exists with `make docs`, `make docs-dev`, `make docs-preview` targets
 **Plans:** 2 plans
 Plans:
-- [ ] 16-01-PLAN.md — VitePress infrastructure: install, config, theme, PWA denylist, build tooling
-- [ ] 16-02-PLAN.md — Landing page and placeholder content pages for all 4 sections
+- [x] 16-01-PLAN.md — VitePress infrastructure: install, config, theme, PWA denylist, build tooling
+- [x] 16-02-PLAN.md — Landing page and placeholder content pages for all 4 sections
 
 ### Phase 17: Screenshot Automation
 **Goal**: Playwright script generates all required screenshots of the running app, producing assets ready for documentation pages
@@ -114,7 +114,7 @@ Phases execute in numeric order: 16 --> 17 --> 18 --> 19 --> 20
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 16. VitePress Setup | v1.3 | 0/2 | Planned | - |
+| 16. VitePress Setup | v1.3 | 2/2 | Complete | 2026-02-09 |
 | 17. Screenshot Automation | v1.3 | 0/TBD | Not started | - |
 | 18. Documentation Content | v1.3 | 0/TBD | Not started | - |
 | 19. CI/CD Integration | v1.3 | 0/TBD | Not started | - |
@@ -122,4 +122,4 @@ Phases execute in numeric order: 16 --> 17 --> 18 --> 19 --> 20
 
 ---
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-09*
+*Last updated: 2026-02-09 (Phase 16 complete)*

@@ -7,20 +7,20 @@
 
 ### VitePress Infrastructure
 
-- [ ] **VITE-01**: VitePress installed and configured with `base: '/gnomad-carrier-frequency/docs/'`
-- [ ] **VITE-02**: Navigation bar with Guide, Use Cases, Reference, About sections
-- [ ] **VITE-03**: Sidebar with hierarchical page structure per section
-- [ ] **VITE-04**: Theme colors matching app branding (#a09588)
-- [ ] **VITE-05**: Landing page with hero image, tagline, feature cards, and call-to-action buttons
-- [ ] **VITE-06**: Package.json scripts for `docs:dev`, `docs:build`, `docs:preview`
-- [ ] **VITE-07**: `.vitepress/cache` and `.vitepress/dist` added to `.gitignore`
-- [ ] **VITE-08**: PWA service worker denylist for `/docs/` path to prevent SW interception
+- [x] **VITE-01**: VitePress installed and configured with `base: '/gnomad-carrier-frequency/docs/'`
+- [x] **VITE-02**: Navigation bar with Guide, Use Cases, Reference, About sections
+- [x] **VITE-03**: Sidebar with hierarchical page structure per section
+- [x] **VITE-04**: Theme colors matching app branding (#a09588)
+- [x] **VITE-05**: Landing page with hero image, tagline, feature cards, and call-to-action buttons
+- [x] **VITE-06**: Package.json scripts for `docs:dev`, `docs:build`, `docs:preview`
+- [x] **VITE-07**: `.vitepress/cache` and `.vitepress/dist` added to `.gitignore`
+- [x] **VITE-08**: PWA service worker denylist for `/docs/` path to prevent SW interception
 
 ### Build Automation
 
-- [ ] **MAKE-01**: Makefile introduced with targets: `make screenshots`, `make docs`, `make docs-dev`, `make docs-preview`
+- [x] **MAKE-01**: Makefile introduced with targets: `make screenshots`, `make docs`, `make docs-dev`, `make docs-preview`
 - [ ] **MAKE-02**: Makefile target `make screenshots` builds app, starts preview server, runs Playwright script, stops server
-- [ ] **MAKE-03**: Makefile target `make docs` builds VitePress documentation site
+- [x] **MAKE-03**: Makefile target `make docs` builds VitePress documentation site
 
 ### Screenshot Automation
 
@@ -119,17 +119,17 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MAKE-01 | Phase 16 | Pending |
+| MAKE-01 | Phase 16 | Complete |
 | MAKE-02 | Phase 17 | Pending |
-| MAKE-03 | Phase 16 | Pending |
-| VITE-01 | Phase 16 | Pending |
-| VITE-02 | Phase 16 | Pending |
-| VITE-03 | Phase 16 | Pending |
-| VITE-04 | Phase 16 | Pending |
-| VITE-05 | Phase 16 | Pending |
-| VITE-06 | Phase 16 | Pending |
-| VITE-07 | Phase 16 | Pending |
-| VITE-08 | Phase 16 | Pending |
+| MAKE-03 | Phase 16 | Complete |
+| VITE-01 | Phase 16 | Complete |
+| VITE-02 | Phase 16 | Complete |
+| VITE-03 | Phase 16 | Complete |
+| VITE-04 | Phase 16 | Complete |
+| VITE-05 | Phase 16 | Complete |
+| VITE-06 | Phase 16 | Complete |
+| VITE-07 | Phase 16 | Complete |
+| VITE-08 | Phase 16 | Complete |
 | SHOT-01 | Phase 17 | Pending |
 | SHOT-02 | Phase 17 | Pending |
 | SHOT-03 | Phase 17 | Pending |
@@ -179,4 +179,4 @@
 
 ---
 *Requirements defined: 2026-02-09*
-*Last updated: 2026-02-09 after roadmap creation*
+*Last updated: 2026-02-09 (Phase 16 complete: 10 requirements satisfied)*
