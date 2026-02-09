@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 
 **Milestone:** v1.3 Documentation Site
 **Phase:** 16 of 20 (VitePress Setup)
-**Plan:** 01 of 02 complete
-**Status:** In progress
-**Last activity:** 2026-02-09 -- Completed 16-01-PLAN.md (VitePress Infrastructure Setup)
+**Plan:** 02 of 02 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-09 -- Completed 16-02-PLAN.md (Content Pages)
 
 ### Progress
 
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [█         ]  10% - Phase 16 in progress (1/10 plans)
+v1.3 Docs:          [██        ]  20% - Phase 16 complete (2/10 plans)
 ```
 
-**Overall:** 58 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 59 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 58
-- v1.3 plans completed: 1
+- Total plans completed: 59
+- v1.3 plans completed: 2
 
 ---
 
@@ -53,6 +53,8 @@ Recent decisions affecting current work:
 - 16-01: VitePress alpha (@next) for Vite 7 compatibility
 - 16-01: PWA navigateFallbackDenylist for /docs/ path (enables coexistence)
 - 16-01: Brand color #a09588 for docs theme (matches app RequiForm palette)
+- 16-02: Landing page uses clinical-first voice (research tool supporting clinical work)
+- 16-02: Placeholder pages kept substantive for search indexing
 
 ### Pending Todos
 
@@ -69,8 +71,8 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-09
-**Completed:** 16-01-PLAN.md (VitePress Infrastructure Setup)
-**Status:** Phase 16 in progress (1/2 plans complete)
+**Completed:** 16-02-PLAN.md (Content Pages)
+**Status:** Phase 16 complete (2/2 plans complete)
 
 ### Handoff Notes
 
