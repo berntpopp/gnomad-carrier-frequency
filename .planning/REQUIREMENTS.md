@@ -16,6 +16,12 @@
 - [ ] **VITE-07**: `.vitepress/cache` and `.vitepress/dist` added to `.gitignore`
 - [ ] **VITE-08**: PWA service worker denylist for `/docs/` path to prevent SW interception
 
+### Build Automation
+
+- [ ] **MAKE-01**: Makefile introduced with targets: `make screenshots`, `make docs`, `make docs-dev`, `make docs-preview`
+- [ ] **MAKE-02**: Makefile target `make screenshots` builds app, starts preview server, runs Playwright script, stops server
+- [ ] **MAKE-03**: Makefile target `make docs` builds VitePress documentation site
+
 ### Screenshot Automation
 
 - [ ] **SHOT-01**: Playwright installed as dev dependency with screenshot generation script
@@ -113,61 +119,64 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VITE-01 | TBD | Pending |
-| VITE-02 | TBD | Pending |
-| VITE-03 | TBD | Pending |
-| VITE-04 | TBD | Pending |
-| VITE-05 | TBD | Pending |
-| VITE-06 | TBD | Pending |
-| VITE-07 | TBD | Pending |
-| VITE-08 | TBD | Pending |
-| SHOT-01 | TBD | Pending |
-| SHOT-02 | TBD | Pending |
-| SHOT-03 | TBD | Pending |
-| SHOT-04 | TBD | Pending |
-| SHOT-05 | TBD | Pending |
-| SHOT-06 | TBD | Pending |
-| SHOT-07 | TBD | Pending |
-| SHOT-08 | TBD | Pending |
-| SHOT-09 | TBD | Pending |
-| SHOT-10 | TBD | Pending |
-| SHOT-11 | TBD | Pending |
-| SHOT-12 | TBD | Pending |
-| SHOT-13 | TBD | Pending |
-| SHOT-14 | TBD | Pending |
-| SHOT-15 | TBD | Pending |
-| SHOT-16 | TBD | Pending |
-| SHOT-17 | TBD | Pending |
-| GUID-01 | TBD | Pending |
-| GUID-02 | TBD | Pending |
-| GUID-03 | TBD | Pending |
-| GUID-04 | TBD | Pending |
-| GUID-05 | TBD | Pending |
-| GUID-06 | TBD | Pending |
-| CASE-01 | TBD | Pending |
-| CASE-02 | TBD | Pending |
-| CASE-03 | TBD | Pending |
-| REF-01 | TBD | Pending |
-| REF-02 | TBD | Pending |
-| REF-03 | TBD | Pending |
-| REF-04 | TBD | Pending |
-| ABOU-01 | TBD | Pending |
-| ABOU-02 | TBD | Pending |
-| ABOU-03 | TBD | Pending |
-| CICD-01 | TBD | Pending |
-| CICD-02 | TBD | Pending |
-| CICD-03 | TBD | Pending |
-| CICD-04 | TBD | Pending |
-| CICD-05 | TBD | Pending |
-| READ-01 | TBD | Pending |
-| READ-02 | TBD | Pending |
-| READ-03 | TBD | Pending |
+| MAKE-01 | Phase 16 | Pending |
+| MAKE-02 | Phase 17 | Pending |
+| MAKE-03 | Phase 16 | Pending |
+| VITE-01 | Phase 16 | Pending |
+| VITE-02 | Phase 16 | Pending |
+| VITE-03 | Phase 16 | Pending |
+| VITE-04 | Phase 16 | Pending |
+| VITE-05 | Phase 16 | Pending |
+| VITE-06 | Phase 16 | Pending |
+| VITE-07 | Phase 16 | Pending |
+| VITE-08 | Phase 16 | Pending |
+| SHOT-01 | Phase 17 | Pending |
+| SHOT-02 | Phase 17 | Pending |
+| SHOT-03 | Phase 17 | Pending |
+| SHOT-04 | Phase 17 | Pending |
+| SHOT-05 | Phase 17 | Pending |
+| SHOT-06 | Phase 17 | Pending |
+| SHOT-07 | Phase 17 | Pending |
+| SHOT-08 | Phase 17 | Pending |
+| SHOT-09 | Phase 17 | Pending |
+| SHOT-10 | Phase 17 | Pending |
+| SHOT-11 | Phase 17 | Pending |
+| SHOT-12 | Phase 17 | Pending |
+| SHOT-13 | Phase 17 | Pending |
+| SHOT-14 | Phase 17 | Pending |
+| SHOT-15 | Phase 17 | Pending |
+| SHOT-16 | Phase 17 | Pending |
+| SHOT-17 | Phase 17 | Pending |
+| GUID-01 | Phase 18 | Pending |
+| GUID-02 | Phase 18 | Pending |
+| GUID-03 | Phase 18 | Pending |
+| GUID-04 | Phase 18 | Pending |
+| GUID-05 | Phase 18 | Pending |
+| GUID-06 | Phase 18 | Pending |
+| CASE-01 | Phase 18 | Pending |
+| CASE-02 | Phase 18 | Pending |
+| CASE-03 | Phase 18 | Pending |
+| REF-01 | Phase 18 | Pending |
+| REF-02 | Phase 18 | Pending |
+| REF-03 | Phase 18 | Pending |
+| REF-04 | Phase 18 | Pending |
+| ABOU-01 | Phase 18 | Pending |
+| ABOU-02 | Phase 18 | Pending |
+| ABOU-03 | Phase 18 | Pending |
+| CICD-01 | Phase 19 | Pending |
+| CICD-02 | Phase 19 | Pending |
+| CICD-03 | Phase 19 | Pending |
+| CICD-04 | Phase 19 | Pending |
+| CICD-05 | Phase 19 | Pending |
+| READ-01 | Phase 20 | Pending |
+| READ-02 | Phase 20 | Pending |
+| READ-03 | Phase 20 | Pending |
 
 **Coverage:**
-- v1.3 requirements: 48 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 48
+- v1.3 requirements: 52 total
+- Mapped to phases: 52
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-09*
-*Last updated: 2026-02-09 after initial definition*
+*Last updated: 2026-02-09 after roadmap creation*
