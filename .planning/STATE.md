@@ -14,10 +14,10 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 ## Current Position
 
 **Milestone:** v1.3 Documentation Site
-**Phase:** 16 of 20 (VitePress Setup) — COMPLETE
-**Plan:** 2 of 2 complete
-**Status:** Phase 16 verified and complete. Ready for Phase 17.
-**Last activity:** 2026-02-09 -- Phase 16 verified (6/6 must-haves passed)
+**Phase:** 17 of 20 (Screenshot Automation) — IN PROGRESS
+**Plan:** 1 of 4 complete (17-02-PLAN.md done)
+**Status:** Phase 17 in progress. Test ID attributes added to 19 components.
+**Last activity:** 2026-02-09 -- Completed 17-02-PLAN.md (42 data-testid attributes added)
 
 ### Progress
 
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [██        ]  20% - Phase 16 complete (2/10 plans)
+v1.3 Docs:          [███       ]  30% - Phase 17 started (3/10 plans)
 ```
 
-**Overall:** 59 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 61 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 59
-- v1.3 plans completed: 2
+- Total plans completed: 61
+- v1.3 plans completed: 3
 
 ---
 
@@ -55,6 +55,9 @@ Recent decisions affecting current work:
 - 16-01: Brand color #a09588 for docs theme (matches app RequiForm palette)
 - 16-02: Landing page uses clinical-first voice (research tool supporting clinical work)
 - 16-02: Placeholder pages kept substantive for search indexing
+- 17-02: data-testid on Vuetify components (stable selectors for Playwright, decoupled from CSS)
+- 17-02: kebab-case naming convention for testids (readable, collision-resistant)
+- 17-02: Settings/history buttons in AppBar not AppFooter (corrected plan assumption)
 
 ### Pending Todos
 
@@ -71,8 +74,8 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-09
-**Completed:** Phase 16 VitePress Setup (2 plans, 10 requirements, verified)
-**Status:** Phase 16 complete — ready for Phase 17 planning
+**Completed:** 17-02-PLAN.md (Test ID Attributes)
+**Status:** Phase 17 in progress — 42 testids added to 19 components in 11 minutes
 
 ### Handoff Notes
 
