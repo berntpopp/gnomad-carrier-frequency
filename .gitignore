@@ -39,3 +39,7 @@ dist-ssr
 
 # Playwright MCP screenshots
 .playwright-mcp/
+
+# VitePress
+docs/.vitepress/cache
+docs/.vitepress/dist

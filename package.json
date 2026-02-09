@@ -10,7 +10,10 @@
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",
     "lighthouse": "lhci autorun --config=lighthouserc.local.json",
-    "ci": "npm run lint && npm run typecheck && npm run build && npm run lighthouse"
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "ci": "npm run lint && npm run typecheck && npm run build && npm run docs:build && npm run lighthouse"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
