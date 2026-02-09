@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 
 **Milestone:** v1.3 Documentation Site
 **Phase:** 16 of 20 (VitePress Setup)
-**Plan:** Ready to plan
-**Status:** Ready to plan
-**Last activity:** 2026-02-09 -- Roadmap created for v1.3
+**Plan:** 01 of 02 complete
+**Status:** In progress
+**Last activity:** 2026-02-09 -- Completed 16-01-PLAN.md (VitePress Infrastructure Setup)
 
 ### Progress
 
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [          ]   0% - Phase 16 ready to plan
+v1.3 Docs:          [█         ]  10% - Phase 16 in progress (1/10 plans)
 ```
 
-**Overall:** 57 plans complete across v1.0 + v1.1 + v1.2
+**Overall:** 58 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 57
-- v1.3 plans completed: 0
+- Total plans completed: 58
+- v1.3 plans completed: 1
 
 ---
 
@@ -50,6 +50,9 @@ Recent decisions affecting current work:
 - v1.3: VitePress chosen over Astro Starlight (same Vite/Vue ecosystem, shared node_modules)
 - v1.3: Playwright for screenshots (same Node/TS ecosystem, full wizard navigation control)
 - v1.3: Merged deployment artifact (app at root, docs at /docs/, single GitHub Pages deploy)
+- 16-01: VitePress alpha (@next) for Vite 7 compatibility
+- 16-01: PWA navigateFallbackDenylist for /docs/ path (enables coexistence)
+- 16-01: Brand color #a09588 for docs theme (matches app RequiForm palette)
 
 ### Pending Todos
 
@@ -66,8 +69,8 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-09
-**Completed:** v1.3 roadmap created (5 phases, 49 requirements mapped)
-**Status:** Phase 16 ready to plan
+**Completed:** 16-01-PLAN.md (VitePress Infrastructure Setup)
+**Status:** Phase 16 in progress (1/2 plans complete)
 
 ### Handoff Notes
 
