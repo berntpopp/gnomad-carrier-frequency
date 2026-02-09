@@ -1,0 +1,39 @@
+{
+  "carrier-freq-templates": {
+    "language": "de",
+    "genderStyle": "*",
+    "patientSex": "male",
+    "enabledSections": {
+      "affected": ["geneIntro", "inheritance", "carrierFrequency", "recurrenceRisk", "recommendation"],
+      "carrier": ["geneIntro", "inheritance", "carrierFrequency", "recurrenceRisk", "recommendation"],
+      "familyMember": ["geneIntro", "inheritance", "carrierFrequency", "recurrenceRisk", "recommendation"]
+    },
+    "customSections": {}
+  },
+  "carrier-freq-app": {
+    "disclaimerAcknowledged": true,
+    "disclaimerAcknowledgedAt": 1707400000000
+  },
+  "carrier-freq-history": {
+    "entries": [
+      {
+        "id": "demo-cftr-1",
+        "gene": {
+          "symbol": "CFTR",
+          "ensembl_id": "ENSG00000001626"
+        },
+        "gnomadVersion": "4.1.0",
+        "indexPatientStatus": "heterozygous",
+        "frequencySource": "gnomad",
+        "results": {
+          "globalCarrierFrequency": 0.04,
+          "populations": []
+        },
+        "timestamp": 1707400000000
+      }
+    ],
+    "settings": {
+      "maxEntries": 50
+    }
+  }
+}

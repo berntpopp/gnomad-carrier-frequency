@@ -1,0 +1,18 @@
+{
+  "data": {
+    "gene": {
+      "gene_id": "ENSG00000001626",
+      "symbol": "CFTR",
+      "gnomad_constraint": {
+        "exp_lof": 63.8,
+        "obs_lof": 33,
+        "oe_lof": 0.52,
+        "oe_lof_lower": 0.38,
+        "oe_lof_upper": 0.71,
+        "pLI": 0.0091,
+        "lof_z": 2.6,
+        "flags": []
+      }
+    }
+  }
+}
