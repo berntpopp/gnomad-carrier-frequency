@@ -1,0 +1,20 @@
+/**
+ * Brand color overrides for VitePress theme
+ * Using gnomAD Carrier Frequency Calculator brand colors (#a09588)
+ */
+
+/* Light mode */
+:root {
+  --vp-c-brand-1: #a09588;
+  --vp-c-brand-2: #8a7f72;
+  --vp-c-brand-3: #6d665c;
+  --vp-c-brand-soft: rgba(160, 149, 136, 0.14);
+}
+
+/* Dark mode */
+.dark {
+  --vp-c-brand-1: #c0b5a8;
+  --vp-c-brand-2: #a09588;
+  --vp-c-brand-3: #8a7f72;
+  --vp-c-brand-soft: rgba(160, 149, 136, 0.16);
+}
