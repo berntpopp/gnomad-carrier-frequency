@@ -67,12 +67,16 @@ Plans:
 **Depends on**: Phase 16 (screenshots saved to docs/public/screenshots/)
 **Requirements**: MAKE-02, SHOT-01, SHOT-02, SHOT-03, SHOT-04, SHOT-05, SHOT-06, SHOT-07, SHOT-08, SHOT-09, SHOT-10, SHOT-11, SHOT-12, SHOT-13, SHOT-14, SHOT-15, SHOT-16, SHOT-17
 **Success Criteria** (what must be TRUE):
-  1. Running `make screenshots` builds the app, starts preview server, generates 14 PNG files in docs/public/screenshots/, and stops the server
+  1. Running `make screenshots` starts dev server, generates 14 WebP files in docs/public/screenshots/, and stops the server
   2. Key UI elements have data-testid attributes enabling reliable element targeting by the script
   3. The clinical disclaimer dialog is auto-dismissed before any screenshots are captured
   4. Screenshots render at correct viewport sizes (1200x800 for desktop, 375x812 for mobile) with appropriate theme (light or dark as specified)
   5. All screenshots show realistic data (CFTR gene with actual gnomAD results) rather than empty or error states
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 17-01-PLAN.md — Install Playwright/sharp/tsx, create API fixtures, build script scaffold with server lifecycle and route interception
+- [ ] 17-02-PLAN.md — Add data-testid attributes to all targeted Vue components
+- [ ] 17-03-PLAN.md — Add all 14 screenshot captures to script and update Makefile target
 
 ### Phase 18: Documentation Content
 **Goal**: All documentation pages are written with clinical accuracy, embedded screenshots, and cross-links forming a complete user guide
@@ -115,11 +119,11 @@ Phases execute in numeric order: 16 --> 17 --> 18 --> 19 --> 20
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 16. VitePress Setup | v1.3 | 2/2 | Complete | 2026-02-09 |
-| 17. Screenshot Automation | v1.3 | 0/TBD | Not started | - |
+| 17. Screenshot Automation | v1.3 | 0/3 | Planned | - |
 | 18. Documentation Content | v1.3 | 0/TBD | Not started | - |
 | 19. CI/CD Integration | v1.3 | 0/TBD | Not started | - |
 | 20. README Streamlining | v1.3 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-09 (Phase 16 complete)*
+*Last updated: 2026-02-09 (Phase 17 planned)*
