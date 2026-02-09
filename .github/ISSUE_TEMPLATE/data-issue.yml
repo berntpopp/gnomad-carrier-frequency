@@ -1,0 +1,91 @@
+name: Data or Calculation Issue
+description: Report incorrect carrier frequencies, unexpected filtering results, or data discrepancies
+title: "[Data]: "
+labels: ["data", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template if you suspect a carrier frequency, variant filter result,
+        or population statistic is incorrect. Please provide as much detail as possible
+        so we can verify and investigate.
+
+  - type: input
+    id: gene
+    attributes:
+      label: Gene
+      description: The gene symbol involved.
+      placeholder: e.g. CFTR, SMN1, GJB2
+    validations:
+      required: true
+
+  - type: input
+    id: variant
+    attributes:
+      label: Variant (if specific)
+      description: A specific variant identifier, if applicable.
+      placeholder: e.g. c.1521_1523delCTT (p.Phe508del)
+    validations:
+      required: false
+
+  - type: dropdown
+    id: gnomad-version
+    attributes:
+      label: gnomAD Version
+      description: Which gnomAD dataset version were you querying?
+      options:
+        - gnomAD v4.1 (GRCh38)
+        - gnomAD v3.1.2 (GRCh38)
+        - gnomAD v2.1.1 (GRCh37)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue type
+      description: What kind of data problem did you observe?
+      options:
+        - Incorrect carrier frequency
+        - Missing variants (expected pathogenic variant not shown)
+        - Variant incorrectly included or excluded by filters
+        - Population frequency mismatch with gnomAD browser
+        - Calculation error in recurrence risk
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-value
+    attributes:
+      label: Expected value and source
+      description: What value did you expect, and where does that expectation come from?
+      placeholder: |
+        Expected carrier frequency: ~1/25 for European population
+        Source: ACMG guidelines / published literature / gnomAD browser direct query
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-value
+    attributes:
+      label: Value shown by the application
+      description: What did the application display instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Any other details, screenshots, or references that help explain the discrepancy.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I verified the expected value against an independent source
+          required: true

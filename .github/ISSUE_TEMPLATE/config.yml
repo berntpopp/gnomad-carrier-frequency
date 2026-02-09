@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & Discussions
+    url: https://github.com/berntpopp/gnomad-carrier-frequency/discussions
+    about: Ask questions about usage, clinical workflows, or carrier frequency interpretation
+  - name: gnomAD Browser
+    url: https://gnomad.broadinstitute.org/
+    about: Browse the gnomAD database directly for variant and gene information
