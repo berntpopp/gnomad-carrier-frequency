@@ -1,10 +1,14 @@
 <template>
-  <div class="d-flex flex-wrap ga-1">
+  <div
+    class="d-flex flex-wrap ga-1"
+    data-testid="filter-chips"
+  >
     <v-chip
       v-if="filters.lofHcEnabled"
       color="primary"
       size="x-small"
       prepend-icon="mdi-check"
+      data-testid="filter-chip-lof"
     >
       LoF HC
     </v-chip>
@@ -23,6 +27,7 @@
       color="success"
       size="x-small"
       prepend-icon="mdi-check"
+      data-testid="filter-chip-clinvar"
     >
       ClinVar P/LP {{ starLabel }}
     </v-chip>

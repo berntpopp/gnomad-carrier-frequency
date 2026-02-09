@@ -6,6 +6,7 @@
     max-width="1400"
     scrollable
     aria-label="Variant Details"
+    data-testid="variant-modal"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <v-card>
@@ -27,6 +28,7 @@
           variant="text"
           size="small"
           aria-label="Close variant modal"
+          data-testid="variant-modal-close-btn"
           @click="emit('update:modelValue', false)"
         />
       </v-card-title>

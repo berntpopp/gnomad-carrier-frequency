@@ -2,6 +2,7 @@
   <v-footer
     app
     class="footer-container text-caption text-medium-emphasis"
+    data-testid="app-footer"
   >
     <div class="footer-content">
       <!-- Primary row: GitHub, Version -->
