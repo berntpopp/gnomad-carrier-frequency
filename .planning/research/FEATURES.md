@@ -1,311 +1,281 @@
-# Features Research: v1.1
+# Feature Landscape: SEO & UX Polish
 
-**Project:** gnomAD Carrier Frequency Calculator
-**Research Date:** 2026-01-19
-**Scope:** v1.1 enhancement features (variant tables, filtering UI, template editor, help system, validation)
-**Confidence:** HIGH (based on current implementation review + domain research)
-
-## Summary
-
-v1.1 features center around enhancing the existing 4-step wizard with richer data exploration (variant tables, population drill-down), greater user control (configurable filters, template editing), and professional polish (help/documentation, validation warnings). Key patterns from the genetic data visualization domain include:
-
-1. **Variant tables** should support expandable rows for population-specific drill-down (gnomAD pattern)
-2. **Filtering UIs** should use chip-based toggles with real-time feedback (Material Design pattern)
-3. **Template editors** should preserve simplicity with variable highlighting, not full WYSIWYG
-4. **Help systems** need careful accessibility design for SPAs (focus management, ARIA live regions)
-5. **Validation warnings** must be non-blocking but prominent for clinical use cases
+**Domain:** Medical/scientific SPA tool -- SEO discoverability and UX polish
+**Project:** gnomAD Carrier Frequency Calculator (v1.3 -> v1.4)
+**Researched:** 2026-02-23
+**Overall Confidence:** HIGH (verified against existing codebase, competitor analysis, SEO audit findings, UX audit findings, and current web standards)
 
 ---
 
-## Feature Area 1: Variant Table with Population Drill-Down
+## Context
 
-The current `StepResults.vue` displays a flat table of populations. v1.1 should add variant-level visibility with population-specific breakdown.
+This research focuses on features needed for SEO indexing and UX polish for an existing Vue 3/Vuetify 3 SPA tool. The app is currently NOT indexed by Google (empty `<body>` in HTML), CTA buttons use a muted `#a09588` color that looks disabled, there is no first-time user onboarding, and the app/docs sites are poorly cross-linked. Competitors (Perinatology, GeniE, Omni Calculator) all use static HTML, 1200-3500 words of content, and structured data.
 
-### Table Stakes
+### What Already Exists
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Sortable columns** | Users need to find highest/lowest frequencies quickly | Low | Already implemented in current v-data-table |
-| **Column headers with units** | Professional data presentation | Low | Currently shows %, ratio, AC, AN |
-| **Global row highlighting** | Distinguish aggregate from population-specific | Low | Currently uses `bg-grey-lighten-4` class |
-| **Founder effect badges** | Clinically significant pattern flagging | Low | Already implemented with chips |
-| **Population label mapping** | "afr" -> "African/African American" | Low | Already implemented via config |
+- `@unhead/vue` for meta tag management (not actively used in app shell)
+- `index.html` with WebApplication + FAQPage structured data (6 FAQ items)
+- VitePress docs site at `/docs/` with 17 pages (pre-rendered HTML)
+- PWA with offline support via `vite-plugin-pwa`
+- Disclaimer modal on first visit via `useAppStore`
+- Footer with icon buttons (GitHub, disclaimer, data sources, methodology, FAQ, about, logs)
+- Dark/light theme toggle
+- `robots.txt` with only `Allow: /` (no sitemap reference)
+- OG tags using relative SVG path (broken on all social platforms)
 
-### Differentiators
+### What Is Missing
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Expandable population rows** | Show subcontinental breakdown on click (e.g., NFE -> Bulgarian, Estonian, Finnish, etc.) | Medium | Vuetify supports `expanded-item` slot; gnomAD v2.1+ provides subcontinental data |
-| **Variant-level table** | Show individual qualifying variants with ClinVar annotation, HGVS, consequence | Medium | Data already fetched; needs new display component |
-| **Population frequency visualization** | Small inline bar charts for visual comparison | Medium | Could use Vuetify progress bars or simple CSS |
-| **Export to CSV** | Allow downloading results for clinical records | Low | Simple blob/download implementation |
-| **Copy individual row** | Quick copy of specific population data | Low | Clipboard API, similar to existing text copy |
-
-### Anti-Features
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| **Full genome browser embed** | Overwhelming complexity, scope creep | Link to gnomAD browser for deep exploration |
-| **Real-time population comparison charts** | Performance overhead, visual clutter | Keep to simple numeric display with optional expand |
-| **Population heat maps** | Requires geographic data, complex visualization | Use simple ranking/highlighting |
-| **Linkout to every external database** | Context switching, maintenance burden | Link only to gnomAD and ClinVar (primary sources) |
-
-### Reference Examples
-
-- **gnomAD Browser**: Population frequency table with subcontinental expansion on variant pages
-- **NCBI Variation Viewer**: Two-panel design with filters (left) and paginated table (right)
-- **Simple ClinVar**: Clean tabular display with clear classification badges
+- Static HTML content in `<body>` for crawlers (currently `<div id="app"></div>`)
+- `sitemap.xml` for either app or docs
+- `<link rel="canonical">` tag
+- `<meta name="robots">` directive
+- PNG OG image (currently SVG, unsupported by social platforms)
+- Cross-links between app and docs site
+- Any onboarding for first-time users
+- Distinct CTA color (primary `#a09588` makes buttons look disabled)
 
 ---
 
-## Feature Area 2: Configurable Filtering UI
+## Table Stakes
 
-Current filtering is hardcoded: LoF HC + ClinVar P/LP with >= 1 star. v1.1 should allow user control.
+Features users/crawlers expect. Missing means the product is invisible to search engines or confusing to first-time users.
 
-### Table Stakes
+### SEO: Fix Indexing (CRITICAL)
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Current filter display** | Show what criteria produced the results | Low | Add info chip or tooltip showing "LoF HC + ClinVar P/LP (>=1 star)" |
-| **Filter reset** | Return to default criteria | Low | Single button to restore defaults |
-| **Filter state persistence** | Remember preferences across sessions | Low | Already have localStorage pattern via Pinia |
-| **Real-time result count** | Show how many variants match current filters | Low | Display count in UI before applying |
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|------------|--------------|-------|
+| **Static HTML seed in `<div id="app">`** | Google sees empty body; SPA rendering is unreliable for low-crawl-priority sites | Low | None -- edit `index.html` | Place keyword-rich content inside `#app` div; Vue replaces on mount. Include H1, feature list, "How it works" section. Must reach 500+ words to compete. |
+| **`<noscript>` fallback** | Crawlers that skip JS need basic content | Low | Pairs with HTML seed | Brief description + link to docs site |
+| **`sitemap.xml`** | Google cannot efficiently discover pages without one | Low | List of all app + docs URLs | Place in `public/sitemap.xml` with both app root and all docs pages |
+| **`robots.txt` with sitemap reference** | Current `robots.txt` has no sitemap pointer | Low | Depends on sitemap existing | Add `Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/sitemap.xml` |
+| **`<link rel="canonical">`** | Prevents duplicate content issues; required for proper indexing | Low | None -- add to `<head>` | `https://gnomad-carrier-frequency.kidney-genetics.org/` |
+| **`<meta name="robots" content="index, follow">`** | Explicit indexing directive for crawlers | Low | None -- add to `<head>` | Standard practice |
+| **PNG OG image (1200x630)** | SVG OG images are not rendered by Facebook, LinkedIn, Twitter/X, Slack, Discord | Low | Need to generate PNG from existing SVG or create new | Use `sharp` (already in devDependencies) to convert at build time, or create a static PNG. Keep under 300KB. |
+| **Absolute URLs for OG tags** | Current `./og-image.svg` relative path is unreliable across platforms | Low | Depends on PNG creation | Change to full `https://...` URL |
+| **VitePress sitemap generation** | Docs pages are pre-rendered HTML that Google can index immediately -- need sitemap to discover them | Low | Add `sitemap` config to `docs/.vitepress/config.ts` | VitePress has built-in sitemap support: `sitemap: { hostname: '...' }` |
 
-### Differentiators
+**Confidence:** HIGH -- all items verified against Google's own documentation, competitor analysis, and current web standards.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Filter chip toggles** | Visual, touch-friendly filter selection | Medium | Use Vuetify chips with `v-chip-group` in multi-select mode |
-| **Include missense toggle** | Expand beyond LoF-only for some genes | Medium | Requires additional filter logic in `variant-filters.ts` |
-| **ClinVar star threshold slider** | Adjust review status stringency (0-4 stars) | Low | Simple v-slider component |
-| **Custom consequence types** | Select specific variant types (nonsense, frameshift, splice) | Medium | Multi-select from predefined list |
-| **Filter presets** | "Conservative" (LoF HC only), "Inclusive" (all P/LP), "Custom" | Medium | Stored configurations with quick switch |
+### SEO: On-Page Optimization
 
-### Anti-Features
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|------------|--------------|-------|
+| **Optimized title tag** | Current title leads with "gnomAD" which means nothing to most searchers. Should lead with target keyword. | Low | None | Change to: "Carrier Frequency Calculator -- gnomAD Population Data" |
+| **Optimized meta description** | Current is good but missing differentiators ("free", "real population data", "multiple ancestries") | Low | None | Add "free" modifier and key differentiators |
+| **Updated WebApplication structured data** | Current schema missing `datePublished`, `dateModified`, `screenshot` fields | Low | Depends on PNG OG image | Add version, dates, screenshot URL |
+| **Internal links in static HTML seed** | Static content must link to docs pages so Google discovers them on first crawl | Low | Depends on HTML seed content | Link to 3-5 key docs pages from the seed content |
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| **Full variant annotation editor** | Scope creep, data integrity risk | Provide read-only display with links to sources |
-| **Raw GraphQL query builder** | Exposes implementation, error-prone | Abstract behind meaningful filter options |
-| **Allele frequency threshold filter** | Changes the calculation meaning, confusing | Keep all qualifying variants in calculation |
-| **Custom gene lists/batching** | Multi-gene analysis is different product | Keep single-gene focus |
+**Confidence:** HIGH -- based on SEO audit findings and competitor comparison matrix.
 
-### Reference Examples
+### UX: CTA Color System
 
-- **Material Design 3 Filter Chips**: Visual multi-select with clear active state
-- **NCBI Variation Viewer**: Eight filter groups with AND between groups, OR within groups
-- **gnomAD Browser**: Filtering options for ClinVar variants and variant consequence
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|------------|--------------|-------|
+| **Distinct primary CTA color** | Current `#a09588` (muted warm gray) makes CONTINUE buttons look disabled. UX audit scored Color & Contrast 6.5/10. | Low | Edit Vuetify theme in `main.ts` | Recommend a saturated, accessible blue or teal (e.g., `#1976D2` or `#00897B`). Keep warm gray as brand/secondary accent. Must pass WCAG AA contrast on both white and dark backgrounds. |
+| **Clear disabled vs. enabled distinction** | Users cannot tell if CONTINUE is clickable -- enabled and disabled states are nearly identical | Low | Depends on new primary color | Enabled = saturated color; Disabled = 30% opacity of that color. Use `aria-disabled` pattern for better a11y. |
+| **Stepper header color update** | Stepper circles use same muted primary, reducing visual hierarchy | Low | Depends on new primary color | Completed steps should use the new primary; current step should be visually prominent |
 
----
-
-## Feature Area 3: In-App Template Editor
-
-Current implementation uses JSON config files for templates with `{{variable}}` placeholders. Users can toggle sections but cannot edit text.
-
-### Table Stakes
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Variable placeholder highlighting** | Show where dynamic content appears | Low | CSS highlighting for `{{variable}}` patterns |
-| **Preview mode** | See rendered text before committing | Low | Already have preview in `TextOutput.vue` |
-| **Section reordering** | Arrange output sections to match workflow | Medium | Draggable list with persistence |
-| **Undo/redo** | Standard editing expectations | Medium | Vue ref-based history stack |
-
-### Differentiators
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Inline template editing** | Edit template text directly in-app | Medium | Textarea with variable syntax preservation |
-| **Variable autocomplete** | Insert available variables via dropdown | Medium | Show available variables: gene, frequency, ratio, pmid, etc. |
-| **Template import/export** | Share templates between users/instances | Low | JSON download/upload |
-| **Multiple template sets** | Different templates for different contexts (clinic, research) | Medium | Named template storage in Pinia |
-| **Template validation** | Warn about unknown variables or malformed placeholders | Low | Regex-based validation before save |
-
-### Anti-Features
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| **Full WYSIWYG/rich text editor** | Clinical text is plain text for pasting; formatting causes issues | Keep plain text with monospace editing |
-| **Template marketplace/sharing** | Scope creep, moderation overhead | Provide import/export for manual sharing |
-| **Conditional logic in templates** | Complexity explosion, debugging nightmare | Keep sections as toggleable blocks, not conditional |
-| **PDF/document generation** | Output goes to EHR via copy-paste | Stay focused on clipboard-ready text |
-
-### Reference Examples
-
-- **ProcessMaker Template Editor**: Variable picker with search and double-click insertion
-- **Document360 Variables**: `/variables` slash command pattern for insertion
-- **EHR Template Systems**: Balance between consistency (templates) and customization (editable sections)
+**Confidence:** HIGH -- directly observed in UX audit; confirmed by CTA design best practices research.
 
 ---
 
-## Feature Area 4: Help/FAQ/Documentation
+## Differentiators
 
-Current app has no help system. Professional clinical tools require guidance and reference documentation.
+Features that set the product apart. Not expected, but create competitive advantage for ranking and user retention.
 
-### Table Stakes
+### SEO: Content & Authority
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Methodology explanation** | How carrier frequency is calculated | Low | Static content explaining Hardy-Weinberg, filtering criteria |
-| **Variable glossary** | What each output variable means | Low | Definitions for carrier frequency, recurrence risk, AC, AN |
-| **Data sources attribution** | Credit gnomAD, ClinVar with version info | Low | Already have version display; formalize in help |
-| **Contact/feedback link** | Professional accountability | Low | Link to GitHub issues or email |
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| **Cross-link: App footer "Docs" icon** | Persistent link from every app page view to docs; passes link equity to pre-rendered content | Low | Add icon button to `AppFooter.vue` | Use `mdi-book-open-variant` icon alongside existing footer icons. Links to `/docs/`. Natural fit with existing icon pattern. |
+| **Cross-link: Docs "Open Calculator" CTAs in content** | Docs pages currently have only one nav-bar link back to app. Adding contextual CTAs within page content (e.g., "Try calculating CFTR carrier frequency") increases click-through. | Low | Edit VitePress markdown pages | Place 1-2 contextual CTA links per docs page, not just the navbar button |
+| **Cross-link: Static HTML nav to docs** | Links in the HTML seed content create crawl paths Google follows on first visit, before JS renders | Low | Depends on HTML seed | Include `<nav>` with links to "What is Carrier Frequency?", "Methodology", "FAQ", "Getting Started" |
+| **Expanded FAQPage structured data** | Already have 6 FAQ items in schema. Competitors with FAQ rich results (Omni Calculator) get enhanced Google listings. Could expand to 8-10 questions. | Low | Edit `index.html` JSON-LD | Add questions about: specific diseases (CFTR, SMA), data freshness, clinical use, methodology comparison vs GeniE |
+| **E-E-A-T author signals** | Google prioritizes content from recognized experts for medical topics (YMYL). Adding author credentials builds trust. | Low | Add to structured data + static content | Add `author` with credentials (MD, PhD affiliation). Already have Bernt Popp as author; add institution and credentials. |
+| **`datePublished` and `dateModified`** | Signals content freshness to Google. Competitors with recent dates rank higher. | Low | Auto-update in build pipeline or manual | Embed in both structured data and visible static content |
 
-### Differentiators
+**Confidence:** MEDIUM-HIGH -- cross-linking patterns verified from competitor analysis and SEO best practices. E-E-A-T importance for medical content confirmed by Google's own YMYL guidelines.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Contextual help tooltips** | Help where it's needed, not buried in docs | Medium | Info icons with popover explanations |
-| **Step-by-step walkthrough** | First-time user guidance | Medium | Optional overlay tutorial (skip-able) |
-| **FAQ accordion** | Common questions in expandable format | Low | Use native `<details>`/`<summary>` for accessibility |
-| **Keyboard shortcuts reference** | Power user efficiency | Low | Simple modal listing shortcuts |
-| **Offline capability notice** | Set expectations about gnomAD dependency | Low | Explain that live API queries are required |
+### UX: First-Time Onboarding
 
-### Anti-Features
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| **Welcome hero card on Step 1** | Replace the bare gene search with a brief welcome card showing what the tool does and why to use it. Displayed only for first-time users (before any gene search). 2-3 sentences + "Try with CFTR" quick-start button. | Medium | `useAppStore` already tracks `disclaimerAcknowledged`; add `hasUsedApp` flag | Card disappears after first gene search. Stored in localStorage via Pinia persistence. Should NOT block the gene search input -- display above or alongside it. |
+| **"Try with CFTR" quick-start** | One-click demo with a well-known gene dramatically reduces time-to-value. CFTR (cystic fibrosis) is universally recognized by genetic counselors. | Medium | Depends on welcome card; requires programmatic gene selection | Pre-fill the gene search and trigger selection. Show as a prominent button on the welcome card. |
+| **Contextual help links on wizard steps** | Small "Learn more" links on each step pointing to relevant docs pages. Step 1 -> "What is carrier frequency?", Step 3 -> "Methodology", Step 4 -> "How to interpret results". | Low | Requires docs pages to exist at target URLs (they do) | Use `text-caption` links below step descriptions. Non-intrusive but discoverable. |
+| **Footer icon text labels (desktop)** | Current footer uses icon-only buttons (data sources, methodology, FAQ, about, logs). First-time users cannot discover these features. | Low | Edit `AppFooter.vue` | Add text labels below or beside icons on sm+ screens. Keep icon-only on mobile (already correct via overflow menu). |
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| **Full user manual PDF** | Maintenance burden, goes stale | Keep help in-app, version with code |
-| **Video tutorials** | High production cost, accessibility issues | Use text with screenshots if needed |
-| **Chatbot/AI assistance** | Complexity, scope creep | FAQ + contextual tooltips sufficient |
-| **Community forum integration** | Moderation overhead | GitHub issues for feedback |
+**Confidence:** HIGH for welcome card and quick-start patterns (standard onboarding UX). MEDIUM for contextual help links (value depends on docs content quality).
 
-### Accessibility Requirements (Critical)
+### UX: Visual Polish
 
-SPA help pages require specific accessibility handling:
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| **Brand color as secondary, not primary** | Keep `#a09588` warm gray as brand accent (AppBar logo hover, section dividers, subtle backgrounds) while using a saturated color for all interactive elements | Low | Part of CTA color system change | Update Vuetify theme: `primary` becomes the new CTA color; add `brand: '#a09588'` as custom color |
+| **Persistent gene context chip** | After gene selection, show a small chip below stepper ("CFTR \| gnomAD v4.1") on Steps 2-4 so users never lose context | Medium | Access wizard state from new component | Reduces cognitive load; users do not have to navigate back to confirm their selection |
+| **Reduced mobile title footprint** | Full title wraps to 3 lines on mobile, consuming 25%+ of viewport | Low | Edit `App.vue` conditional rendering | On mobile (xs), hide the `<h1>` since "gCFCalc" in AppBar already identifies the app |
+| **Replace native alert/confirm dialogs** | Template import errors and template reset use native `alert()`/`confirm()` which break the visual language | Medium | Create reusable Vuetify confirm dialog component | Use `v-dialog` with confirm/cancel actions for consistency |
 
-- **Focus management**: Move focus to help content when opened
-- **ARIA live regions**: Announce dynamic content changes
-- **Keyboard navigation**: Tab through FAQ sections, Enter/Space to expand
-- **Screen reader testing**: Verify NVDA/VoiceOver announce accordion states
-- **`tabindex="-1"`**: On help container for programmatic focus
-
-### Reference Examples
-
-- **vue3-accessible-accordion**: WAI-ARIA Authoring Practices 1.1 compliant
-- **Native `<details>`/`<summary>`**: Built-in accessibility with less code
-- **Deque SPA Accessibility Guide**: Focus management and ARIA patterns
+**Confidence:** HIGH -- all directly observed in UX audit screenshots.
 
 ---
 
-## Feature Area 5: Gene Validation & Inheritance Warnings
+## Anti-Features
 
-Current app accepts any gene symbol without validation. Clinical tools need guardrails.
-
-### Table Stakes
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Gene symbol validation** | Catch typos before wasted API calls | Low | Already using gnomAD search autocomplete |
-| **Gene not found handling** | Clear message when gene doesn't exist | Low | Currently shows "No results found" |
-| **Loading states** | Feedback during API calls | Low | Already implemented with v-progress-circular |
-
-### Differentiators
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Inheritance pattern warning** | Alert if gene not associated with AR inheritance | Medium | Requires OMIM/ClinGen data or manual curation |
-| **Gene constraint display** | Show pLI/LOEUF scores for context | Low | Available from gnomAD gene query |
-| **Synonymous gene lookup** | Handle common aliases (e.g., CFTR vs ABCC7) | Medium | gnomAD returns aliases; could auto-suggest |
-| **Low coverage warning** | Flag genes with poor exome coverage | Low | Available from gnomAD gene coverage data |
-| **No qualifying variants warning** | Clear explanation when no P/LP variants found | Low | Already shows "Using default carrier frequency assumption" |
-
-### Anti-Features
+Features to explicitly NOT build. Common mistakes when adding SEO and UX polish.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| **Blocking inheritance validation** | Some AR genes have AD forms too; user knows clinical context | Non-blocking warning banner |
-| **Automatic inheritance lookup** | Data sources vary in completeness | Link to OMIM/GeneReviews for verification |
-| **Condition name autocomplete** | Disease terminology is complex (OMIM vs MONDO vs common names) | Stay gene-focused, not condition-focused |
-| **Variant-level pathogenicity override** | Clinical interpretation outside app scope | Trust ClinVar + LoF annotations |
-
-### Clinical Disclaimer Requirements
-
-**CRITICAL**: Any clinical tool needs appropriate disclaimers:
-
-- "For research/educational use only - verify with clinical laboratory"
-- "Results should be interpreted by qualified genetic professionals"
-- "gnomAD data represents population-level frequencies, not clinical diagnosis"
-- "This tool does not replace genetic counseling"
-
-### Reference Examples
-
-- **gnomAD Gene Constraint**: pLI, LOEUF, Z-scores displayed prominently
-- **ACMG/AMP Guidelines**: Framework for pathogenicity interpretation (PP1-5, BP1-7, etc.)
-- **Direct-to-Consumer Testing Disclaimers**: Required transparency about limitations
+| **Server-side rendering (SSR) / Nuxt migration** | Massive architectural change for a single-page calculator tool. The app has one indexable route (`/`). Static HTML seed content in `index.html` achieves 90% of SSR's SEO benefit at 1% of the effort. The docs site (VitePress) already handles the content-heavy pages with pre-rendered HTML. | Use static HTML seed in `index.html` + VitePress for content pages. |
+| **Prerender service (Prerender.io, Rendertron)** | Adds infrastructure complexity and cost for a tool with one page. Dynamic rendering is for sites with hundreds of JS-rendered routes. | Static HTML seed is sufficient for a single-page app. |
+| **Full product tour library (Shepherd, Intro.js)** | Genetic counselors are domain experts, not consumer users. A multi-step tooltip tour is patronizing and adds 15-40KB bundle size. | Simple welcome card with quick-start button. One-time, non-intrusive. |
+| **Video tutorials or animated walkthroughs** | High production cost, accessibility burden (captions, audio descriptions), maintenance as UI changes. Target audience learns by doing. | Text-based "Getting Started" in docs (already exists). Quick-start button for hands-on learning. |
+| **SEO-focused keyword stuffing in app UI** | Adding visible "SEO text" to the running application degrades the professional tool experience for actual users. | Put SEO content in static HTML seed (replaced by Vue on mount) and in VitePress docs pages. Keep the app UI clean. |
+| **Multiple color themes or color customization** | Scope creep. Light/dark toggle already exists and works well. Custom themes add testing burden and distract from core functionality. | Stick with light/dark. Fix the CTA color within the existing theme system. |
+| **Elaborate loading/splash screen** | Adds perceived wait time. The app loads in ~2.4s FCP which is acceptable. A splash screen makes it feel slower. | Keep current approach: app shell renders quickly, wizard appears when ready. |
+| **Social sharing buttons in the app** | Medical professionals share tools via institutional channels (email, Slack), not social media buttons. Social buttons look unprofessional in clinical tools. | Fix OG image so that when professionals DO share links, the preview renders correctly. |
+| **Cookie consent banner** | The app uses only localStorage for user preferences (no tracking cookies, no analytics cookies). A cookie banner would be both unnecessary and annoying. | If analytics are added later, revisit. For now, localStorage-only does not require consent under GDPR. |
+| **Google Analytics or tracking scripts** | Adds privacy concerns for a medical tool. Genetic counselors work with sensitive patient contexts. Third-party tracking undermines trust. | Use privacy-respecting analytics only if needed (e.g., Plausible, or none at all). Rely on Google Search Console for search performance data. |
 
 ---
 
 ## Feature Dependencies
 
 ```
-Filter Configuration -----+
-                          +--> Variant Table --> Results Display
-Template Editor ----------+
+CRITICAL PATH (SEO Indexing):
+  Static HTML seed in index.html
+    |
+    +-- Internal links to docs (in seed content)
+    +-- <noscript> fallback
+    +-- <link rel="canonical">
+    +-- <meta name="robots">
 
-Help System (standalone, no dependencies)
+  sitemap.xml (independent)
+    |
+    +-- robots.txt update (depends on sitemap)
 
-Gene Validation --> Gene Search --> Variant Fetch --> Frequency Calc
+  VitePress sitemap config (independent)
+
+  PNG OG image (independent)
+    |
+    +-- Absolute OG URLs (depends on PNG)
+    +-- Updated structured data screenshot (depends on PNG)
+
+CTA COLOR SYSTEM:
+  New primary color in Vuetify theme (main.ts)
+    |
+    +-- Stepper header color (automatic via Vuetify theming)
+    +-- Disabled state distinction (automatic via Vuetify theming)
+    +-- Brand color as secondary (same edit)
+
+ONBOARDING:
+  Welcome hero card
+    |
+    +-- "Try with CFTR" quick-start (depends on card)
+    +-- hasUsedApp localStorage flag (depends on card)
+
+  Footer icon labels (independent)
+  Contextual help links (independent, but more valuable with good docs content)
+
+CROSS-LINKING:
+  App footer "Docs" icon (independent)
+  Docs contextual CTAs (independent, edit markdown)
+  Static HTML nav to docs (part of HTML seed)
 ```
 
-**Build Order Recommendation:**
-1. Help/Documentation (independent, low risk)
-2. Gene Validation warnings (enhances existing flow)
-3. Filter Configuration (affects data pipeline)
-4. Variant Table enhancements (depends on filter data)
-5. Template Editor (independent, can be parallel with 3-4)
+### Build Order Recommendation
+
+1. **SEO Indexing fixes** -- everything else is pointless if Google cannot see the site
+2. **CTA color system** -- single highest-impact UX change, low effort
+3. **Cross-linking** -- connects app to its pre-rendered content
+4. **On-page SEO optimization** -- title, meta, structured data refinement
+5. **First-time onboarding** -- welcome card + quick-start
+6. **Visual polish** -- gene context chip, mobile title, native dialog replacement
 
 ---
 
-## MVP Recommendation for v1.1
+## MVP Recommendation
 
-**Prioritize (Table Stakes + 1 Differentiator each):**
+### Must-Have for This Milestone
 
-1. **Variant Table**: Expandable population rows for subcontinental data
-2. **Filtering**: Filter chip toggles for LoF/ClinVar inclusion + star threshold
-3. **Help**: FAQ accordion + methodology explanation
-4. **Validation**: Inheritance pattern warning (non-blocking)
+These features address the two critical problems (not indexed, CTA looks disabled):
 
-**Defer to v1.2+:**
-- Full template editor (users managing with section toggles)
-- Variant-level detail table (population-level sufficient for carrier frequency)
-- Export functionality (copy-paste sufficient for clinical workflow)
-- Walkthrough tutorial (users are professionals who learn quickly)
+1. **Static HTML seed content** in `index.html` (500+ words, keyword-rich, with internal links)
+2. **`sitemap.xml`** + **`robots.txt`** update + **canonical URL** + **robots meta**
+3. **PNG OG image** with absolute URLs
+4. **New CTA primary color** (saturated, accessible, distinct from disabled state)
+5. **App-to-docs cross-link** (footer icon)
+6. **VitePress sitemap configuration**
+
+### Should-Have for This Milestone
+
+High-value, low-effort enhancements:
+
+7. **Optimized title and meta description**
+8. **Updated structured data** (dates, version, screenshot)
+9. **Welcome hero card** with "Try with CFTR" quick-start
+10. **Footer icon text labels** on desktop
+11. **Docs-to-app contextual CTAs** in page content
+
+### Defer to Future Milestones
+
+- Persistent gene context chip (medium complexity, UX improvement not SEO)
+- Mobile title reduction (low impact relative to SEO fixes)
+- Native dialog replacement (cosmetic, not blocking)
+- E-E-A-T author credential expansion (depends on publication/DOI)
+- Additional educational docs content pages (content creation, not development)
+
+---
+
+## Competitor Feature Comparison
+
+| Feature | This App (Current) | This App (After Milestone) | Perinatology (#1) | GeniE/gnomAD (#2) | Omni Calculator (#3) |
+|---------|-------------------|---------------------------|--------------------|--------------------|----------------------|
+| Google indexed | NO | YES (static HTML seed) | Yes (static HTML) | Yes (SSR) | Yes (SSR) |
+| Static/crawlable content | 0 words | 500+ words | ~500 words | ~1200 words | ~3000 words |
+| Sitemap | No | Yes | Yes | Yes | Yes |
+| Canonical URL | No | Yes | Yes | Yes | Yes |
+| FAQPage schema | Yes (6 items) | Yes (expanded) | No | No | Yes (5 items) |
+| OG image (PNG) | No (SVG) | Yes (PNG 1200x630) | N/A | Yes | Yes |
+| Internal cross-linking | None | App<->Docs bidirectional | Deep (calculator network) | Deep (gnomAD ecosystem) | Massive (thousands) |
+| CTA visual clarity | Poor (muted gray) | Clear (saturated color) | Basic HTML form | Standard buttons | Green CTAs |
+| First-time onboarding | None (disclaimer only) | Welcome card + quick-start | None | Blog-style explanation | Extensive educational text |
+| Real gnomAD data | YES | YES | No | YES | No |
+| Clinical text generation | YES | YES | No | No | No |
+| Multi-population | YES | YES | No | YES | No |
 
 ---
 
 ## Sources
 
-### Variant Table & Population Display
-- [UCSC Genome Browser 2025 Update](https://academic.oup.com/nar/article/53/D1/D1243/7845169) - gnomAD 4.1 integration, variant display patterns
-- [gnomAD Browser](https://gnomad.broadinstitute.org/) - Population frequency table with subcontinental expansion
-- [gnomAD v2.1 Release Notes](https://gnomad.broadinstitute.org/news/2018-10-gnomad-v2-1/) - Subcontinental population breakdown
-- [Variant Interpretation Using gnomAD (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC9160216/) - Population frequency table features
-- [NCBI Variation Viewer](https://www.ncbi.nlm.nih.gov/variation/view/help/) - Filter panel + table design pattern
+### SEO & Indexing
+- [SPA SEO Strategies 2026](https://www.copebusiness.com/technical-seo/spa-seo-strategies/) -- SPA-specific SEO challenges and solutions
+- [Prerendering Vue SPAs for SEO](https://nuxtseo.com/learn-seo/vue/spa/prerendering) -- Vue-specific prerendering approaches
+- [Google JavaScript SEO Basics](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics) -- Official Google guidance on JS rendering
+- [VitePress Sitemap Generation](https://vitepress.dev/guide/sitemap-generation) -- Built-in sitemap support documentation
+- [FAQPage Structured Data](https://developers.google.com/search/docs/appearance/structured-data/faqpage) -- Google's FAQPage rich result requirements
+- [Schema.org Health and Medical Types](https://schema.org/docs/meddocs.html) -- Medical schema best practices
 
-### Filtering UI
-- [Material Design 3 Chips](https://m3.material.io/components/chips/guidelines) - Filter chip design patterns
-- [Data Table UX Best Practices](https://uxplanet.org/best-practices-for-usable-and-efficient-data-table-in-applications-4a1d1fb29550) - Filtering placement and feedback
-- [Filter UI Examples for SaaS](https://www.eleken.co/blog-posts/filter-ux-and-ui-for-saas) - Dynamic filtering, save views, real-time feedback
-- [Vuetify Data Table](https://vuetifyjs.com/en/components/data-tables/basics/) - Column filtering implementation
-- [ClinVar Classification](https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/) - Star rating system, classification terms
+### OG Images
+- [OG Image Sizes 2025 Guide](https://www.krumzi.com/blog/open-graph-image-sizes-for-social-media-the-complete-2025-guide) -- Format and dimension requirements
+- [OG Image Tips 2025](https://myogimage.com/blog/og-image-tips-2025-social-sharing-guide) -- PNG vs SVG, compression, platform compatibility
 
-### Template Editing
-- [EHR Templates Best Practices (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC7735456/) - Template design with variables
-- [ProcessMaker WYSIWYG Editor](https://wiki.processmaker.com/index.php/New_WYSIWYG_HTML_Editor) - Variable picker pattern
-- [Document360 Variables](https://docs.document360.com/docs/variables) - Slash command variable insertion
-- [CKEditor Placeholder](https://ckeditor.com/docs/ckeditor5/latest/features/editor-placeholder.html) - Placeholder highlighting
+### CTA & Button Design
+- [Disabled Buttons in UI](https://uxplanet.org/disabled-buttons-in-user-interface-4dafda3e6fe7) -- Active vs disabled state patterns
+- [CTA Best Practices for UX & Accessibility](https://www.portent.com/blog/content/cta-best-practices-for-ux-design-web-accessibility-w-examples.htm) -- Color, contrast, and accessibility
+- [Button States Explained](https://www.uxpin.com/studio/blog/button-states/) -- How to design distinct button states
+- [Why You Should Not Gray Out Disabled Buttons](https://uxmovement.com/buttons/why-you-shouldnt-gray-out-disabled-buttons/) -- Use opacity of primary color instead
 
-### Help/Documentation Accessibility
-- [SPA Accessibility Guide (TestParty)](https://testparty.ai/blog/spa-accessibility) - Focus management, ARIA patterns
-- [Deque SPA Accessibility Tips](https://www.deque.com/blog/accessibility-tips-in-single-page-applications/) - Screen reader considerations
-- [Accessible Accordion Patterns (Aditus)](https://www.aditus.io/patterns/accordion/) - ARIA attributes for FAQ
-- [vue3-accessible-accordion](https://github.com/jonbackus/vue3-accessible-accordion) - WAI-ARIA compliant Vue component
-- [SitePoint SPA Accessibility](https://www.sitepoint.com/accessibility-best-practices-for-single-page-applications/) - Focus and announcement patterns
+### Onboarding
+- [Onboarding UX Patterns](https://www.appcues.com/blog/user-onboarding-ui-ux-patterns) -- Welcome messages, product tours, interactive learning
+- [Guide to Onboarding UX](https://www.toptal.com/designers/product-design/guide-to-onboarding-ux) -- First impressions and activation patterns
+- [Best User Onboarding Examples](https://www.appcues.com/blog/the-10-best-user-onboarding-experiences) -- Real-world patterns from successful products
 
-### Gene Validation & Clinical Context
-- [ACMG Carrier Screening Guidelines (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC8488021/) - Professional counseling requirements
-- [Bayesian Analysis in Genetic Counseling (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC1867463/) - Risk calculation methodology
-- [False-Positive DTC Testing Results (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC6301953/) - Disclaimer requirements
-- [ConsCal Tool](https://pubmed.ncbi.nlm.nih.gov/37221981/) - Recurrence risk calculation for AR diseases
-- [ClinGen Variant Curation SOP](https://clinicalgenome.org/site/assets/files/3677/clingen_variant-curation_sopv1.pdf) - Classification criteria
+### Competitor Analysis
+- [GeniE Genetic Prevalence Estimator](https://gnomad.broadinstitute.org/news/2024-06-genie/) -- Broad Institute's competing tool
+- [Omni Calculator Allele Frequency](https://www.omnicalculator.com/biology/allele-frequency) -- SEO-optimized competitor with FAQPage schema
+- [Perinatology Hardy-Weinberg Calculator](https://www.perinatology.com/calculators/Hardy-Weinberg.htm) -- #1 ranked static HTML competitor
+
+### Project-Internal References
+- `.planning/SEO-REPORT.md` -- Comprehensive SEO audit with competitor deep-dive (2026-02-23)
+- `.planning/UI-UX-AUDIT.md` -- 12-category UX audit scoring 7.3/10 overall (2026-02-23)

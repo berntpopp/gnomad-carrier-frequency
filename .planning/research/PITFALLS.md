@@ -1,435 +1,503 @@
-# Domain Pitfalls: gnomAD Carrier Frequency Calculator
+# Pitfalls Research: SEO & UX Polish (v1.4)
 
-**Domain:** Genetic risk calculation using gnomAD population data
-**Researched:** 2026-01-18
-**Confidence:** HIGH (verified with official gnomAD documentation and peer-reviewed publications)
+**Project:** gnomAD Carrier Frequency Calculator
+**Researched:** 2026-02-23
+**Confidence:** HIGH (verified with codebase analysis, official documentation, and multiple community sources)
+
+---
+
+## Summary
+
+**Top 7 Pitfalls to Avoid in v1.4:**
+
+1. **Service worker precaches stale `index.html` with old static content** - Adding SEO static HTML inside `<div id="app">` will be precached by Workbox; users with existing SW will not see updated content until they accept the PWA update prompt
+2. **Changing Vuetify primary color cascades to 40+ component bindings** - The `color="primary"` prop is used in 40+ places; a saturated new color may clash with non-CTA uses (chips, cards, links)
+3. **OG image uses relative path AND SVG format** - Double failure: relative `./og-image.svg` is unresolvable by social crawlers AND SVG is not rendered by any major platform
+4. **VitePress sitemap overwrites SPA sitemap in merged deploy artifact** - Both builds output `sitemap.xml`; the `cp -r docs/.vitepress/dist dist/docs` merge step does not combine them
+5. **Structured data version number hardcoded** - `softwareVersion: "1.2.0"` in index.html JSON-LD is already stale (project is v1.3.0); will remain wrong after every release
+6. **Onboarding overlay blocks the disclaimer modal** - PWA "App ready" snackbar already competes with disclaimer; adding a tour overlay creates a triple-modal first-run experience
+7. **`navigateFallback: 'index.html'` serves SPA shell to Googlebot** - Workbox navigation fallback returns the cached SPA HTML for all routes, which may interfere with crawling of `/docs/` subpaths if denylist regex fails
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause incorrect risk calculations, clinical misinterpretation, or require rewrites.
+Mistakes that directly break SEO indexing, cause visual regressions across the app, or create stuck-state bugs for users.
 
 ---
 
-### Pitfall 1: Summing Allele Frequencies Incorrectly for Carrier Frequency
+### Pitfall 1: Service Worker Precaches Stale `index.html` After Static Content Is Added
 
-**What goes wrong:** Using `sum(AF)` directly as the "allele frequency" then computing carrier frequency as `2 * sum(AF)`. This double-counts carriers who have multiple pathogenic variants and ignores the probability math.
+**What goes wrong:** You add rich static HTML inside `<div id="app">` for SEO. Workbox precaches `index.html` with a content hash. Existing users who have the old service worker installed continue seeing the old (empty) `index.html` from their SW cache. The `registerType: 'prompt'` setting means users must explicitly click "Update" in the PWA notification to get the new content. Users who dismiss the prompt or never see it remain stuck on the old version indefinitely.
 
-**Why it happens:** The carrier frequency formula `2pq` (or `2q` when q is small) assumes a single allele. When a gene has multiple pathogenic variants, the cumulative allele frequency `q = AF1 + AF2 + ... + AFn` is valid for calculating `q`, but only when variants are in linkage equilibrium and no individual carries multiple variants.
+**Why it happens:** The current Workbox config uses `globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']` which precaches all HTML files. With `navigateFallback: 'index.html'`, the service worker intercepts all navigation requests and returns the cached `index.html`. The `registerType: 'prompt'` means the new service worker waits in the `waiting` state until the user explicitly activates it.
 
 **Consequences:**
-- Overestimation of carrier frequency by up to 2x for genes with common variants
-- Incorrect recurrence risk communicated to patients
-- False precision in clinical documentation
+- Existing PWA users see the old empty `<div id="app">` even after deployment
+- The SEO static content only helps new visitors and search crawlers (who do not run service workers)
+- Users who dismissed the update prompt have no easy way to trigger it again (1-hour polling interval)
+- If the static HTML includes navigation links to `/docs/`, those links appear only for new users
+
+**Warning signs:**
+- After deployment, test in a browser where the PWA was previously installed
+- Check Application tab in DevTools for "waiting" service worker state
+- `curl` returns new HTML but browser shows old content
 
 **Prevention:**
-1. Sum allele frequencies: `q_cumulative = sum(pathogenic_AF)`
-2. Apply carrier frequency formula: `carrier_freq = 2 * q_cumulative` (when q is small, which it almost always is for rare diseases)
-3. For very accurate calculations with common variants, use `2pq` where `p = 1 - q_cumulative`
-4. Document the approximation used
+1. Consider changing `registerType` from `'prompt'` to `'autoUpdate'` for this release, since the SEO changes are purely additive and do not disrupt user state
+2. If keeping `'prompt'`, ensure the update notification UI is prominent and persistent (not easily dismissed)
+3. Test the SW update flow explicitly: install old version, deploy new version, verify the update prompt appears
+4. Add `skipWaiting()` in the service worker for critical HTML changes (the `vite-plugin-pwa` `registerType: 'autoUpdate'` does this automatically)
+5. Verify that `cleanupOutdatedCaches: true` actually purges the old `index.html` precache entry when the new SW activates
 
-**Detection:**
-- `q_cumulative > 0.05` suggests the `2q` approximation may introduce >5% error
-- Compare your calculations against published carrier frequencies for well-studied genes (CFTR, SMN1)
+**Detection:** After deploying the SEO HTML changes, open the site in a browser that previously had the PWA installed. If the static HTML does not appear, the SW cache is serving stale content.
 
-**Phase to address:** Phase 1 (core calculation logic)
+**Phase to address:** SEO Indexing phase (must be considered when adding static HTML to `index.html`)
+
+**Confidence:** HIGH - Verified via codebase analysis of `vite.config.ts` (line 27: `registerType: 'prompt'`) and `usePwaUpdate.ts`
 
 **Sources:**
-- [Hardy-Weinberg Equilibrium Calculator](https://www.perinatology.com/calculators/Hardy-Weinberg.htm)
-- [Applications in Population Genetics - Hamamy 2012](https://www.gfmer.ch/SRH-Course-2012/community-genetics/pdf/Applications-population-genetics-Hamamy-2012.pdf)
+- [Workbox index.html cached in bad state - Issue #1528](https://github.com/GoogleChrome/workbox/issues/1528)
+- [The Day a Service Worker Held My Entire Site Hostage](https://dev.to/bradleymatera/the-day-a-service-worker-held-my-entire-site-hostage-21d3)
+- [Service Workers That Don't Surprise You](https://dev.to/crisiscoresystems/service-workers-that-dont-surprise-you-deterministic-caching-for-offline-first-pwas-5480)
 
 ---
 
-### Pitfall 2: Using Wrong gnomAD Dataset Version
+### Pitfall 2: Changing Vuetify Primary Color Cascades to 40+ Component Bindings
 
-**What goes wrong:** Querying gnomAD v2 for GRCh38 coordinates, or v4 when the gene is poorly covered, or mixing exome/genome frequencies without understanding their differences.
+**What goes wrong:** The UX audit recommends changing the primary color from `#a09588` (muted warm gray) to a more saturated CTA color. You update the Vuetify theme `primary` value in `main.ts`. Immediately, 40+ components that use `color="primary"` change appearance, including many that are NOT CTAs: filter chips, section toggle chips, links, card headers, progress indicators, and informational elements.
 
-**Why it happens:**
-- gnomAD v2 uses GRCh37 (hg19), v3/v4 use GRCh38
-- Exome and genome datasets are non-overlapping sample sets with different ancestry compositions
-- v4 is 5x larger but some genes have better coverage in v2
+**Why it happens:** The codebase uses `color="primary"` as a catch-all for "branded color" across very different component types:
+- **CTA buttons:** `StepGene.vue`, `StepStatus.vue`, `StepFrequency.vue`, `StepResults.vue` (CONTINUE buttons)
+- **Non-CTA uses:** `FilterChips.vue` (category chips), `TextOutput.vue` (section toggle chips), `SettingsDialog.vue` (switches, selects), `FrequencyResults.vue` (expansion panel), `AppBar.vue` (CSS variable reference), `HistoryPanel.vue` (background tint)
+- **Dark mode separately:** `main.ts` line 44 sets dark primary to `#BDBDBD`, which also needs updating
+
+A saturated blue or green CTA color applied to all 40+ bindings will make the app look garish. Filter chips, toggle switches, and informational badges should not all be bright blue.
 
 **Consequences:**
-- Zero results (coordinate mismatch)
-- Artificially inflated/deflated frequencies
-- Missing variants that exist in other dataset versions
+- Filter chips look like clickable CTAs when they are toggles
+- Section toggle chips in TextOutput compete visually with the actual "Copy" and "Export" buttons
+- HistoryPanel's `rgba(var(--v-theme-primary), 0.08)` background tint becomes a visible colored wash
+- AppBar title color changes from subtle brand color to saturated accent
+- Dark mode primary (`#BDBDBD`) also needs updating or it will be inconsistent
+
+**Warning signs:**
+- After changing primary color, open every step of the wizard and check visual hierarchy
+- Filter chips in Step 3 should NOT look like primary action buttons
+- The AppBar brand text should not be the same saturated color as CTAs
 
 **Prevention:**
-1. **For coding variants:** Use gnomAD v4 exomes (807,000+ samples) as primary
-2. **Validate coverage:** Check allele number (AN) - low AN indicates poor coverage
-3. **Reference genome:** Always specify and validate GRCh38 for v4 queries
-4. **Cross-reference:** For critical genes, compare v2 and v4 frequencies
+1. **Do NOT simply change the primary color.** Instead, introduce a secondary color strategy:
+   - Keep `primary: '#a09588'` (or slight refinement) for brand/non-CTA uses
+   - Add a new custom color (e.g., `'cta': '#2E7D32'` or `'action': '#1565C0'`) to the Vuetify theme
+   - Update ONLY the CTA buttons (CONTINUE, BACK, Copy, Export) to use `color="cta"`
+   - Leave chips, switches, and informational elements on `color="primary"`
+2. **Alternatively**, change primary but audit and re-bind all 40+ usages:
+   - Move non-CTA uses to `color="secondary"` or a new named color
+   - This is more work but results in cleaner semantic color usage
+3. **Test both themes:** light AND dark. The dark theme has its own primary definition that must be updated in parallel.
+4. **Check CSS variable references:** `AppBar.vue` line 140 uses `rgb(var(--v-theme-primary))` directly in CSS, and `HistoryPanel.vue` line 165 and `VariablePicker.vue` line 110 use `rgba(var(--v-theme-primary), 0.08)` for background tints.
 
-**Detection:**
-- Unexpectedly zero variants for known disease genes
-- AN < 50,000 indicates poor coverage
-- Dramatic frequency differences between exome and genome for same variant
+**Detection:** Visual regression testing. Screenshot every wizard step + settings dialog + history panel before and after color change.
 
-**Phase to address:** Phase 1 (API integration setup)
+**Phase to address:** UX Polish phase (color change task)
 
-**Sources:**
-- [gnomAD Changelog](https://gnomad.broadinstitute.org/news/changelog/)
-- [Difference between V2 and V4 - gnomAD Discussion](https://discuss.gnomad.broadinstitute.org/t/difference-between-v2-and-v4/416)
+**Confidence:** HIGH - Verified by grep showing 40+ `color="primary"` bindings across codebase
 
 ---
 
-### Pitfall 3: Trusting ClinVar "Pathogenic" Without Filtering
+### Pitfall 3: OG Image Has Two Simultaneous Failures (Relative Path + SVG Format)
 
-**What goes wrong:** Including all ClinVar "pathogenic" or "likely pathogenic" variants without checking review status, submission quality, or recency.
+**What goes wrong:** The current `og:image` meta tag has two independent problems that must both be fixed:
+1. **Relative URL:** `content="./og-image.svg"` - Social platform crawlers resolve this relative to nothing since they fetch the URL without browser context
+2. **SVG format:** Even with an absolute URL, Facebook, LinkedIn, Twitter/X, Slack, and Discord do not render SVG images in link previews
 
-**Why it happens:**
-- ClinVar aggregates submissions from multiple labs with varying quality
-- 40% of common (AF > 0.5%) P/LP variants were downgraded upon reanalysis
-- Some "pathogenic" variants are actually pseudogene mapping artifacts
+Fixing only one problem leaves the other. Fixing only the URL (making it absolute) still shows a blank preview because SVG is unsupported. Fixing only the format (converting to PNG) but leaving the relative path still results in a broken image.
+
+**Why it happens:** The SVG was likely chosen because it already existed as the favicon source and scales perfectly. The relative path works in `<img>` tags in the browser context but OG crawlers do not have that context.
 
 **Consequences:**
-- Including benign variants inflates carrier frequency
-- Including artifacts creates impossible frequencies (e.g., 28% carrier frequency)
-- Clinical text based on wrong data
+- Every social share (Twitter/X, LinkedIn, Slack, Discord, Facebook) shows a text-only link with no image preview
+- Academic and clinical genetics communities that share the tool see unprofessional link previews
+- Reduced click-through rate from social shares
+
+**Warning signs:**
+- Test with [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)
+- Test with [Twitter Card Validator](https://cards-dev.twitter.com/validator)
+- Check that the `og:image` URL is resolvable from outside your domain
 
 **Prevention:**
-1. **Require review status:** Filter for >= 1 gold star (multiple submitters, no conflicts)
-2. **Check for conflicts:** Exclude variants with conflicting interpretations
-3. **Frequency sanity check:** AF > 1% in any population warrants manual review
-4. **Cross-reference:** Variant should have supporting evidence beyond single submission
+1. Generate a PNG (1200x630px) OG image at build time or as a static asset
+2. Use absolute HTTPS URL: `content="https://gnomad-carrier-frequency.kidney-genetics.org/og-image.png"`
+3. Update BOTH `og:image` AND `twitter:image` meta tags (lines 15 and 24 of `index.html`)
+4. Add `og:image:type` meta tag: `content="image/png"`
+5. Verify with social platform debugging tools after deployment
 
-**Detection:**
-- Calculated carrier frequency > 10% for any population (highly unusual for AR diseases)
-- Variant with high AF but single submitter
-- ClinVar entry shows "conflicting interpretations"
+**Phase to address:** SEO Indexing phase (immediate fix, prerequisite for social sharing)
 
-**Phase to address:** Phase 2 (variant filtering logic)
+**Confidence:** HIGH - Verified from codebase (`index.html` lines 15, 24) and OG protocol specification
 
 **Sources:**
-- [Reinterpretation of common pathogenic variants in ClinVar - Nature 2020](https://www.nature.com/articles/s41598-019-57335-5)
-- [Variant interpretation using population databases: Lessons from gnomAD](https://pmc.ncbi.nlm.nih.gov/articles/PMC9160216/)
+- [Open Graph Protocol - og:image requirements](https://ogp.me/)
+- [Relative vs Absolute URL for OG Image](https://veonr.com/blog/relative-vs-absolute-og-image-video-urls)
 
 ---
 
-### Pitfall 4: Ignoring Population Stratification for Founder Effects
+### Pitfall 4: VitePress Sitemap Conflicts with SPA Sitemap in Merged Deploy
 
-**What goes wrong:** Using global gnomAD frequencies when the patient belongs to a population with known founder effects (Ashkenazi Jewish, Finnish, Amish, specific ethnic groups).
+**What goes wrong:** The SEO plan calls for adding VitePress `sitemap` config to auto-generate a sitemap for docs pages. The SPA also needs its own `public/sitemap.xml` for the root app URL. The deploy workflow (`deploy.yml` line 44) runs `cp -r docs/.vitepress/dist dist/docs`, which places the VitePress output under `dist/docs/`. If VitePress generates a `sitemap.xml` at its root, it ends up at `dist/docs/sitemap.xml`. Meanwhile, the SPA's `public/sitemap.xml` is at `dist/sitemap.xml`. These are two separate sitemaps with no cross-reference.
 
-**Why it happens:**
-- Global frequencies mask population-specific enrichment
-- Founder populations have 10-100x higher carrier frequencies for specific variants
-- User interface doesn't prompt for or emphasize population selection
+**Why it happens:** VitePress and the Vite SPA are separate build processes that produce separate output directories. The deploy workflow merges them by copying, not by combining their outputs. Neither build process knows about the other's sitemap.
 
 **Consequences:**
-- Dramatically underestimating risk for founder populations (e.g., 1:25 vs 1:250 for Tay-Sachs in Ashkenazi)
-- Overestimating risk when patient is from non-enriched population
-- Missing clinically significant risk communication
+- `robots.txt` can only reference one `Sitemap:` URL (by convention). If it points to `/sitemap.xml`, the docs pages are not in it. If it points to `/docs/sitemap.xml`, the SPA root URL is not in it.
+- Google discovers either the SPA URLs or the docs URLs, but not both, unless a sitemap index is used
+- VitePress sitemap URLs will use the VitePress `base: '/docs/'` prefix, so the generated URLs should be correct, but the sitemap file itself lives at `/docs/sitemap.xml` which is non-standard
+
+**Warning signs:**
+- After build, check if both `dist/sitemap.xml` and `dist/docs/sitemap.xml` exist
+- Check `robots.txt` to see which sitemap URL is referenced
+- Submit both sitemaps to Google Search Console and verify both are discovered
 
 **Prevention:**
-1. **Display all populations:** Show carrier frequencies for all gnomAD ancestry groups
-2. **Highlight outliers:** Flag when any population frequency is >5x the global frequency
-3. **Founder effect warning:** For genes with known founder mutations, display explicit warnings
-4. **Default to highest:** For clinical conservatism, consider displaying the highest population frequency prominently
+1. **Use a sitemap index file** at `/sitemap.xml` that references both sub-sitemaps:
+   ```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+     <sitemap>
+       <loc>https://gnomad-carrier-frequency.kidney-genetics.org/sitemap-app.xml</loc>
+     </sitemap>
+     <sitemap>
+       <loc>https://gnomad-carrier-frequency.kidney-genetics.org/docs/sitemap.xml</loc>
+     </sitemap>
+   </sitemapindex>
+   ```
+2. Rename the SPA sitemap to `sitemap-app.xml` to avoid collision
+3. Update `robots.txt` to reference the index: `Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/sitemap.xml`
+4. In VitePress config, set `sitemap.hostname` to the full domain so generated URLs are absolute
+5. Add a post-build step in the deploy workflow that creates the sitemap index after both builds complete
 
-**Detection:**
-- Ashkenazi Jewish frequency > 5x European Non-Finnish frequency
-- Finnish frequency > 5x other European frequencies
-- Known founder effect genes: HEXA, GBA, BRCA1/2, many others
+**Phase to address:** SEO Indexing phase (sitemap creation task)
 
-**Phase to address:** Phase 2 (population display) and Phase 3 (founder effect detection)
+**Confidence:** HIGH - Verified from `deploy.yml` merge step and VitePress config (no sitemap configured yet)
 
 **Sources:**
-- [Estimation of carrier frequencies utilizing gnomAD for ACMG recommended carrier screening](https://pubmed.ncbi.nlm.nih.gov/38459613/)
-- [History Shapes Genes: The Founder Effect - Jnetics](https://www.jnetics.org/the-founder-effect/)
+- [VitePress Sitemap Generation](https://vitepress.dev/guide/sitemap-generation)
+- [Sitemaps XML Format - Sitemap Index](https://www.sitemaps.org/protocol.html)
 
 ---
 
-### Pitfall 5: LOFTEE "High Confidence" Misinterpretation
+### Pitfall 5: `navigateFallback` May Interfere with Docs Crawling
 
-**What goes wrong:** Treating all LoF variants equally, or conversely, excluding valid LoF variants that lack "HC" (high confidence) annotation.
+**What goes wrong:** The Workbox config sets `navigateFallback: 'index.html'` with `navigateFallbackDenylist: [/^\/docs/]`. This correctly excludes `/docs/` paths from the SPA navigation fallback. However, if the regex is not precise enough, edge cases can slip through (e.g., a URL path that contains "docs" but does not start with `/docs/`). More importantly, Googlebot does not run service workers on first visit to a domain, so this is primarily a user-facing concern, not an SEO concern.
 
-**Why it happens:**
-- 28% of gnomAD homozygous pLoF variants may not actually cause loss of function
-- LOFTEE is conservative - some true LoF variants are flagged as "low confidence"
-- Variants in last exon, low-expression regions, or with splice rescues get filtered
+**Why it happens:** Service workers are only activated after the first page visit. Google's crawler visits with a clean context each time (no prior service worker registration). The real risk is for **returning users** who navigate from the SPA to `/docs/` pages: if the denylist regex fails, the SW returns the SPA shell instead of letting the navigation through to the VitePress-rendered docs.
 
 **Consequences:**
-- Including artifact LoF variants inflates carrier frequency
-- Excluding valid LoF variants underestimates carrier frequency
-- False precision in either direction
+- Returning users who click an in-app link to `/docs/` might see the SPA shell instead of VitePress content (if regex fails)
+- This is NOT a direct SEO problem since Googlebot does not use service workers
+- But it IS a UX problem if the cross-linking from SPA to docs is broken for PWA users
+
+**Warning signs:**
+- After adding cross-links from SPA to `/docs/`, test navigation in a browser where the PWA is installed
+- Open DevTools Network tab and verify that `/docs/` requests bypass the service worker
+- Check that the regex `^\/docs` correctly matches all docs paths
 
 **Prevention:**
-1. **Filter by LOFTEE:** Include only LoF with `lof = "HC"` (high confidence)
-2. **Don't filter only by consequence:** Not all frameshift/nonsense are true LoF
-3. **Check flags:** Review `lof_flags` for warnings about specific variants
-4. **Combine with ClinVar:** LoF HC + ClinVar pathogenic = highest confidence
+1. The current regex `/^\/docs/` is correct and should match all paths starting with `/docs`
+2. Add explicit tests: navigate to `/docs/`, `/docs/guide/`, `/docs/reference/methodology` with PWA installed
+3. Consider adding `/sitemap.xml` and `/robots.txt` to the denylist so these files are always fetched fresh from the server:
+   ```js
+   navigateFallbackDenylist: [/^\/docs/, /\/sitemap.*\.xml$/, /\/robots\.txt$/]
+   ```
+4. For the SPA-to-docs cross-link, use full page navigation (not router push), since docs are a separate app
 
-**Detection:**
-- LoF variant with AF > 0.1% and no disease association
-- Variant in last exon or low-pext region
-- `lof_flags` field is not empty
+**Phase to address:** SEO Indexing phase (when adding cross-links and sitemap)
 
-**Phase to address:** Phase 2 (variant filtering logic)
-
-**Sources:**
-- [Loss-of-Function Curations in gnomAD](https://gnomad.broadinstitute.org/news/2020-10-loss-of-function-curations-in-gnomad/)
-- [Advanced variant classification framework - AJHG 2023](https://pmc.ncbi.nlm.nih.gov/articles/PMC10029069/)
+**Confidence:** MEDIUM - The denylist regex appears correct, but edge cases need testing with actual PWA installation
 
 ---
 
 ## Moderate Pitfalls
 
-Mistakes that cause technical debt, user confusion, or require significant fixes.
+Mistakes that cause visual inconsistency, SEO ineffectiveness, or technical debt.
 
 ---
 
-### Pitfall 6: gnomAD API Rate Limiting and Blocking
+### Pitfall 6: Structured Data Contains Stale Version and Missing Required Fields
 
-**What goes wrong:** Making sequential API calls for each variant, getting blocked after ~10 requests, or causing poor UX with slow sequential loading.
+**What goes wrong:** The JSON-LD structured data in `index.html` has `softwareVersion: "1.2.0"` but the project is already at v1.3.0 (per `package.json`). This version number must be manually updated on every release. Additionally, the structured data mixes `WebApplication` and `FAQPage` types in a single `@graph`, which is valid but can confuse Google's Rich Results Test if not structured carefully.
 
-**Why it happens:**
-- gnomAD API is designed for interactive browser use, not bulk queries
-- HTTP to HTTPS redirect (302) can break POST requests
-- No official rate limit documentation
-
-**Prevention:**
-1. **Batch by gene:** Query all variants for a gene in single request (gnomAD supports this)
-2. **Cache results:** Store gene variant data locally (localStorage or sessionStorage)
-3. **Use HTTPS directly:** Always use `https://gnomad.broadinstitute.org/api`
-4. **Handle 429/503:** Implement exponential backoff for rate limit errors
-5. **Show loading states:** Users understand network delays with proper feedback
-
-**Detection:**
-- HTTP 429 (Too Many Requests) responses
-- Queries suddenly returning empty after working
-- Console errors about CORS or redirects
-
-**Phase to address:** Phase 1 (API integration)
-
-**Sources:**
-- [Blocked when using API to get AF - gnomAD Discussion](https://discuss.gnomad.broadinstitute.org/t/blocked-when-using-api-to-get-af/149)
-- [gnomAD GitHub Issue #536 - HTTPS redirect](https://github.com/macarthur-lab/gnomadjs/issues/536)
-
----
-
-### Pitfall 7: Not Handling Missing/Zero gnomAD Data
-
-**What goes wrong:** Showing "0" or "undefined" carrier frequency when gnomAD returns no variants, or crashing when gene is not found.
-
-**Why it happens:**
-- Gene may have no pathogenic variants in gnomAD (ultra-rare conditions)
-- Gene symbol may not match gnomAD (aliases, outdated nomenclature)
-- Query may return variants but none pass filters
+**Why it happens:** The version number in the HTML template is not connected to the build system. Unlike `import.meta.env.VITE_APP_VERSION` (defined in `vite.config.ts` line 107), the `index.html` JSON-LD is raw HTML that Vite does not process for variable substitution.
 
 **Consequences:**
-- "0% carrier frequency" is clinically misleading (implies certainty)
-- Missing fallback to population defaults (typically 1:100 or 1:200)
-- User confusion about whether query failed or gene has no data
+- Stale version number in structured data is a trust signal issue (Google may see inconsistency with actual app version)
+- Manual updates are forgotten, accumulating staleness over releases
+- If Google's structured data parser encounters issues with the `@graph` array, neither the `WebApplication` nor the `FAQPage` rich results may appear
+
+**Warning signs:**
+- After a release, check if `softwareVersion` in `index.html` matches `package.json` version
+- Run [Google Rich Results Test](https://search.google.com/test/rich-results) to verify both schema types are recognized
+- Check for "missing field" warnings in the Schema.org validator
 
 **Prevention:**
-1. **Distinguish zero from unknown:** "No qualifying variants found" vs "API error"
-2. **Provide fallback:** Default carrier frequency assumption (1:100) per requirements
-3. **Validate gene symbol:** Query gene first to confirm it exists in gnomAD
-4. **Display confidence:** Show "Based on gnomAD data" vs "Using default assumption"
+1. **Automate version injection** using a Vite plugin or build script that replaces `softwareVersion` in `index.html` at build time, using the same `pkg.version` source as `VITE_APP_VERSION`
+2. Alternatively, move the structured data to a Vue component's `<script>` that can use `import.meta.env.VITE_APP_VERSION`
+3. Validate structured data with [Schema Markup Validator](https://validator.schema.org/) after each change
+4. Ensure `dateModified` is also updated (currently hardcoded as `"2026-02-01"` in the SEO report's recommended schema)
 
-**Detection:**
-- Gene search returns but variant query returns empty
-- Carrier frequency displays as 0, null, or undefined
-- User reports "it says no risk" for known disease genes
+**Phase to address:** SEO On-Page Optimization phase
 
-**Phase to address:** Phase 1 (core calculation) and Phase 3 (UX refinement)
+**Confidence:** HIGH - Verified: `package.json` shows `"version": "1.3.0"`, `index.html` JSON-LD shows `"softwareVersion": "1.2.0"`
+
+**Sources:**
+- [Common JSON-LD Schema Issues and Solutions](https://zeo.org/resources/blog/most-common-json-ld-schema-issues-and-solutions)
+- [Fixing Common Structured Data Errors](https://salt.agency/blog/fixing-common-json-ld-structured-data-issues-in-google-search-console/)
 
 ---
 
-### Pitfall 8: Transcript Selection Inconsistency
+### Pitfall 7: Onboarding Overlay Competes with Existing First-Run Modals
 
-**What goes wrong:** Variants are annotated on different transcripts, leading to inconsistent consequence annotations or missing variants.
+**What goes wrong:** The app already has two first-run experiences: a **disclaimer modal** (clinical tool, must-accept) and a **PWA "App ready for offline use" snackbar**. Adding an onboarding tour or welcome overlay creates a triple-modal situation. The user's first experience becomes: dismiss disclaimer -> dismiss PWA notification -> navigate through onboarding tour. This is hostile UX, especially for genetic counselors who just want to use the tool.
 
-**Why it happens:**
-- gnomAD shows Ensembl canonical transcript by default
-- ClinVar often uses RefSeq transcripts
-- MANE Select transcript may differ from gnomAD canonical
-- Same variant can be "missense" on one transcript and "synonymous" on another
+**Why it happens:** Each feature (disclaimer, PWA notification, onboarding) is developed independently. The disclaimer is legally required. The PWA notification is technically generated. The onboarding is a UX improvement. Nobody tests the combined first-run flow.
 
 **Consequences:**
-- Missing pathogenic variants annotated on non-canonical transcripts
-- Including variants that are benign on clinically-relevant transcript
-- Confusion when variant descriptions don't match ClinVar
+- First-time user faces 3+ modal/overlay interactions before seeing the actual tool
+- Users may perceive the app as cumbersome rather than welcoming
+- On mobile, overlapping modals create z-index and scroll-lock conflicts
+- Onboarding tour targeting specific DOM elements may fail if the disclaimer modal is still covering them
+
+**Warning signs:**
+- Test the complete first-time flow in an incognito window
+- Count the number of modals/overlays/snackbars the user must interact with before reaching Step 1
+- Check if the onboarding tour tries to highlight elements that are behind the disclaimer modal
 
 **Prevention:**
-1. **Use MANE Select:** Prioritize MANE Select transcript when available
-2. **Query canonical:** gnomAD's gene query returns variants on canonical transcript
-3. **Document transcript:** Show which transcript is being used in results
-4. **Don't over-filter:** Accept variants pathogenic on any clinically-relevant transcript
+1. **Sequence the first-run experiences:**
+   - Step A: Disclaimer modal (required, blocks everything)
+   - Step B: After disclaimer is accepted, show onboarding (if first visit)
+   - Step C: PWA notification appears AFTER onboarding completes (delay by 5+ seconds)
+2. **Use localStorage flags** to gate each experience: `disclaimer-accepted`, `onboarding-completed`, `pwa-notification-shown`
+3. **Keep onboarding minimal:** A single welcome card with a "Try with CFTR" quick-start button is better than a multi-step tour for this app. Genetic counselors are domain experts; they do not need UI hand-holding.
+4. **Do NOT use a third-party tour library** unless the app becomes significantly more complex. A simple first-visit card component is lighter weight, more maintainable, and avoids the known pitfalls of tour libraries (mobile scroll issues, stale element targeting, z-index battles with Vuetify dialogs).
 
-**Detection:**
-- Variant IDs don't match between gnomAD and ClinVar
-- Consequence differs from published literature
-- Missing known pathogenic variant from results
+**Phase to address:** UX Polish phase (onboarding task)
 
-**Phase to address:** Phase 2 (variant filtering and display)
+**Confidence:** HIGH - Verified from codebase: disclaimer exists as modal, PWA snackbar exists in `usePwaUpdate.ts`, UI/UX audit confirms both
 
 **Sources:**
-- [RFC: add MANE and RefSeq transcripts to gnomAD browser](https://github.com/broadinstitute/gnomad-browser/issues/518)
-- [MANE transcript set - Nature 2022](https://www.nature.com/articles/s41586-022-04558-8)
+- [5 Best Vue.js Product Tour Libraries](https://www.chameleon.io/blog/vuejs-product-tours)
+- [4 Best Vue Onboarding Libraries 2026](https://userguiding.com/blog/vue-tour)
 
 ---
 
-### Pitfall 9: Using AF Instead of Filtering Allele Frequency (FAF)
+### Pitfall 8: Static HTML Inside `<div id="app">` May Flash Before Vue Mounts (FOUC)
 
-**What goes wrong:** Using raw allele frequency (AF) for clinical interpretation instead of the statistically robust filtering allele frequency (FAF).
+**What goes wrong:** Adding static HTML seed content inside `<div id="app">` for SEO creates a brief Flash of Unstyled Content (FOUC). The user sees raw, unstyled HTML (headings, paragraphs, lists) for 100-500ms before Vue mounts and replaces it with the actual app. This looks like the page is broken or loading incorrectly.
 
-**Why it happens:**
-- AF is the obvious, simple metric
-- FAF concept is less intuitive
-- FAF is not always displayed prominently
+**Why it happens:** Vue's `createApp(App).mount('#app')` replaces all innerHTML of the mount target. Until the JavaScript bundle loads, parses, and executes, the static HTML is visible. On slow connections or devices, this can last several seconds. The static HTML has no Vuetify styling since Vuetify CSS is loaded via JS.
 
 **Consequences:**
-- For rare variants, AF may be artificially high due to sampling variance
-- Clinical decisions based on less reliable frequency estimates
-- Inconsistency with ACMG/AMP guidelines which recommend FAF
+- Users see a flash of plain HTML before the styled app appears
+- On slow connections (common in clinical settings with hospital firewalls), this can last 2-5 seconds
+- Returning PWA users do not see this (SW serves cached assets), so the problem is only visible to new users and search engines
+- If the static content includes navigation links, users might click them during the FOUC window
+
+**Warning signs:**
+- Test on slow 3G network throttling in DevTools
+- Record a performance trace and look for a paint before the Vue app mounts
+- Check if the static content is visually jarring against the Vuetify-styled app
 
 **Prevention:**
-1. **Prefer FAF:** Use "Grpmax Filtering AF" for population maximum frequency
-2. **Understand the difference:** FAF is the 95% CI lower bound of AF
-3. **For carrier frequency:** Sum of individual variant AFs is acceptable (FAF is for variant-level filtering)
-4. **Display both:** Show AF with confidence context
+1. **Style the static HTML to match the app's visual feel:**
+   ```html
+   <style>
+     #app > main { font-family: Roboto, sans-serif; max-width: 800px; margin: 0 auto; padding: 24px; }
+     #app > main h1 { font-size: 1.5rem; color: #424242; }
+   </style>
+   ```
+2. **Add a CSS transition** that fades out the static content when Vue takes over (though Vue's mount replaces it instantly, so this is tricky)
+3. **Keep the static content minimal** but sufficient for SEO: H1, 2-3 paragraphs, a feature list. Do not replicate the entire app UI.
+4. **Add `<noscript>` separately** for users with JS disabled, providing a clear message
+5. **Consider the loading skeleton pattern:** Make the static HTML look like a loading skeleton rather than finished content, so the transition to the real app feels natural
 
-**Detection:**
-- Rare variant (AC < 10) with high reported AF
-- gnomAD shows FAF significantly lower than AF for a variant
+**Phase to address:** SEO Indexing phase (static HTML insertion task)
 
-**Phase to address:** Phase 2 (frequency display and calculation)
+**Confidence:** MEDIUM - This is a known pattern in SPA SEO. The severity depends on the user's connection speed and the app's bundle size.
 
-**Sources:**
-- [Filtering Allele Frequency - gnomAD Help](https://gnomad.broadinstitute.org/help/faf)
-- [ClinGen Guidance on gnomAD v4 - March 2024](https://clinicalgenome.org/site/assets/files/9445/clingen_guidance_to_vceps_regarding_the_use_of_gnomad_v4_march_2024.pdf)
+---
+
+### Pitfall 9: Canonical URL and Base Path Mismatch
+
+**What goes wrong:** The app uses `base: '/'` in Vite config (line 109), the VitePress docs use `base: '/docs/'`, and the site is served from a custom domain. The canonical URL must match exactly what users and Google see. If the canonical URL in `index.html` does not match the actual deployed URL (including trailing slash), Google may treat them as different pages or ignore the canonical signal.
+
+**Why it happens:** GitHub Pages historically served at `username.github.io/repo-name/` with a base path, but this project uses a custom domain (`gnomad-carrier-frequency.kidney-genetics.org`) with root base. The OG URL is already set to the correct domain (line 18 of `index.html`). However, adding a canonical URL introduces a new place where this must be kept in sync.
+
+**Consequences:**
+- If canonical URL is `https://gnomad-carrier-frequency.kidney-genetics.org` (no trailing slash) but Google indexes `https://gnomad-carrier-frequency.kidney-genetics.org/` (with trailing slash), the canonical signal is weakened
+- If the domain or deployment changes, canonical URLs in `index.html` become stale
+- VitePress docs canonical URLs must use `/docs/` prefix, not the VitePress-relative paths
+
+**Warning signs:**
+- Check Google Search Console for "Duplicate without user-selected canonical" coverage issues
+- Verify canonical URL includes trailing slash to match the actual URL
+- Check that the OG URL and canonical URL match exactly
+
+**Prevention:**
+1. Use consistent trailing slash: `https://gnomad-carrier-frequency.kidney-genetics.org/`
+2. Ensure `og:url` and `<link rel="canonical">` have identical values
+3. Configure VitePress with `sitemap.hostname: 'https://gnomad-carrier-frequency.kidney-genetics.org'` so docs sitemaps use the correct domain
+4. Add a CI check that verifies canonical URLs in built HTML match the deployment domain
+
+**Phase to address:** SEO Indexing phase (canonical URL task)
+
+**Confidence:** HIGH - Verified from codebase: `base: '/'`, OG URL uses correct domain
+
+---
+
+### Pitfall 10: Native `alert()`/`confirm()` Replacement Breaks Existing Error Handling Logic
+
+**What goes wrong:** The app uses native `alert()` in `SettingsDialog.vue` (lines 788, 791) for template import errors and `confirm()` in `SettingsDialog.vue` (line 801) for template reset and `LogViewer.vue` (line 234) for log clearing. Replacing these with Vuetify `v-dialog` components changes the control flow from synchronous to asynchronous. The `confirm()` calls are used in `if (confirm(...))` patterns which are synchronous. A Vuetify dialog requires async/await or Promise-based flow.
+
+**Why it happens:** Native `alert()` and `confirm()` are synchronous and blocking. They pause JavaScript execution until the user responds. Vuetify dialogs are asynchronous components that show/hide reactively. The calling code must be refactored from `if (confirm(msg)) { doThing() }` to an async pattern with a dialog state variable.
+
+**Consequences:**
+- If you simply replace `confirm()` with a `v-dialog` without changing the control flow, the action will execute immediately without waiting for user confirmation
+- The template reset and log clear actions will run unconditionally
+- You need to introduce dialog state refs, confirmation callbacks, and potentially a shared confirmation dialog composable
+
+**Warning signs:**
+- After replacing `confirm()`, test the template reset and log clear flows
+- Verify that the destructive action only happens when the user clicks "Confirm" in the dialog
+- Check that the dialog can be cancelled without triggering the action
+
+**Prevention:**
+1. Create a reusable `useConfirmDialog()` composable that returns a Promise:
+   ```typescript
+   const { confirm } = useConfirmDialog()
+   if (await confirm('Reset all templates to defaults?')) {
+     templateStore.resetTemplates()
+   }
+   ```
+2. Replace all 4 native dialog calls at once (do not partially migrate)
+3. Ensure the confirmation dialog inherits the current theme (light/dark)
+4. Test keyboard navigation (Enter to confirm, Escape to cancel) for accessibility
+
+**Phase to address:** UX Polish phase (dialog replacement task)
+
+**Confidence:** HIGH - Verified from codebase: 4 native dialog calls identified with exact line numbers
 
 ---
 
 ## Minor Pitfalls
 
-Mistakes that cause annoyance or minor inaccuracies but are easily fixable.
+Mistakes that cause inconvenience or small quality issues but are fixable.
 
 ---
 
-### Pitfall 10: Floating Point Display Precision
+### Pitfall 11: `manifest.json` Theme Color Not Updated When Primary Changes
 
-**What goes wrong:** Displaying carrier frequencies with excessive decimal places (e.g., "0.03999999999999") or inconsistent precision.
+**What goes wrong:** The PWA manifest in `vite.config.ts` (line 33) sets `theme_color: '#a09588'`. If the primary color changes for the UX polish, the manifest theme color and the HTML meta theme-color become inconsistent. Android Chrome uses `theme_color` for the status bar and task switcher; a mismatch between the app's visible primary color and the browser chrome looks like a bug.
 
-**Why it happens:**
-- JavaScript floating point representation (IEEE-754)
-- Not formatting output consistently
-- Multiplying small numbers accumulates error
+**Why it happens:** The theme color is set in the Vite config, not derived from the Vuetify theme. These are independent systems.
 
 **Prevention:**
-1. **Format output:** Use `toFixed(4)` or similar for display
-2. **Use ratios:** Display as "1 in 250" rather than "0.004"
-3. **Consistent significant figures:** 2-3 significant figures is appropriate for these estimates
+1. When changing primary/CTA colors, audit all color definitions: Vuetify theme (light AND dark), PWA manifest `theme_color`, `<meta name="theme-color">` if present, and any hardcoded color values
+2. If the brand color (#a09588 or refinement) stays as the "identity" color, keep the manifest aligned to that, not to the new CTA color
 
-**Detection:**
-- Numbers with many decimal places in UI
-- Inconsistent precision across different values
-- "0.9999..." instead of "1.0"
+**Phase to address:** UX Polish phase (color change task, same PR)
 
-**Phase to address:** Phase 3 (UI polish)
+**Confidence:** HIGH - Verified from `vite.config.ts` line 33
 
 ---
 
-### Pitfall 11: Gene Symbol Validation and Aliases
+### Pitfall 12: Footer Icon Labels Break Mobile Overflow Menu
 
-**What goes wrong:** User enters gene alias or outdated symbol, query fails silently or returns wrong gene.
+**What goes wrong:** Adding text labels to footer icons (recommended by UX audit) works on desktop but the footer already collapses to a 3-dot overflow menu on mobile. If labels are added as always-visible text, the mobile layout may break. If labels are added only as tooltips, they do not help discoverability.
 
-**Why it happens:**
-- HGNC symbol changes over time
-- Common aliases exist (e.g., "BRCA1" is clear, but "GAA" vs "LYAG")
-- Typos in user input
+**Why it happens:** The footer has a responsive breakpoint that switches from icon row to overflow menu. Adding text to icons changes the space requirements and may push the breakpoint or cause wrapping.
 
 **Prevention:**
-1. **Autocomplete:** Implement gene search with gnomAD's gene query
-2. **Validate first:** Check gene exists before variant query
-3. **Show canonical name:** Display the official HGNC symbol after lookup
-4. **Handle aliases:** Accept common aliases and map to current symbol
+1. Add labels only on desktop (using Vuetify's `d-none d-sm-inline` display utility)
+2. On mobile, keep icon-only in the overflow menu but use descriptive menu item text
+3. Test at multiple viewport widths (especially 360px, 390px, 768px)
 
-**Detection:**
-- Gene query returns null or error
-- Returned gene name differs from input
-- User reports "gene not found" for valid gene
+**Phase to address:** UX Polish phase (footer improvement task)
 
-**Phase to address:** Phase 1 (gene search)
+**Confidence:** MEDIUM - UX audit mentions the responsive footer behavior, but specific breakpoint code was not verified
 
 ---
 
-### Pitfall 12: Not Accounting for Exome vs Genome Coverage Differences
+### Pitfall 13: SEO Title Change May Confuse Existing (Limited) Brand Recognition
 
-**What goes wrong:** Using exome data for genes with poor exome coverage, missing variants that would appear in genome data.
+**What goes wrong:** The SEO report recommends changing the title from "gnomAD Carrier Frequency Calculator" to "Carrier Frequency Calculator -- gnomAD Population Data | gCFCalc". While better for SEO, if anyone has bookmarked or referenced the original title, the change creates a minor brand discontinuity.
 
-**Why it happens:**
-- Some gene regions have low exome capture efficiency
-- gnomAD genomes have more uniform coverage but smaller sample size
-- User assumes all gnomAD data is equivalent
+**Why it happens:** SEO optimization favors leading with the target keyword. But this project is in a niche academic/clinical domain where the "gnomAD" prefix signals legitimacy to the target audience.
 
 **Prevention:**
-1. **Check coverage:** Display mean coverage or AN for the gene
-2. **Low coverage warning:** Flag genes with mean coverage < 20x
-3. **Consider both:** For critical decisions, note if genome data differs
+1. The change is correct for SEO purposes -- proceed with it
+2. But consider a compromise that keeps "gnomAD" prominent: "gnomAD Carrier Frequency Calculator | gCFCalc" (moves target keyword to `<h1>` in static HTML instead)
+3. Use `<h1>` in the static HTML seed for the keyword-leading version, keep `<title>` more brand-focused
+4. The OG title can differ from the page title to optimize for different contexts
 
-**Detection:**
-- AN varies dramatically across exons of same gene
-- Gene known to have exome capture issues (e.g., GC-rich regions)
-- Genome frequency differs significantly from exome frequency
+**Phase to address:** SEO On-Page Optimization phase
 
-**Phase to address:** Phase 3 (advanced features)
-
-**Sources:**
-- [gnomAD v4.1 - Exome/Genome discordance flags](https://gnomad.broadinstitute.org/news/2024-04-gnomad-v4-1/)
+**Confidence:** LOW - This is a judgment call about brand vs. keyword priority; no definitive answer
 
 ---
 
 ## Phase-Specific Warnings
 
-| Phase | Topic | Likely Pitfall | Mitigation |
-|-------|-------|---------------|------------|
-| Phase 1 | API Integration | Rate limiting, HTTPS redirect | Batch queries, use HTTPS, implement retry logic |
-| Phase 1 | Gene Search | Symbol validation | Use gnomAD gene query with autocomplete |
-| Phase 1 | Core Calculation | Summing AF incorrectly | Verify formula: `carrier_freq = 2 * sum(AF)` for rare diseases |
-| Phase 2 | Variant Filtering | Including artifact/benign variants | Filter: LoF HC OR ClinVar P/LP with >= 1 star |
-| Phase 2 | Population Data | Ignoring founder effects | Display all populations, flag outliers |
-| Phase 2 | Frequency Display | AF vs FAF confusion | Use AF sum for carrier frequency, document method |
-| Phase 3 | Fallback Logic | Zero vs unknown confusion | Distinguish "no data" from "no pathogenic variants" |
-| Phase 3 | Clinical Text | Wrong frequency source cited | Track data provenance (gnomAD vs literature vs default) |
-| Phase 3 | UI Polish | Floating point display | Format to 2-3 significant figures |
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| Static HTML seed content | SW precaches stale HTML (Pitfall 1) | Consider `autoUpdate` or ensure update prompt is tested |
+| Static HTML seed content | FOUC flash before Vue mounts (Pitfall 8) | Add minimal inline styles matching app aesthetic |
+| Sitemap creation | VitePress + SPA sitemap collision (Pitfall 4) | Use sitemap index file, not single sitemap |
+| OG image fix | Relative path AND SVG format (Pitfall 3) | Fix BOTH: absolute HTTPS URL + PNG format |
+| Structured data | Stale version number (Pitfall 6) | Automate injection from package.json at build time |
+| Canonical URL | Trailing slash mismatch (Pitfall 9) | Match exactly with OG URL including trailing slash |
+| Primary color change | 40+ component cascade (Pitfall 2) | Introduce CTA-specific color, keep primary for brand |
+| Onboarding | Triple-modal first run (Pitfall 7) | Sequence: disclaimer -> onboarding -> PWA notify |
+| Native dialog replacement | Sync-to-async control flow (Pitfall 10) | Create `useConfirmDialog` composable, migrate all 4 calls |
+| Footer labels | Mobile overflow menu break (Pitfall 12) | Desktop-only labels, test responsive breakpoints |
+| PWA manifest | Theme color mismatch (Pitfall 11) | Audit all color definitions in same PR as color change |
+| `navigateFallback` | Docs cross-links broken for PWA users (Pitfall 5) | Test with installed PWA, verify denylist regex |
 
 ---
 
-## Pre-Implementation Checklist
+## Integration Risk Summary
 
-Before building each phase, verify:
+The highest-risk integration point is the **service worker + SEO content** interaction. The current SW config (`registerType: 'prompt'`, `navigateFallback: 'index.html'`, `globPatterns` including `*.html`) means that:
 
-- [ ] gnomAD API endpoint is `https://gnomad.broadinstitute.org/api` (not HTTP)
-- [ ] Query uses gnomAD v4 with GRCh38 reference genome
-- [ ] Gene query includes MANE Select/canonical transcript info
-- [ ] Variant filtering includes LoF confidence flag (`lof = "HC"`)
-- [ ] ClinVar pathogenicity includes review status filter
-- [ ] Population-specific frequencies are captured from response
-- [ ] Carrier frequency formula documented: `2 * sum(pathogenic_AF)`
-- [ ] Fallback value (1:100) implemented when no qualifying variants found
-- [ ] Error handling covers: gene not found, API timeout, rate limiting, zero variants
+1. **New static HTML in `index.html` will be precached** by the service worker
+2. **Existing users will not see the new content** until they accept the PWA update
+3. **The navigation fallback ensures all routes return the SPA shell**, which is correct for the app but must be verified to NOT interfere with `/docs/` cross-links
+
+The recommended approach is to:
+- Change `registerType` to `'autoUpdate'` for this specific release (since SEO changes are additive, not breaking)
+- OR implement a more prominent update notification UI that ensures users update promptly
+- Test the full SW lifecycle: install old version -> deploy new version -> verify content updates
+
+The second highest risk is the **color change cascade**. With 40+ `color="primary"` bindings, a naive primary color change will affect the entire app. The mitigation is straightforward (add a named CTA color instead of changing primary) but requires discipline to implement correctly.
 
 ---
 
 ## Sources
 
-### Official gnomAD Resources
-- [gnomAD Browser & API](https://gnomad.broadinstitute.org/)
-- [gnomAD FAQ](https://gnomad.broadinstitute.org/faq)
-- [gnomAD Changelog](https://gnomad.broadinstitute.org/news/changelog/)
-- [Filtering Allele Frequency Documentation](https://gnomad.broadinstitute.org/help/faf)
-- [Loss-of-Function Curations](https://gnomad.broadinstitute.org/news/2020-10-loss-of-function-curations-in-gnomad/)
-
-### Peer-Reviewed Publications
-- [Variant interpretation using population databases: Lessons from gnomAD - Human Mutation 2022](https://pmc.ncbi.nlm.nih.gov/articles/PMC9160216/)
-- [Reinterpretation of common pathogenic variants in ClinVar - Scientific Reports 2020](https://www.nature.com/articles/s41598-019-57335-5)
-- [Advanced variant classification framework - AJHG 2023](https://pmc.ncbi.nlm.nih.gov/articles/PMC10029069/)
-- [MANE transcript set - Nature 2022](https://www.nature.com/articles/s41586-022-04558-8)
-- [Estimation of carrier frequencies utilizing gnomAD - 2024](https://pubmed.ncbi.nlm.nih.gov/38459613/)
-
-### Community Resources
-- [gnomAD Discussion Forum](https://discuss.gnomad.broadinstitute.org/)
-- [ClinGen Guidance on gnomAD v4 - March 2024](https://clinicalgenome.org/site/assets/files/9445/clingen_guidance_to_vceps_regarding_the_use_of_gnomad_v4_march_2024.pdf)
+- [Workbox stale index.html caching - Issue #1528](https://github.com/GoogleChrome/workbox/issues/1528)
+- [Workbox stale index.html - Issue #2299](https://github.com/GoogleChrome/workbox/issues/2299)
+- [Service Worker holds site hostage](https://dev.to/bradleymatera/the-day-a-service-worker-held-my-entire-site-hostage-21d3)
+- [Service Workers and SEO](https://www.sara-taher.com/service-workers-seo/)
+- [PWA partial rendering issues with service workers](https://searchengineland.com/pwa-how-to-avoid-partial-rendering-issues-with-service-workers-317631)
+- [SEO for Vue SPAs](https://nuxtseo.com/learn-seo/vue/spa)
+- [Vue SPA SEO Prerendering](https://nuxtseo.com/learn-seo/vue/spa/prerendering)
+- [OG Protocol Specification](https://ogp.me/)
+- [Relative vs Absolute OG Image URLs](https://veonr.com/blog/relative-vs-absolute-og-image-video-urls)
+- [VitePress Sitemap Generation](https://vitepress.dev/guide/sitemap-generation)
+- [Common JSON-LD Schema Issues](https://zeo.org/resources/blog/most-common-json-ld-schema-issues-and-solutions)
+- [Fixing Structured Data Errors](https://salt.agency/blog/fixing-common-json-ld-structured-data-issues-in-google-search-console/)
+- [Vue 3 Onboarding Libraries](https://www.chameleon.io/blog/vuejs-product-tours)
+- [Vuetify 3 Theme Documentation](https://vuetifyjs.com/en/features/theme/)
+- [Vuetify Disabled Button Color Issues](https://github.com/vuetifyjs/vuetify/issues/15147)
+- [Open Graph Tags Complete Guide 2026](https://share-preview.com/blog/og-tags-complete-guide.html)

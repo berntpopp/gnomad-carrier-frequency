@@ -1,420 +1,244 @@
-# Stack Research: v1.1 Features
+# Technology Stack: SEO & UX Polish (v1.4)
 
-**Project:** gnomAD Carrier Frequency Calculator v1.1
-**Researched:** 2026-01-19
+**Project:** gnomAD Carrier Frequency Calculator
+**Researched:** 2026-02-23
 **Overall Confidence:** HIGH
-
-## Summary
-
-v1.1 adds five feature areas to the existing Vue 3/Vuetify 3/TypeScript stack:
-
-| Feature | Recommendation | Confidence |
-|---------|----------------|------------|
-| ClinGen Integration | Direct fetch to CSV endpoint, cache in Pinia store | HIGH |
-| Excel/JSON Export | SheetJS (xlsx) 0.20.3 via CDN + file-saver | HIGH |
-| Browser Logging | loglevel 1.9.2 | HIGH |
-| Build Speed | Rolldown (Vite 7 experimental), ESLint flat config optimizations | MEDIUM |
-| Dark/Light Theme | VueUse useDark + Vuetify useTheme sync | HIGH |
-
-**Key insight:** All v1.1 features can be implemented with minimal new dependencies. The existing stack (Vue 3.5+, Vuetify 3.8+, VueUse 12.x, Pinia 3.x) already provides most needed infrastructure.
+**Scope:** Stack additions for SEO indexing, structured data, OG image, VitePress sitemap, and Vuetify UX improvements
 
 ---
 
-## 1. ClinGen Gene-Disease Validity Integration
+## Executive Summary
 
-### Recommendation
+This milestone requires **zero new npm dependencies**. Every capability needed is achievable through:
+1. Configuration changes to existing tools (VitePress sitemap, Vuetify theme)
+2. Build scripts using already-installed `sharp` (OG image conversion)
+3. Hand-authored static HTML in `index.html` (SEO seed content)
+4. Pure CSS/HTML patterns (skip-to-content, onboarding)
+5. Built-in Vuetify components (progress indicators, color system)
 
-**Approach:** Direct fetch to ClinGen CSV download endpoint with client-side parsing and Pinia-persisted caching.
-
-**Endpoint:** `https://search.clinicalgenome.org/kb/gene-validity/download`
-- Returns real-time CSV of all gene-disease validity curations
-- No authentication required for public download
-- CORS-enabled for browser requests
-
-### Rationale
-
-ClinGen provides two data access methods:
-
-1. **GCI API** (requires API key, restricted to GCEP members)
-2. **Public CSV download** (no auth, real-time, open access)
-
-For a genetic counselor tool, the public CSV download is appropriate:
-- Contains all published gene-disease validity classifications
-- Includes gene symbol, disease, mode of inheritance, classification (Definitive, Strong, Moderate, Limited, etc.)
-- Updated in real-time as new curations are published
-
-### Implementation Details
-
-```typescript
-// Fetch and parse ClinGen data
-const response = await fetch('https://search.clinicalgenome.org/kb/gene-validity/download');
-const csvText = await response.text();
-// Parse CSV (use built-in or lightweight parser)
-```
-
-**Caching Strategy:**
-- Store parsed data in Pinia store with `pinia-plugin-persistedstate`
-- Add timestamp to track freshness
-- Cache TTL: 24 hours (curations don't change frequently)
-- Manual refresh button for users who need latest data
-
-**CSV Parsing Options:**
-
-| Library | Size | Recommendation |
-|---------|------|----------------|
-| Built-in (split/map) | 0 KB | Use for simple CSV structure |
-| papaparse | ~6 KB gzip | Only if CSV has edge cases (quoted fields, etc.) |
-
-**Confidence:** HIGH - Verified endpoint exists and returns CSV. No authentication required for public data.
-
-### What NOT to Use
-
-- **GCI API**: Requires API key, intended for ClinGen internal tools and GCEP members
-- **GraphQL (GeneGraph)**: Not yet publicly released as of research date
-
-### Sources
-
-- [ClinGen Downloads Page](https://search.clinicalgenome.org/kb/downloads)
-- [GCI API Documentation](https://vci-gci-docs.clinicalgenome.org/vci-gci-docs/gci-help/gci-api)
+The discipline here is restraint: do not add libraries for problems that are solved by configuration or a few lines of code.
 
 ---
 
-## 2. Excel/JSON Export
+## Recommended Stack Changes
 
-### Recommendation
+### 1. SEO: Static HTML Seed Content
 
-**Primary:** SheetJS (xlsx) v0.20.3 + file-saver v2.0.5
+**Approach:** Hand-edit `index.html` to place static HTML inside `<div id="app">`
+**New dependencies:** NONE
 
-### Rationale
+**How it works:** Vue 3's `createApp().mount('#app')` replaces all innerHTML of the mount target when the app mounts. This means any static HTML placed inside `<div id="app">` is visible to crawlers on first load, then seamlessly replaced by the Vue app once JavaScript executes.
 
-SheetJS is the de facto standard for browser-based Excel generation. Critical note: the npm registry version (0.18.5) is outdated and has security vulnerabilities. Must install from SheetJS CDN.
+**This is the single most impactful SEO change.** The current body contains only `<div id="app"></div>` which gives Google zero indexable content. Adding ~300-500 words of keyword-rich static HTML solves the core indexing problem without any build tooling changes.
 
-**Why SheetJS over ExcelJS:**
-
-| Criterion | SheetJS | ExcelJS |
-|-----------|---------|---------|
-| Bundle size | ~200 KB | ~400 KB |
-| Excel styling | Pro version only | Included |
-| Browser support | Excellent | Requires polyfills |
-| Maintenance | Active | Active |
-
-For this use case (simple data export without styling), SheetJS is sufficient and smaller.
-
-### Installation
-
-```bash
-# CRITICAL: Do NOT use npm install xlsx (outdated, vulnerable)
-npm rm xlsx 2>/dev/null
-npm install https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
-npm install file-saver
-npm install -D @types/file-saver
+```html
+<div id="app">
+  <!-- Static seed content: visible to crawlers, replaced by Vue on mount -->
+  <main>
+    <h1>Carrier Frequency Calculator - gnomAD Population Data</h1>
+    <p>Calculate carrier frequency and recurrence risk for autosomal
+       recessive conditions using real population data from the Genome
+       Aggregation Database (gnomAD).</p>
+    <!-- ... more educational content ... -->
+    <nav>
+      <a href="/docs/guide/">Documentation</a>
+      <a href="/docs/reference/methodology">Methodology</a>
+    </nav>
+  </main>
+  <noscript>
+    <p>This application requires JavaScript to run.</p>
+  </noscript>
+</div>
 ```
 
-### Implementation Pattern
+**Why NOT prerender / SSR / vite-ssg:**
+- This is a single-page SPA with one URL (no routes). Prerendering tools are designed for multi-route apps.
+- SSR adds server infrastructure complexity for a GitHub Pages static deployment.
+- The static HTML seed approach is simpler, has zero build cost, and solves the exact problem (empty body for crawlers).
+- Vue replaces the seed content on mount -- there is no hydration mismatch risk because there is no hydration; it is a full replacement.
 
-```typescript
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+**Confidence:** HIGH -- This is a well-documented Vue.js pattern. Vue's mount behavior is authoritative: it replaces innerHTML of the mount element.
 
-// Excel export
-function exportToExcel(data: CarrierResult[], filename: string) {
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Results');
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-  saveAs(blob, `${filename}.xlsx`);
-}
-
-// JSON export
-function exportToJSON(data: CarrierResult[], filename: string) {
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  saveAs(blob, `${filename}.json`);
-}
-```
-
-### Version Details
-
-| Package | Version | Source |
-|---------|---------|--------|
-| xlsx | 0.20.3 | SheetJS CDN (NOT npm) |
-| file-saver | 2.0.5 | npm |
-| @types/file-saver | 2.0.7 | npm |
-
-**Confidence:** HIGH - SheetJS is widely used, well-documented. CDN installation verified.
-
-### What NOT to Use
-
-- **xlsx from npm registry**: Version 0.18.5 has known vulnerabilities (Prototype Pollution, DoS)
-- **ExcelJS**: Larger bundle, requires polyfills, overkill for simple exports
-- **vue3-xlsx**: Thin wrapper, adds unnecessary abstraction
-
-### Sources
-
-- [SheetJS Documentation](https://docs.sheetjs.com/)
-- [SheetJS CDN Migration](https://cdn.sheetjs.com/xlsx/)
-- [SheetJS Vue Integration](https://docs.sheetjs.com/docs/demos/frontend/vue/)
-- [file-saver npm](https://www.npmjs.com/package/file-saver)
+**Sources:**
+- [Vue.js Ways of Using Vue](https://vuejs.org/guide/extras/ways-of-using-vue)
+- [Nuxt SEO: SPA Patterns](https://nuxtseo.com/learn-seo/vue/spa)
 
 ---
 
-## 3. Browser-Based Logging System
+### 2. SEO: Canonical URL and Robots Meta
 
-### Recommendation
+**Approach:** Add two `<meta>` / `<link>` tags to `index.html` `<head>`
+**New dependencies:** NONE
 
-**Library:** loglevel v1.9.2
-
-### Rationale
-
-loglevel is the best fit for browser logging:
-
-| Criterion | loglevel | Pino (browser) | LogTape |
-|-----------|----------|----------------|---------|
-| Bundle size | 1.4 KB gzip | 3 KB gzip | Larger |
-| Dependencies | 0 | 0 | 0 |
-| Browser-native | Yes | Adapted | Yes |
-| TypeScript | Included | Included | Included |
-| npm downloads/week | 9M+ | Lower | Lower |
-| Line numbers preserved | Yes | No | Varies |
-
-Key advantage: loglevel preserves stack traces and line numbers in browser console, critical for debugging.
-
-### Installation
-
-```bash
-npm install loglevel
-# TypeScript types are included
+```html
+<link rel="canonical" href="https://gnomad-carrier-frequency.kidney-genetics.org/" />
+<meta name="robots" content="index, follow" />
 ```
 
-### Implementation Pattern
+**Why not `@unhead/vue`:** The project has exactly one page (the SPA root). There are no dynamic routes requiring per-page meta management. A static canonical tag in `index.html` is all that is needed. Installing `@unhead/vue` for a single-page app with no router would be over-engineering.
 
-```typescript
-// src/utils/logger.ts
-import log from 'loglevel';
-
-// Configure based on environment
-if (import.meta.env.DEV) {
-  log.setLevel('debug');
-} else {
-  log.setLevel('warn'); // Production: only warn and error
-}
-
-export const logger = log;
-
-// Usage throughout app
-import { logger } from '@/utils/logger';
-
-logger.debug('Fetching gene variants', { gene: 'CFTR' });
-logger.info('Carrier frequency calculated', { frequency: 0.022 });
-logger.warn('ClinGen cache expired, refetching');
-logger.error('gnomAD API request failed', error);
-```
-
-### Optional: Log Persistence Plugin
-
-For persisting logs to localStorage (useful for debugging user-reported issues):
-
-```bash
-npm install loglevel-plugin-remote  # If remote logging needed later
-```
-
-**Confidence:** HIGH - loglevel is mature, widely used, minimal footprint.
-
-### What NOT to Use
-
-- **winston**: Node.js-focused, requires polyfills for browser
-- **console.log directly**: No level filtering, no production control
-- **Custom solution**: Unnecessary when loglevel exists
-
-### Sources
-
-- [loglevel npm](https://www.npmjs.com/package/loglevel)
-- [loglevel GitHub](https://github.com/pimterry/loglevel)
-- [Browser Logging Best Practices](https://gajus.medium.com/logging-in-browser-2f053dbe69df)
+**Confidence:** HIGH
 
 ---
 
-## 4. Build/Lint/Typecheck Speed Improvements
+### 3. SEO: Sitemap Strategy (Two Sitemaps)
 
-### Recommendation
+**Approach:** Hand-authored `public/sitemap.xml` for SPA + VitePress built-in sitemap for docs
+**New dependencies:** NONE
 
-**Multi-pronged approach:**
+#### 3a. SPA Sitemap: `public/sitemap.xml`
 
-1. **Vite 7 Rolldown** (experimental) - 3-16x faster builds
-2. **ESLint flat config optimizations** - Already using, add global ignores
-3. **vue-tsc parallelization** - Use vite-plugin-checker
-4. **TypeScript isolatedDeclarations** - Future consideration (not yet stable for Vue)
+The SPA has one URL. A hand-authored sitemap is appropriate:
 
-### 4.1 Vite 7 Rolldown (Experimental)
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://gnomad-carrier-frequency.kidney-genetics.org/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+```
 
-Vite 7.x includes experimental Rolldown bundler support. Rolldown is Rust-based, providing:
-- 45% faster cold starts
-- 3-16x faster production builds
-- 100x reduction in peak memory for large apps
+**Why NOT `vite-plugin-sitemap`:**
+- It scans the dist folder for generated HTML files. An SPA has exactly one: `index.html`.
+- A hand-written file with one `<url>` entry is simpler, faster, and has zero build overhead.
+- Adding a build-time plugin for a single URL is unnecessary complexity.
 
-**Current Status:** Experimental in Vite 7. Production-ready expected in Vite 8.
+#### 3b. VitePress Docs Sitemap: Built-in Configuration
 
-**Configuration:**
+VitePress has built-in sitemap generation since v1.x. It is a one-line config change:
 
 ```typescript
-// vite.config.ts
-import { defineConfig } from 'vite';
-
+// docs/.vitepress/config.ts
 export default defineConfig({
-  // Enable Rolldown (experimental)
-  experimental: {
-    rolldownDev: true,  // Use Rolldown in dev
-    rolldownBuild: true // Use Rolldown for production builds
+  // ... existing config ...
+  sitemap: {
+    hostname: 'https://gnomad-carrier-frequency.kidney-genetics.org'
   }
-});
+})
 ```
 
-**Confidence:** MEDIUM - Experimental flag. Test thoroughly before enabling.
+This generates `sitemap.xml` in the VitePress build output (`docs/.vitepress/dist/sitemap.xml`) containing all docs pages automatically. Since VitePress builds to `/docs/` base, URLs will be correctly prefixed.
 
-### 4.2 ESLint Flat Config Optimizations
+**Important:** The VitePress sitemap covers `/docs/*` pages. The SPA sitemap covers `/`. Both are needed. The `robots.txt` should reference both:
 
-The project already uses ESLint 9 flat config. Optimizations:
+```
+User-agent: *
+Allow: /
 
-```javascript
-// eslint.config.js
-import pluginVue from 'eslint-plugin-vue';
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
-
-export default defineConfigWithVueTs(
-  {
-    // Global ignores - prevents wasting time on generated files
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      'coverage/**',
-      '**/*.d.ts',
-      '.planning/**'  // Don't lint planning docs
-    ]
-  },
-  pluginVue.configs['flat/recommended'],
-  vueTsConfigs.recommended
-);
+Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/sitemap.xml
+Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/docs/sitemap.xml
 ```
 
-**Performance tips:**
-- Use `--quiet` flag in CI (skips warn-level rules entirely in ESLint 9)
-- Global ignores prevent scanning irrelevant directories
-- Flat config inherently faster than legacy cascading config
+Alternatively, combine into a single sitemap index file. The simpler approach (two Sitemap entries in robots.txt) is recommended.
 
-**Confidence:** HIGH - Already on ESLint 9, just needs ignore optimization.
-
-### 4.3 vue-tsc Parallelization
-
-vue-tsc is inherently slow for large projects. Options:
-
-**Option A: vite-plugin-checker (Recommended)**
-
-Run type checking in parallel worker thread:
-
-```bash
-npm install -D vite-plugin-checker
-```
-
-```typescript
-// vite.config.ts
-import checker from 'vite-plugin-checker';
-
-export default defineConfig({
-  plugins: [
-    vue(),
-    checker({
-      vueTsc: true,
-      typescript: true
-    })
-  ]
-});
-```
-
-**Option B: Skip vue-tsc in dev, run in CI only**
-
-```json
-{
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "typecheck": "vue-tsc --noEmit",
-    "build:ci": "vue-tsc -b && vite build"
-  }
-}
-```
-
-**Confidence:** HIGH for vite-plugin-checker approach.
-
-### 4.4 TypeScript isolatedDeclarations
-
-TypeScript 5.5+ `isolatedDeclarations` can dramatically speed up type generation (20-100x). However:
-
-- Vue SFC support is experimental
-- Requires explicit type annotations on all exports
-- Known issues with `<script setup>` implicit types
-
-**Recommendation:** Monitor vuejs/language-tools for stable support. Not ready for production Vue projects yet.
-
-**Confidence:** LOW for Vue projects currently.
-
-### Sources
-
-- [Vite 7 Performance](https://vite.dev/guide/performance)
-- [Vite 7 Rolldown Announcement](https://dev.to/aggarwal_gaurav_1012/vite-70-is-here-rust-powered-speed-smarter-tooling-a-cleaner-build-experience-1k9j)
-- [ESLint Flat Config Best Practices](https://eslint.org/blog/2025/03/flat-config-extends-define-config-global-ignores/)
-- [vue-tsc Performance Issues](https://github.com/vuejs/language-tools/issues/2533)
-- [vite-plugin-checker](https://github.com/fi3ework/vite-plugin-checker)
-- [TypeScript isolatedDeclarations](https://marvinh.dev/blog/speeding-up-javascript-ecosystem-part-10/)
+**Confidence:** HIGH -- VitePress sitemap is documented at [vitepress.dev/guide/sitemap-generation](https://vitepress.dev/guide/sitemap-generation). Vite's own docs use this exact pattern.
 
 ---
 
-## 5. Dark/Light Theme Switching
+### 4. SEO: OG Image (SVG to PNG Conversion)
 
-### Recommendation
+**Approach:** Build script using `sharp` (already installed as devDependency)
+**New dependencies:** NONE
 
-**Approach:** VueUse `useDark` composable + Vuetify `useTheme` synchronization
+`sharp` is already in `devDependencies` at version `^0.34.5` and is used by `scripts/generate-screenshots.ts` for WebP conversion. It natively supports SVG-to-PNG conversion.
 
-### Rationale
-
-The project already uses VueUse 12.x. The `useDark` composable provides:
-- System preference detection (prefers-color-scheme)
-- Automatic localStorage persistence
-- Reactive toggle
-
-However, Vuetify maintains its own theme state via `useTheme`. These must be synchronized.
-
-### Implementation Pattern
+**Build script pattern:**
 
 ```typescript
-// src/composables/useAppTheme.ts
-import { useDark, useToggle } from '@vueuse/core';
-import { useTheme } from 'vuetify';
-import { watch } from 'vue';
+// scripts/generate-og-image.ts
+import sharp from 'sharp';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-export function useAppTheme() {
-  const vuetifyTheme = useTheme();
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-  // useDark handles localStorage persistence and system preference
-  const isDark = useDark({
-    // Sync to Vuetify when useDark changes
-    onChanged(dark: boolean) {
-      vuetifyTheme.global.name.value = dark ? 'dark' : 'light';
-    }
-  });
-
-  const toggleDark = useToggle(isDark);
-
-  return {
-    isDark,
-    toggleDark
-  };
-}
+await sharp(resolve(__dirname, '../public/og-image.svg'))
+  .resize(1200, 630)
+  .png()
+  .toFile(resolve(__dirname, '../public/og-image.png'));
 ```
 
-### Vuetify Theme Configuration
+Run with: `bun run tsx scripts/generate-og-image.ts`
 
-Update `src/main.ts` to define both light and dark themes:
+**Integration:** Add as a `prebuild` script or a standalone npm script. The generated `og-image.png` goes into `public/` and is committed to the repo (it is a static asset, not a build artifact).
+
+**Also required:** Update `index.html` to use absolute PNG URLs:
+```html
+<meta property="og:image" content="https://gnomad-carrier-frequency.kidney-genetics.org/og-image.png" />
+<meta name="twitter:image" content="https://gnomad-carrier-frequency.kidney-genetics.org/og-image.png" />
+```
+
+**Why not a dynamic OG image service (Vercel OG, Satori):**
+- The app is deployed on GitHub Pages (static hosting). No server-side rendering available.
+- The OG image content is static (app name, logo, tagline). It does not change per-page.
+- A one-time build script is far simpler than a dynamic image generation pipeline.
+
+**Confidence:** HIGH -- sharp SVG-to-PNG is well-documented. The project already uses sharp.
+
+**Sources:**
+- [sharp Output Options](https://sharp.pixelplumbing.com/api-output/)
+- [Convert SVG to PNG with sharp](https://techsparx.com/nodejs/graphics/svg-to-png.html)
+
+---
+
+### 5. SEO: FAQPage Structured Data
+
+**Approach:** Expand existing JSON-LD in `index.html`
+**New dependencies:** NONE
+
+The project already has FAQPage structured data in `index.html` (6 Q&A pairs added in commit `1ae0bfd`). This is already done correctly as static JSON-LD in the `<head>`.
+
+**Remaining work:** Ensure FAQ content is also rendered as visible HTML in the seed content (not just in JSON-LD). Google prefers FAQ answers that are both in structured data AND visible on the page.
+
+**Confidence:** HIGH -- Already implemented, just needs visible HTML counterpart.
+
+---
+
+### 6. UX: Vuetify Color System (CTA Fix)
+
+**Approach:** Modify Vuetify theme configuration in `src/main.ts`
+**New dependencies:** NONE
+
+#### The Problem (Quantified)
+
+The current primary color `#a09588` has a **2.94:1** contrast ratio for white text on the primary background. This fails WCAG AA minimum of 4.5:1 for normal text and 3:1 for large text/UI components. The CONTINUE button with white text on `#a09588` looks disabled.
+
+#### The Solution: Separate Brand Color from CTA Color
+
+Vuetify 3's theme system supports custom named colors beyond the defaults. The recommendation is to:
+
+1. **Keep `#a09588` as a brand/accent color** (it is distinctive and professional)
+2. **Add a new, saturated primary color for CTAs**
+3. **Use Vuetify's `color` prop** to apply the right color contextually
+
+**Recommended color: `#00796B` (Teal 700)**
+
+| Metric | #a09588 (current) | #00796B (recommended) |
+|--------|-------------------|----------------------|
+| White text contrast | 2.94:1 (FAIL AA) | 5.32:1 (PASS AA) |
+| On `#FAFAFA` background | 2.81:1 | 5.10:1 |
+| Visual impression | Muted, disabled-looking | Saturated, actionable |
+| Color-blind safe | N/A (too muted to register) | Distinguishable in all types |
+
+**Alternative options (all pass AA):**
+
+| Color | Hex | White text contrast | Character |
+|-------|-----|-------------------|-----------|
+| Teal 700 | `#00796B` | 5.32:1 | Calm, clinical, trustworthy |
+| Blue 800 | `#1565C0` | 5.75:1 | Authoritative, standard SaaS |
+| Green 800 | `#2E7D32` | 5.13:1 | Positive, growth, go/proceed |
+| Blue 900 | `#0D47A1` | 8.63:1 | Very high contrast, bold |
+
+**Recommendation: Teal 700 (`#00796B`)** because:
+- Medical/clinical tools conventionally use teal/green (trust, health)
+- High enough contrast (5.32:1) without being jarring
+- Pairs well with the warm gray `#a09588` brand accent
+- Works in both light and dark themes
+
+**Implementation in `src/main.ts`:**
 
 ```typescript
 const vuetify = createVuetify({
@@ -426,57 +250,189 @@ const vuetify = createVuetify({
       light: {
         dark: false,
         colors: {
-          primary: '#1976D2',
+          primary: '#00796B',      // Teal 700 -- CTAs, active stepper, links
           secondary: '#424242',
-          background: '#FFFFFF',
-          surface: '#FFFFFF'
+          accent: '#a09588',       // Brand warm gray -- decorative, logo, borders
+          surface: '#FFFFFF',
+          background: '#FAFAFA',
         }
       },
       dark: {
         dark: true,
         colors: {
-          primary: '#2196F3',
-          secondary: '#424242',
-          background: '#121212',
-          surface: '#1E1E1E'
+          primary: '#4DB6AC',      // Teal 200 -- lighter for dark backgrounds
+          secondary: '#757575',
+          accent: '#BDBDBD',
         }
       }
     }
   }
-});
+})
 ```
 
-### UI Component
+**Key Vuetify theme facts:**
+- Custom color names (like `accent`) become usable as `color="accent"` on any Vuetify component
+- Vuetify auto-generates CSS custom properties: `--v-theme-primary`, `--v-theme-accent`, etc.
+- Vuetify auto-generates lighten/darken variants for each color
+- No SCSS compilation needed -- colors are injected as CSS variables at runtime
+
+**PWA manifest update also needed:**
+```typescript
+// vite.config.ts VitePWA manifest
+theme_color: '#00796B', // Match new primary
+```
+
+**Confidence:** HIGH -- Vuetify 3 theme system is well-documented and the project already uses it.
+
+**Sources:**
+- [Vuetify Theme Configuration](https://vuetifyjs.com/en/features/theme/)
+- [WCAG 2.2 Contrast Requirements](https://www.makethingsaccessible.com/guides/contrast-requirements-for-wcag-2-2-level-aa/)
+- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
+
+---
+
+### 7. UX: Onboarding Pattern
+
+**Approach:** Custom Vue component using Vuetify built-in components (v-card, v-dialog, v-btn)
+**New dependencies:** NONE
+
+#### Why NOT a Tour Library
+
+The project was evaluated for three onboarding libraries:
+
+| Library | Version | Weekly DL | Vue 3 | TypeScript | Verdict |
+|---------|---------|-----------|-------|------------|---------|
+| v-onboarding | 2.12.2 | 13.8K | Yes | Yes | Overkill |
+| vue-onboarding-tour | 1.x | <1K | Yes | Partial | Immature |
+| vue-shepherd | 4.x | 7K | Yes | Yes | Heavy (Shepherd dep) |
+
+**Why these are all unnecessary:**
+
+The UX audit recommends a "brief welcome card" and a "Try with CFTR" quick-start button -- not a multi-step spotlight tour. This is a:
+- First-visit conditional card (check localStorage flag)
+- One or two sentences of explanation
+- A "Try with CFTR" CTA button that pre-fills the gene search
+- A "Got it" dismiss button that sets the localStorage flag
+
+This is 30-50 lines of Vue code using `v-card` and `v-btn`. Adding a 14KB+ dependency with Popper.js positioning and SVG overlays for a single card is unjustifiable.
+
+**Implementation pattern:**
 
 ```vue
 <template>
-  <v-btn icon @click="toggleDark()">
-    <v-icon>{{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
-  </v-btn>
+  <v-card v-if="showOnboarding" class="mb-4" variant="tonal" color="primary">
+    <v-card-title>Welcome to gCFCalc</v-card-title>
+    <v-card-text>
+      Calculate carrier frequency for autosomal recessive conditions
+      using real gnomAD population data.
+    </v-card-text>
+    <v-card-actions>
+      <v-btn @click="tryExample">Try with CFTR</v-btn>
+      <v-btn variant="text" @click="dismiss">Dismiss</v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
-
-<script setup lang="ts">
-import { useAppTheme } from '@/composables/useAppTheme';
-
-const { isDark, toggleDark } = useAppTheme();
-</script>
 ```
 
-**No new dependencies required** - VueUse is already installed.
+State persistence: use the existing `pinia-plugin-persistedstate` (already installed) or simple `localStorage.getItem('onboarding-dismissed')`.
 
-**Confidence:** HIGH - Both VueUse and Vuetify APIs are well-documented.
+**Confidence:** HIGH -- Standard Vuetify components, no external dependencies needed.
 
-### What NOT to Use
+---
 
-- **Manual localStorage**: VueUse handles this with proper reactivity
-- **CSS-only solution**: Won't sync with Vuetify component themes
-- **Vuetify alone**: Doesn't provide system preference detection or persistence
+### 8. UX: Skip-to-Content
 
-### Sources
+**Approach:** Custom HTML/CSS element (6 lines of HTML, 10 lines of CSS)
+**New dependencies:** NONE
 
-- [VueUse useDark](https://vueuse.org/core/usedark/)
-- [Vuetify Theme Documentation](https://vuetifyjs.com/en/features/theme/)
-- [Implementing Dark Mode with VueUse](https://www.vuemastery.com/blog/implementing-dark-mode-with-vueuse/)
+#### Why NOT `@vue-a11y/skip-to`
+
+- The npm package was last updated 5 years ago (2021)
+- The Vue 3 compatible version is on `@next` tag, unclear maintenance status
+- Skip-to-content is a standard HTML/CSS pattern that requires no JavaScript framework
+
+**Implementation:**
+
+Add to `App.vue` as the first child of `<v-app>`:
+
+```html
+<a href="#main-content" class="skip-link">
+  Skip to main content
+</a>
+```
+
+```css
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--v-theme-primary);
+  color: white;
+  padding: 8px 16px;
+  z-index: 9999;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+```
+
+Add `id="main-content"` and `tabindex="-1"` to the `<v-main>` element.
+
+This is the pattern recommended by [Vue.js Accessibility Guide](https://vuejs.org/guide/best-practices/accessibility.html) and [WebAIM](https://webaim.org/techniques/skipnav/).
+
+**Confidence:** HIGH -- Standard WCAG pattern, no library needed.
+
+**Sources:**
+- [Vue.js Accessibility Best Practices](https://vuejs.org/guide/best-practices/accessibility.html)
+- [WebAIM Skip Navigation](https://webaim.org/techniques/skipnav/)
+
+---
+
+### 9. UX: Step Transition Loading Indicator
+
+**Approach:** Vuetify `v-progress-linear` component (already available)
+**New dependencies:** NONE
+
+The UX audit identified that transitioning from Step 2 to Step 3 involves an API call with no visible loading indicator. The solution uses Vuetify's built-in `v-progress-linear` component in indeterminate mode.
+
+**Pattern:** Place a `v-progress-linear` at the top of the wizard stepper area, conditionally shown when a step transition involves async work:
+
+```vue
+<v-progress-linear
+  :active="isTransitioning"
+  indeterminate
+  color="primary"
+  height="3"
+/>
+```
+
+This is the standard Material Design pattern for indicating background work. Vuetify's `v-progress-linear` supports:
+- `indeterminate` mode (no known progress amount)
+- `active` prop to show/hide without layout shift
+- Automatic color theming via `color="primary"`
+
+**No new components or libraries needed** -- `v-progress-linear` is part of the Vuetify core already imported in `main.ts` via `import * as components from 'vuetify/components'`.
+
+**Confidence:** HIGH
+
+**Sources:**
+- [Vuetify Progress Linear](https://vuetifyjs.com/en/components/progress-linear/)
+
+---
+
+## What NOT to Add (and Why)
+
+| Rejected Dependency | Why Rejected |
+|-------------------|--------------|
+| `@unhead/vue` | Single-page app with no router. Static meta tags in `index.html` suffice. |
+| `vite-ssg` | SPA has one route. Static seed HTML in `index.html` achieves the same SEO benefit without SSG complexity. |
+| `vite-plugin-sitemap` | One-URL SPA. A hand-written 8-line XML file is simpler than a build plugin. |
+| `v-onboarding` / `vue-shepherd` | Onboarding is a single welcome card, not a multi-step spotlight tour. Vuetify's `v-card` handles this. |
+| `@vue-a11y/skip-to` | 5 years old, unmaintained Vue 3 support. Skip-to-content is 6 lines of HTML/CSS. |
+| `prerender-spa-plugin` | Abandoned (last update 2020). Also unnecessary -- static seed HTML solves the indexing problem. |
+| `schema-dts` / JSON-LD libraries | Structured data is hand-authored JSON in `index.html`. A 40KB+ type library for 50 lines of JSON is overkill. |
+| `vue-meta` / `@vueuse/head` | Both sunset/deprecated in favor of `@unhead/vue`, which itself is unnecessary (see above). |
 
 ---
 
@@ -484,77 +440,121 @@ const { isDark, toggleDark } = useAppTheme();
 
 ### New Production Dependencies
 
-```bash
-# Excel/JSON Export
-npm install https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
-npm install file-saver
-
-# Browser Logging
-npm install loglevel
-```
+**NONE**
 
 ### New Dev Dependencies
 
-```bash
-npm install -D @types/file-saver
-npm install -D vite-plugin-checker  # Optional: parallel type checking
-```
+**NONE**
 
-### No New Dependencies Needed For
+### Existing Dependencies Leveraged
 
-- ClinGen integration (use native fetch)
-- Dark/light theme (VueUse already installed)
-- ESLint optimizations (already on ESLint 9)
+| Existing Package | Version | New Use |
+|-----------------|---------|---------|
+| `sharp` | ^0.34.5 (devDep) | SVG-to-PNG OG image conversion build script |
+| `vuetify` | ^3.8.1 | Theme color reconfiguration, `v-progress-linear` loading indicators |
+| `vitepress` | ^2.0.0-alpha.16 (devDep) | Built-in sitemap generation via config |
+| `pinia-plugin-persistedstate` | ^4.7.1 | Onboarding dismissal persistence |
 
-### Updated package.json
+### Configuration-Only Changes
 
-```json
-{
-  "dependencies": {
-    "file-saver": "^2.0.5",
-    "loglevel": "^1.9.2",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
-  },
-  "devDependencies": {
-    "@types/file-saver": "^2.0.7",
-    "vite-plugin-checker": "^0.8.0"
-  }
-}
-```
+| File | Change | Purpose |
+|------|--------|---------|
+| `index.html` | Add seed HTML inside `<div id="app">`, canonical, robots meta, absolute OG URLs | SEO indexing |
+| `src/main.ts` | Update Vuetify theme colors object | CTA contrast fix |
+| `docs/.vitepress/config.ts` | Add `sitemap: { hostname: '...' }` | Docs sitemap generation |
+| `public/robots.txt` | Add Sitemap directives | Sitemap discovery |
+| `public/sitemap.xml` | New hand-authored file | SPA sitemap |
+| `vite.config.ts` | Update PWA `theme_color` | Match new primary color |
+
+### New Files (Code)
+
+| File | Purpose |
+|------|---------|
+| `scripts/generate-og-image.ts` | Build script: SVG to PNG conversion |
+| `src/components/OnboardingCard.vue` | First-visit welcome card |
+| Skip-link HTML/CSS in `App.vue` | Keyboard accessibility |
 
 ---
 
-## Verification Checklist
+## Version Verification
 
-| Feature | Library | Version | Verified Source |
-|---------|---------|---------|-----------------|
-| ClinGen | fetch (native) | N/A | ClinGen downloads page |
-| Excel export | xlsx | 0.20.3 | SheetJS CDN |
-| File download | file-saver | 2.0.5 | npm registry |
-| Logging | loglevel | 1.9.2 | npm registry |
-| Theme toggle | @vueuse/core | 12.x (existing) | VueUse docs |
-| Build speed | vite | 7.x (existing) | Vite docs |
-| Type checking | vite-plugin-checker | 0.8.x | npm registry |
+All versions verified against npm registry and official documentation as of 2026-02-23:
+
+| Package | In Project | Latest Available | Action |
+|---------|-----------|-----------------|--------|
+| sharp | ^0.34.5 | 0.34.5 | No update needed |
+| vuetify | ^3.8.1 | 3.8.x | No update needed |
+| vitepress | ^2.0.0-alpha.16 | 2.0.0-alpha.16 | No update needed (sitemap supported) |
+| pinia-plugin-persistedstate | ^4.7.1 | 4.7.x | No update needed |
+
+---
+
+## Integration Points
+
+### How Color Change Ripples Through the App
+
+Changing `primary` in the Vuetify theme affects ALL components that use `color="primary"`:
+- `v-btn` (CONTINUE, BACK buttons)
+- `v-stepper` (step circles, active indicator)
+- `v-progress-circular` (loading spinners)
+- `v-progress-linear` (new transition indicator)
+- `v-chip` (filter chips using primary color)
+- `v-autocomplete` (focused border color)
+- `v-radio` (selected state)
+- `v-alert` (if using primary color)
+
+This is intentional -- the primary color should be the "action" color. The warm gray brand identity shifts to `accent` for decorative uses (app bar background, borders, logo area).
+
+**Components that may need manual `color="accent"` override:**
+- AppBar background (if currently using primary)
+- Logo/branding elements
+- Decorative borders or dividers
+
+### How VitePress Sitemap Interacts with SPA Sitemap
+
+The deployment creates this URL structure:
+```
+/                    -> SPA (index.html)
+/sitemap.xml         -> SPA sitemap (hand-authored)
+/docs/               -> VitePress docs
+/docs/sitemap.xml    -> VitePress sitemap (auto-generated)
+```
+
+Both sitemaps are referenced in `robots.txt`. Google treats each independently.
+
+### How Seed HTML Interacts with Vue Mount
+
+1. Browser loads `index.html` -- user sees static seed content
+2. JavaScript bundles load and execute
+3. `createApp(App).mount('#app')` replaces ALL innerHTML of `#app`
+4. Vue app renders normally
+
+The transition is seamless. There is no flash of unstyled content because:
+- The seed content has minimal styling (just semantic HTML)
+- Vue mounting happens fast (typically <500ms on modern devices)
+- The Vuetify CSS loads before the app mounts
+
+**Edge case:** If JavaScript fails to load entirely, the user sees the seed content plus `<noscript>` message. This is a graceful degradation, not a bug.
 
 ---
 
 ## Sources
 
 ### Official Documentation
-- [ClinGen Downloads](https://search.clinicalgenome.org/kb/downloads)
-- [SheetJS Documentation](https://docs.sheetjs.com/)
-- [loglevel GitHub](https://github.com/pimterry/loglevel)
-- [VueUse useDark](https://vueuse.org/core/usedark/)
-- [Vuetify Theme](https://vuetifyjs.com/en/features/theme/)
-- [Vite Performance Guide](https://vite.dev/guide/performance)
+- [VitePress Sitemap Generation](https://vitepress.dev/guide/sitemap-generation)
+- [Vuetify Theme Configuration](https://vuetifyjs.com/en/features/theme/)
+- [Vuetify Progress Linear](https://vuetifyjs.com/en/components/progress-linear/)
+- [Vue.js Accessibility](https://vuejs.org/guide/best-practices/accessibility.html)
+- [sharp API Documentation](https://sharp.pixelplumbing.com/api-output/)
+- [WCAG 2.2 Contrast Requirements](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html)
 
-### Articles and Guides
-- [Vite 7 Rolldown](https://dev.to/aggarwal_gaurav_1012/vite-70-is-here-rust-powered-speed-smarter-tooling-a-cleaner-build-experience-1k9j)
-- [ESLint 2025 Review](https://eslint.org/blog/2026/01/eslint-2025-year-review/)
-- [Browser Logging Best Practices](https://gajus.medium.com/logging-in-browser-2f053dbe69df)
-- [Vue Mastery Dark Mode](https://www.vuemastery.com/blog/implementing-dark-mode-with-vueuse/)
+### Web Research (Verified)
+- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) -- used for contrast ratio calculations
+- [WebAIM Skip Navigation](https://webaim.org/techniques/skipnav/) -- skip-to-content pattern
+- [Vue SPA SEO Patterns](https://nuxtseo.com/learn-seo/vue/spa) -- seed content approach
+- [WCAG AA Contrast for Buttons](https://www.makethingsaccessible.com/guides/contrast-requirements-for-wcag-2-2-level-aa/)
 
-### npm Packages
-- [xlsx npm (outdated warning)](https://www.npmjs.com/package/xlsx)
-- [file-saver npm](https://www.npmjs.com/package/file-saver)
-- [loglevel npm](https://www.npmjs.com/package/loglevel)
+### npm Registry (Version Verification)
+- [sharp@0.34.5](https://www.npmjs.com/package/sharp)
+- [v-onboarding@2.12.2](https://www.npmjs.com/package/v-onboarding) -- evaluated and rejected
+- [@vue-a11y/skip-to](https://www.npmjs.com/package/@vue-a11y/skip-to) -- evaluated and rejected

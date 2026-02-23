@@ -1,834 +1,718 @@
-# Architecture Research: v1.1
+# Architecture Research: SEO & UX Polish Milestone
 
-**Researched:** 2026-01-19
-**Overall confidence:** HIGH (existing patterns well-established, new patterns use existing libraries)
-
-## Summary
-
-The v1.1 features integrate cleanly with the existing Vue 3/Pinia architecture. The current codebase follows consistent patterns:
-
-1. **Composables** manage reactive state and API calls (`useWizard`, `useGeneSearch`, `useCarrierFrequency`)
-2. **Pinia stores** with `pinia-plugin-persistedstate` for persisted user preferences (`useTemplateStore`)
-3. **Config-driven** approach with JSON files in `src/config/` accessed via typed helpers
-4. **Services/utils** are pure functions without reactive state (`variant-filters.ts`, `frequency-calc.ts`)
-
-The v1.1 features map to these patterns:
-
-| Feature | Pattern | Location |
-|---------|---------|----------|
-| ClinGen caching | New Pinia store with TTL | `src/stores/useClingenStore.ts` |
-| Settings system | Extend existing Pinia store + new store | `src/stores/useSettingsStore.ts` |
-| Browser logging | New composable + component | `src/composables/useLogger.ts` |
-| App shell | Refactor `App.vue` with Vuetify layout | `src/App.vue`, `src/layouts/` |
+**Researched:** 2026-02-23
+**Overall confidence:** HIGH
+**Scope:** How SEO (static HTML, sitemap, structured data) and UX (color system, onboarding, context chips, accessibility) changes integrate with the existing Vue 3/Vuetify 3/VitePress architecture
 
 ---
 
-## 1. ClinGen Data Caching
+## Executive Summary
 
-### Integration Pattern
-
-Create a new Pinia store with TTL-based cache invalidation using the existing `pinia-plugin-persistedstate` plugin. The pattern extends what `useTemplateStore` already does, adding timestamp tracking for monthly expiry.
-
-**Key insight:** ClinGen does not expose a public GraphQL API for gene-disease validity. Data is available only via CSV download from https://search.clinicalgenome.org/kb/downloads. The implementation must either:
-
-1. **Option A (Recommended):** Pre-process CSV to JSON at build time, bundle as static asset
-2. **Option B:** Fetch CSV at runtime, parse in browser (larger payload, slower)
-
-### Data Flow
-
-```
-[Build Time / First Load]
-
-clinicalgenome.org/kb/downloads
-        |
-        v (CSV download)
-  Parse to JSON
-        |
-        v
-useClingenStore (Pinia)
-        |
-        v (persist with timestamp)
-  localStorage
-
-[Subsequent Loads]
-
-localStorage ─────────────────────────────────┐
-        |                                     |
-        v (check timestamp)                   |
-  If expired (>30 days) ─── refetch ──────────┘
-        |
-        v (if valid)
-  Return cached data
-        |
-        v
-useCarrierFrequency (lookup gene)
-        |
-        v
-Display inheritance warning if not AR
-```
-
-### New Components/Files
-
-```
-src/
-├── stores/
-│   └── useClingenStore.ts      # NEW: Cache store with TTL
-├── services/
-│   └── clingen-service.ts      # NEW: CSV fetch + parse logic
-├── types/
-│   └── clingen.ts              # NEW: TypeScript interfaces
-└── config/
-    └── clingen.json            # NEW: Cache settings (TTL, URL)
-```
-
-### Store Implementation Pattern
-
-```typescript
-// src/stores/useClingenStore.ts
-interface ClingenCacheState {
-  geneValidity: Record<string, ClingenGeneValidity>;
-  lastUpdated: number | null;  // Unix timestamp
-  isLoading: boolean;
-  error: string | null;
-}
-
-export const useClingenStore = defineStore('clingen', {
-  state: (): ClingenCacheState => ({
-    geneValidity: {},
-    lastUpdated: null,
-    isLoading: false,
-    error: null,
-  }),
-
-  getters: {
-    isExpired: (state) => {
-      if (!state.lastUpdated) return true;
-      const TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
-      return Date.now() - state.lastUpdated > TTL_MS;
-    },
-
-    getGeneValidity: (state) => (gene: string) => {
-      return state.geneValidity[gene.toUpperCase()] ?? null;
-    },
-  },
-
-  actions: {
-    async refreshCache(force = false) {
-      if (!force && !this.isExpired) return;
-      // Fetch and parse ClinGen CSV
-    },
-
-    lookupGene(gene: string): ClingenGeneValidity | null {
-      // Trigger refresh if expired, return cached data
-    },
-  },
-
-  persist: {
-    key: 'clingen-cache',
-    storage: localStorage,
-  },
-});
-```
-
-### Dependencies
-
-- Depends on: `pinia-plugin-persistedstate` (already installed)
-- No new npm dependencies required
-- ClinGen CSV parsing can use built-in `fetch` + simple CSV parser (or add `papaparse`)
+The SEO and UX improvements integrate with the existing architecture at five distinct layers: the static HTML shell (`index.html`), the Vuetify theme configuration (`main.ts`), the Vue component tree (`App.vue` and children), the VitePress docs configuration (`docs/.vitepress/config.ts`), and the deployment pipeline (`.github/workflows/deploy.yml`). None of these changes require new dependencies or architectural restructuring. The most architecturally significant change is adding static HTML seed content to `index.html`, which leverages a well-documented Vue 3 behavior: `createApp(App).mount('#app')` **replaces all innerHTML** of the container element when the root component has a `<template>` (which `App.vue` does). This means any static content placed inside `<div id="app">` is visible to crawlers and users until Vue initializes, then cleanly replaced by the SPA. The `<noscript>` tag should be placed **outside** `<div id="app">` to persist after Vue mounts.
 
 ---
 
-## 2. Settings System
+## 1. Static HTML Seed Content in index.html
 
-### Integration Pattern
+### 1.1 Vue 3 Mount Behavior (HIGH confidence)
 
-Create a new `useSettingsStore` for application-wide settings (theme, filter defaults). This follows the existing `useTemplateStore` pattern but separates concerns:
+**Key finding verified via official Vue docs:**
 
-- `useTemplateStore`: Clinical text preferences (language, gender style, sections)
-- `useSettingsStore`: Application settings (theme, filter defaults, logging level)
+When `app.mount('#app')` is called and the root component (`App.vue`) has a `<template>` or render function, Vue **replaces** the entire innerHTML of the container element. This is the documented Vue 3 behavior:
 
-### Data Flow
+> "If [the root component] has a template or a render function defined, it will replace any existing DOM nodes inside the container."
+> -- [Vue.js Application API: app.mount()](https://vuejs.org/api/application.html#app-mount)
 
-```
-User interacts with Settings UI
-        |
-        v
-useSettingsStore.setFilterDefaults()
-        |
-        v (auto-persist)
-localStorage
-        |
-        v (reactive)
-Components read via computed getters
-```
+This means:
+- Static HTML placed **inside** `<div id="app">...</div>` is visible to crawlers and users on initial page load
+- When Vue initializes (typically 1-3 seconds), that static content is replaced by the rendered SPA
+- No flash-of-content issues because Vue replaces the entire container at once
+- No hydration mismatches because this is NOT SSR hydration -- it is full replacement
 
-### New Components/Files
+**This is NOT SSR.** The `createSSRApp()` API preserves and hydrates pre-rendered DOM. The existing `createApp()` API simply replaces it. This is the desired behavior for SEO seed content.
+
+### 1.2 Integration Architecture
+
+**File modified:** `index.html` (root)
 
 ```
-src/
-├── stores/
-│   └── useSettingsStore.ts     # NEW: App settings store
-├── components/
-│   └── settings/
-│       ├── SettingsDialog.vue  # NEW: Settings modal
-│       ├── FilterSettings.vue  # NEW: Filter defaults panel
-│       └── ThemeSettings.vue   # NEW: Theme toggle panel
-└── config/
-    └── settings.json           # EXTEND: Add filter default schema
+BEFORE (current):
+<body>
+  <div id="app"></div>                    <!-- empty, 0 bytes of content -->
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+AFTER:
+<body>
+  <div id="app">
+    <!-- SEO seed content: visible until Vue mounts, then replaced -->
+    <header>...</header>
+    <main>
+      <h1>Carrier Frequency Calculator -- gnomAD Population Data</h1>
+      <p>Calculate carrier frequency and recurrence risk...</p>
+      <h2>How It Works</h2>
+      <p>...</p>
+      <h2>Key Features</h2>
+      <ul>...</ul>
+      <nav aria-label="Documentation">
+        <a href="/docs/guide/">Guide</a>
+        <a href="/docs/reference/methodology">Methodology</a>
+        ...
+      </nav>
+    </main>
+  </div>
+  <noscript>
+    <p>This application requires JavaScript...</p>
+  </noscript>
+  <script type="module" src="/src/main.ts"></script>
+</body>
 ```
 
-### Store Implementation Pattern
+### 1.3 Critical Detail: noscript Placement
+
+The `<noscript>` element MUST be placed **outside** `<div id="app">`, not inside it. Reasons:
+
+1. Vue replaces all innerHTML of `<div id="app">` on mount -- including `<noscript>` tags inside it
+2. Vue templates cannot contain `<noscript>` elements (compilation error)
+3. Browsers with JS disabled need the noscript content to persist permanently
+
+Place `<noscript>` between `</div>` and `<script>` in the body.
+
+### 1.4 Build Output Consideration
+
+**Important:** The current Vite build strips `<head>` meta tags from `dist/index.html` (observed in the current build output). This is a Vite configuration issue. The build output at `dist/index.html` currently shows:
+
+```html
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <!-- meta description, OG tags, structured data are ALL MISSING -->
+  <title>gnomAD Carrier Frequency Calculator</title>
+  <script type="module" crossorigin src="/assets/index-xxx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-xxx.css">
+</head>
+<body>
+  <div id="app"></div>  <!-- seed content also missing -->
+</body>
+```
+
+This needs investigation. Vite should preserve the HTML in `index.html` and only inject script/style tags. The seed content inside `<div id="app">` and all `<head>` content should be preserved in the build output. If Vite is configured correctly (which it appears to be), the issue may be a stale build artifact. Verify with a fresh `bun run build`.
+
+### 1.5 What the Seed Content Should NOT Include
+
+- No Vue directives (`v-if`, `v-model`, etc.) -- this is plain HTML, not a Vue template
+- No dynamic data -- keep it static and generic (no specific gene names)
+- No Vuetify classes -- those require Vuetify CSS which loads with JS
+- No interactive elements -- buttons, forms, etc. won't work before Vue mounts
+- Keep it under ~2KB to avoid layout shift when Vue replaces it
+
+### 1.6 Build Order Dependency
+
+This change has **zero dependencies** on any other change. It can be done first, independently, and verified immediately by viewing the page source.
+
+---
+
+## 2. Vuetify Primary Color Change
+
+### 2.1 Current Theme Configuration
+
+**File:** `src/main.ts` (lines 26-50)
 
 ```typescript
-// src/stores/useSettingsStore.ts
-interface SettingsState {
-  // Theme
-  theme: 'light' | 'dark' | 'system';
-
-  // Filter defaults
-  filterDefaults: {
-    includeLofHC: boolean;
-    includeMissense: boolean;
-    includeClinVarPathogenic: boolean;
-    includeClinVarLikelyPathogenic: boolean;
-    minClinVarStars: number;
-  };
-
-  // Logging
-  logLevel: 'debug' | 'info' | 'warn' | 'error';
-  logRetentionDays: number;
-}
-
-export const useSettingsStore = defineStore('settings', {
-  state: (): SettingsState => ({
-    theme: 'system',
-    filterDefaults: {
-      includeLofHC: true,
-      includeMissense: false,
-      includeClinVarPathogenic: true,
-      includeClinVarLikelyPathogenic: true,
-      minClinVarStars: 1,
-    },
-    logLevel: 'warn',
-    logRetentionDays: 7,
-  }),
-
-  actions: {
-    setTheme(theme: SettingsState['theme']) {
-      this.theme = theme;
-      this.applyTheme();
-    },
-
-    applyTheme() {
-      // Update Vuetify theme via useTheme()
-    },
-  },
-
-  persist: {
-    key: 'app-settings',
-    storage: localStorage,
-  },
-});
-```
-
-### Theme Integration with Vuetify
-
-```typescript
-// In component or App.vue setup
-import { useTheme } from 'vuetify';
-import { useSettingsStore } from '@/stores/useSettingsStore';
-
-const theme = useTheme();
-const settings = useSettingsStore();
-
-// Apply stored theme on load
-watch(() => settings.theme, (newTheme) => {
-  if (newTheme === 'system') {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    theme.global.name.value = prefersDark ? 'dark' : 'light';
-  } else {
-    theme.global.name.value = newTheme;
+const vuetify = createVuetify({
+  components,
+  directives,
+  theme: {
+    defaultTheme: 'light',
+    themes: {
+      light: {
+        dark: false,
+        colors: {
+          primary: '#a09588',     // warm gray -- looks disabled
+          secondary: '#424242',
+          surface: '#FFFFFF',
+          background: '#FAFAFA',
+        }
+      },
+      dark: {
+        dark: true,
+        colors: {
+          primary: '#BDBDBD',
+          secondary: '#757575',
+        }
+      }
+    }
   }
-}, { immediate: true });
+})
 ```
 
-### Dependencies
+### 2.2 Impact Analysis
 
-- Vuetify `useTheme()` composable (already available)
-- No new npm dependencies
+The `primary` color is used throughout the codebase:
 
----
+| Component | Usage | Impact of Color Change |
+|-----------|-------|----------------------|
+| `StepGene.vue` | `<v-btn color="primary">Continue</v-btn>` | CTA becomes more visible |
+| `StepStatus.vue` | `<v-btn color="primary">Continue</v-btn>` | Same |
+| `StepFrequency.vue` | `<v-btn color="primary">Continue</v-btn>` + `<v-tabs bg-color="primary">` | CTAs + tab bar change |
+| `StepResults.vue` | Various chip colors, share button | Accent chips change |
+| `DisclaimerBanner.vue` | `<v-btn color="primary">I Understand</v-btn>` | Disclaimer CTA |
+| `WizardStepper.vue` | Stepper item active color (implicit Vuetify default) | Active step indicator |
+| `App.vue` | PWA update snackbar `color="primary"` | Snackbar background |
+| `vite.config.ts` | PWA manifest `theme_color: '#a09588'` | PWA chrome color |
 
-## 3. Browser-Based Logging
+### 2.3 Recommended Approach
 
-### Integration Pattern
+**Do NOT change `primary` directly.** Instead, keep the warm gray as the brand identity and introduce a separate **action color** for CTAs. However, this would require changing every `color="primary"` to a custom color name throughout the codebase, which is high-effort for low additional benefit.
 
-Create a logging composable that:
-1. Captures log events with timestamps and context
-2. Stores logs in a circular buffer (memory) with optional persistence
-3. Provides a LogViewer component for debugging
+**Simpler approach: Change `primary` to the new action color.** The warm gray `#a09588` is currently only used via `color="primary"`. There is no separate "brand color" CSS variable usage. Changing `primary` to a more saturated color affects all usages at once, which is the desired outcome.
 
-This is NOT a Vue plugin approach (like `vue-logger-plugin`) because the existing codebase uses composables consistently. A composable fits the architecture better.
-
-### Data Flow
-
-```
-Application code
-        |
-        v
-useLogger().log('info', 'message', { context })
-        |
-        v
-Log buffer (reactive ref, max N entries)
-        |
-        v (optional persist)
-localStorage (pruned to retention period)
-        |
-        v
-LogViewer component displays entries
-```
-
-### New Components/Files
-
-```
-src/
-├── composables/
-│   └── useLogger.ts            # NEW: Logging composable
-├── components/
-│   └── debug/
-│       └── LogViewer.vue       # NEW: Log display component
-└── types/
-    └── logger.ts               # NEW: Log entry types
-```
-
-### Composable Implementation Pattern
+**Recommended change in `src/main.ts`:**
 
 ```typescript
-// src/composables/useLogger.ts
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-
-interface LogEntry {
-  timestamp: number;
-  level: LogLevel;
-  message: string;
-  context?: Record<string, unknown>;
-  source?: string;
-}
-
-const LOG_BUFFER_SIZE = 500;
-const logs = ref<LogEntry[]>([]);
-
-export function useLogger(source?: string) {
-  const settings = useSettingsStore();
-
-  const shouldLog = (level: LogLevel): boolean => {
-    const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-    return levels.indexOf(level) >= levels.indexOf(settings.logLevel);
-  };
-
-  const log = (level: LogLevel, message: string, context?: Record<string, unknown>) => {
-    if (!shouldLog(level)) return;
-
-    const entry: LogEntry = {
-      timestamp: Date.now(),
-      level,
-      message,
-      context,
-      source,
-    };
-
-    logs.value.push(entry);
-    if (logs.value.length > LOG_BUFFER_SIZE) {
-      logs.value.shift();
-    }
-
-    // Also log to console in dev
-    if (import.meta.env.DEV) {
-      console[level](message, context);
-    }
-  };
-
-  return {
-    logs: readonly(logs),
-    log,
-    debug: (msg: string, ctx?: Record<string, unknown>) => log('debug', msg, ctx),
-    info: (msg: string, ctx?: Record<string, unknown>) => log('info', msg, ctx),
-    warn: (msg: string, ctx?: Record<string, unknown>) => log('warn', msg, ctx),
-    error: (msg: string, ctx?: Record<string, unknown>) => log('error', msg, ctx),
-    clear: () => { logs.value = []; },
-  };
+light: {
+  dark: false,
+  colors: {
+    primary: '#2E7D32',       // green-800: medical/clinical feel, good contrast
+    secondary: '#a09588',     // move warm gray to secondary (preserve brand)
+    surface: '#FFFFFF',
+    background: '#FAFAFA',
+  }
+},
+dark: {
+  dark: true,
+  colors: {
+    primary: '#66BB6A',       // green-400: visible on dark backgrounds
+    secondary: '#BDBDBD',
+  }
 }
 ```
 
-### LogViewer Component Pattern
+**Also update:** `vite.config.ts` PWA manifest `theme_color` to match the new primary.
 
-```vue
-<!-- src/components/debug/LogViewer.vue -->
-<template>
-  <v-dialog v-model="isOpen" max-width="800">
-    <v-card>
-      <v-card-title>
-        Application Logs
-        <v-spacer />
-        <v-btn icon @click="logger.clear()">
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </v-card-title>
-      <v-card-text>
-        <v-virtual-scroll :items="logs" height="400" item-height="48">
-          <template #default="{ item }">
-            <div class="log-entry" :class="item.level">
-              <span class="timestamp">{{ formatTime(item.timestamp) }}</span>
-              <span class="level">{{ item.level }}</span>
-              <span class="message">{{ item.message }}</span>
-            </div>
-          </template>
-        </v-virtual-scroll>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
-</template>
-```
+### 2.4 Ripple Effects
 
-### Dependencies
+Changing `primary` in Vuetify automatically updates:
+- All `color="primary"` component props
+- The `rgb(var(--v-theme-primary))` CSS custom property used in `AppBar.vue` hover style
+- Stepper active step color (Vuetify uses primary by default)
+- Tab active indicator color
+- Progress circular color (when `color="primary"`)
+- Any implicit Vuetify defaults that reference the primary theme color
 
-- Vuetify `v-virtual-scroll` for performance with many log entries
-- No new npm dependencies
+**No component code changes needed** -- only the theme definition in `main.ts` and the PWA manifest in `vite.config.ts`.
+
+### 2.5 Build Order Dependency
+
+This change has **zero dependencies** on other changes. It is a single-file edit (`main.ts`) plus one line in `vite.config.ts`. Can be done independently and verified immediately in dev server.
 
 ---
 
-## 4. App Shell with Navigation
+## 3. Onboarding Component
 
-### Integration Pattern
+### 3.1 Component Tree Integration Point
 
-Refactor `App.vue` from a simple single-component layout to a proper Vuetify app shell with:
-
-- `v-app-bar`: Logo, title, settings gear, theme toggle
-- `v-navigation-drawer`: Navigation links (Calculator, Help, About)
-- `v-main`: Current wizard content
-
-This is a structural change that wraps the existing `WizardStepper` component.
-
-### Data Flow
+The onboarding component fits into the existing component tree at the `App.vue` level, between the `DisclaimerBanner` and the `WizardStepper`:
 
 ```
-App.vue (shell)
-    |
-    ├── v-app-bar
-    │   ├── Logo
-    │   ├── Title
-    │   ├── Theme toggle (reads/writes useSettingsStore)
-    │   └── Settings gear (opens SettingsDialog)
-    |
-    ├── v-navigation-drawer
-    │   ├── Calculator (current wizard)
-    │   ├── Help/FAQ
-    │   └── About
-    |
-    └── v-main
-        └── <router-view> or WizardStepper
+App.vue
+  |-- VueAnnouncer (sr-only)
+  |-- DisclaimerBanner       <-- shows first (persistent dialog until acknowledged)
+  |-- AppBar
+  |-- v-main
+  |    |-- v-container
+  |         |-- h1 title
+  |         |-- p subtitle
+  |         |-- OnboardingCard  <-- NEW: shows after disclaimer, before wizard
+  |         |-- WizardStepper
+  |-- AppFooter
+  |-- SettingsDialog
+  |-- LogViewerPanel
+  |-- HistoryDrawer
 ```
 
-### New Components/Files
+### 3.2 State Management
 
-```
-src/
-├── App.vue                     # REFACTOR: Add shell structure
-├── components/
-│   ├── AppBar.vue              # NEW: Top bar with logo, actions
-│   ├── AppDrawer.vue           # NEW: Navigation drawer
-│   └── settings/
-│       └── SettingsDialog.vue  # NEW: Settings modal
-└── assets/
-    ├── logo.svg                # NEW: App logo
-    └── favicon.ico             # NEW: Favicon
-```
-
-### App.vue Refactored Structure
-
-```vue
-<!-- src/App.vue -->
-<template>
-  <v-app>
-    <AppBar @toggle-drawer="drawer = !drawer" @open-settings="settingsOpen = true" />
-
-    <AppDrawer v-model="drawer" />
-
-    <v-main>
-      <v-container max-width="900">
-        <!-- If using vue-router -->
-        <router-view />
-        <!-- Or keep WizardStepper directly for now -->
-        <WizardStepper />
-      </v-container>
-    </v-main>
-
-    <SettingsDialog v-model="settingsOpen" />
-  </v-app>
-</template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-import AppBar from '@/components/AppBar.vue';
-import AppDrawer from '@/components/AppDrawer.vue';
-import SettingsDialog from '@/components/settings/SettingsDialog.vue';
-import WizardStepper from '@/components/wizard/WizardStepper.vue';
-
-const drawer = ref(false);
-const settingsOpen = ref(false);
-</script>
-```
-
-### AppBar Component Pattern
-
-```vue
-<!-- src/components/AppBar.vue -->
-<template>
-  <v-app-bar color="primary" density="comfortable">
-    <v-app-bar-nav-icon @click="$emit('toggle-drawer')" />
-
-    <v-img src="@/assets/logo.svg" max-height="32" max-width="32" class="ml-2" />
-
-    <v-app-bar-title>gnomAD Carrier Frequency</v-app-bar-title>
-
-    <v-spacer />
-
-    <v-btn icon @click="toggleTheme">
-      <v-icon>{{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
-    </v-btn>
-
-    <v-btn icon @click="$emit('open-settings')">
-      <v-icon>mdi-cog</v-icon>
-    </v-btn>
-  </v-app-bar>
-</template>
-
-<script setup lang="ts">
-import { computed } from 'vue';
-import { useTheme } from 'vuetify';
-import { useSettingsStore } from '@/stores/useSettingsStore';
-
-defineEmits(['toggle-drawer', 'open-settings']);
-
-const theme = useTheme();
-const settings = useSettingsStore();
-
-const isDark = computed(() => theme.global.name.value === 'dark');
-
-const toggleTheme = () => {
-  settings.setTheme(isDark.value ? 'light' : 'dark');
-};
-</script>
-```
-
-### Router Consideration
-
-The current app has no router. For v1.1, consider adding `vue-router` if Help/About pages are desired. However, a simpler approach:
-
-- Keep single-page architecture
-- Use tabs or conditional rendering for Help/About content
-- Avoid router complexity for a calculator tool
-
-**Recommendation:** Defer `vue-router` unless multi-page navigation is truly needed.
-
-### Dependencies
-
-- No new npm dependencies (Vuetify layout components already available)
-- Optional: `vue-router` if multi-page navigation desired
-
----
-
-## 5. Template Editor
-
-### Integration Pattern
-
-Extend the existing `useTemplateStore` which already has `customSections` support. Add a UI component for editing templates.
-
-### Data Flow
-
-```
-useTemplateStore (existing)
-    |
-    ├── customSections: Record<string, string>
-    ├── setCustomSection(key, template)
-    └── resetCustomSection(key)
-        |
-        v
-TemplateEditor.vue (new)
-    |
-    ├── Shows default template text
-    ├── Allows editing with preview
-    └── Saves to customSections
-```
-
-### New Components/Files
-
-```
-src/
-└── components/
-    └── settings/
-        └── TemplateEditor.vue  # NEW: Template editing UI
-```
-
-### Component Pattern
-
-```vue
-<!-- src/components/settings/TemplateEditor.vue -->
-<template>
-  <v-card>
-    <v-card-title>Edit Templates</v-card-title>
-    <v-card-text>
-      <v-select
-        v-model="selectedPerspective"
-        :items="perspectives"
-        label="Perspective"
-      />
-      <v-select
-        v-model="selectedSection"
-        :items="sections"
-        label="Section"
-      />
-      <v-textarea
-        v-model="editedTemplate"
-        label="Template"
-        rows="6"
-        :hint="'Variables: {{gene}}, {{carrierFrequency}}, etc.'"
-      />
-      <v-card variant="tonal" class="mt-4">
-        <v-card-subtitle>Preview</v-card-subtitle>
-        <v-card-text>{{ renderedPreview }}</v-card-text>
-      </v-card>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn @click="resetToDefault">Reset to Default</v-btn>
-      <v-spacer />
-      <v-btn color="primary" @click="save">Save</v-btn>
-    </v-card-actions>
-  </v-card>
-</template>
-```
-
-### Dependencies
-
-- Uses existing `useTemplateStore` and `template-renderer.ts`
-- No new npm dependencies
-
----
-
-## 6. Filter Configuration
-
-### Integration Pattern
-
-The current `variant-filters.ts` has hardcoded filter logic. Refactor to:
-
-1. Make filter criteria configurable via `useSettingsStore.filterDefaults`
-2. Allow per-calculation override in the wizard UI
-3. Keep pure functions but accept filter config as parameter
-
-### Data Flow
-
-```
-useSettingsStore.filterDefaults (defaults)
-        |
-        v
-StepFrequency.vue (optional override UI)
-        |
-        v
-useCarrierFrequency (passes config to filter)
-        |
-        v
-filterPathogenicVariants(variants, clinvar, filterConfig)
-```
-
-### Modified Files
-
-```
-src/
-├── stores/
-│   └── useSettingsStore.ts     # Has filterDefaults
-├── utils/
-│   └── variant-filters.ts      # MODIFY: Accept FilterConfig parameter
-├── types/
-│   └── filter.ts               # NEW: FilterConfig type
-├── composables/
-│   └── useCarrierFrequency.ts  # MODIFY: Pass filter config
-└── components/
-    └── wizard/
-        └── StepFrequency.vue   # MODIFY: Add filter override UI
-```
-
-### Filter Config Type
+The onboarding state should be managed in `useAppStore` (Pinia, persisted to localStorage), alongside the existing `disclaimerAcknowledged` state:
 
 ```typescript
-// src/types/filter.ts
-export interface FilterConfig {
-  includeLofHC: boolean;
-  includeMissense: boolean;
-  includeClinVarPathogenic: boolean;
-  includeClinVarLikelyPathogenic: boolean;
-  minClinVarStars: number;
+// src/stores/useAppStore.ts
+interface AppStoreState {
+  disclaimerAcknowledged: boolean;
+  disclaimerAcknowledgedAt: number | null;
+  onboardingDismissed: boolean;      // NEW
+  onboardingSeen: boolean;           // NEW: track if ever shown
 }
 ```
 
-### Modified Filter Function
+### 3.3 Display Logic
+
+```
+Show onboarding when:
+  1. disclaimerAcknowledged === true  (disclaimer must be dismissed first)
+  2. onboardingDismissed === false    (not yet dismissed by user)
+  3. state.gene === null              (wizard is at initial state)
+```
+
+This prevents the onboarding from overlapping with the disclaimer modal and ensures it only appears for first-time users who haven't started using the tool yet.
+
+### 3.4 Component Design
+
+**New file:** `src/components/OnboardingCard.vue`
+
+A simple `v-card` (not a dialog/overlay) that appears inline above the wizard, containing:
+- Brief description of what the tool does (2-3 sentences)
+- "Try with CFTR" quick-start button (pre-populates gene search)
+- "Dismiss" text button to hide permanently
+
+The "Try with CFTR" action would:
+1. Set `state.gene` to a pre-configured CFTR GeneSearchResult object
+2. Trigger the gene search flow (same as selecting from autocomplete)
+3. Dismiss the onboarding card
+
+### 3.5 Build Order Dependency
+
+Depends on:
+- Nothing technically, but should be done AFTER the primary color change (so the CTA button has the new visible color)
+- Uses existing `useAppStore` (extend state) and `useWizard` (set gene state)
+
+---
+
+## 4. VitePress Sitemap and Cross-Linking
+
+### 4.1 Current Deployment Architecture
+
+```
+GitHub Actions deploy.yml:
+  1. bun run build          --> dist/           (Vite SPA)
+  2. bun run docs:build     --> docs/.vitepress/dist/  (VitePress static)
+  3. cp -r docs/.vitepress/dist dist/docs      (merge into single artifact)
+  4. Upload dist/ to GitHub Pages
+
+Result on gnomad-carrier-frequency.kidney-genetics.org:
+  /              --> Vite SPA (index.html + JS/CSS)
+  /docs/         --> VitePress static site
+  /docs/guide/   --> VitePress guide pages
+  /docs/about/   --> VitePress about pages
+  etc.
+```
+
+### 4.2 Sitemap Strategy
+
+There are TWO sitemaps needed:
+
+**A. App sitemap:** `public/sitemap.xml` (static, hand-authored)
+- Covers `/` (the SPA root)
+- Listed in `public/robots.txt`
+- Deployed to `dist/sitemap.xml` --> `https://domain/sitemap.xml`
+
+**B. VitePress sitemap:** Auto-generated by VitePress
+- Covers all `/docs/*` pages
+- Configured in `docs/.vitepress/config.ts`
+- Generated during `bun run docs:build` to `docs/.vitepress/dist/sitemap.xml`
+- Deployed to `dist/docs/sitemap.xml` --> `https://domain/docs/sitemap.xml`
+
+### 4.3 VitePress Sitemap Configuration
+
+**File modified:** `docs/.vitepress/config.ts`
 
 ```typescript
-// src/utils/variant-filters.ts
-export function filterPathogenicVariants(
-  variants: GnomadVariant[],
-  clinvarVariants: ClinVarVariant[],
-  config: FilterConfig = defaultFilterConfig
-): GnomadVariant[] {
-  return variants.filter((v) => shouldIncludeVariant(v, clinvarVariants, config));
+export default defineConfig({
+  title: 'gnomAD Carrier Frequency Docs',
+  description: '...',
+  base: '/docs/',
+
+  sitemap: {
+    hostname: 'https://gnomad-carrier-frequency.kidney-genetics.org/docs/'
+  },
+
+  // ... rest of config
+})
+```
+
+**Critical detail from VitePress issue #3863:** When using `base: '/docs/'`, the hostname MUST include the base path with trailing slash: `hostname: 'https://domain/docs/'`. VitePress does NOT automatically append the base to sitemap URLs.
+
+### 4.4 Unified Sitemap Index
+
+To link both sitemaps, the `robots.txt` should reference both:
+
+```
+User-agent: *
+Allow: /
+
+Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/sitemap.xml
+Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/docs/sitemap.xml
+```
+
+Alternatively, create a sitemap index file. But dual-sitemap reference in `robots.txt` is simpler and equally effective for Google.
+
+### 4.5 Cross-Link Architecture
+
+**App --> Docs links (3 integration points):**
+
+1. **Static HTML seed content in `index.html`:** Include `<nav>` with links to key docs pages. These exist in the raw HTML so Google discovers them before JS renders. Replaced when Vue mounts (but Google already indexed them).
+
+2. **AppFooter.vue docs icon:** Add a documentation icon button to the existing footer icon bar, alongside GitHub, disclaimer, methodology, FAQ, and about icons. Pattern matches existing footer structure exactly:
+   ```vue
+   <v-tooltip text="Documentation" location="top">
+     <template #activator="{ props }">
+       <v-btn v-bind="props" icon variant="text" size="small"
+              href="/docs/" aria-label="Documentation">
+         <v-icon size="small">mdi-book-open-variant</v-icon>
+       </v-btn>
+     </template>
+   </v-tooltip>
+   ```
+
+3. **Structured data in `index.html`:** Add `sameAs` or `relatedLink` properties pointing to docs pages in the JSON-LD.
+
+**Docs --> App links (already partially exist):**
+- VitePress nav bar has "Open Calculator" link (already configured)
+- Add contextual "Open Calculator" CTAs within docs page content
+
+### 4.6 Build Order Dependency
+
+- `robots.txt` update: independent, do first
+- `sitemap.xml` creation: independent, do alongside robots.txt
+- VitePress config update: independent, verify with `bun run docs:build`
+- Footer docs link: independent of other changes
+- All can be done in parallel
+
+---
+
+## 5. Gene Context Chip in Wizard Steps
+
+### 5.1 Integration Point
+
+The context chip shows the selected gene and gnomAD version on Steps 2-4. It fits in the `WizardStepper.vue` component, between the stepper header and the stepper window:
+
+```vue
+<!-- WizardStepper.vue -->
+<v-stepper ...>
+  <v-stepper-header>
+    <!-- existing step items -->
+  </v-stepper-header>
+
+  <!-- NEW: Gene context chip, shown after gene selection (steps 2-4) -->
+  <div v-if="state.gene && state.currentStep > 1" class="px-4 pt-2">
+    <v-chip size="small" variant="tonal" color="primary" prepend-icon="mdi-dna">
+      {{ state.gene.symbol }} | gnomAD {{ gnomadVersionLabel }}
+    </v-chip>
+  </div>
+
+  <v-stepper-window>
+    <!-- existing step content -->
+  </v-stepper-window>
+</v-stepper>
+```
+
+### 5.2 Data Flow
+
+The gene symbol is already available via `state.gene.symbol` from `useWizard()`. The gnomAD version needs to come from `useGnomadVersion()`:
+
+```typescript
+// Already imported in WizardStepper.vue:
+const { state } = useWizard();
+
+// Need to add:
+import { useGnomadVersion } from '@/api';
+const { versionLabel } = useGnomadVersion();
+```
+
+Check that `useGnomadVersion` exposes a display-friendly label. If it only exposes a raw version string, that is sufficient.
+
+### 5.3 Accessibility
+
+Add `aria-label` to the chip: `aria-label="Currently analyzing gene ${state.gene.symbol} using gnomAD version ${versionLabel}"`.
+
+### 5.4 Build Order Dependency
+
+- Depends on: nothing (uses existing composables and state)
+- Should be done AFTER primary color change (so the chip uses the new visible primary color)
+
+---
+
+## 6. Accessibility Improvements
+
+### 6.1 Skip-to-Content Link
+
+**Integration point:** First element inside `<v-app>` in `App.vue`, before `VueAnnouncer`:
+
+```vue
+<v-app>
+  <!-- Skip to main content link (a11y) -->
+  <a href="#main-content" class="skip-link">
+    Skip to main content
+  </a>
+  <VueAnnouncer class="sr-only" />
+  <DisclaimerBanner />
+  <AppBar ... />
+  <v-main>
+    <v-container id="main-content" max-width="900">
+      ...
+    </v-container>
+  </v-main>
+  ...
+</v-app>
+```
+
+The `id="main-content"` target goes on the `v-container` inside `v-main`. CSS for the skip link:
+
+```css
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: rgb(var(--v-theme-primary));
+  color: white;
+  padding: 8px 16px;
+  z-index: 100;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
 }
 ```
 
----
+This is a standard pattern. The link is visually hidden until focused via Tab, then slides into view.
 
-## Suggested Build Order
+### 6.2 Footer Text Labels
 
-Based on dependencies between features:
+**File modified:** `AppFooter.vue`
 
-### Phase 1: Foundation (Settings + Theme)
+Current footer buttons are icon-only with tooltips. On desktop (`d-none d-sm-flex`), add text labels below or beside the icons. Two approaches:
 
-**Build first because other features depend on settings store.**
+**Approach A: Add text to existing buttons (minimal change)**
+Change icon buttons to text buttons with icons on desktop:
+```vue
+<v-btn v-bind="props" variant="text" size="small"
+       :icon="xs" :prepend-icon="xs ? undefined : 'mdi-database'">
+  <template v-if="!xs">Data Sources</template>
+  <v-icon v-else size="small">mdi-database</v-icon>
+</v-btn>
+```
 
-1. `useSettingsStore.ts` - New store with theme + filter defaults
-2. `ThemeSettings.vue` - Theme toggle component
-3. Refactor `main.ts` - Apply stored theme on load
-4. Update `App.vue` - Add basic app bar with theme toggle
+**Approach B: Keep icons, add aria improvements only**
+Keep the visual design but ensure every button has comprehensive `aria-label` and `title` attributes (most already do).
 
-**Deliverable:** Working theme toggle, settings persistence
+Approach A is recommended by the UX audit. It makes footer navigation self-documenting without requiring hover. The existing mobile overflow menu already has text labels, so this brings parity.
 
-### Phase 2: App Shell
+### 6.3 Build Order Dependency
 
-**Build second because it provides the UI container for other features.**
-
-1. `AppBar.vue` - Full app bar with logo, actions
-2. `AppDrawer.vue` - Navigation drawer (even if minimal)
-3. `SettingsDialog.vue` - Modal for settings
-4. Refactor `App.vue` - Full shell structure
-5. Add logo/favicon assets
-
-**Deliverable:** Complete app shell with navigation and settings access
-
-### Phase 3: Filter Configuration
-
-**Build third because it's isolated and improves core functionality.**
-
-1. `FilterConfig` type in `types/filter.ts`
-2. Refactor `variant-filters.ts` to accept config
-3. `FilterSettings.vue` - Settings panel for defaults
-4. Update `StepFrequency.vue` - Optional override UI
-5. Wire through `useCarrierFrequency`
-
-**Deliverable:** Configurable variant filtering
-
-### Phase 4: ClinGen Integration
-
-**Build fourth because it's independent and adds clinical value.**
-
-1. `useClingenStore.ts` - Cache store with TTL
-2. `clingen-service.ts` - CSV fetch/parse (or static JSON)
-3. Type definitions in `types/clingen.ts`
-4. Inheritance warning UI in `StepGene.vue` or `StepResults.vue`
-
-**Deliverable:** ClinGen gene validity lookup with inheritance warnings
-
-### Phase 5: Browser Logging
-
-**Build fifth because it supports debugging of all previous features.**
-
-1. `useLogger.ts` composable
-2. `LogViewer.vue` component
-3. Add logging to key composables (useGeneSearch, useCarrierFrequency)
-4. Settings integration for log level
-
-**Deliverable:** In-app log viewer for debugging
-
-### Phase 6: Template Editor
-
-**Build last because it extends existing functionality.**
-
-1. `TemplateEditor.vue` component
-2. Integrate into SettingsDialog
-3. Preview functionality
-
-**Deliverable:** User-editable clinical text templates
+- Skip-to-content: independent, no dependencies
+- Footer labels: independent, no dependencies
+- Both can be done in parallel with other changes
 
 ---
 
-## Component Boundaries Summary
+## 7. OG Image and Meta Tag Fixes
+
+### 7.1 OG Image Format
+
+**Current:** `./og-image.svg` (relative path, SVG format)
+**Required:** Absolute URL, PNG format (1200x630px)
+
+SVG is not rendered by Facebook, LinkedIn, Twitter/X, Slack, or Discord for Open Graph previews.
+
+**Files to modify:**
+- `index.html`: Update `<meta property="og:image">` and `<meta name="twitter:image">` to absolute PNG URL
+- `public/`: Generate or add `og-image.png` (1200x630px)
+
+The project already has `sharp` as a dev dependency, so an SVG-to-PNG conversion can be scripted.
+
+### 7.2 Canonical URL
+
+Add to `index.html` `<head>`:
+```html
+<link rel="canonical" href="https://gnomad-carrier-frequency.kidney-genetics.org/" />
+```
+
+### 7.3 Robots Meta
+
+Add to `index.html` `<head>`:
+```html
+<meta name="robots" content="index, follow" />
+```
+
+### 7.4 Build Order Dependency
+
+Independent. Can be done as part of the initial `index.html` modifications.
+
+---
+
+## 8. Structured Data Updates
+
+### 8.1 Current State
+
+`index.html` already has a `<script type="application/ld+json">` block with:
+- `@graph` array containing `WebApplication` and `FAQPage` schemas
+- WebApplication has `featureList`, `author`, `offers` (free), `applicationCategory`
+- FAQPage has 6 questions with answers
+
+### 8.2 Recommended Updates
+
+1. **Update `softwareVersion`** from `"1.2.0"` to match `package.json` version (`"1.3.0"`)
+2. **Add `dateModified`** with current date
+3. **Add `screenshot`** property pointing to the new PNG OG image
+4. **Optimize title in WebApplication `name`** to lead with target keyword: `"Carrier Frequency Calculator"` with `"gnomAD Carrier Frequency Calculator"` as `alternateName`
+5. **Add `sameAs`** array linking to the docs site and GitHub
+
+These changes are all in `index.html` and have no code dependencies.
+
+---
+
+## 9. Integration Map: Files Modified vs Created
+
+### Files MODIFIED (existing)
+
+| File | Changes | Dependencies |
+|------|---------|-------------|
+| `index.html` | Seed HTML content in `<div id="app">`, noscript outside, canonical URL, robots meta, OG image fix, structured data updates, title tag optimization, meta description optimization | None |
+| `src/main.ts` | Change `primary` color in both light and dark themes, move warm gray to `secondary` | None |
+| `vite.config.ts` | Update PWA manifest `theme_color` to match new primary | After main.ts |
+| `src/App.vue` | Add skip-to-content link, add `id="main-content"` to container, add OnboardingCard conditionally | After OnboardingCard created |
+| `src/stores/useAppStore.ts` | Add `onboardingDismissed` and `onboardingSeen` state properties | None |
+| `src/components/AppFooter.vue` | Add docs icon button, optionally add text labels to icon buttons | None |
+| `src/components/wizard/WizardStepper.vue` | Add gene context chip between stepper header and window | None |
+| `public/robots.txt` | Add sitemap references | None |
+| `docs/.vitepress/config.ts` | Add `sitemap` configuration with hostname including base path | None |
+
+### Files CREATED (new)
+
+| File | Purpose | Dependencies |
+|------|---------|-------------|
+| `src/components/OnboardingCard.vue` | First-time user welcome card with "Try CFTR" button | useAppStore, useWizard |
+| `public/sitemap.xml` | App sitemap with root URL + doc page URLs | None |
+| `public/og-image.png` | PNG version of OG image (1200x630) | sharp (already installed as devDep) |
+
+### Files NOT modified
+
+| File | Why |
+|------|-----|
+| `src/composables/*` | No new composables needed -- existing useWizard, useAppTheme, useGnomadVersion suffice |
+| `src/api/*` | No API changes |
+| `src/config/*` | No new config files |
+| `src/types/*` | Extend AppStoreState in-place; no new type files |
+| Wizard step components | Context chip lives in WizardStepper parent, not in individual steps |
+
+---
+
+## 10. Suggested Build Order
+
+Based on dependency analysis:
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│ App.vue (Shell)                                                 │
-│   ├── AppBar.vue                                                │
-│   │     └── reads: useSettingsStore (theme)                     │
-│   │     └── emits: toggle-drawer, open-settings                 │
-│   ├── AppDrawer.vue                                             │
-│   │     └── Navigation links                                    │
-│   ├── SettingsDialog.vue                                        │
-│   │     ├── ThemeSettings.vue → useSettingsStore                │
-│   │     ├── FilterSettings.vue → useSettingsStore               │
-│   │     └── TemplateEditor.vue → useTemplateStore               │
-│   └── v-main                                                    │
-│         └── WizardStepper.vue (existing)                        │
-│               └── reads: useSettingsStore.filterDefaults        │
-│               └── queries: useClingenStore for warnings         │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│ Stores                                                          │
-│   ├── useSettingsStore (NEW)                                    │
-│   │     ├── theme: 'light' | 'dark' | 'system'                  │
-│   │     ├── filterDefaults: FilterConfig                        │
-│   │     └── logLevel, logRetentionDays                          │
-│   ├── useTemplateStore (EXISTING)                               │
-│   │     ├── language, genderStyle, patientSex                   │
-│   │     ├── enabledSections                                     │
-│   │     └── customSections                                      │
-│   └── useClingenStore (NEW)                                     │
-│         ├── geneValidity: Record<string, ClingenGeneValidity>   │
-│         ├── lastUpdated: timestamp                              │
-│         └── isExpired, refreshCache(), lookupGene()             │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│ Composables                                                     │
-│   ├── useLogger (NEW)                                           │
-│   │     └── log(), debug(), info(), warn(), error(), clear()    │
-│   ├── useWizard (EXISTING)                                      │
-│   ├── useGeneSearch (EXISTING, add logging)                     │
-│   ├── useCarrierFrequency (MODIFY, accept FilterConfig)         │
-│   └── useTextGenerator (EXISTING)                               │
-└─────────────────────────────────────────────────────────────────┘
+Phase 1: Independent Foundation (can all be done in parallel)
+  |
+  |-- [A] index.html: seed content, meta tags, canonical, robots meta, OG image fix
+  |-- [B] public/robots.txt: add sitemap references
+  |-- [C] public/sitemap.xml: create static app sitemap
+  |-- [D] docs/.vitepress/config.ts: add sitemap config
+  |-- [E] public/og-image.png: generate PNG from SVG
+  |
+Phase 2: Theme (independent, but UX audit's top priority)
+  |
+  |-- [F] src/main.ts: change primary color
+  |-- [G] vite.config.ts: update PWA theme_color (after F)
+  |
+Phase 3: Component Changes (after Phase 2 for visual consistency)
+  |
+  |-- [H] src/App.vue: add skip-to-content link + id="main-content"
+  |-- [I] src/components/AppFooter.vue: add docs icon, text labels
+  |-- [J] src/components/wizard/WizardStepper.vue: add gene context chip
+  |-- [K] src/stores/useAppStore.ts: add onboarding state
+  |-- [L] src/components/OnboardingCard.vue: create onboarding card (after K)
+  |-- [M] src/App.vue: integrate OnboardingCard (after L)
 ```
+
+### Rationale for Ordering
+
+1. **Phase 1 first** because the SEO report identifies "not indexed by Google" as the critical problem. Static HTML seed content, sitemap, and robots.txt are the highest-impact changes for indexing.
+
+2. **Phase 2 second** because the UX audit's #1 recommendation is the CTA color. This is a single-file edit with maximum visual impact.
+
+3. **Phase 3 third** because component changes benefit from the new color system being in place (the onboarding card CTA, context chip, and skip link all use `primary`).
+
+---
+
+## 11. Architectural Patterns to Follow
+
+### 11.1 Static Content Pattern
+
+The seed HTML in `index.html` establishes a pattern: **static content for crawlers, dynamic content for users**. This is not SSR. It is a deliberate divergence where the raw HTML serves a different purpose (SEO) than the rendered app (interactivity). Keep this content focused on:
+- Keywords and descriptions (for crawlers)
+- Links to docs pages (for crawler discovery)
+- Minimal presentation (no styling that would flash before Vue loads)
+
+### 11.2 Pinia Store Extension Pattern
+
+The `useAppStore` extension follows the existing pattern: add new state properties with persistence. The `onboardingDismissed` state mirrors `disclaimerAcknowledged`:
+- Boolean flag with localStorage persistence
+- Getter for display logic
+- Action to dismiss
+- No expiry needed (once dismissed, permanently dismissed)
+
+### 11.3 Vuetify Theme Pattern
+
+The color change stays within the existing `createVuetify` configuration pattern. No runtime theme mutation, no new theme variants, no additional CSS custom properties. Just update the hex values.
+
+---
+
+## 12. Anti-Patterns to Avoid
+
+### 12.1 Do NOT Use createSSRApp
+
+The seed content strategy uses standard `createApp()` replacement, not SSR hydration. Using `createSSRApp()` would cause hydration mismatch warnings because the seed HTML does not match the Vue template output. The replacement behavior is correct and intended.
+
+### 12.2 Do NOT Install @unhead/vue
+
+The milestone context mentions `@unhead/vue` as "installed" but it is NOT in `package.json` and NOT in `node_modules`. It is not needed for these changes. The existing `<head>` content in `index.html` is sufficient for static meta tags. Dynamic head management would only be needed if the app had multiple routes with different titles -- this is a single-page wizard with one URL.
+
+### 12.3 Do NOT Use Vite Plugin for HTML Injection
+
+Vite plugins like `vite-plugin-html` or `vite-ssg` add complexity. The seed content can be placed directly in `index.html` as static HTML. Vite preserves `index.html` content during build and only injects script/style tags.
+
+### 12.4 Do NOT Create a Sitemap Index File
+
+With only two sitemaps (app root + VitePress docs), a sitemap index XML adds unnecessary complexity. Listing both sitemaps in `robots.txt` is the simpler and equally effective approach.
+
+### 12.5 Do NOT Add Vuetify CSS Classes to Seed Content
+
+Seed content in `index.html` renders before Vuetify CSS loads. Using Vuetify classes (`text-h4`, `mb-6`, etc.) would cause unstyled content. Keep seed content in plain semantic HTML with minimal inline styles if any.
+
+---
+
+## 13. Confidence Assessment
+
+| Area | Confidence | Basis |
+|------|------------|-------|
+| Vue mount replacement behavior | HIGH | Official Vue docs, verified |
+| Vuetify theme color change | HIGH | Verified in codebase: all usages are via `color="primary"` prop |
+| VitePress sitemap config | HIGH | Official VitePress docs + issue #3863 for base path behavior |
+| Seed content Vite build preservation | MEDIUM | Vite docs say index.html is preserved, but current build output is suspicious (appears stale). Needs verification with fresh build |
+| noscript placement | HIGH | Vue mount replaces innerHTML of container; noscript outside container persists |
+| OnboardingCard integration | HIGH | Follows existing DisclaimerBanner pattern in App.vue |
+| Gene context chip | HIGH | WizardStepper.vue already has access to state.gene and display breakpoints |
+| OG image SVG->PNG | HIGH | sharp is already a devDependency |
+
+---
+
+## 14. Open Questions
+
+1. **Build output stripping:** The current `dist/index.html` is missing meta tags and structured data. Is this a stale build or a Vite configuration issue? A fresh `bun run build` should clarify. If Vite is stripping content, may need to investigate `vite-plugin-html` or move meta to a Vite plugin.
+
+2. **CFTR pre-configured data:** For the "Try with CFTR" onboarding button, a pre-configured `GeneSearchResult` object for CFTR is needed. This should match the structure returned by the gnomAD gene search API. It could be hard-coded as a constant in `src/config/` or fetched live (but live fetch defeats the "instant demo" purpose).
+
+3. **OG image content:** The current `og-image.svg` content should be reviewed. Converting SVG to PNG with sharp is straightforward, but the image content itself may need updating to reflect the new branding (new primary color).
 
 ---
 
 ## Sources
 
-### Pinia Persistence & Caching
-- [Pinia Plugin Persistedstate - Advanced Usage](https://prazdevs.github.io/pinia-plugin-persistedstate/guide/advanced.html) - Custom serializers, hooks
-- [Pinia State Documentation](https://pinia.vuejs.org/core-concepts/state.html) - $subscribe for persistence
-- [vue-pinia-cache-composables](https://github.com/volkar/vue-pinia-cache-composables) - TTL-based caching pattern
-
-### Vuetify Layout & Theming
-- [Vuetify Application Layout](https://vuetifyjs.com/en/features/application-layout/) - v-app, v-main, layout components
-- [Vuetify Navigation Drawers](https://vuetifyjs.com/en/components/navigation-drawers/) - Drawer patterns
-- [Vuetify Theme](https://vuetifyjs.com/en/features/theme/) - Theme toggle patterns
-- [Layouts & Theming in Vuetify 3](https://www.thisdot.co/blog/layouts-and-theming-in-vuetify-3) - Implementation guide
-
-### Vue Logging
-- [vue-logger-plugin](https://github.com/dev-tavern/vue-logger-plugin) - Logging patterns (reference only, using composable instead)
-- [vuejs3-logger](https://github.com/MarcSchaetz/vuejs3-logger) - Log level patterns
-
-### ClinGen Data
-- [ClinGen File Downloads](https://search.clinicalgenome.org/kb/downloads) - Gene validity CSV available, no public API
-- [ClinGen GitHub](https://github.com/clingen-data-model) - genegraph-api (internal use)
-
-### Existing Codebase
-- `/mnt/c/development/gnomad-carrier-frequency/src/stores/useTemplateStore.ts` - Pinia persist pattern
-- `/mnt/c/development/gnomad-carrier-frequency/src/composables/useWizard.ts` - Composable pattern
-- `/mnt/c/development/gnomad-carrier-frequency/src/utils/variant-filters.ts` - Pure function pattern
+- [Vue.js Application API: app.mount()](https://vuejs.org/api/application.html#app-mount) -- official docs on mount replacement behavior
+- [Vue.js SSR Guide](https://vuejs.org/guide/scaling-up/ssr.html) -- createSSRApp vs createApp distinction
+- [Vue 3 Migration: Mount Changes](https://v3-migration.vuejs.org/breaking-changes/mount-changes) -- innerHTML replacement in Vue 3
+- [VitePress Sitemap Generation](https://vitepress.dev/guide/sitemap-generation) -- official sitemap config
+- [VitePress Issue #3863](https://github.com/vuejs/vitepress/issues/3863) -- base path + sitemap hostname must include base
+- [Vuetify Theme Documentation](https://vuetifyjs.com/en/features/theme/) -- theme color configuration
+- [Vue Discussion #12788](https://github.com/orgs/vuejs/discussions/12788) -- keeping/replacing mount element content
