@@ -88,7 +88,13 @@ Plans:
   3. Reference pages for methodology, data sources, filters, and templates provide technically accurate details that a genetic counselor can cite (Hardy-Weinberg formula, gnomAD version differences, filter options, template syntax)
   4. Citation page includes both CITATION.cff content and a BibTeX entry ready to copy
   5. All pages have working cross-links to related content and screenshots render correctly in the VitePress build
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 18-01-PLAN.md — Infrastructure (screenshot CSS, sidebar config) and Guide section (introduction + getting started walkthrough)
+- [ ] 18-02-PLAN.md — Use Cases section (overview, carrier screening, family planning, clinical letter)
+- [ ] 18-03-PLAN.md — Reference section (overview, methodology, data sources, filters, templates)
+- [ ] 18-04-PLAN.md — About section (overview, citation, changelog, contributing) and CITATION.cff
+- [ ] 18-05-PLAN.md — Landing page disclaimer, cross-link audit, and build verification
 
 ### Phase 19: CI/CD Integration
 **Goal**: Both the app and documentation site deploy automatically from a single GitHub Actions workflow, with screenshots updating when UI changes
@@ -120,10 +126,10 @@ Phases execute in numeric order: 16 --> 17 --> 18 --> 19 --> 20
 |-------|-----------|----------------|--------|-----------|
 | 16. VitePress Setup | v1.3 | 2/2 | Complete | 2026-02-09 |
 | 17. Screenshot Automation | v1.3 | 3/3 | Complete | 2026-02-09 |
-| 18. Documentation Content | v1.3 | 0/TBD | Not started | - |
+| 18. Documentation Content | v1.3 | 0/5 | Not started | - |
 | 19. CI/CD Integration | v1.3 | 0/TBD | Not started | - |
 | 20. README Streamlining | v1.3 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-09 (Phase 17 complete)*
+*Last updated: 2026-02-23 (Phase 18 planned)*
