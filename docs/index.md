@@ -25,4 +25,8 @@ features:
     details: Generate ready-to-use German and English clinical documentation text from customizable templates with support for multiple clinical perspectives
 ---
 
-A research tool for genetic counselors and clinical researchers to calculate carrier frequencies for autosomal recessive conditions using population data from the Genome Aggregation Database (gnomAD).
+A research tool for clinical researchers and genetic counselors to calculate carrier frequencies for autosomal recessive conditions using population data from the Genome Aggregation Database (gnomAD).
+
+::: warning For Research Use Only
+The gnomAD Carrier Frequency Calculator is intended to support clinical documentation workflows and research. Results should be reviewed by a qualified clinician and do not constitute a diagnostic report. Always verify calculations against primary sources before clinical use.
+:::
