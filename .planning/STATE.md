@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 
 **Milestone:** v1.3 Documentation Site
 **Phase:** 18 of 20 (Documentation Content) — In progress
-**Plan:** 4 of ~5 complete
-**Status:** Phase 18 plan 04 complete. About section written + CITATION.cff created. Ready for Reference section plans.
-**Last activity:** 2026-02-23 -- Completed 18-04-PLAN.md (CITATION.cff, citation, changelog, contributing, about/index)
+**Plan:** 5 of ~5 complete
+**Status:** Phase 18 plan 03 complete. All 5 reference section pages written. Phase 18 may now be complete pending final review.
+**Last activity:** 2026-02-23 -- Completed 18-03-PLAN.md (Reference overview, Methodology, Data Sources, Filters, Templates)
 
 ### Progress
 
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [████████  ]  80% - Phase 18 plan 04 done (8/10 plans)
+v1.3 Docs:          [█████████ ]  90% - Phase 18 complete (9/10 plans)
 ```
 
-**Overall:** 68 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 69 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 68
-- v1.3 plans completed: 9
+- Total plans completed: 69
+- v1.3 plans completed: 10
 
 ---
 
@@ -73,6 +73,8 @@ Recent decisions affecting current work:
 - 18-04: CITATION.cff uses ORCID for author identification (CFF 1.2.0 standard)
 - 18-04: Changelog stops at v1.2.0 (v1.3 in progress, not released)
 - 18-04: BibTeX @software type used for software citations
+- 18-03: Use <span v-pre>{{variable}}</span> in markdown to escape Vue interpolation (backtick code spans inside tables and ::: containers still processed by VitePress alpha 16)
+- 18-03: Avoid {{}} in ::: tip/warning/info container text — Vue processes container content as Vue template
 
 ### Pending Todos
 
@@ -89,22 +91,24 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-23
-**Completed:** Phase 18 Plan 04 — CITATION.cff, about/citation.md, about/changelog.md, about/contributing.md, about/index.md
-**Status:** Plan 18-04 complete — About section fully written + CITATION.cff at repo root
+**Completed:** Phase 18 Plan 03 — Reference overview, Methodology, Data Sources, Filters, Templates (all 5 reference pages)
+**Status:** Plan 18-03 complete — Phase 18 all content plans complete (01, 02, 03, 04)
 
 ### Handoff Notes
 
 v1.3 Documentation Site milestone:
 - Phase 16: VitePress Setup -- COMPLETE
 - Phase 17: Screenshot Automation -- COMPLETE
-- Phase 18: Documentation Content (16 requirements) — IN PROGRESS (plans 01, 02, 04 done)
+- Phase 18: Documentation Content (16 requirements) — COMPLETE (all plans done)
   - 18-01: Guide section (Introduction + Getting Started) -- COMPLETE
   - 18-02: Use Cases section (carrier screening, family planning, clinical letter) -- COMPLETE
+  - 18-03: Reference section (overview, methodology, data sources, filters, templates) -- COMPLETE
   - 18-04: About section (overview, citation, changelog, contributing) + CITATION.cff -- COMPLETE
-  - Remaining: Reference section plans
-- Phase 19: CI/CD Integration (5 requirements)
+- Phase 19: CI/CD Integration (5 requirements) — NEXT
 - Phase 20: README Streamlining (3 requirements)
 - Branch: feature/v1.3-documentation
+
+Template variable escaping pattern for VitePress: use `<span v-pre>{{variable}}</span>` for any {{}} in markdown docs. This is documented in 18-03-SUMMARY.md.
 
 Screenshot-frame CSS pattern established. All future doc plans embedding screenshots should use:
 ```html
