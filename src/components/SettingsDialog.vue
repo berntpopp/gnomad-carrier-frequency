@@ -593,7 +593,7 @@ import { useAppStore } from '@/stores/useAppStore';
 import { useLogStore } from '@/stores/useLogStore';
 import { useTemplateStore } from '@/stores/useTemplateStore';
 import { useHistoryStore } from '@/stores/useHistoryStore';
-import { useClingenValidity, usePwaInstall } from '@/composables';
+import { useClingenValidity, usePwaInstall, useConfirmDialog } from '@/composables';
 import TemplateEditor from '@/components/TemplateEditor.vue';
 import VariablePicker from '@/components/VariablePicker.vue';
 
@@ -629,6 +629,9 @@ const {
 
 // PWA Install
 const { canInstall, isInstalled, isIos, promptInstall } = usePwaInstall();
+
+// Confirm dialog
+const { ask } = useConfirmDialog();
 
 // Data Cache management
 interface CacheInfo {
@@ -779,26 +782,72 @@ function handleImportTemplates(event: Event) {
   const file = input.files?.[0];
   if (!file) return;
 
+  // Reset file input before reading to prevent holding the file input open
+  input.value = '';
+
   const reader = new FileReader();
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
     try {
       const data = JSON.parse(e.target?.result as string);
-      const success = templateStore.importTemplates(data);
-      if (!success) {
-        alert('Invalid template file format');
+
+      // Validate structure without applying yet
+      if (
+        !data ||
+        typeof data !== 'object' ||
+        !data.version ||
+        !data.language ||
+        !data.customSections ||
+        !data.enabledSections
+      ) {
+        await ask({
+          title: 'Import Error',
+          message: 'Invalid template file format.',
+          confirmText: 'OK',
+          cancelText: '',
+        });
+        return;
+      }
+
+      // Build summary for confirmation
+      const langName = data.language === 'de' ? 'German' : 'English';
+      const sectionCount = Object.values(data.enabledSections as Record<string, string[]>)
+        .flat()
+        .length;
+
+      const confirmed = await ask({
+        title: 'Import Templates',
+        message: `Import ${langName} templates with ${sectionCount} enabled sections?`,
+        confirmText: 'Import',
+        cancelText: 'Cancel',
+        confirmColor: 'primary',
+      });
+
+      if (confirmed) {
+        templateStore.importTemplates(data);
       }
     } catch {
-      alert('Failed to parse template file');
+      await ask({
+        title: 'Import Error',
+        message: 'Failed to parse template file.',
+        confirmText: 'OK',
+        cancelText: '',
+      });
     }
-    // Reset file input
-    input.value = '';
   };
   reader.readAsText(file);
 }
 
 // Reset templates for current language
-function handleResetLanguage() {
-  if (confirm(`Reset all ${templateStore.language === 'de' ? 'German' : 'English'} templates to defaults?`)) {
+async function handleResetLanguage() {
+  const langName = templateStore.language === 'de' ? 'German' : 'English';
+  const confirmed = await ask({
+    title: 'Reset Templates',
+    message: `This will reset all ${langName} templates to defaults. This cannot be undone.`,
+    confirmText: 'Yes, reset',
+    cancelText: 'Keep current',
+    confirmColor: 'error',
+  });
+  if (confirmed) {
     templateStore.resetLanguageTemplates(templateStore.language);
   }
 }

@@ -63,6 +63,20 @@ watch(searchInput, (value) => {
   }
 });
 
+// Display-only watcher: sync local v-autocomplete model when selectedGene
+// changes externally (e.g., from prefillGene called by WelcomeCard).
+// Does NOT emit 'select' — selectGene() is already called upstream and
+// emitting here would create a duplicate invocation and duplicate constraint fetches.
+watch(selectedGene, (gene) => {
+  if (gene !== null) {
+    model.value = gene;
+    searchInput.value = gene.symbol;
+  } else {
+    model.value = null;
+    searchInput.value = '';
+  }
+});
+
 const items = computed(() =>
   selectedGene.value ? [selectedGene.value] : results.value
 );

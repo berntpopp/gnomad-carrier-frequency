@@ -46,8 +46,9 @@
         </div>
 
         <p class="text-body-2 mb-4">
-          A web-based tool for genetic counselors to calculate carrier frequencies
+          A web-based research tool to calculate carrier frequencies
           for autosomal recessive conditions using gnomAD population data.
+          For research and educational use only.
         </p>
 
         <v-list density="compact">

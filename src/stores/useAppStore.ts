@@ -3,12 +3,14 @@ import { defineStore } from 'pinia';
 interface AppStoreState {
   disclaimerAcknowledged: boolean;
   disclaimerAcknowledgedAt: number | null; // Unix timestamp
+  onboardingDismissed: boolean;
 }
 
 export const useAppStore = defineStore('app', {
   state: (): AppStoreState => ({
     disclaimerAcknowledged: false,
     disclaimerAcknowledgedAt: null,
+    onboardingDismissed: false,
   }),
 
   getters: {
@@ -27,6 +29,14 @@ export const useAppStore = defineStore('app', {
       if (!state.disclaimerAcknowledgedAt) return null;
       return new Date(state.disclaimerAcknowledgedAt).toLocaleDateString();
     },
+
+    /**
+     * Show welcome onboarding card only after disclaimer accepted and not yet dismissed.
+     * Ensures first-time users get guided entry after accepting the disclaimer.
+     */
+    shouldShowOnboarding: (state): boolean => {
+      return state.disclaimerAcknowledged === true && state.onboardingDismissed === false;
+    },
   },
 
   actions: {
@@ -44,6 +54,14 @@ export const useAppStore = defineStore('app', {
     resetDisclaimer() {
       this.disclaimerAcknowledged = false;
       this.disclaimerAcknowledgedAt = null;
+    },
+
+    /**
+     * Dismiss the onboarding welcome card permanently.
+     * Persisted to localStorage so returning users never see it again.
+     */
+    dismissOnboarding() {
+      this.onboardingDismissed = true;
     },
   },
 

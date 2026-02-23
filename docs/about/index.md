@@ -4,7 +4,7 @@ The gnomAD Carrier Frequency Calculator is an open-source research tool for calc
 
 ## The Project
 
-Built for research and educational use, the calculator queries the Genome Aggregation Database (gnomAD) directly from the browser and generates documentation text in German and English. It is designed for researchers, geneticists, and genetic counselors exploring carrier frequencies for autosomal recessive conditions. No server-side processing is required - all calculations run locally in the browser. This tool is not a validated clinical diagnostic tool; any outputs must be independently verified by qualified professionals.
+Built for research and educational use, the calculator queries the Genome Aggregation Database (gnomAD) directly from the browser and generates documentation text in German and English. It is designed for researchers and geneticists exploring carrier frequencies for autosomal recessive conditions. No server-side processing is required - all calculations run locally in the browser. This tool is not a validated clinical diagnostic tool; any outputs must be independently verified by qualified professionals.
 
 ## Links
 

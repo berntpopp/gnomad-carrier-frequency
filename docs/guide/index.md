@@ -1,6 +1,6 @@
 # Guide
 
-This guide covers everything you need to use the gnomAD Carrier Frequency Calculator effectively. Whether you are a researcher, geneticist, or genetic counselor, these pages will walk you through the calculator's features and help you interpret results.
+This guide covers everything you need to use the gnomAD Carrier Frequency Calculator effectively. Whether you are a researcher or geneticist, these pages will walk you through the calculator's features and help you interpret results.
 
 ::: warning For Research Use Only
 The gnomAD Carrier Frequency Calculator is a research tool. It is not a validated clinical diagnostic tool. Results must be independently reviewed and verified by qualified professionals before any use in a clinical context.
@@ -8,7 +8,7 @@ The gnomAD Carrier Frequency Calculator is a research tool. It is not a validate
 
 ## What is the gnomAD Carrier Frequency Calculator?
 
-The gnomAD Carrier Frequency Calculator is a browser-based research tool that queries the [Genome Aggregation Database (gnomAD)](https://gnomad.broadinstitute.org/) to calculate carrier frequencies for autosomal recessive conditions. It is designed for researchers, geneticists, and genetic counselors who need to explore population-level carrier frequencies and generate supporting documentation.
+The gnomAD Carrier Frequency Calculator is a browser-based research tool that queries the [Genome Aggregation Database (gnomAD)](https://gnomad.broadinstitute.org/) to calculate carrier frequencies for autosomal recessive conditions. It is designed for researchers and geneticists who need to explore population-level carrier frequencies and generate supporting documentation.
 
 The calculator applies Hardy-Weinberg equilibrium to derive carrier frequencies from allele frequencies observed in gnomAD populations. Hardy-Weinberg equilibrium is a population genetics principle stating that, in a stable population, allele and genotype frequencies remain constant across generations. This means that if the pathogenic allele frequency in the population is _q_, then the carrier frequency (heterozygous individuals) is approximately 2_q_ for rare variants. The calculator uses this relationship to translate gnomAD allele data into interpretable carrier frequencies.
 

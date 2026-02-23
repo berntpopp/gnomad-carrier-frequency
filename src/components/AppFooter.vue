@@ -23,7 +23,10 @@
               rel="noopener noreferrer"
               aria-label="Source code on GitHub"
             >
-              <v-icon size="small" start>
+              <v-icon
+                size="small"
+                start
+              >
                 mdi-github
               </v-icon>
               <span class="d-none d-sm-inline">GitHub</span>
@@ -57,7 +60,10 @@
               rel="noopener noreferrer"
               aria-label="Open documentation"
             >
-              <v-icon size="small" start>
+              <v-icon
+                size="small"
+                start
+              >
                 mdi-book-open-outline
               </v-icon>
               <span class="d-none d-sm-inline">Docs</span>
@@ -79,7 +85,10 @@
               aria-label="View clinical disclaimer"
               @click="reopenDisclaimer"
             >
-              <v-icon size="small" start>
+              <v-icon
+                size="small"
+                start
+              >
                 mdi-alert-circle-outline
               </v-icon>
               <span class="d-none d-sm-inline">Disclaimer</span>
@@ -105,7 +114,10 @@
                   size="small"
                   aria-label="View data sources"
                 >
-                  <v-icon size="small" start>
+                  <v-icon
+                    size="small"
+                    start
+                  >
                     mdi-database
                   </v-icon>
                   <span class="d-none d-sm-inline">Data</span>
@@ -130,7 +142,10 @@
                   size="small"
                   aria-label="View calculation methodology"
                 >
-                  <v-icon size="small" start>
+                  <v-icon
+                    size="small"
+                    start
+                  >
                     mdi-function-variant
                   </v-icon>
                   <span class="d-none d-sm-inline">Method</span>
@@ -155,7 +170,10 @@
                   size="small"
                   aria-label="View frequently asked questions"
                 >
-                  <v-icon size="small" start>
+                  <v-icon
+                    size="small"
+                    start
+                  >
                     mdi-help-circle-outline
                   </v-icon>
                   <span class="d-none d-sm-inline">FAQ</span>
@@ -180,7 +198,10 @@
                   size="small"
                   aria-label="About this application"
                 >
-                  <v-icon size="small" start>
+                  <v-icon
+                    size="small"
+                    start
+                  >
                     mdi-information-outline
                   </v-icon>
                   <span class="d-none d-sm-inline">About</span>
@@ -204,7 +225,10 @@
               aria-label="View application logs"
               @click="emit('openLogViewer')"
             >
-              <v-icon size="small" start>
+              <v-icon
+                size="small"
+                start
+              >
                 mdi-console
               </v-icon>
               <span class="d-none d-sm-inline">Logs</span>

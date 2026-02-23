@@ -40,17 +40,17 @@ Requirements for the Discoverability & Polish milestone. Addresses two critical 
 
 ### UX Onboarding
 
-- [ ] **UXO-01**: Welcome hero card displayed for first-time users after disclaimer
-- [ ] **UXO-02**: "Try with CFTR" quick-start button that pre-fills gene search
-- [ ] **UXO-03**: Onboarding state persisted in `useAppStore` via Pinia
-- [ ] **UXO-04**: Onboarding card dismissed after first gene search or explicit dismiss
+- [x] **UXO-01**: Welcome hero card displayed for first-time users after disclaimer
+- [x] **UXO-02**: "Try with CFTR" quick-start button that pre-fills gene search
+- [x] **UXO-03**: Onboarding state persisted in `useAppStore` via Pinia
+- [x] **UXO-04**: Onboarding card dismissed after first gene search or explicit dismiss
 
 ### UX Visual Polish
 
-- [ ] **UXV-01**: Mobile title hidden on xs breakpoint (AppBar "gCFCalc" suffices)
-- [ ] **UXV-02**: Persistent gene context chip on Steps 2-4 showing gene + gnomAD version
-- [ ] **UXV-03**: Native `alert()`/`confirm()` replaced with `useConfirmDialog` composable + Vuetify dialog
-- [ ] **UXV-04**: All 4 native dialog calls migrated (template import, template reset, log clear)
+- [x] **UXV-01**: Mobile title hidden on xs breakpoint (AppBar "gCFCalc" suffices)
+- [x] **UXV-02**: Persistent gene context chip on Steps 2-4 showing gene + gnomAD version
+- [x] **UXV-03**: Native `alert()`/`confirm()` replaced with `useConfirmDialog` composable + Vuetify dialog
+- [x] **UXV-04**: All 4 native dialog calls migrated (template import, template reset, log clear)
 
 ### Accessibility
 
@@ -61,9 +61,9 @@ Requirements for the Discoverability & Polish milestone. Addresses two critical 
 
 ### Documentation Content
 
-- [ ] **DOC-01**: "What is Carrier Frequency?" educational page in VitePress docs (~1,500 words)
-- [ ] **DOC-02**: "How to Calculate Carrier Frequency" tutorial page in VitePress docs (~1,200 words)
-- [ ] **DOC-03**: Expanded FAQ page with FAQPage structured data per page
+- [x] **DOC-01**: "What is Carrier Frequency?" educational page in VitePress docs (~1,500 words)
+- [x] **DOC-02**: "How to Calculate Carrier Frequency" tutorial page in VitePress docs (~1,200 words)
+- [x] **DOC-03**: Expanded FAQ page with FAQPage structured data per page
 
 ## Future Requirements
 
@@ -132,17 +132,17 @@ Deferred to later milestones.
 | A11-02 | Phase 22 | Complete |
 | A11-03 | Phase 22 | Complete |
 | A11-04 | Phase 22 | Complete |
-| UXO-01 | Phase 23 | Pending |
-| UXO-02 | Phase 23 | Pending |
-| UXO-03 | Phase 23 | Pending |
-| UXO-04 | Phase 23 | Pending |
-| UXV-01 | Phase 23 | Pending |
-| UXV-02 | Phase 23 | Pending |
-| UXV-03 | Phase 23 | Pending |
-| UXV-04 | Phase 23 | Pending |
-| DOC-01 | Phase 24 | Pending |
-| DOC-02 | Phase 24 | Pending |
-| DOC-03 | Phase 24 | Pending |
+| UXO-01 | Phase 23 | Complete |
+| UXO-02 | Phase 23 | Complete |
+| UXO-03 | Phase 23 | Complete |
+| UXO-04 | Phase 23 | Complete |
+| UXV-01 | Phase 23 | Complete |
+| UXV-02 | Phase 23 | Complete |
+| UXV-03 | Phase 23 | Complete |
+| UXV-04 | Phase 23 | Complete |
+| DOC-01 | Phase 24 | Complete |
+| DOC-02 | Phase 24 | Complete |
+| DOC-03 | Phase 24 | Complete |
 
 **Coverage:**
 - v1.4 requirements: 37 total

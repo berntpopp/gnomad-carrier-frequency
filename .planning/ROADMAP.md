@@ -6,7 +6,7 @@
 - **v1.1 Release-Ready** - Phases 5-10 (shipped 2026-01-19)
 - **v1.2 Sharing** - Phases 11-15 (shipped 2026-01-20)
 - **v1.3 Documentation Site** - Phases 16-20 (shipped 2026-02-23)
-- **v1.4 Discoverability & Polish** - Phases 21-24 (in progress)
+- **v1.4 Discoverability & Polish** - Phases 21-24 (shipped 2026-02-23)
 
 ## Phases
 
@@ -38,14 +38,14 @@
 
 </details>
 
-### v1.4 Discoverability & Polish (In Progress)
+### v1.4 Discoverability & Polish (SHIPPED 2026-02-23)
 
 **Milestone Goal:** Fix Google indexing with static HTML seed content and structured data, improve CTA visibility with WCAG-compliant color system, add first-time onboarding experience, and expand documentation with educational content pages.
 
 - [x] **Phase 21: SEO Foundation** - Make the site visible to Google and social media platforms
 - [x] **Phase 22: CTA Color System & Accessibility** - WCAG-compliant interactive colors and accessibility improvements
-- [ ] **Phase 23: Onboarding & Visual Polish** - First-time user guidance and native dialog replacement
-- [ ] **Phase 24: Documentation Content** - Educational pages for carrier frequency concepts
+- [x] **Phase 23: Onboarding & Visual Polish** - First-time user guidance and native dialog replacement
+- [x] **Phase 24: Documentation Content** - Educational pages for carrier frequency concepts
 
 ## Phase Details
 
@@ -96,9 +96,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 23-01-PLAN.md -- Welcome hero card with CFTR quick-start, onboarding state in useAppStore, prefillGene in useGeneSearch
-- [ ] 23-02-PLAN.md -- Mobile title hiding on xs breakpoint, persistent gene context chip on Steps 2-4
-- [ ] 23-03-PLAN.md -- useConfirmDialog composable + ConfirmDialog.vue singleton, migrate all 4 native dialog calls
+- [x] 23-01-PLAN.md -- Welcome hero card with CFTR quick-start, onboarding state in useAppStore, prefillGene in useGeneSearch
+- [x] 23-02-PLAN.md -- Mobile title hiding on xs breakpoint, persistent gene context chip on Steps 2-4
+- [x] 23-03-PLAN.md -- useConfirmDialog composable + ConfirmDialog.vue singleton, migrate all 4 native dialog calls
 
 ### Phase 24: Documentation Content
 **Goal**: Users searching for carrier frequency concepts find educational content that establishes the tool's authority and drives calculator usage
@@ -108,10 +108,11 @@ Plans:
   1. A "What is Carrier Frequency?" page (~1,500 words) exists in the docs site explaining the concept with clinical context, and includes a CTA linking to the calculator
   2. A "How to Calculate Carrier Frequency" tutorial page (~1,200 words) exists with worked examples using Hardy-Weinberg, linking to the calculator for real data
   3. The FAQ page is expanded with additional questions and each docs page with FAQ content includes FAQPage structured data for Google rich results
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 24-01: Educational pages (carrier frequency explainer, calculation tutorial) and expanded FAQ with structured data
+- [x] 24-01-PLAN.md -- Educational pages (carrier frequency explainer + calculation tutorial) with Article JSON-LD, comparison table, config.ts sidebar/nav
+- [x] 24-02-PLAN.md -- Expanded FAQ page with 7 net-new questions and FAQPage JSON-LD structured data
 
 ## Progress
 
@@ -126,9 +127,9 @@ Phases execute sequentially: 21 -> 22 -> 23 -> 24
 | 16-20 | v1.3 | 14/14 | Complete | 2026-02-23 |
 | 21. SEO Foundation | v1.4 | 4/4 | Complete | 2026-02-23 |
 | 22. CTA Color & A11y | v1.4 | 3/3 | Complete | 2026-02-23 |
-| 23. Onboarding & Polish | v1.4 | 0/3 | Not started | - |
-| 24. Docs Content | v1.4 | 0/1 | Not started | - |
+| 23. Onboarding & Polish | v1.4 | 3/3 | Complete | 2026-02-23 |
+| 24. Docs Content | v1.4 | 2/2 | Complete | 2026-02-23 |
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-23 (Phase 22 complete)*
+*Last updated: 2026-02-23 (Phase 24 complete, v1.4 shipped)*

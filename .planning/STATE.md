@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** Phase 22 - CTA Color System & Accessibility
+**Current focus:** Phase 24 - Documentation Content -- COMPLETE
 
 ---
 
 ## Current Position
 
-**Milestone:** v1.4 Discoverability & Polish
-**Phase:** 22 of 24 (CTA Color System & Accessibility) -- COMPLETE
-**Plan:** 3 of 3 in current phase
-**Status:** Phase complete
-**Last activity:** 2026-02-23 -- Completed 22-03-PLAN.md (skip-link, footer labels, wizard loading bar)
+**Milestone:** v1.4 Discoverability & Polish -- COMPLETE
+**Phase:** 24 of 24 (Documentation Content) -- COMPLETE
+**Plan:** 2 of 2 in current phase (Plan 02 COMPLETE)
+**Status:** COMPLETE
+**Last activity:** 2026-02-23 -- Completed 24-02-PLAN.md (FAQ page with FAQPage JSON-LD)
 
 ### Progress
 
@@ -26,18 +26,18 @@ v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
-v1.4 Discover:      [#######   ]  64% - Phase 22 COMPLETE (7/11 plans)
+v1.4 Discover:      [##########] 100% - COMPLETE (12/12 plans)
 ```
 
-**Overall:** 78 plans complete across v1.0-v1.4. 4 plans remaining for v1.4.
+**Overall:** 82 plans complete across v1.0-v1.4. All milestones shipped.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 78
-- v1.4 plans completed: 7
+- Total plans completed: 82
+- v1.4 plans completed: 12
 
 **v1.4 Phases:**
 
@@ -45,8 +45,8 @@ v1.4 Discover:      [#######   ]  64% - Phase 22 COMPLETE (7/11 plans)
 |-------|-------|-------|----------|
 | 21. SEO Foundation | 4/4 COMPLETE | ~8 min | 2 min |
 | 22. CTA Color & A11y | 3/3 COMPLETE | ~9 min | 3 min |
-| 23. Onboarding & Polish | 0/3 | - | - |
-| 24. Docs Content | 0/1 | - | - |
+| 23. Onboarding & Polish | 3/3 COMPLETE | - | - |
+| 24. Docs Content | 2/2 COMPLETE | ~8 min | 4 min |
 
 ---
 
@@ -75,6 +75,21 @@ v1.4 Discover:      [#######   ]  64% - Phase 22 COMPLETE (7/11 plans)
 | 22-03 | Skip-link targets v-main container (not first input) | Works universally across all 4 wizard steps without step-aware logic |
 | 22-03 | icon prop removed from footer buttons (not just label added) | Vuetify icon prop enforces icon-only rendering, suppresses label content |
 | 22-03 | Footer primary row also received labels (3 primary + 5 secondary = 8 total) | Plan explicitly required 8 labeled buttons across both rows |
+| 23-02 | v-if="!xs" on outer v-tooltip wrapper (not just v-app-bar-title) | Hides both tooltip and title together; avoids orphaned tooltip on mobile |
+| 23-02 | goToStep(1) used for chip click (not resetWizard) | Preserves gene for re-selection; user can keep or change gene on Step 1 |
+| 23-01 | prefillGene inside useGeneSearch() function body (not module-level) | Retains closure access to caller's useQuery data/results refs; shared debouncedTerm fires all active queries |
+| 23-01 | WelcomeCard dismisses before prefillGene() resolves | Immediate visual feedback; card disappears on click, not after async search completes |
+| 23-01 | GeneSearch watch(selectedGene) does NOT emit select | Prevents duplicate selectGene() call and double constraint fetch when prefillGene triggers selection |
+| 23-01 | StepGene watch(selectedGene) as single selection code path | Handles both manual dropdown selection and programmatic prefillGene; removes @select emit dependency |
+| 23-03 | Module-level singleton refs in useConfirmDialog | Module scope ensures all consumers share same dialog state without duplication |
+| 23-03 | Template import validates structure locally before summary dialog | Enables preview summary (language, section count) before applying; mirrors store validation |
+| 23-03 | FileReader.onload made async | Required to await ask() inside callback; safe as FileReader doesn't use return value |
+| 24-01 | Concepts nav entry placed between Use Cases and Reference | Logical progression: how to use (Guide/Use Cases) -> conceptual background (Concepts) -> technical reference (Reference) |
+| 24-01 | FAQ sidebar entry pre-registered in config.ts before file exists | Avoids config change in Plan 02; 404 expected until Plan 02 creates /reference/faq |
+| 24-01 | Table carrier frequency values framed as approximate estimates, not exact gnomAD values | Prevents outdated figures becoming authoritative; directs users to calculator for current data |
+| 24-02 | Two FAQ categories: Hardy-Weinberg Equilibrium (3 Qs) and gnomAD Data (4 Qs) | Logical grouping by domain; HWE questions are conceptual, gnomAD questions are data-technical |
+| 24-02 | No Research Use Only callout on FAQ page | FAQ is reference content, not educational claims requiring research disclaimer |
+| 24-02 | Visible Q&A text verbatim matches JSON-LD acceptedAnswer text | Google requires FAQ content visible to users; verbatim match ensures schema validity |
 
 ### Pending Todos
 
@@ -92,19 +107,23 @@ None.
 ### Last Session
 
 **Date:** 2026-02-23
-**Completed:** 22-03-PLAN.md -- WCAG 2.4.1 skip-link, 8 labeled footer buttons, wizard loading progress bar
-**Status:** Phase 22 COMPLETE (3/3 plans done)
+**Completed:** 24-02-PLAN.md -- FAQ page with FAQPage JSON-LD, 7 net-new Q&A pairs
+**Status:** Phase 24 COMPLETE, v1.4 COMPLETE
 
 ### Handoff Notes
 
-Phase 22 (CTA Color & Accessibility) is COMPLETE:
-- Plan 01 COMPLETE: Vuetify primary = teal #117A7F (light) / #4DB6AC (dark); secondary = warm gray #a09588; PWA manifest + seed CSS updated
-- Plan 02 COMPLETE: 8 non-CTA elements (filter chips, switches, decorative icons, variable chips) migrated to secondary; 16 primary bindings remain (all CTAs)
-- Plan 03 COMPLETE: Skip-link (WCAG 2.4.1), 8 footer icon+label buttons, v-progress-linear in WizardStepper
+All v1.4 phases and plans are complete:
 
-v1.4 remaining phases:
-- Phase 23: Onboarding & Visual Polish (3 plans)
-- Phase 24: Documentation Content (1 plan)
+Phase 24 (Documentation Content) COMPLETE:
+- Plan 01 COMPLETE: docs/concepts/what-is-carrier-frequency.md (~1,573 words), docs/concepts/how-to-calculate.md (~1,595 words), VitePress config updated with Concepts nav + sidebar, FAQ pre-registered
+- Plan 02 COMPLETE: docs/reference/faq.md with 7 net-new Q&A pairs (HWE + gnomAD Data categories), FAQPage JSON-LD, all cross-links validated
+
+Phase 23 (Onboarding & Visual Polish) COMPLETE:
+- Plan 01 COMPLETE: onboarding state in useAppStore (persisted), WelcomeCard.vue with CFTR quick-start, singleton useGeneSearch (module-level state), prefillGene function
+- Plan 02 COMPLETE: AppBar title hidden on mobile xs; gene context chip shows "GENE · version" on Steps 2-4; tap navigates to Step 1
+- Plan 03 COMPLETE: useConfirmDialog composable + ConfirmDialog singleton; all 4 native dialog calls migrated; template import shows summary before applying
+
+v1.4 remaining: None. All 12 plans complete.
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
 Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
@@ -116,3 +135,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *v1.1 shipped: 2026-01-19*
 *v1.2 shipped: 2026-01-20*
 *v1.3 shipped: 2026-02-23*
+*v1.4 shipped: 2026-02-23*

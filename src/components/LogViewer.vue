@@ -151,7 +151,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useLogStore } from '@/stores/useLogStore';
-import { useExport } from '@/composables';
+import { useExport, useConfirmDialog } from '@/composables';
 import type { LogLevel, LogEntry } from '@/types';
 
 const emit = defineEmits<{
@@ -160,6 +160,7 @@ const emit = defineEmits<{
 
 const logStore = useLogStore();
 const { exportLogsToJson } = useExport();
+const { ask } = useConfirmDialog();
 
 // Filter state
 const searchQuery = ref('');
@@ -230,8 +231,15 @@ function handleDownload() {
 }
 
 // Clear all logs
-function handleClear() {
-  if (confirm('Clear all application logs?')) {
+async function handleClear() {
+  const confirmed = await ask({
+    title: 'Clear Logs',
+    message: 'Clear all application logs? This cannot be undone.',
+    confirmText: 'Clear logs',
+    cancelText: 'Cancel',
+    confirmColor: 'error',
+  });
+  if (confirmed) {
     logStore.clearAll();
   }
 }

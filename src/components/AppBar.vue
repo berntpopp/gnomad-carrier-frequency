@@ -5,6 +5,7 @@
   >
     <div class="app-bar-content">
       <v-tooltip
+        v-if="!xs"
         text="Calculate carrier frequency and recurrence risk from gnomAD population data."
         location="bottom"
         max-width="300"
@@ -20,6 +21,18 @@
           </v-app-bar-title>
         </template>
       </v-tooltip>
+
+      <v-chip
+        v-if="xs && state.currentStep > 1 && state.gene"
+        size="small"
+        color="primary"
+        variant="tonal"
+        class="ml-2"
+        data-testid="gene-context-chip"
+        @click="goToStep(1)"
+      >
+        {{ state.gene.symbol }} &middot; {{ version }}
+      </v-chip>
 
       <OfflineIndicator class="ml-3" />
 
@@ -107,11 +120,16 @@
 </template>
 
 <script setup lang="ts">
-import { useAppTheme, useNetworkStatus } from '@/composables';
+import { useDisplay } from 'vuetify';
+import { useAppTheme, useNetworkStatus, useWizard } from '@/composables';
+import { useGnomadVersion } from '@/api';
 import OfflineIndicator from '@/components/OfflineIndicator.vue';
 
+const { xs } = useDisplay();
 const { toggleTheme, tooltipText, themeIcon } = useAppTheme();
 const { showBackOnlineNotification, dismissBackOnlineNotification } = useNetworkStatus();
+const { state, goToStep } = useWizard();
+const { version } = useGnomadVersion();
 
 const emit = defineEmits<{
   openSettings: [];

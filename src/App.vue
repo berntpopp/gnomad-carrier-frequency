@@ -1,6 +1,9 @@
 <template>
   <v-app>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a
+      href="#main-content"
+      class="skip-link"
+    >Skip to main content</a>
     <VueAnnouncer class="sr-only" />
     <DisclaimerBanner />
     <AppBar
@@ -9,7 +12,10 @@
       @reset="handleReset"
     />
 
-    <v-main id="main-content" tabindex="-1">
+    <v-main
+      id="main-content"
+      tabindex="-1"
+    >
       <v-container max-width="900">
         <h1 class="text-h4 mb-2">
           gnomAD Carrier Frequency Calculator
@@ -50,6 +56,7 @@
       v-model="showHistory"
       @restore="handleHistoryRestore"
     />
+    <ConfirmDialog />
 
     <!-- PWA Update Notification -->
     <v-snackbar
@@ -107,6 +114,7 @@ import SettingsDialog from '@/components/SettingsDialog.vue';
 import LogViewerPanel from '@/components/LogViewerPanel.vue';
 import HistoryDrawer from '@/components/HistoryDrawer.vue';
 import WizardStepper from '@/components/wizard/WizardStepper.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useLogStore } from '@/stores/useLogStore';
 import { useWizard, useUrlState, usePwaUpdate, useHistoryAutoSave, useHistoryRestore } from '@/composables';
 

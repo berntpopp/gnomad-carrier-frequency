@@ -372,6 +372,12 @@
         text-align: center;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       }
+      /* Hide seed content when JS is available (prevents layout shift) */
+      .js-loaded .seed-header,
+      .js-loaded .seed-main,
+      .js-loaded .seed-footer {
+        display: none;
+      }
       @media (max-width: 600px) {
         .seed-h1 {
           font-size: 1.5rem;
@@ -387,6 +393,7 @@
     </style>
   </head>
   <body>
+    <script>document.documentElement.classList.add('js-loaded')</script>
     <div id="app">
       <header class="seed-header">
         <a class="seed-header-logo" href="/">gCFCalc</a>
@@ -404,11 +411,11 @@
         <h1 class="seed-h1">gnomAD Carrier Frequency Calculator</h1>
 
         <p class="seed-subtitle">
-          A free, browser-based tool for genetic counselors and clinical geneticists to calculate
-          carrier frequency and recurrence risk for autosomal recessive conditions. Powered by
-          real population allele frequency data from the Genome Aggregation Database (gnomAD),
-          the calculator provides population-specific estimates across multiple ancestries and
-          generates ready-to-use clinical documentation text in German and English.
+          A free, browser-based research tool to calculate carrier frequency and recurrence risk
+          for autosomal recessive conditions. Powered by real population allele frequency data
+          from the Genome Aggregation Database (gnomAD), the calculator provides population-specific
+          estimates across multiple ancestries and generates documentation text in German and English.
+          For research and educational use only.
         </p>
 
         <h2 class="seed-section-title">Key Features</h2>

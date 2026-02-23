@@ -1,4 +1,4 @@
-import { computed, ref, type Ref } from 'vue';
+import { computed, ref, watch, type Ref } from 'vue';
 import { useQuery } from 'villus';
 import { useDebounceFn } from '@vueuse/core';
 import { GENE_SEARCH_QUERY, GENE_DETAILS_QUERY } from '@/api/queries/gene-search';
@@ -18,6 +18,11 @@ const { debounceMs, minSearchChars, maxAutocompleteResults } = config.settings;
 const sharedGeneConstraint = ref<GeneConstraint | null>(null);
 const sharedConstraintLoading = ref(false);
 
+// Promoted to module-level so all callers share the same reactive state
+const searchTerm = ref('');
+const debouncedTerm = ref('');
+const selectedGene = ref<GeneSearchResult | null>(null);
+
 export interface UseGeneSearchReturn {
   searchTerm: Ref<string>;
   setSearchTerm: (term: string) => void;
@@ -30,14 +35,11 @@ export interface UseGeneSearchReturn {
   isValidGene: Ref<boolean>;
   geneConstraint: Ref<GeneConstraint | null>;
   constraintLoading: Ref<boolean>;
+  prefillGene: (symbol: string) => Promise<GeneSearchResult>;
 }
 
 export function useGeneSearch(): UseGeneSearchReturn {
   const { version } = useGnomadVersion();
-
-  const searchTerm = ref('');
-  const debouncedTerm = ref('');
-  const selectedGene = ref<GeneSearchResult | null>(null);
 
   // Debounce using timing from config
   const setSearchTerm = useDebounceFn((term: string) => {
@@ -48,8 +50,10 @@ export function useGeneSearch(): UseGeneSearchReturn {
   // Watch raw input and trigger debounced update
   const updateSearchTerm = (term: string) => {
     searchTerm.value = term;
-    // Clear selection when user types
-    if (selectedGene.value && term.toUpperCase() !== selectedGene.value.symbol) {
+    // Clear selection when user types a different gene name.
+    // Don't clear on empty string — v-autocomplete resets its search model
+    // during stepper transitions, which would incorrectly deselect the gene.
+    if (selectedGene.value && term.length > 0 && term.toUpperCase() !== selectedGene.value.symbol) {
       selectedGene.value = null;
     }
     setSearchTerm(term);
@@ -131,6 +135,46 @@ export function useGeneSearch(): UseGeneSearchReturn {
 
   const isValidGene = computed(() => selectedGene.value !== null);
 
+  /**
+   * Programmatically search for and select a gene by symbol.
+   * Bypasses debounce by setting debouncedTerm directly.
+   * Returns a Promise that resolves when the gene is selected.
+   *
+   * Used by WelcomeCard for the "Try with CFTR" quick-start button.
+   */
+  const prefillGene = (symbol: string): Promise<GeneSearchResult> => {
+    const normalised = symbol.trim().toUpperCase();
+
+    return new Promise((resolve, reject) => {
+      // Bypass debounce: set both raw and debounced term immediately
+      searchTerm.value = symbol;
+      debouncedTerm.value = normalised;
+
+      // Reject after 5 seconds if no results arrive
+      const timeout = setTimeout(() => {
+        stop();
+        reject(new Error(`Gene not found: ${symbol}`));
+      }, 5000);
+
+      // One-shot watcher on results - fires when query returns data
+      const stop = watch(
+        results,
+        (newResults) => {
+          if (newResults.length > 0) {
+            clearTimeout(timeout);
+            stop();
+            // Find exact match or fall back to first result
+            const exactMatch = newResults.find((g) => g.symbol === normalised);
+            const match = exactMatch ?? newResults[0]!;
+            selectGene(match);
+            resolve(match);
+          }
+        },
+        { immediate: false },
+      );
+    });
+  };
+
   return {
     searchTerm,
     setSearchTerm: updateSearchTerm,
@@ -143,5 +187,6 @@ export function useGeneSearch(): UseGeneSearchReturn {
     isValidGene,
     geneConstraint: sharedGeneConstraint,
     constraintLoading: sharedConstraintLoading,
+    prefillGene,
   };
 }

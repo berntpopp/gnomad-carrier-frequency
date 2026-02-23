@@ -51,3 +51,6 @@ export type { UseHistoryAutoSaveReturn } from './useHistoryAutoSave';
 
 export { useHistoryRestore } from './useHistoryRestore';
 export type { UseHistoryRestoreReturn } from './useHistoryRestore';
+
+export { useConfirmDialog } from './useConfirmDialog';
+export type { ConfirmDialogOptions } from './useConfirmDialog';

@@ -30,6 +30,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/' },
       { text: 'Use Cases', link: '/use-cases/' },
+      { text: 'Concepts', link: '/concepts/what-is-carrier-frequency' },
       { text: 'Reference', link: '/reference/' },
       { text: 'About', link: '/about/' },
       { text: 'Open Calculator', link: 'https://gnomad-carrier-frequency.kidney-genetics.org/', target: '_blank' }
@@ -37,6 +38,15 @@ export default defineConfig({
 
     // Sidebar configuration
     sidebar: {
+      '/concepts/': [
+        {
+          text: 'Concepts',
+          items: [
+            { text: 'What is Carrier Frequency?', link: '/concepts/what-is-carrier-frequency' },
+            { text: 'How to Calculate', link: '/concepts/how-to-calculate' }
+          ]
+        }
+      ],
       '/guide/': [
         {
           text: 'Guide',
@@ -64,7 +74,8 @@ export default defineConfig({
             { text: 'Methodology', link: '/reference/methodology' },
             { text: 'Data Sources', link: '/reference/data-sources' },
             { text: 'Filters', link: '/reference/filters' },
-            { text: 'Templates', link: '/reference/templates' }
+            { text: 'Templates', link: '/reference/templates' },
+            { text: 'FAQ', link: '/reference/faq' }
           ]
         }
       ],
