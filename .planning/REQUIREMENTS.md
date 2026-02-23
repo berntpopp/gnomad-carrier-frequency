@@ -105,66 +105,66 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MONO-01 | TBD | Pending |
-| MONO-02 | TBD | Pending |
-| MONO-03 | TBD | Pending |
-| MONO-04 | TBD | Pending |
-| MONO-05 | TBD | Pending |
-| MONO-06 | TBD | Pending |
-| MONO-07 | TBD | Pending |
-| MONO-08 | TBD | Pending |
-| MONO-09 | TBD | Pending |
-| MONO-10 | TBD | Pending |
-| MONO-11 | TBD | Pending |
-| MONO-12 | TBD | Pending |
-| MONO-13 | TBD | Pending |
-| CALC-01 | TBD | Pending |
-| CALC-02 | TBD | Pending |
-| CALC-03 | TBD | Pending |
-| CALC-04 | TBD | Pending |
-| CALC-05 | TBD | Pending |
-| CALC-06 | TBD | Pending |
-| CALC-07 | TBD | Pending |
-| CALC-08 | TBD | Pending |
-| CALC-09 | TBD | Pending |
-| CLI-01 | TBD | Pending |
-| CLI-02 | TBD | Pending |
-| CLI-03 | TBD | Pending |
-| CLI-04 | TBD | Pending |
-| CLI-05 | TBD | Pending |
-| CLI-06 | TBD | Pending |
-| CLI-07 | TBD | Pending |
-| CLI-08 | TBD | Pending |
-| CLI-09 | TBD | Pending |
-| CLI-10 | TBD | Pending |
-| CLI-11 | TBD | Pending |
-| CLI-12 | TBD | Pending |
-| CLI-13 | TBD | Pending |
-| GENE-01 | TBD | Pending |
-| GENE-02 | TBD | Pending |
-| GENE-03 | TBD | Pending |
-| GENE-04 | TBD | Pending |
-| GENE-05 | TBD | Pending |
-| GENE-06 | TBD | Pending |
-| GENE-07 | TBD | Pending |
-| TEST-01 | TBD | Pending |
-| TEST-02 | TBD | Pending |
-| TEST-03 | TBD | Pending |
-| TEST-04 | TBD | Pending |
-| TEST-05 | TBD | Pending |
-| TEST-06 | TBD | Pending |
-| TEST-07 | TBD | Pending |
-| TEST-08 | TBD | Pending |
-| TEST-09 | TBD | Pending |
-| TEST-10 | TBD | Pending |
-| TEST-11 | TBD | Pending |
-| TEST-12 | TBD | Pending |
+| MONO-01 | Phase 25 | Pending |
+| MONO-02 | Phase 25 | Pending |
+| MONO-03 | Phase 25 | Pending |
+| MONO-04 | Phase 25 | Pending |
+| MONO-05 | Phase 25 | Pending |
+| MONO-06 | Phase 25 | Pending |
+| MONO-07 | Phase 25 | Pending |
+| MONO-08 | Phase 25 | Pending |
+| MONO-09 | Phase 25 | Pending |
+| MONO-10 | Phase 25 | Pending |
+| MONO-11 | Phase 25 | Pending |
+| MONO-12 | Phase 25 | Pending |
+| MONO-13 | Phase 25 | Pending |
+| CALC-01 | Phase 26 | Pending |
+| CALC-02 | Phase 26 | Pending |
+| CALC-03 | Phase 26 | Pending |
+| CALC-04 | Phase 26 | Pending |
+| CALC-05 | Phase 26 | Pending |
+| CALC-06 | Phase 26 | Pending |
+| CALC-07 | Phase 26 | Pending |
+| CALC-08 | Phase 26 | Pending |
+| CALC-09 | Phase 26 | Pending |
+| CLI-01 | Phase 27 | Pending |
+| CLI-02 | Phase 27 | Pending |
+| CLI-03 | Phase 27 | Pending |
+| CLI-04 | Phase 27 | Pending |
+| CLI-05 | Phase 27 | Pending |
+| CLI-06 | Phase 27 | Pending |
+| CLI-07 | Phase 27 | Pending |
+| CLI-08 | Phase 27 | Pending |
+| CLI-09 | Phase 27 | Pending |
+| CLI-10 | Phase 27 | Pending |
+| CLI-11 | Phase 27 | Pending |
+| CLI-12 | Phase 27 | Pending |
+| CLI-13 | Phase 27 | Pending |
+| GENE-01 | Phase 28 | Pending |
+| GENE-02 | Phase 28 | Pending |
+| GENE-03 | Phase 28 | Pending |
+| GENE-04 | Phase 28 | Pending |
+| GENE-05 | Phase 28 | Pending |
+| GENE-06 | Phase 28 | Pending |
+| GENE-07 | Phase 28 | Pending |
+| TEST-01 | Phase 25 | Pending |
+| TEST-02 | Phase 26 | Pending |
+| TEST-03 | Phase 26 | Pending |
+| TEST-04 | Phase 26 | Pending |
+| TEST-05 | Phase 26 | Pending |
+| TEST-06 | Phase 26 | Pending |
+| TEST-07 | Phase 28 | Pending |
+| TEST-08 | Phase 27 | Pending |
+| TEST-09 | Phase 29 | Pending |
+| TEST-10 | Phase 29 | Pending |
+| TEST-11 | Phase 29 | Pending |
+| TEST-12 | Phase 29 | Pending |
 
 **Coverage:**
-- v1.5 requirements: 50 total
-- Mapped to phases: 0
-- Unmapped: 50 (pending roadmap creation)
+- v1.5 requirements: 54 total
+- Mapped to phases: 54
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after initial definition*
+*Last updated: 2026-02-23 (traceability mapped to phases 25-29)*
