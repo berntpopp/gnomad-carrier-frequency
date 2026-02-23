@@ -59,13 +59,13 @@
   3. Sharing the app URL on social media (Facebook Sharing Debugger, Twitter Card Validator) renders a 1200x630 preview image with correct title and description
   4. The VitePress docs site generates a sitemap at `/docs/sitemap.xml`, and `robots.txt` references both the app and docs sitemaps
   5. Navigating from app footer to docs and from docs content back to the calculator works in both directions without broken links
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 21-01: Static HTML seed, meta tags, canonical URL, robots directive, noscript fallback, preconnect hints
-- [ ] 21-02: OG image generation, sitemap.xml, robots.txt update, VitePress sitemap config
-- [ ] 21-03: Structured data update, title/description optimization, FAQPage schema expansion
-- [ ] 21-04: Cross-linking (app footer docs link, static HTML nav to docs, docs "Open Calculator" CTAs)
+- [ ] 21-01-PLAN.md -- Static HTML seed content (500+ words), meta tags, canonical URL, robots directive, preconnect hints, noscript fallback
+- [ ] 21-02-PLAN.md -- OG image PNG generation, app sitemap.xml, robots.txt update, VitePress sitemap config
+- [ ] 21-03-PLAN.md -- Expanded JSON-LD structured data (WebApplication + bilingual FAQPage), OG/Twitter meta tag correction
+- [ ] 21-04-PLAN.md -- Cross-linking: app footer docs link, docs pages calculator CTAs with deep-links
 
 ### Phase 22: CTA Color System & Accessibility
 **Goal**: Interactive elements have clear visual hierarchy with WCAG AA contrast, and keyboard-only users can navigate efficiently
@@ -131,4 +131,4 @@ Phases execute sequentially: 21 -> 22 -> 23 -> 24
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-23 (v1.4 phases added)*
+*Last updated: 2026-02-23 (Phase 21 planned)*
