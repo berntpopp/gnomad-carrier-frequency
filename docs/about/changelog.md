@@ -2,6 +2,18 @@
 
 Version history for the gnomAD Carrier Frequency Calculator.
 
+## v1.3.0 (2026-02-23)
+
+**Documentation Site**
+
+- VitePress documentation site with 17 pages (Guide, Use Cases, Reference, About)
+- Playwright screenshot automation generating 14 WebP screenshots
+- Unified deployment pipeline merging app and docs at custom domain
+- CITATION.cff with CFF 1.2.0 standard and BibTeX entry
+- Research-use-only disclaimers on docs landing page
+- CI workflow for automated screenshot refresh on UI changes
+- Streamlined README as slim landing page
+
 ## v1.2.0 (2026-01-20)
 
 **Sharing and Mobile Optimization**
