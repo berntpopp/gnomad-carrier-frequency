@@ -119,7 +119,9 @@ Plans:
   1. README contains only essentials: title, badges, one-line description, hero screenshot, 3-step quick start, and link to full documentation
   2. A documentation badge links directly to the live docs site
   3. License and citation section references the docs citation page for full details
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 20-01-PLAN.md -- Rewrite README.md to slim landing-page format
 
 ## Progress
 
@@ -132,7 +134,7 @@ Phases execute in numeric order: 16 --> 17 --> 18 --> 19 --> 20
 | 17. Screenshot Automation | v1.3 | 3/3 | Complete | 2026-02-09 |
 | 18. Documentation Content | v1.3 | 5/5 | Complete | 2026-02-23 |
 | 19. CI/CD Integration | v1.3 | 3/3 | Complete | 2026-02-23 |
-| 20. README Streamlining | v1.3 | 0/TBD | Not started | - |
+| 20. README Streamlining | v1.3 | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-09*
