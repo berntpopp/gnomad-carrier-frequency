@@ -77,7 +77,7 @@ Plans:
   1. The web app results step shows HWE 2pq carrier frequency by default, with a toggle to switch to the simplified formula — the displayed value for CFTR NFE matches the expected ~1:23 (2pq ≈ 0.0431)
   2. Enabling the homozygote exclusion toggle updates the displayed carrier frequency in real time using the VCR formula per variant and GCR inclusion-exclusion across variants
   3. The web app results step shows genetic prevalence (q²) and Bayesian prevalence (penetrance-adjusted) alongside carrier frequency
-  4. Running `bun run test --filter @gnomad-cf/core` executes unit tests for all calculation functions with CFTR, SMN1, and HEXA reference values and all tests pass
+  4. Running `bun run test --filter @gnomad-cf/core` executes unit tests for all calculation functions with CFTR, GJB2, and HEXA reference values and all tests pass
   5. No calculation change is merged without a corresponding golden-value test asserting the expected output against published reference values
 **Plans**: 5 plans
 
@@ -164,4 +164,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-23 (Phase 26 planned: 5 plans in 2 waves)*
+*Last updated: 2026-02-24 (Phase 26 plans revised: dependency fix, SMN1->GJB2, precision improvements)*
