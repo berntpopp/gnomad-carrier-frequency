@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 
 **Milestone:** v1.3 Documentation Site
 **Phase:** 18 of 20 (Documentation Content) — In progress
-**Plan:** 2 of ~5 complete
-**Status:** Phase 18 plan 02 complete. Use Cases section written. Ready for Reference section plans.
-**Last activity:** 2026-02-23 -- Completed 18-02-PLAN.md (use-cases index, carrier-screening, family-planning, clinical-letter)
+**Plan:** 4 of ~5 complete
+**Status:** Phase 18 plan 04 complete. About section written + CITATION.cff created. Ready for Reference section plans.
+**Last activity:** 2026-02-23 -- Completed 18-04-PLAN.md (CITATION.cff, citation, changelog, contributing, about/index)
 
 ### Progress
 
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [███████   ]  70% - Phase 18 plan 02 done (7/10 plans)
+v1.3 Docs:          [████████  ]  80% - Phase 18 plan 04 done (8/10 plans)
 ```
 
-**Overall:** 66 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 68 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 66
-- v1.3 plans completed: 7
+- Total plans completed: 68
+- v1.3 plans completed: 9
 
 ---
 
@@ -70,6 +70,9 @@ Recent decisions affecting current work:
 - 18-02: family-planning.md text-only (no screenshot) — carrier-screening already shows the variant table
 - 18-02: HFE clinical letter page uses markdown table for three-perspective comparison
 - 18-02: English text snippet shown in clinical-letter.md (docs are English; German mentioned as available)
+- 18-04: CITATION.cff uses ORCID for author identification (CFF 1.2.0 standard)
+- 18-04: Changelog stops at v1.2.0 (v1.3 in progress, not released)
+- 18-04: BibTeX @software type used for software citations
 
 ### Pending Todos
 
@@ -86,18 +89,19 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-23
-**Completed:** Phase 18 Plan 02 — use-cases index, carrier screening (CASE-01), family planning (CASE-02), clinical letter (CASE-03)
-**Status:** Plan 18-02 complete — Use Cases section done, ready for Reference section plans
+**Completed:** Phase 18 Plan 04 — CITATION.cff, about/citation.md, about/changelog.md, about/contributing.md, about/index.md
+**Status:** Plan 18-04 complete — About section fully written + CITATION.cff at repo root
 
 ### Handoff Notes
 
 v1.3 Documentation Site milestone:
 - Phase 16: VitePress Setup -- COMPLETE
 - Phase 17: Screenshot Automation -- COMPLETE
-- Phase 18: Documentation Content (16 requirements) — IN PROGRESS (plan 02 done)
+- Phase 18: Documentation Content (16 requirements) — IN PROGRESS (plans 01, 02, 04 done)
   - 18-01: Guide section (Introduction + Getting Started) -- COMPLETE
   - 18-02: Use Cases section (carrier screening, family planning, clinical letter) -- COMPLETE
-  - Remaining: Reference section, About section, etc.
+  - 18-04: About section (overview, citation, changelog, contributing) + CITATION.cff -- COMPLETE
+  - Remaining: Reference section plans
 - Phase 19: CI/CD Integration (5 requirements)
 - Phase 20: README Streamlining (3 requirements)
 - Branch: feature/v1.3-documentation
