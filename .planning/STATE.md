@@ -14,10 +14,10 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 ## Current Position
 
 **Milestone:** v1.3 Documentation Site
-**Phase:** 18 of 20 (Documentation Content) — In progress
-**Plan:** 5 of ~5 complete
-**Status:** Phase 18 plan 03 complete. All 5 reference section pages written. Phase 18 may now be complete pending final review.
-**Last activity:** 2026-02-23 -- Completed 18-03-PLAN.md (Reference overview, Methodology, Data Sources, Filters, Templates)
+**Phase:** 18 of 20 (Documentation Content) — COMPLETE
+**Plan:** 5 of 5 complete
+**Status:** Phase 18 complete. All 5 plans executed. Landing page disclaimer added. VitePress build verified with zero errors.
+**Last activity:** 2026-02-23 -- Completed 18-05-PLAN.md (Final quality gate: landing page disclaimer + build verification)
 
 ### Progress
 
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [█████████ ]  90% - Phase 18 complete (9/10 plans)
+v1.3 Docs:          [█████████ ]  95% - Phase 18 COMPLETE (10/10 plans)
 ```
 
-**Overall:** 69 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 70 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 69
-- v1.3 plans completed: 10
+- Total plans completed: 70
+- v1.3 plans completed: 11
 
 ---
 
@@ -75,6 +75,7 @@ Recent decisions affecting current work:
 - 18-04: BibTeX @software type used for software citations
 - 18-03: Use <span v-pre>{{variable}}</span> in markdown to escape Vue interpolation (backtick code spans inside tables and ::: containers still processed by VitePress alpha 16)
 - 18-03: Avoid {{}} in ::: tip/warning/info container text — Vue processes container content as Vue template
+- 18-05: Landing page disclaimer placed as ::: warning block in content section after frontmatter (not inside frontmatter)
 
 ### Pending Todos
 
@@ -91,22 +92,25 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-23
-**Completed:** Phase 18 Plan 03 — Reference overview, Methodology, Data Sources, Filters, Templates (all 5 reference pages)
-**Status:** Plan 18-03 complete — Phase 18 all content plans complete (01, 02, 03, 04)
+**Completed:** Phase 18 Plan 05 — Final quality gate (landing page disclaimer + build verification)
+**Status:** Phase 18 COMPLETE — All 5 plans executed. 17 pages, 14 screenshots, zero broken links verified.
 
 ### Handoff Notes
 
 v1.3 Documentation Site milestone:
 - Phase 16: VitePress Setup -- COMPLETE
 - Phase 17: Screenshot Automation -- COMPLETE
-- Phase 18: Documentation Content (16 requirements) — COMPLETE (all plans done)
+- Phase 18: Documentation Content (16 requirements) — COMPLETE
   - 18-01: Guide section (Introduction + Getting Started) -- COMPLETE
   - 18-02: Use Cases section (carrier screening, family planning, clinical letter) -- COMPLETE
   - 18-03: Reference section (overview, methodology, data sources, filters, templates) -- COMPLETE
   - 18-04: About section (overview, citation, changelog, contributing) + CITATION.cff -- COMPLETE
+  - 18-05: Final quality gate (landing page disclaimer + build verification) -- COMPLETE
 - Phase 19: CI/CD Integration (5 requirements) — NEXT
 - Phase 20: README Streamlining (3 requirements)
 - Branch: feature/v1.3-documentation
+
+Documentation site is verified and ready for Phase 19 CI/CD deployment pipeline setup.
 
 Template variable escaping pattern for VitePress: use `<span v-pre>{{variable}}</span>` for any {{}} in markdown docs. This is documented in 18-03-SUMMARY.md.
 
