@@ -38,7 +38,7 @@ Unified deployment pipeline merging the Vue app and VitePress docs into a single
 ### Failure handling & gating
 - Docs build failure blocks the entire deploy — app + docs are one artifact, both must succeed
 - Screenshot workflow failure auto-creates a GitHub issue tagged 'screenshots'
-- Screenshot auto-commit uses `[skip ci]` to prevent redundant CI checks on image-only changes, but allows deploy workflow to trigger (cascade deploy for fresh docs)
+- Screenshot auto-commit does NOT use `[skip ci]` — research (19-RESEARCH.md) proved `[skip ci]` skips ALL push-triggered workflows including deploy, making selective skip technically impossible. Cascade deploy is achieved via PAT push; infinite loop prevention via paths allow-list + actor check.
 - Rely on GitHub's built-in email notifications for workflow failures — no custom notifications
 
 ### Claude's Discretion
