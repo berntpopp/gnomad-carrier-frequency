@@ -108,9 +108,13 @@ export default defineConfig({
   },
   base: '/',  // Custom domain serves from root
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+    alias: [
+      {
+        find: /^@gnomad-cf\/core(\/.*)?$/,
+        replacement: fileURLToPath(new URL('../../packages/core/src', import.meta.url)) + '$1',
+      },
+      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+    ],
   },
   server: {
     // WSL2 with Windows filesystem requires polling for file watching

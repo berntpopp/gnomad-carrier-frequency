@@ -2,14 +2,8 @@ import { defineConfig } from 'tsdown'
 
 export default defineConfig({
   entry: {
-    index:        'src/index.ts',
-    types:        'src/types/index.ts',
-    config:       'src/config/index.ts',
-    queries:      'src/queries/index.ts',
-    client:       'src/client/index.ts',
-    filters:      'src/filters/index.ts',
-    calculations: 'src/calculations/index.ts',
-    templates:    'src/templates/index.ts',
+    // Currently only barrel export — entries added as modules are extracted in Phase 26
+    index: 'src/index.ts',
   },
   format: ['esm'],
   dts: true,

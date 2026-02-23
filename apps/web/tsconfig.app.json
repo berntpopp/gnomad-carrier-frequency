@@ -7,7 +7,9 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@gnomad-cf/core": ["../../packages/core/src/index.ts"],
+      "@gnomad-cf/core/*": ["../../packages/core/src/*"]
     },
 
     /* JSON imports */
