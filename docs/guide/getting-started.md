@@ -3,7 +3,7 @@
 This page walks you through a complete calculation from start to finish. You will search for a gene, set the patient's status, choose a frequency source, and review results — all in under a minute.
 
 ::: tip Before You Begin
-Open the calculator in a new tab: [Launch Calculator](https://carrier-frequency.requireform.com/). No account or installation required — the calculator runs entirely in your browser.
+Open the calculator in a new tab: [Launch Calculator](https://gnomad-carrier-frequency.kidney-genetics.org/). No account or installation required — the calculator runs entirely in your browser.
 :::
 
 ## Step 1: Search for a Gene
@@ -63,7 +63,7 @@ The frequency source step lets you specify where the carrier frequency data come
 
 The final step shows your calculation results and generates ready-to-use clinical documentation.
 
-The **population table** displays carrier frequency and recurrence risk for each gnomAD population. Global values appear first, followed by population-specific breakdowns (African/African American, Ashkenazi Jewish, East Asian, European non-Finnish, Finnish, Latino/Admixed American, Middle Eastern, South Asian, and others). If one population shows a notably higher carrier frequency than the global average, this may indicate a founder effect — a historically isolated population where a particular variant has become more common. See [Methodology](/reference/methodology) for details on the calculation.
+The **population table** displays carrier frequency and recurrence risk for each gnomAD population. Global values appear first, followed by population-specific breakdowns (African/African-American, Admixed American, Ashkenazi Jewish, East Asian, Finnish, Middle Eastern, Non-Finnish European, South Asian). If one population shows a notably higher carrier frequency than the global average, this may indicate a founder effect — a historically isolated population where a particular variant has become more common. See [Methodology](/reference/methodology) for details on the calculation.
 
 The **clinical text panel** on the right generates documentation based on your selections. You can choose the perspective — whether you are writing about an affected patient, a healthy carrier, or a family member — and the language (German or English). For German text, you can select the gender-inclusive style: asterisk (*), colon (:), or slash (/). The text is automatically populated with your gene, variant, frequency, and risk data.
 

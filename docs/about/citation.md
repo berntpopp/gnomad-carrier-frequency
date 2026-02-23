@@ -6,7 +6,7 @@ If you use the gnomAD Carrier Frequency Calculator in your research or clinical 
 
 Plain-text citation:
 
-> Popp, B. (2026). gnomAD Carrier Frequency Calculator (Version 1.2.0) [Software]. https://carrier-frequency.requireform.com/
+> Popp, B. (2026). gnomAD Carrier Frequency Calculator (Version 1.2.0) [Software]. https://gnomad-carrier-frequency.kidney-genetics.org/
 
 ## CITATION.cff
 
@@ -23,7 +23,7 @@ authors:
     orcid: "https://orcid.org/0000-0002-3679-1081"
 version: 1.2.0
 date-released: "2026-01-20"
-url: "https://carrier-frequency.requireform.com/"
+url: "https://gnomad-carrier-frequency.kidney-genetics.org/"
 repository-code: "https://github.com/berntpopp/gnomad-carrier-frequency"
 license: MIT
 keywords:
@@ -43,7 +43,7 @@ abstract: "A browser-based calculator for carrier frequencies and recurrence ris
   title = {gnomAD Carrier Frequency Calculator},
   year = {2026},
   version = {1.2.0},
-  url = {https://carrier-frequency.requireform.com/},
+  url = {https://gnomad-carrier-frequency.kidney-genetics.org/},
   license = {MIT}
 }
 ```

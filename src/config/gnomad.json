@@ -17,7 +17,7 @@
         { "code": "nfe", "label": "Non-Finnish European", "description": "European ancestry (non-Finnish)" },
         { "code": "sas", "label": "South Asian", "description": "South Asian ancestry" }
       ],
-      "notes": "v4.1 released Nov 2023, largest dataset with 807,162 samples"
+      "notes": "v4.1 released April 2024, largest dataset with ~807,162 samples"
     },
     "v3": {
       "version": "v3",

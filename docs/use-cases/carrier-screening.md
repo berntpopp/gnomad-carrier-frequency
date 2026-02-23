@@ -21,7 +21,7 @@ When the CFTR variant table loads, review each variant before accepting the defa
   <figcaption>The variant table lists all qualifying CFTR variants. Each row can be individually included or excluded from the carrier frequency calculation.</figcaption>
 </figure>
 
-One variant that may appear is **c.1210-11T>G** — also known as the 5T allele in the intron 8 polypyrimidine tract. This variant has disputed pathogenicity. Some classification schemes consider it pathogenic only in combination with specific TG tract lengths (TG12 or TG13), while others classify it as benign or of uncertain significance for most individuals. Its presence in gnomAD at appreciable frequency reflects this complexity: it causes complete cystic fibrosis only in specific combinations, and isolated carriers may have no clinical phenotype or only CBAVD (congenital bilateral absence of the vas deferens).
+One variant that may appear is **c.1210-11T>G** — also known as the 5T allele in the intron 8 polypyrimidine tract. This variant has context-dependent clinical significance. Its pathogenicity depends on the TG repeat tract length on the same allele (TG12 or TG13 increase severity) and whether a classic CF-causing variant is present on the other allele. Its presence in gnomAD at appreciable frequency reflects this complexity: it causes complete cystic fibrosis only in specific combinations, and isolated carriers may have no clinical phenotype or only CBAVD (congenital bilateral absence of the vas deferens).
 
 ### Excluding a Variant
 
@@ -39,9 +39,9 @@ The results table shows carrier frequencies for each gnomAD genetic ancestry gro
 
 With heterozygous carrier status selected, the recurrence risk for this couple equals:
 
-**carrier frequency of partner's population × carrier frequency of partner's population × 1/4**
+**partner's carrier frequency × 1/4**
 
-The ×1/4 accounts for the probability that both partners pass on the pathogenic allele in the same pregnancy. Because one partner is a known carrier (probability = 1), the result simplifies to: the other partner's carrier frequency × 1/4.
+Because one partner is a known carrier, the remaining question is whether the other partner also carries a pathogenic variant (probability = population carrier frequency). If both are carriers, the probability of an affected child in any given pregnancy is 1/4 (standard autosomal recessive Mendelian risk). The calculator therefore computes: carrier frequency ÷ 4.
 
 ::: info ClinGen Classification is Advisory
 ClinGen gene-disease validity classifications are shown in the results for reference but do not automatically filter variants. The variant table criteria (LoF HC + ClinVar pathogenic/likely pathogenic) are what determine the calculation inputs.

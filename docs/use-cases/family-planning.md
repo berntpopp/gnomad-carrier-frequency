@@ -24,17 +24,17 @@ The key difference between this scenario and a standard carrier screening consul
 
 For a **heterozygous carrier** (standard carrier screening):
 
-> recurrence risk = carrier_frequency × carrier_frequency × 1/4
+> recurrence risk = carrier_frequency / 4
 
-The ×1/4 accounts for two unknowns: whether the partner is also a carrier, and whether both pass on the pathogenic allele in a given pregnancy.
+The index patient is a known carrier. The risk depends on whether their partner also carries a pathogenic variant (probability = population carrier frequency) and, if so, whether both pass on the pathogenic allele (probability = 1/4). Since the index patient's carrier status is already established, the formula is: partner's carrier frequency × 1/4 = carrier_frequency / 4.
 
 For a **compound heterozygous or homozygous patient** (this scenario):
 
-> recurrence risk = carrier_frequency × 1/2
+> recurrence risk = carrier_frequency / 2
 
-The ×1/2 instead of ×1/4 reflects a critical difference: one parent is an **obligate carrier** (probability = 1, because the child inherited a pathogenic variant from each parent). Only the other parent's carrier status remains uncertain. With one obligate carrier and the other parent's carrier probability equal to the population carrier frequency, the risk of an affected child in any given pregnancy is carrier_frequency × 1/2.
+The ÷2 instead of ÷4 reflects a critical difference: the affected patient will always pass on at least one pathogenic allele. The risk therefore depends only on whether their partner carries a pathogenic variant (probability = carrier frequency) and passes it on (probability = 1/2 if carrier). With one obligate pathogenic allele from the affected parent, the formula becomes: carrier_frequency × 1/2 = carrier_frequency / 2.
 
-This is a substantially higher risk estimate than the standard carrier screening formula. For CFTR in a non-Finnish European family, where the carrier frequency is approximately 1 in 25, the recurrence risk is around 1 in 50 — compared to 1 in 2,500 from the standard carrier × carrier calculation.
+This is a substantially higher risk estimate than the carrier screening formula. For CFTR in a non-Finnish European family, where the carrier frequency is approximately 1 in 25, the recurrence risk for an affected patient's offspring is around 1 in 50 (carrier_frequency / 2) — compared to 1 in 100 (carrier_frequency / 4) for a known carrier.
 
 ::: tip Population-Specific Values
 Carrier frequencies vary substantially between ancestry groups. For CFTR, the non-Finnish European (NFE) carrier frequency is notably higher than in East Asian or South Asian populations, reflecting founder effects in European populations. When the family's ancestry is known, use the population-specific value rather than the global average.

@@ -9,7 +9,7 @@ Built to support clinical documentation workflows, the calculator queries the Ge
 ## Links
 
 - [GitHub Repository](https://github.com/berntpopp/gnomad-carrier-frequency) — Source code and issue tracker
-- [Open Calculator](https://carrier-frequency.requireform.com/) — Launch the calculator
+- [Open Calculator](https://gnomad-carrier-frequency.kidney-genetics.org/) — Launch the calculator
 - [Getting Started](/guide/getting-started) — Walkthrough for new users
 
 ## This Section

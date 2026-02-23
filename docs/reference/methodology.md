@@ -36,7 +36,7 @@ The carrier frequency is the heterozygous genotype frequency 2pq. For rare disea
 The calculator uses this approximation: `carrier_frequency = 2 × q`
 
 ::: info Why the Approximation Works
-For a gene with combined allele frequency q = 0.02 (2%): exact 2pq = 2 × 0.98 × 0.02 = 0.0392. Approximation 2q = 0.04. The difference is less than 0.001 (0.1%). For most clinical purposes, this is negligible. The approximation is accurate when q < 0.05 (5%), which covers virtually all autosomal recessive conditions.
+For a gene with combined allele frequency q = 0.02 (2%): exact 2pq = 2 × 0.98 × 0.02 = 0.0392. Approximation 2q = 0.04. The difference is 0.0008 — negligible for clinical purposes. The approximation is most accurate when q is small; for virtually all autosomal recessive conditions (q < 0.05), the error remains under 1%.
 :::
 
 ### Population-Specific Calculations

@@ -85,10 +85,10 @@ The calculator supports four German gender-inclusive writing styles. The selecte
 
 | Style | Example | Common Usage |
 |-------|---------|-------------|
-| Asterisk (`*`) | Anlagetrager\*innen | Most common in Germany; widely recognized |
-| Colon (`:`) | Anlagetrager:innen | Official German public service style guide |
-| Slash (`/`) | Anlagetrager/-innen | Traditional alternative form |
-| Traditional | Anlagetragerinnen und Anlagetrager | Full masculine and feminine form |
+| Asterisk (`*`) | Anlageträger\*innen | Most common in Germany; widely recognized |
+| Colon (`:`) | Anlageträger:innen | Official German public service style guide |
+| Slash (`/`) | Anlageträger/-innen | Traditional alternative form |
+| Traditional | Anlageträgerinnen und Anlageträger | Full feminine and masculine form |
 
 The gender style affects German output only. English templates do not use gendered patient forms.
 

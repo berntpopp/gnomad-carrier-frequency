@@ -39,7 +39,7 @@ The star threshold controls review confidence:
 | Stars | Meaning |
 |-------|---------|
 | 0 | No assertion criteria provided |
-| 1 | Assertion criteria provided (single submitter) |
+| 1 | Criteria provided, single submitter (also applies to conflicting classifications) |
 | 2 | Criteria provided, multiple submitters, no conflicts |
 | 3 | Reviewed by expert panel |
 | 4 | Practice guideline |

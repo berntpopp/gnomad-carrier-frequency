@@ -40,7 +40,7 @@ Select **German** as the output language, then choose the gender-inclusive style
 - **Asterisk (\*)** — Träger\*in — most widely used in clinical correspondence in German-speaking countries
 - **Colon (:)** — Träger:in — accepted in official contexts, used by some institutions
 - **Slash (/)** — Träger/in — traditional gender-inclusive style, less common in newer documentation
-- **Traditional** — Träger/Trägerin (long form) — explicit dual form, appropriate where space permits
+- **Traditional** — Trägerin und Träger (long form) — explicit dual feminine and masculine form, appropriate where space permits
 
 The generated text uses your calculation results automatically — the carrier frequency, recurrence risk, gene name, and data source are substituted into the template wherever the corresponding `{{variable}}` placeholders appear.
 
