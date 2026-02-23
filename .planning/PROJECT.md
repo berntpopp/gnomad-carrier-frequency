@@ -8,6 +8,21 @@ A progressive web application for genetic counselors to calculate carrier freque
 
 Accurate recurrence risk calculation from real gnomAD population data, with clinical documentation output that's ready to paste into patient letters.
 
+## Current Milestone: v1.5 Core Extraction & CLI
+
+**Goal:** Extract calculation engine into a reusable monorepo package with CLI for batch analyses, improve carrier frequency math (Hardy-Weinberg 2pq, homozygote exclusion, genetic prevalence), add community-curated gene configs, and build a comprehensive test suite.
+
+**Target features:**
+- Monorepo restructure (bun workspaces: core, cli, web)
+- Full CLI pipeline (gene lookup → status → recurrence risk → clinical text, batch mode)
+- Hardy-Weinberg 2pq carrier frequency calculation (#1)
+- gnomAD homozygote exclusion toggle (#3)
+- Genetic prevalence calculation q² + Bayesian (#7)
+- Community-curated gene-specific configs (JSON/YAML, PR-based) (#14)
+- Core package unit tests + CLI integration tests + web app component/E2E tests (#2)
+
+**GitHub issues:** #1, #2, #3, #7, #14, #16
+
 ## Current State
 
 **Version:** v1.4 Discoverability & Polish (shipped 2026-02-23)
@@ -99,23 +114,41 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 
 ### Active
 
-(None — planning next milestone)
+**Monorepo & Core Package**
+- [ ] Bun workspaces monorepo restructure (packages/core, packages/cli, apps/web)
+- [ ] Core package with typed API: carrier frequency, recurrence risk, clinical text
+- [ ] Web app imports core package instead of inline composables
 
-### Future (v1.5+)
+**CLI**
+- [ ] Full calculation pipeline from terminal (gene → status → frequency → risk → text)
+- [ ] Batch processing for multiple genes (JSON/CSV input and output)
+- [ ] Programmatic API for use as a library
 
-**Testing Infrastructure**
+**Calculation Improvements**
+- [ ] Hardy-Weinberg 2pq carrier frequency formula (#1)
+- [ ] gnomAD homozygote exclusion toggle (#3)
+- [ ] Genetic prevalence calculation (q² and Bayesian) (#7)
+
+**Community Gene Configs**
+- [ ] JSON/YAML per-gene configuration files (recommended filters, founder effects, notes)
+- [ ] Config loading in core package
+- [ ] PR-based contribution workflow with validation (#14)
+
+**Testing**
 - [ ] Vitest setup with coverage reporting
-- [ ] Unit tests for composables (useCarrierFrequency, useExclusionState, useHistoryStore)
-- [ ] Unit tests for utilities (variant-filters, frequency calculations, template renderer)
-- [ ] Component tests with Vue Test Utils
+- [ ] Core package unit tests (carrier frequency, recurrence risk, Hardy-Weinberg, template renderer)
+- [ ] CLI integration tests
+- [ ] Vue component tests with Vue Test Utils
 - [ ] Playwright E2E tests for critical flows (wizard completion, URL sharing, history)
 - [ ] CI integration for test coverage reporting
+
+### Future (v1.6+)
 
 **Features**
 - [ ] X-linked recessive inheritance calculation
 - [ ] X-linked dominant inheritance calculation
 - [ ] Bayesian residual risk for negative carrier test
-- [ ] Batch processing for multiple genes
+- [ ] Structural variant (SV) support (#8)
 - [ ] Export results to PDF
 - [ ] At-risk couple calculation (both partners)
 
@@ -130,6 +163,8 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - SSR / Nuxt migration — static HTML seed achieves 90% of SSR's SEO benefit
 - Full product tour library — genetic counselors are domain experts
 - Google Analytics — privacy concerns for medical tool
+- Structural variant support — deferred to v1.6+ (#8)
+- npm registry publishing — not yet needed, GitHub Pages is primary distribution
 
 ## Context
 
@@ -178,5 +213,7 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 | Module-level useConfirmDialog | Singleton refs ensure all consumers share same dialog state — v1.4 | ✓ Good |
 | German FAQ natural language | Different search terminology (Heterozygotenfrequenz vs carrier frequency) — v1.4 | ✓ Good |
 
+| Monorepo with bun workspaces | Core logic reusable across CLI + web + tests; single repo simplicity — v1.5 | — Pending |
+
 ---
-*Last updated: 2026-02-23 after v1.4 milestone*
+*Last updated: 2026-02-23 after v1.5 milestone start*
