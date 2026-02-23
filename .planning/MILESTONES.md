@@ -1,5 +1,33 @@
 # Project Milestones: gnomAD Carrier Frequency Calculator
 
+## v1.4 Discoverability & Polish (Shipped: 2026-02-23)
+
+**Delivered:** SEO-ready static HTML seed content with structured data, WCAG AA teal color system, first-time onboarding experience, and educational documentation pages.
+
+**Phases completed:** 21-24 (12 plans total)
+
+**Key accomplishments:**
+
+- Static HTML seed content (750 words) for Google indexing with sitemaps, canonical URLs, OG image PNG, and bilingual structured data (WebApplication + FAQPage)
+- WCAG AA teal primary color system (#117A7F/#4DB6AC) with skip-to-content link, footer desktop labels, and step transition loading indicator
+- First-time onboarding with WelcomeCard and CFTR quick-start, persistent gene context chip on Steps 2-4
+- useConfirmDialog composable replacing all 4 native alert/confirm calls with Vuetify dialogs
+- Educational docs pages (carrier frequency explainer + calculation tutorial) with Article JSON-LD
+- Expanded FAQ with 7 net-new questions and FAQPage structured data
+
+**Stats:**
+
+- 72 files created/modified (+6,753 / -199 lines)
+- ~76,044 lines total project code
+- 4 phases, 12 plans, 37 requirements
+- Same day ship (2026-02-23, ~2.5 hours)
+
+**Git range:** `feat(21-02)` → `fix(23)`
+
+**What's next:** v1.5 Testing Infrastructure or new feature milestone
+
+---
+
 ## v1.3 Documentation Site (Shipped: 2026-02-23)
 
 **Delivered:** Professional documentation site with auto-generated screenshots, deployed alongside the app on GitHub Pages at a custom domain.

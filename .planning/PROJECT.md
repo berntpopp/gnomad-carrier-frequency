@@ -2,38 +2,20 @@
 
 ## What This Is
 
-A progressive web application for genetic counselors to calculate carrier frequencies and recurrence risks for autosomal recessive conditions. Users enter a gene, select the index patient's status, and get population-specific carrier frequencies from gnomAD with calculated recurrence risks and ready-to-paste German or English clinical documentation text. The app works offline, supports shareable URLs, maintains a history of previous calculations, and includes a professional documentation site with automated screenshots.
+A progressive web application for genetic counselors to calculate carrier frequencies and recurrence risks for autosomal recessive conditions. Users enter a gene, select the index patient's status, and get population-specific carrier frequencies from gnomAD with calculated recurrence risks and ready-to-paste German or English clinical documentation text. The app works offline, supports shareable URLs, maintains a history of previous calculations, includes a professional documentation site with automated screenshots, and is SEO-optimized with static seed content and structured data for Google indexing.
 
 ## Core Value
 
 Accurate recurrence risk calculation from real gnomAD population data, with clinical documentation output that's ready to paste into patient letters.
 
-## Current Milestone: v1.4 Discoverability & Polish
-
-**Goal:** Fix Google indexing, improve search visibility with structured data and educational content, and polish the UI with better CTA colors, first-time onboarding, and mobile optimizations.
-
-**Target features:**
-- Static HTML seed content for Google indexing
-- Sitemap, canonical URLs, robots meta, preconnect hints
-- OG image PNG with absolute URLs
-- Expanded structured data (WebApplication + FAQPage schema)
-- Title tag + meta description optimization
-- VitePress sitemap generation + cross-linking (app ↔ docs)
-- 2-3 educational docs pages (carrier frequency, Hardy-Weinberg, FAQ)
-- CTA/primary color fix with clear disabled/enabled contrast
-- First-time onboarding (welcome card / "Try with CFTR")
-- Mobile title reduction + persistent gene context chip
-- Replace native alert()/confirm() with Vuetify dialogs
-- Skip-to-content link, footer icon labels, step transition loading
-
 ## Current State
 
-**Version:** v1.3 Documentation Site (shipped 2026-02-23)
+**Version:** v1.4 Discoverability & Polish (shipped 2026-02-23)
 **Deployed:** https://gnomad-carrier-frequency.kidney-genetics.org/
 **Docs:** https://gnomad-carrier-frequency.kidney-genetics.org/docs/
-**Codebase:** ~30,624 lines TypeScript/Vue/Markdown
+**Codebase:** ~76,044 lines TypeScript/Vue/Markdown
 
-**Features delivered (v1.0-v1.3):**
+**Features delivered (v1.0-v1.4):**
 - gnomAD API integration (v4, v3, v2 support)
 - 4-step wizard: Gene → Status → Frequency → Results
 - Population-specific carrier frequencies with founder effect detection
@@ -53,6 +35,14 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - **v1.3:** Unified deployment pipeline (app + docs at custom domain)
 - **v1.3:** CITATION.cff with CFF 1.2.0 and BibTeX support
 - **v1.3:** Research-use-only disclaimers on docs and landing page
+- **v1.4:** Static HTML seed content (750 words) for Google indexing
+- **v1.4:** Sitemaps, canonical URLs, OG image, bilingual structured data
+- **v1.4:** WCAG AA teal primary color (#117A7F/#4DB6AC) with warm gray secondary
+- **v1.4:** Skip-to-content link, footer desktop labels, step loading indicator
+- **v1.4:** First-time onboarding (WelcomeCard + CFTR quick-start)
+- **v1.4:** Gene context chip on Steps 2-4, mobile title hiding
+- **v1.4:** useConfirmDialog composable replacing native dialogs
+- **v1.4:** Educational docs (carrier frequency explainer, calculation tutorial, expanded FAQ)
 
 ## Requirements
 
@@ -92,31 +82,26 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - ✓ Citation page with CFF and BibTeX — v1.3
 - ✓ Unified deploy workflow (app + docs merged artifact) — v1.3
 - ✓ Slim README with docs site link — v1.3
+- ✓ Static HTML seed content for Google indexing (750 words) — v1.4
+- ✓ Sitemaps, canonical URL, robots meta, preconnect hints — v1.4
+- ✓ OG image PNG with absolute HTTPS URLs — v1.4
+- ✓ Structured data (WebApplication + bilingual FAQPage) — v1.4
+- ✓ Title tag + meta description optimization — v1.4
+- ✓ VitePress sitemap generation + app ↔ docs cross-linking — v1.4
+- ✓ Teal primary color WCAG AA (#117A7F/#4DB6AC) — v1.4
+- ✓ Skip-to-content link + footer desktop labels — v1.4
+- ✓ Step transition loading indicator — v1.4
+- ✓ First-time onboarding (WelcomeCard + CFTR quick-start) — v1.4
+- ✓ Gene context chip on Steps 2-4 — v1.4
+- ✓ useConfirmDialog replacing native dialogs — v1.4
+- ✓ Educational docs pages (carrier frequency, Hardy-Weinberg) — v1.4
+- ✓ Expanded FAQ with FAQPage structured data — v1.4
 
 ### Active
 
-**SEO & Discoverability**
-- [ ] Static HTML seed content in index.html for crawler indexing
-- [ ] Sitemap.xml, canonical URL, robots meta
-- [ ] OG image PNG with absolute URLs
-- [ ] Expanded structured data (WebApplication + FAQPage)
-- [ ] Title tag + meta description optimization
-- [ ] VitePress sitemap generation
-- [ ] App ↔ docs cross-linking
-- [ ] Educational docs pages (carrier frequency, Hardy-Weinberg, FAQ)
-- [ ] Preconnect hints for gnomAD API
+(None — planning next milestone)
 
-**UI/UX Polish**
-- [ ] CTA/primary color fix with disabled/enabled contrast
-- [ ] First-time onboarding experience
-- [ ] Mobile title reduction
-- [ ] Persistent gene context chip (Steps 2-4)
-- [ ] Replace native alert()/confirm() with Vuetify dialogs
-- [ ] Skip-to-content link
-- [ ] Footer icon labels on desktop
-- [ ] Step transition loading indicator
-
-### Future (v1.4+)
+### Future (v1.5+)
 
 **Testing Infrastructure**
 - [ ] Vitest setup with coverage reporting
@@ -134,11 +119,17 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - [ ] Export results to PDF
 - [ ] At-risk couple calculation (both partners)
 
+**Performance**
+- [ ] Tree-shakeable icons (@mdi/js migration)
+
 ### Out of Scope
 
 - Backend/database — direct gnomAD GraphQL from browser
 - User accounts/authentication — stateless tool
 - Diagnostic claims — clinical tool for documentation, not diagnosis
+- SSR / Nuxt migration — static HTML seed achieves 90% of SSR's SEO benefit
+- Full product tour library — genetic counselors are domain experts
+- Google Analytics — privacy concerns for medical tool
 
 ## Context
 
@@ -174,12 +165,18 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 | Singleton composables | Shared state across components (exclusions, history) — v1.2 | ✓ Good |
 | lz-string for URL compression | Compact exclusion encoding in shareable URLs — v1.2 | ✓ Good |
 | 50-entry history default | Balance of utility vs storage — v1.2 | ✓ Good |
-| VitePress for docs | Same Vite/Vue ecosystem, shared node_modules, used by Vue/Pinia/Vitest — v1.3 | ✓ Good |
+| VitePress for docs | Same Vite/Vue ecosystem, shared node_modules — v1.3 | ✓ Good |
 | Playwright for screenshots | Same Node/TS ecosystem, full control over wizard navigation — v1.3 | ✓ Good |
 | Merged deployment artifact | App at root, docs at /docs/, single GitHub Pages deployment — v1.3 | ✓ Good |
 | Fixture-based API mocking | Realistic CFTR data for reproducible screenshots — v1.3 | ✓ Good |
 | Clinical-first voice in docs | Research tool supporting clinical work, "For Research Use Only" — v1.3 | ✓ Good |
 | `<span v-pre>` for template vars | VitePress alpha processes {{}} in containers — v1.3 | ✓ Good |
+| Title leads with "Carrier Frequency Calculator" | Primary search term users type; gnomAD is secondary qualifier — v1.4 | ✓ Good |
+| seed-* CSS class prefix | Avoids Vuetify global style conflicts at runtime — v1.4 | ✓ Good |
+| Teal primary #117A7F / #4DB6AC | WCAG AA contrast (5.10:1 / 6.83:1); warm gray → secondary — v1.4 | ✓ Good |
+| useGeneSearch singleton | Module-level state enables prefillGene for onboarding — v1.4 | ✓ Good |
+| Module-level useConfirmDialog | Singleton refs ensure all consumers share same dialog state — v1.4 | ✓ Good |
+| German FAQ natural language | Different search terminology (Heterozygotenfrequenz vs carrier frequency) — v1.4 | ✓ Good |
 
 ---
-*Last updated: 2026-02-23 after v1.4 milestone started*
+*Last updated: 2026-02-23 after v1.4 milestone*
