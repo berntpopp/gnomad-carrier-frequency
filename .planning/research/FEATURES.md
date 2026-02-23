@@ -1,281 +1,499 @@
-# Feature Landscape: SEO & UX Polish
+# Feature Research
 
-**Domain:** Medical/scientific SPA tool -- SEO discoverability and UX polish
-**Project:** gnomAD Carrier Frequency Calculator (v1.3 -> v1.4)
+**Domain:** CLI tools, community gene curation, carrier frequency calculations
+**Project:** gnomAD Carrier Frequency Calculator — v1.5 milestone
 **Researched:** 2026-02-23
-**Overall Confidence:** HIGH (verified against existing codebase, competitor analysis, SEO audit findings, UX audit findings, and current web standards)
+**Confidence:** HIGH for calculation methods (verified against peer-reviewed literature and published pipelines); MEDIUM for CLI patterns (established conventions, no single authoritative source); MEDIUM for gene config schema (community practice, not standardized)
 
 ---
 
-## Context
+## Context: What Already Exists
 
-This research focuses on features needed for SEO indexing and UX polish for an existing Vue 3/Vuetify 3 SPA tool. The app is currently NOT indexed by Google (empty `<body>` in HTML), CTA buttons use a muted `#a09588` color that looks disabled, there is no first-time user onboarding, and the app/docs sites are poorly cross-linked. Competitors (Perinatology, GeniE, Omni Calculator) all use static HTML, 1200-3500 words of content, and structured data.
+The existing web app (`src/utils/frequency-calc.ts`) calculates carrier frequency as:
 
-### What Already Exists
+```
+carrier_freq = 2 × Σ(variant_AF_i)
+```
 
-- `@unhead/vue` for meta tag management (not actively used in app shell)
-- `index.html` with WebApplication + FAQPage structured data (6 FAQ items)
-- VitePress docs site at `/docs/` with 17 pages (pre-rendered HTML)
-- PWA with offline support via `vite-plugin-pwa`
-- Disclaimer modal on first visit via `useAppStore`
-- Footer with icon buttons (GitHub, disclaimer, data sources, methodology, FAQ, about, logs)
-- Dark/light theme toggle
-- `robots.txt` with only `Allow: /` (no sitemap reference)
-- OG tags using relative SVG path (broken on all social platforms)
+where `variant_AF_i = (exome_AC + genome_AC) / (exome_AN + genome_AN)` per variant. This is the simplified Hardy-Weinberg estimate using `2q ≈ 2 × sum(AF)` without accounting for homozygotes and without properly applying the full HWE formula. The recurrence risk uses `carrier_freq / 4` (heterozygous index) or `carrier_freq / 2` (homozygous/compound het index).
 
-### What Is Missing
-
-- Static HTML content in `<body>` for crawlers (currently `<div id="app"></div>`)
-- `sitemap.xml` for either app or docs
-- `<link rel="canonical">` tag
-- `<meta name="robots">` directive
-- PNG OG image (currently SVG, unsupported by social platforms)
-- Cross-links between app and docs site
-- Any onboarding for first-time users
-- Distinct CTA color (primary `#a09588` makes buttons look disabled)
+The v1.5 milestone targets: Hardy-Weinberg 2pq, homozygote exclusion, genetic prevalence (q² and Bayesian), CLI, community gene configs, and a full test suite.
 
 ---
 
-## Table Stakes
+## Calculation Methods: Research Findings
 
-Features users/crawlers expect. Missing means the product is invisible to search engines or confusing to first-time users.
+### Hardy-Weinberg Equilibrium Fundamentals
 
-### SEO: Fix Indexing (CRITICAL)
+**Source:** [Hardy-Weinberg Equilibrium — Biology LibreTexts](https://bio.libretexts.org/Workbench/Modern_Genetics/11:_Population_genetics/11.01:_Hardy-Weinberg_equilibrium), [Khan Academy HWE](https://www.khanacademy.org/science/ap-biology/natural-selection/hardy-weinberg-equilibrium/v/applying-hardy-weinberg), [Nature Scitable](https://www.nature.com/scitable/definition/hardy-weinberg-equation-299/)
+**Confidence:** HIGH
 
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| **Static HTML seed in `<div id="app">`** | Google sees empty body; SPA rendering is unreliable for low-crawl-priority sites | Low | None -- edit `index.html` | Place keyword-rich content inside `#app` div; Vue replaces on mount. Include H1, feature list, "How it works" section. Must reach 500+ words to compete. |
-| **`<noscript>` fallback** | Crawlers that skip JS need basic content | Low | Pairs with HTML seed | Brief description + link to docs site |
-| **`sitemap.xml`** | Google cannot efficiently discover pages without one | Low | List of all app + docs URLs | Place in `public/sitemap.xml` with both app root and all docs pages |
-| **`robots.txt` with sitemap reference** | Current `robots.txt` has no sitemap pointer | Low | Depends on sitemap existing | Add `Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/sitemap.xml` |
-| **`<link rel="canonical">`** | Prevents duplicate content issues; required for proper indexing | Low | None -- add to `<head>` | `https://gnomad-carrier-frequency.kidney-genetics.org/` |
-| **`<meta name="robots" content="index, follow">`** | Explicit indexing directive for crawlers | Low | None -- add to `<head>` | Standard practice |
-| **PNG OG image (1200x630)** | SVG OG images are not rendered by Facebook, LinkedIn, Twitter/X, Slack, Discord | Low | Need to generate PNG from existing SVG or create new | Use `sharp` (already in devDependencies) to convert at build time, or create a static PNG. Keep under 300KB. |
-| **Absolute URLs for OG tags** | Current `./og-image.svg` relative path is unreliable across platforms | Low | Depends on PNG creation | Change to full `https://...` URL |
-| **VitePress sitemap generation** | Docs pages are pre-rendered HTML that Google can index immediately -- need sitemap to discover them | Low | Add `sitemap` config to `docs/.vitepress/config.ts` | VitePress has built-in sitemap support: `sitemap: { hostname: '...' }` |
+The HWE genotype frequency equation: `p² + 2pq + q² = 1`
 
-**Confidence:** HIGH -- all items verified against Google's own documentation, competitor analysis, and current web standards.
+Where:
+- `q` = pathogenic allele frequency (sum of all pathogenic AFs per gene)
+- `p` = wild-type allele frequency = `1 - q`
+- `2pq` = heterozygote (carrier) frequency
+- `q²` = affected (homozygous/compound het) frequency
 
-### SEO: On-Page Optimization
+For rare diseases where `q` is small, `p ≈ 1`, so `2pq ≈ 2q`, meaning the current simplified formula `2 × sum(AF)` is a valid approximation. However, for higher-frequency variants (e.g., CFTR ΔF508 in Europeans, q ≈ 0.02), the difference between `2q` and `2pq = 2q(1-q)` is meaningful (e.g., 0.0400 vs 0.0392 for q=0.02, a 2% overestimate). Clinical-grade tools use `2pq`.
 
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| **Optimized title tag** | Current title leads with "gnomAD" which means nothing to most searchers. Should lead with target keyword. | Low | None | Change to: "Carrier Frequency Calculator -- gnomAD Population Data" |
-| **Optimized meta description** | Current is good but missing differentiators ("free", "real population data", "multiple ancestries") | Low | None | Add "free" modifier and key differentiators |
-| **Updated WebApplication structured data** | Current schema missing `datePublished`, `dateModified`, `screenshot` fields | Low | Depends on PNG OG image | Add version, dates, screenshot URL |
-| **Internal links in static HTML seed** | Static content must link to docs pages so Google discovers them on first crawl | Low | Depends on HTML seed content | Link to 3-5 key docs pages from the seed content |
+### Homozygote Exclusion from Carrier Count
 
-**Confidence:** HIGH -- based on SEO audit findings and competitor comparison matrix.
+**Source:** [npj Genomic Medicine pipeline](https://pmc.ncbi.nlm.nih.gov/articles/PMC9763236/), [gnomAD variant interpretation lessons](https://pmc.ncbi.nlm.nih.gov/articles/PMC9160216/), [Schmitz et al. 2022 Clinical Genetics](https://onlinelibrary.wiley.com/doi/abs/10.1111/cge.14148)
+**Confidence:** HIGH
 
-### UX: CTA Color System
+The published pipeline (Guo et al., npj Genomic Medicine 2022) uses:
 
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| **Distinct primary CTA color** | Current `#a09588` (muted warm gray) makes CONTINUE buttons look disabled. UX audit scored Color & Contrast 6.5/10. | Low | Edit Vuetify theme in `main.ts` | Recommend a saturated, accessible blue or teal (e.g., `#1976D2` or `#00897B`). Keep warm gray as brand/secondary accent. Must pass WCAG AA contrast on both white and dark backgrounds. |
-| **Clear disabled vs. enabled distinction** | Users cannot tell if CONTINUE is clickable -- enabled and disabled states are nearly identical | Low | Depends on new primary color | Enabled = saturated color; Disabled = 30% opacity of that color. Use `aria-disabled` pattern for better a11y. |
-| **Stepper header color update** | Stepper circles use same muted primary, reducing visual hierarchy | Low | Depends on new primary color | Completed steps should use the new primary; current step should be visually prominent |
+```
+VCR = (AC - 2×Hom) / (0.5 × AN)
+```
 
-**Confidence:** HIGH -- directly observed in UX audit; confirmed by CTA design best practices research.
+Rationale: homozygotes contribute 2 alleles to AC but 0 to carrier count. The denominator `0.5 × AN` converts from alleles to individuals. This can be rewritten as:
+
+```
+carrier_count = AC - 2×Hom
+individual_count = AN / 2
+VCR = carrier_count / individual_count = (AC - 2×Hom) / (AN / 2)
+```
+
+Multi-variant gene carrier rate (GCR) then uses inclusion-exclusion to avoid double-counting:
+
+```
+GCR = 1 - Π(1 - VCRᵢ)   for all variants i in the gene
+```
+
+The existing app uses `2 × Σ(AF)` which overestimates because homozygotes are counted as carriers (they are not — they are affected individuals) and the approximation `2q ≈ 2pq` ignores the `(1-q)` correction.
+
+**Homozygote filter for pathogenicity:** Variants with 10+ homozygotes in gnomAD are typically flagged as likely non-pathogenic (or reduced penetrance) for severe early-onset conditions. This is a separate concern from the calculation — it is a variant-quality filter, not a formula change.
+
+### Genetic Prevalence: q² and Bayesian
+
+**Source:** [GeniE Genetic Prevalence Estimator](https://gnomad.broadinstitute.org/news/2024-06-genie/), [CureFZ disease prevalence estimation](https://www.curefzi.org/2019/06/05/using-genetic-data-to-estimate-disease-prevalence/), [PMC7007541 worldwide IRD prevalence](https://pmc.ncbi.nlm.nih.gov/articles/PMC7007541/)
+**Confidence:** HIGH for q² formula; MEDIUM for Bayesian approach
+
+**Method 1: q² (Hardy-Weinberg)**
+
+```
+q = Σ(pathogenic AF per gene)
+genetic_prevalence = q²
+```
+
+This estimates the proportion of individuals expected to be affected (homozygous or compound heterozygous) under HWE assumptions. GeniE (Broad Institute, 2024) uses this method directly from gnomAD allele frequencies.
+
+**Method 2: Bayesian / penetrance-adjusted**
+
+```
+P(disease) = P(genotype) × penetrance / P(genotype | disease)
+           = q² × penetrance
+```
+
+When penetrance < 1 (e.g., CFTR variants with variable expression), the naive q² overestimates prevalence. The Bayesian adjustment multiplies by penetrance. For most severe AR conditions with full penetrance, q² and Bayesian yield near-identical results (as confirmed by Guo et al., 2022).
+
+**Practical note:** The published studies (Genetics in Medicine 2024, Kandolin et al. 2024) validate that Bayesian methods and HWE maximum-likelihood methods produce "highly concordant results" for severe AR conditions. q² is the correct starting point; Bayesian is the refinement for partial penetrance.
 
 ---
 
-## Differentiators
+## Feature Landscape
 
-Features that set the product apart. Not expected, but create competitive advantage for ranking and user retention.
+### Table Stakes (Users Expect These)
 
-### SEO: Content & Authority
+Features that are expected for a v1.5 milestone of this tool. Missing any of these means the milestone deliverable is incomplete or the tool is less accurate than published literature.
+
+| Feature | Why Expected | Complexity | Dependencies on Existing Code | Notes |
+|---------|--------------|------------|-------------------------------|-------|
+| **Hardy-Weinberg 2pq carrier frequency** | Published gnomAD pipelines (npj Genomic Medicine, Genetics in Medicine 2024) use 2pq, not 2q. Current 2×sum(AF) is a known approximation. Clinical tools should be accurate. | Low | Modify `calculateCarrierFrequency()` in `frequency-calc.ts` | New formula: `q = Σ(AF); p = 1 - q; cf = 2pq`. Backward-compatible if expressed as a flag. For rare diseases q<<1 the change is <0.5%; for common variants (CFTR in Europeans) it is ~2%. |
+| **Homozygote exclusion from carrier count** | The gnomAD homozygote count is available in API responses. Published pipelines explicitly subtract `2×Hom` from carrier counts to avoid counting affected individuals as carriers. Current code ignores homozygote data entirely. | Medium | Requires homozygote count in `VariantFrequencyData` type; `aggregatePopulationFrequencies()` needs updating | gnomAD API already returns homozygote counts per population. Types must be updated to include `hom` field. Formula per variant: `VCR = (AC - 2×Hom) / (AN / 2)`. |
+| **Gene carrier rate via inclusion-exclusion** | When combining multiple variants per gene, simple sum of AFs overcounts. Published formula is `GCR = 1 - Π(1 - VCRᵢ)`. This is the standard for multi-variant genes. | Medium | Replace `2 × Σ(AF)` in `globalStats` computation | Critical for genes with many pathogenic variants (e.g., CFTR with 30+ variants). For single-variant genes, difference is negligible. |
+| **Genetic prevalence q²** | Directly derived from carrier frequency research. GeniE (Broad/gnomAD official tool 2024) implements this. Users will expect this output alongside carrier frequency. | Low | New computed value in `useCarrierFrequency.ts` and `frequency-calc.ts` | `q² = q²` where `q = Σ(AF)`. Display as "1 in N" births expected to be affected. Include in CLI output and results panel. |
+| **CLI: single gene calculation** | Any tool adding a "core package" must expose CLI. Standard expectation for bioinformatics tools (bcftools, VEP, ANNOVAR all have CLI). Users expect `gnomad-cf CFTR --population nfe` to work. | High | Requires monorepo restructure (bun workspaces) + extraction of core calculation logic from Vue composables into a framework-agnostic package | CLI must replicate the full pipeline: gene lookup → variant fetch → filter → calculate → output. |
+| **CLI: JSON output by default** | All modern bioinformatics CLIs support structured output for programmatic consumption. VEP, bcftools, and community tools all support `--format json`. | Low | Part of CLI implementation | JSON output allows `jq` piping. Also support TSV/CSV for spreadsheet users. |
+| **CLI: --help with all flags** | Unix CLI convention. Every flag documented inline. | Low | Part of CLI implementation using Click (Python) or commander.js (Node) | Include examples in `--help` text. |
+| **CLI: batch mode (gene list input)** | Published pipelines process gene lists (Kandolin et al. processed 113 ACMG genes; Guo et al. processed 2699 genes). Batch is the primary use case for research users. | Medium | Depends on single-gene CLI working; needs rate-limiting for gnomAD API | Accept JSON/CSV/newline-delimited gene lists. Output one result per line (JSONL) or full JSON array. |
+| **Core package unit tests** | No test suite currently exists. Adding calculation improvements without tests risks silent regressions. Standard practice for any extracted library. | Medium | Requires Vitest setup; no existing test infrastructure | Test `calculateCarrierFrequency`, `calculateHWE`, `homozygote exclusion`, `genetic prevalence` with known values (e.g., CFTR ΔF508 q≈0.02 in NFE → expected carrier freq ≈ 3.9%). |
+| **Community gene config loading** | The app already has a config-driven architecture (`src/config/`). Users need a place to register gene-specific recommended filters, founder effect notes, and variant exclusions. | Medium | Extend existing config system; add per-gene JSON/YAML files | One file per gene (e.g., `genes/CFTR.json`) with recommended filters, known founder variants, and curation notes. |
+
+**Confidence:** HIGH (all verified against published literature and the existing codebase).
+
+### Differentiators (Competitive Advantage)
+
+Features that go beyond what published pipelines provide and differentiate this tool for clinical genetic counseling use.
 
 | Feature | Value Proposition | Complexity | Dependencies | Notes |
 |---------|-------------------|------------|--------------|-------|
-| **Cross-link: App footer "Docs" icon** | Persistent link from every app page view to docs; passes link equity to pre-rendered content | Low | Add icon button to `AppFooter.vue` | Use `mdi-book-open-variant` icon alongside existing footer icons. Links to `/docs/`. Natural fit with existing icon pattern. |
-| **Cross-link: Docs "Open Calculator" CTAs in content** | Docs pages currently have only one nav-bar link back to app. Adding contextual CTAs within page content (e.g., "Try calculating CFTR carrier frequency") increases click-through. | Low | Edit VitePress markdown pages | Place 1-2 contextual CTA links per docs page, not just the navbar button |
-| **Cross-link: Static HTML nav to docs** | Links in the HTML seed content create crawl paths Google follows on first visit, before JS renders | Low | Depends on HTML seed | Include `<nav>` with links to "What is Carrier Frequency?", "Methodology", "FAQ", "Getting Started" |
-| **Expanded FAQPage structured data** | Already have 6 FAQ items in schema. Competitors with FAQ rich results (Omni Calculator) get enhanced Google listings. Could expand to 8-10 questions. | Low | Edit `index.html` JSON-LD | Add questions about: specific diseases (CFTR, SMA), data freshness, clinical use, methodology comparison vs GeniE |
-| **E-E-A-T author signals** | Google prioritizes content from recognized experts for medical topics (YMYL). Adding author credentials builds trust. | Low | Add to structured data + static content | Add `author` with credentials (MD, PhD affiliation). Already have Bernt Popp as author; add institution and credentials. |
-| **`datePublished` and `dateModified`** | Signals content freshness to Google. Competitors with recent dates rank higher. | Low | Auto-update in build pipeline or manual | Embed in both structured data and visible static content |
+| **Genetic prevalence Bayesian (penetrance-adjusted)** | q² assumes full penetrance. Adding a penetrance parameter allows calculation for CFTR (mild alleles), HCM genes (30-50% penetrance). GeniE does not expose this. | Medium | Depends on q² implementation; adds user-facing penetrance input | Store penetrance in gene configs with citation. Default penetrance = 1.0 (full). Display adjusted prevalence alongside naive q². |
+| **Homozygote count filter flag (pathogenicity QC)** | Variants with 10+ gnomAD homozygotes are likely non-pathogenic for severe conditions. Exposing this as a configurable filter (default ON) catches a class of false positives not currently handled. | Low | Requires homozygote count in types (same dependency as homozygote exclusion calculation) | Configurable threshold from config JSON. CLI flag `--max-homozygotes 10`. Different from homozygote exclusion from carrier formula — this is a variant filter, not a formula change. |
+| **At-risk couple frequency** | `P(both carriers) = GCF₁ × GCF₂`. Standard in carrier screening reports. GeniE calculates this; the existing web app does not. | Low | Depends on full HWE calculation | Display in results panel and CLI output. Formula: `CF_partner1 × CF_partner2`. For same gene: `GCF²`. |
+| **PR-based gene config contribution workflow** | GitHub Actions validation on gene config PRs (schema check, required fields, citation format). Enables community contributions without breaking production. | Medium | Depends on gene config schema being finalized; GitHub Actions CI | Validate schema with JSON Schema or Zod. Block merge if required fields missing. Auto-generate docs from configs. |
+| **Population-stratified prevalence display** | Show q² per population, not just globally. Critical for founder effect genes (e.g., CFTR in Ashkenazi Jewish population). No competitor shows population-stratified prevalence in the UI. | Low | Depends on q² implementation + existing population breakdown in app | Per-population q² = per-population q². Already have the population breakdown. |
+| **CLI: clinical text output** | The web app generates clinical documentation text (German/English). Exposing this in the CLI means genetic counselors can automate text generation for batch reporting. No other CLI tool does this. | Medium | Depends on extracting `template-renderer.ts` into core package | `gnomad-cf CFTR --patient-status heterozygous --language de --output text` |
+| **CLI: stdin/stdout piping** | Accept gene names from stdin, output to stdout. Enables shell pipeline composition: `cat genes.txt \| gnomad-cf --batch - \| jq '.[] \| select(.carrierFrequency > 0.01)'` | Low | Depends on batch mode CLI | Standard Unix convention (VEP, bcftools all support this). |
+| **Gene config: founder effect variant annotations** | Per-gene configs can document specific founder effect variants with population, frequency, and clinical citation. This transforms the app from "gnomAD lookup" to "curated clinical resource." | Medium | Depends on gene config schema | Store variant IDs with founder effect notes. Display in variant table. Export to CLI output. |
+| **Shareable URL for CLI results** | Output includes a URL that opens the web app pre-populated with the same calculation. Bridges CLI research workflow with web-based clinical documentation. | Low | Depends on existing URL state encoding (`useUrlState.ts`) | Existing URL encoding already handles full state. CLI generates the URL from the same inputs. |
 
-**Confidence:** MEDIUM-HIGH -- cross-linking patterns verified from competitor analysis and SEO best practices. E-E-A-T importance for medical content confirmed by Google's own YMYL guidelines.
+**Confidence:** MEDIUM (competitive analysis confirms gap vs. GeniE and published pipelines; implementation complexity estimated from existing codebase familiarity).
 
-### UX: First-Time Onboarding
+### Anti-Features (Commonly Requested, Often Problematic)
 
-| Feature | Value Proposition | Complexity | Dependencies | Notes |
-|---------|-------------------|------------|--------------|-------|
-| **Welcome hero card on Step 1** | Replace the bare gene search with a brief welcome card showing what the tool does and why to use it. Displayed only for first-time users (before any gene search). 2-3 sentences + "Try with CFTR" quick-start button. | Medium | `useAppStore` already tracks `disclaimerAcknowledged`; add `hasUsedApp` flag | Card disappears after first gene search. Stored in localStorage via Pinia persistence. Should NOT block the gene search input -- display above or alongside it. |
-| **"Try with CFTR" quick-start** | One-click demo with a well-known gene dramatically reduces time-to-value. CFTR (cystic fibrosis) is universally recognized by genetic counselors. | Medium | Depends on welcome card; requires programmatic gene selection | Pre-fill the gene search and trigger selection. Show as a prominent button on the welcome card. |
-| **Contextual help links on wizard steps** | Small "Learn more" links on each step pointing to relevant docs pages. Step 1 -> "What is carrier frequency?", Step 3 -> "Methodology", Step 4 -> "How to interpret results". | Low | Requires docs pages to exist at target URLs (they do) | Use `text-caption` links below step descriptions. Non-intrusive but discoverable. |
-| **Footer icon text labels (desktop)** | Current footer uses icon-only buttons (data sources, methodology, FAQ, about, logs). First-time users cannot discover these features. | Low | Edit `AppFooter.vue` | Add text labels below or beside icons on sm+ screens. Keep icon-only on mobile (already correct via overflow menu). |
-
-**Confidence:** HIGH for welcome card and quick-start patterns (standard onboarding UX). MEDIUM for contextual help links (value depends on docs content quality).
-
-### UX: Visual Polish
-
-| Feature | Value Proposition | Complexity | Dependencies | Notes |
-|---------|-------------------|------------|--------------|-------|
-| **Brand color as secondary, not primary** | Keep `#a09588` warm gray as brand accent (AppBar logo hover, section dividers, subtle backgrounds) while using a saturated color for all interactive elements | Low | Part of CTA color system change | Update Vuetify theme: `primary` becomes the new CTA color; add `brand: '#a09588'` as custom color |
-| **Persistent gene context chip** | After gene selection, show a small chip below stepper ("CFTR \| gnomAD v4.1") on Steps 2-4 so users never lose context | Medium | Access wizard state from new component | Reduces cognitive load; users do not have to navigate back to confirm their selection |
-| **Reduced mobile title footprint** | Full title wraps to 3 lines on mobile, consuming 25%+ of viewport | Low | Edit `App.vue` conditional rendering | On mobile (xs), hide the `<h1>` since "gCFCalc" in AppBar already identifies the app |
-| **Replace native alert/confirm dialogs** | Template import errors and template reset use native `alert()`/`confirm()` which break the visual language | Medium | Create reusable Vuetify confirm dialog component | Use `v-dialog` with confirm/cancel actions for consistency |
-
-**Confidence:** HIGH -- all directly observed in UX audit screenshots.
-
----
-
-## Anti-Features
-
-Features to explicitly NOT build. Common mistakes when adding SEO and UX polish.
+Features that seem valuable but should be deliberately excluded from v1.5 scope.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| **Server-side rendering (SSR) / Nuxt migration** | Massive architectural change for a single-page calculator tool. The app has one indexable route (`/`). Static HTML seed content in `index.html` achieves 90% of SSR's SEO benefit at 1% of the effort. The docs site (VitePress) already handles the content-heavy pages with pre-rendered HTML. | Use static HTML seed in `index.html` + VitePress for content pages. |
-| **Prerender service (Prerender.io, Rendertron)** | Adds infrastructure complexity and cost for a tool with one page. Dynamic rendering is for sites with hundreds of JS-rendered routes. | Static HTML seed is sufficient for a single-page app. |
-| **Full product tour library (Shepherd, Intro.js)** | Genetic counselors are domain experts, not consumer users. A multi-step tooltip tour is patronizing and adds 15-40KB bundle size. | Simple welcome card with quick-start button. One-time, non-intrusive. |
-| **Video tutorials or animated walkthroughs** | High production cost, accessibility burden (captions, audio descriptions), maintenance as UI changes. Target audience learns by doing. | Text-based "Getting Started" in docs (already exists). Quick-start button for hands-on learning. |
-| **SEO-focused keyword stuffing in app UI** | Adding visible "SEO text" to the running application degrades the professional tool experience for actual users. | Put SEO content in static HTML seed (replaced by Vue on mount) and in VitePress docs pages. Keep the app UI clean. |
-| **Multiple color themes or color customization** | Scope creep. Light/dark toggle already exists and works well. Custom themes add testing burden and distract from core functionality. | Stick with light/dark. Fix the CTA color within the existing theme system. |
-| **Elaborate loading/splash screen** | Adds perceived wait time. The app loads in ~2.4s FCP which is acceptable. A splash screen makes it feel slower. | Keep current approach: app shell renders quickly, wizard appears when ready. |
-| **Social sharing buttons in the app** | Medical professionals share tools via institutional channels (email, Slack), not social media buttons. Social buttons look unprofessional in clinical tools. | Fix OG image so that when professionals DO share links, the preview renders correctly. |
-| **Cookie consent banner** | The app uses only localStorage for user preferences (no tracking cookies, no analytics cookies). A cookie banner would be both unnecessary and annoying. | If analytics are added later, revisit. For now, localStorage-only does not require consent under GDPR. |
-| **Google Analytics or tracking scripts** | Adds privacy concerns for a medical tool. Genetic counselors work with sensitive patient contexts. Third-party tracking undermines trust. | Use privacy-respecting analytics only if needed (e.g., Plausible, or none at all). Rely on Google Search Console for search performance data. |
+| **X-linked recessive calculation in CLI** | Different formula, different gene list, different clinical interpretation. Adding X-linked to v1.5 scope will delay the core AR improvements. The existing web app is AR-only. | Defer to v1.6. Note in CLI `--help` that X-linked is not yet supported. |
+| **Local gnomAD database download** | bcftools plugins and the gnomAD-toolbox use Hail + Spark for full gnomAD dataset access (807K individuals). Running this locally requires 10+ GB downloads and Spark setup. Not appropriate for a CLI targeting genetic counselors. | Continue using gnomAD GraphQL API. Note rate limits in documentation. Add retry logic and caching for batch mode. |
+| **npm registry publishing in v1.5** | Adding package publishing infrastructure (npm, JSR) requires versioning discipline, changelog maintenance, and compatibility guarantees. Premature for a tool still in active development. | GitHub-based consumption: `bun add github:username/repo#workspace=core`. Document this as the install method. |
+| **Variant-level pathogenicity re-scoring (CADD, SIFT, PolyPhen)** | The published pipeline (Guo et al.) uses these for missense classification. Adding full in-browser/CLI variant scoring requires either large local databases or external API calls with significant latency. | The existing ClinVar + LoF HC filter approach is clinically validated. Add homozygote count as a QC filter. Document that missense scoring requires separate bioinformatics pipeline. |
+| **GUI for gene config contribution** | A web-based curation interface (like ClinGen's Gene Curation Interface) is a multi-month product. The target audience (genetic counselors, researchers) is comfortable with GitHub PRs. | PR-based contribution with JSON Schema validation in CI. Clear CONTRIBUTING.md with template. |
+| **Bayesian residual risk for negative carrier test** | This requires prior probability estimation (Bayes' theorem applied to negative test result) and is a separate clinical calculation from carrier frequency. High risk of introducing errors if bundled with carrier frequency. | Listed in PROJECT.md as v1.6+ feature. Keep separate. |
+| **Real-time websocket gnomAD updates** | gnomAD releases annually. The API returns current data. Websocket updates provide no value here. | Existing fetch-on-demand approach is correct. |
+| **VCF file upload for batch input** | VCF parsing is a separate domain (requires htslib-equivalent, FORMAT/INFO field parsing). The CLI targets gene-symbol input, not raw sequencing data. | Accept gene symbols, HGNC IDs, or Ensembl gene IDs as input. Document limitation clearly. |
+| **Interactive CLI (TUI)** | Terminal UI libraries (Ink for Node, Rich/Textual for Python) add significant complexity and are harder to automate. The target CLI user is scripting batch workflows. | Flags-based CLI with clear `--help`. Interactive mode adds no value for batch processing. |
+| **Parallel gnomAD API requests without rate limiting** | gnomAD GraphQL has implicit rate limits. Firing unlimited parallel requests for 100-gene batch jobs will result in 429s. | Implement sequential processing with configurable concurrency (default: 3 concurrent requests). Cache responses during a batch run. |
+
+**Confidence:** HIGH for scope-related anti-features (project constraints clear). HIGH for technical anti-features (API behavior well understood from existing implementation).
 
 ---
 
 ## Feature Dependencies
 
 ```
-CRITICAL PATH (SEO Indexing):
-  Static HTML seed in index.html
+CALCULATION IMPROVEMENTS (in priority order):
+
+  1. Type updates: add homozygote count to VariantFrequencyData
+     |
+     +-- 2. Homozygote exclusion formula: VCR = (AC - 2×Hom) / (AN/2)
+     |        |
+     |        +-- 4. Gene carrier rate (inclusion-exclusion): GCR = 1 - Π(1 - VCRᵢ)
+     |
+     +-- 3. Homozygote count as pathogenicity filter (Hom >= 10 → flag/exclude)
+
+  4. Full HWE 2pq: q = Σ(AF); cf = 2q(1-q)       [independent of #2, #3]
+     |
+     +-- 5. Genetic prevalence q²: prev = q²
+     |        |
+     |        +-- 6. Bayesian penetrance adjustment: prev_adj = q² × penetrance
+     |        |
+     |        +-- 7. At-risk couple frequency: ARC = CF₁ × CF₂
+     |
+     +-- 8. Population-stratified prevalence (per-population q²)
+
+MONOREPO RESTRUCTURE (prerequisite for CLI):
+
+  Bun workspaces setup (packages/core, packages/cli, apps/web)
     |
-    +-- Internal links to docs (in seed content)
-    +-- <noscript> fallback
-    +-- <link rel="canonical">
-    +-- <meta name="robots">
-
-  sitemap.xml (independent)
+    +-- Extract frequency-calc.ts → packages/core/src/calculations.ts
+    +-- Extract template-renderer.ts → packages/core/src/text-generation.ts
+    +-- Extract variant-filters.ts → packages/core/src/variant-filters.ts
+    +-- Update apps/web to import from @gnomad-cf/core
     |
-    +-- robots.txt update (depends on sitemap)
+    +-- CLI (packages/cli):
+         |
+         +-- Single gene mode: gnomad-cf CFTR
+         +-- Batch mode: gnomad-cf --batch genes.json
+         +-- Output formats: --format json|tsv|text
+         +-- Clinical text: --output text --language de|en
 
-  VitePress sitemap config (independent)
+COMMUNITY GENE CONFIGS:
 
-  PNG OG image (independent)
+  Schema definition (JSON Schema or Zod)
     |
-    +-- Absolute OG URLs (depends on PNG)
-    +-- Updated structured data screenshot (depends on PNG)
-
-CTA COLOR SYSTEM:
-  New primary color in Vuetify theme (main.ts)
+    +-- Per-gene config files (genes/CFTR.json, genes/SMN1.json, ...)
+    +-- Config loader in core package
+    +-- Web app integration (load gene config on gene selection)
+    +-- CLI integration (apply gene config to batch runs)
     |
-    +-- Stepper header color (automatic via Vuetify theming)
-    +-- Disabled state distinction (automatic via Vuetify theming)
-    +-- Brand color as secondary (same edit)
+    +-- GitHub Actions PR validation (schema check)
+    +-- Documentation generation from configs
 
-ONBOARDING:
-  Welcome hero card
+TESTING:
+
+  Vitest setup
     |
-    +-- "Try with CFTR" quick-start (depends on card)
-    +-- hasUsedApp localStorage flag (depends on card)
-
-  Footer icon labels (independent)
-  Contextual help links (independent, but more valuable with good docs content)
-
-CROSS-LINKING:
-  App footer "Docs" icon (independent)
-  Docs contextual CTAs (independent, edit markdown)
-  Static HTML nav to docs (part of HTML seed)
+    +-- Core unit tests (calculations: known-value fixtures)
+    +-- CLI integration tests (subprocess execution with captured output)
+    +-- Vue component tests (Vue Test Utils)
+    +-- Playwright E2E (critical wizard flows)
 ```
 
 ### Build Order Recommendation
 
-1. **SEO Indexing fixes** -- everything else is pointless if Google cannot see the site
-2. **CTA color system** -- single highest-impact UX change, low effort
-3. **Cross-linking** -- connects app to its pre-rendered content
-4. **On-page SEO optimization** -- title, meta, structured data refinement
-5. **First-time onboarding** -- welcome card + quick-start
-6. **Visual polish** -- gene context chip, mobile title, native dialog replacement
+1. **Type updates + homozygote data** — unblocks both calculation improvements and test fixtures
+2. **Core calculation improvements** — HWE 2pq, homozygote exclusion, GCR, q²
+3. **Vitest + unit tests for calculations** — validate improvements with published reference values
+4. **Monorepo restructure** — extract core, update web app imports
+5. **Gene config schema + initial gene files** — CFTR, SMN1, HEXA as examples
+6. **CLI single-gene mode** — depends on core package
+7. **CLI batch mode** — depends on single-gene CLI + rate limiting
+8. **CLI integration tests** — depends on CLI working
+9. **Vue component tests + Playwright E2E** — depends on stable web app
 
 ---
 
-## MVP Recommendation
+## MVP Definition
 
-### Must-Have for This Milestone
+### Must-Have for v1.5
 
-These features address the two critical problems (not indexed, CTA looks disabled):
+These define whether the milestone is delivered:
 
-1. **Static HTML seed content** in `index.html` (500+ words, keyword-rich, with internal links)
-2. **`sitemap.xml`** + **`robots.txt`** update + **canonical URL** + **robots meta**
-3. **PNG OG image** with absolute URLs
-4. **New CTA primary color** (saturated, accessible, distinct from disabled state)
-5. **App-to-docs cross-link** (footer icon)
-6. **VitePress sitemap configuration**
+1. **HWE 2pq carrier frequency formula** replacing `2 × Σ(AF)` — improves clinical accuracy
+2. **Homozygote exclusion** — `VCR = (AC - 2×Hom) / (AN/2)` per variant, `GCR = 1 - Π(1 - VCRᵢ)` per gene
+3. **Genetic prevalence q²** — displayed in results panel and CLI output
+4. **Monorepo restructure** — bun workspaces with `packages/core`, `packages/cli`, `apps/web`
+5. **CLI: single gene mode** — `gnomad-cf CFTR --population nfe --format json`
+6. **CLI: batch mode** — `gnomad-cf --batch genes.json --format jsonl`
+7. **Gene config schema + 3-5 initial configs** — CFTR, SMN1, HEXA/HEX-B (Tay-Sachs), PKU (PAH)
+8. **Core unit tests** — carrier frequency, HWE, homozygote exclusion, q² with reference values
+9. **CLI integration tests** — at least CFTR smoke test (mocked API response)
 
-### Should-Have for This Milestone
+### Should-Have for v1.5
 
-High-value, low-effort enhancements:
+High-value, achievable within milestone scope:
 
-7. **Optimized title and meta description**
-8. **Updated structured data** (dates, version, screenshot)
-9. **Welcome hero card** with "Try with CFTR" quick-start
-10. **Footer icon text labels** on desktop
-11. **Docs-to-app contextual CTAs** in page content
+10. **Homozygote count pathogenicity filter** — Hom >= threshold → flag variant as likely non-pathogenic
+11. **Bayesian prevalence** — q² × penetrance, with penetrance configurable per gene
+12. **At-risk couple frequency** — CF² displayed in results
+13. **Vue component tests** — frequency display, variant table
+14. **Playwright E2E** — wizard completion flow
 
-### Defer to Future Milestones
+### Defer to v1.6+
 
-- Persistent gene context chip (medium complexity, UX improvement not SEO)
-- Mobile title reduction (low impact relative to SEO fixes)
-- Native dialog replacement (cosmetic, not blocking)
-- E-E-A-T author credential expansion (depends on publication/DOI)
-- Additional educational docs content pages (content creation, not development)
+- X-linked recessive calculation
+- Structural variant (SV) support
+- PDF export
+- npm registry publishing
+- Interactive CLI (TUI)
+- Full bioinformatics pipeline integration (VCF input)
 
 ---
 
-## Competitor Feature Comparison
+## Feature Prioritization Matrix
 
-| Feature | This App (Current) | This App (After Milestone) | Perinatology (#1) | GeniE/gnomAD (#2) | Omni Calculator (#3) |
-|---------|-------------------|---------------------------|--------------------|--------------------|----------------------|
-| Google indexed | NO | YES (static HTML seed) | Yes (static HTML) | Yes (SSR) | Yes (SSR) |
-| Static/crawlable content | 0 words | 500+ words | ~500 words | ~1200 words | ~3000 words |
-| Sitemap | No | Yes | Yes | Yes | Yes |
-| Canonical URL | No | Yes | Yes | Yes | Yes |
-| FAQPage schema | Yes (6 items) | Yes (expanded) | No | No | Yes (5 items) |
-| OG image (PNG) | No (SVG) | Yes (PNG 1200x630) | N/A | Yes | Yes |
-| Internal cross-linking | None | App<->Docs bidirectional | Deep (calculator network) | Deep (gnomAD ecosystem) | Massive (thousands) |
-| CTA visual clarity | Poor (muted gray) | Clear (saturated color) | Basic HTML form | Standard buttons | Green CTAs |
-| First-time onboarding | None (disclaimer only) | Welcome card + quick-start | None | Blog-style explanation | Extensive educational text |
-| Real gnomAD data | YES | YES | No | YES | No |
-| Clinical text generation | YES | YES | No | No | No |
-| Multi-population | YES | YES | No | YES | No |
+| Feature | Clinical Value | User Demand | Implementation Effort | Risk | Priority |
+|---------|---------------|-------------|----------------------|------|----------|
+| HWE 2pq formula | High (accuracy) | Medium | Low | Low | P1 |
+| Homozygote exclusion | High (accuracy) | Medium | Medium | Medium | P1 |
+| Gene carrier rate GCR | High (accuracy) | Medium | Low | Low | P1 |
+| Genetic prevalence q² | High (new info) | High | Low | Low | P1 |
+| Monorepo restructure | Foundation | Medium | High | Medium | P1 |
+| CLI single gene | High (new audience) | High | High | Medium | P1 |
+| Core unit tests | Foundation | Low | Medium | Low | P1 |
+| Gene config schema | Moderate | Medium | Low | Low | P1 |
+| Initial gene configs (4-5) | Moderate | Medium | Low | Low | P1 |
+| CLI batch mode | High (researchers) | High | Medium | Medium | P2 |
+| Hom count filter | Moderate (accuracy) | Medium | Low | Low | P2 |
+| Bayesian prevalence | Moderate (accuracy) | Medium | Medium | Medium | P2 |
+| At-risk couple freq | Moderate | Medium | Low | Low | P2 |
+| Vue component tests | Foundation | Low | Medium | Low | P2 |
+| Playwright E2E | Foundation | Low | Medium | Medium | P2 |
+| CLI clinical text | High (unique) | Medium | Medium | Low | P3 |
+| PR validation CI | Moderate | Low | Medium | Low | P3 |
+| Population-stratified q² | Moderate | Low | Low | Low | P3 |
+
+---
+
+## Competitor Feature Analysis
+
+| Feature | This App (Current) | This App (v1.5 Target) | GeniE (Broad/gnomAD 2024) | Published Pipelines (Guo et al., Kandolin et al.) | bcftools/VEP (general tools) |
+|---------|-------------------|----------------------|--------------------------|--------------------------------------------------|------------------------------|
+| Carrier frequency method | 2×Σ(AF) approx | 2pq HWE | 2pq HWE (q²-based) | GCR = 1-Π(1-VCRᵢ) | N/A (variant-level tools) |
+| Homozygote exclusion | No | Yes | Implicit in q² | Yes (explicit VCR formula) | N/A |
+| Genetic prevalence | No | Yes (q² + Bayesian) | Yes (q², primary output) | Yes | N/A |
+| At-risk couple frequency | No | Yes | No | Yes | N/A |
+| Penetrance adjustment | No | Yes (config-based) | No | Partial | N/A |
+| Population-specific | Yes (all gnomAD pops) | Yes | Yes | Yes | N/A |
+| Clinical text generation | Yes (DE/EN) | Yes + CLI | No | No | No |
+| CLI interface | No | Yes | No | Scripts only | Yes |
+| Batch mode | No | Yes | No | Yes (custom scripts) | Yes |
+| JSON output | Export only | CLI default | Download | Custom | Yes |
+| Community gene configs | No | Yes (PR-based) | Partial (ClinVar-based) | No | No |
+| Homozygote count filter | No | Yes | No | Yes (Hom >= 10 exclusion) | No |
+| Unit test suite | No | Yes | Yes (academic validation) | Yes (validated against cohorts) | Yes |
+| ClinGen validity warnings | Yes | Yes | No | No | No |
+| Manual variant exclusion | Yes | Yes | No | No | N/A |
+| Shareable URLs | Yes | Yes | No | N/A | N/A |
+| PWA / offline | Yes | Yes | No | N/A | N/A |
+
+**Key gap vs. GeniE:** GeniE calculates genetic prevalence but does not generate clinical documentation text, does not support multi-perspective clinical letters, and is web-only. The CLI + clinical text combination is the primary differentiator.
+
+**Key gap vs. published pipelines:** Published pipelines are research scripts, not user-facing tools. They process 2000+ genes in bulk but require Hail/Python environment and are not installable by a clinical user. The CLI being installable via `npm install -g` or `bun add` is a key differentiator.
+
+---
+
+## Calculation Reference Values (for Test Fixtures)
+
+Verified reference values from published literature. Use in unit tests to validate implementation.
+
+| Gene | Population | q (sum AF) | Expected 2pq | Expected q² | Source |
+|------|-----------|------------|--------------|-------------|--------|
+| CFTR (ΔF508 only) | Non-Finnish European | ~0.020 | ~0.0392 | ~0.0004 (1:2500) | [Carrier freq CF literature] |
+| CFTR (all P/LP variants) | Non-Finnish European | ~0.022 | ~0.0431 | ~0.00048 (1:2080) | Kandolin et al. 2024 |
+| SMN1 | Global | ~0.010 | ~0.0198 | ~0.0001 (1:10000) | Published SMA epidemiology |
+| HEXA (Tay-Sachs) | Ashkenazi Jewish | ~0.033 | ~0.0638 | ~0.0011 (1:930) | Carrier screening literature |
+
+**Note:** The difference between `2q` (current) and `2pq` (HWE-correct) for CFTR-NFE: 0.0400 vs 0.0392 — a 2% overestimate in the current implementation. For rare diseases (q < 0.001), the difference is <0.1% and clinically negligible.
+
+---
+
+## Gene Config Schema Design
+
+Based on the existing config-driven architecture and community curation research.
+
+### Recommended Schema
+
+```json
+{
+  "gene": "CFTR",
+  "hgnc_id": "HGNC:1884",
+  "condition": "Cystic Fibrosis",
+  "inheritance": "autosomal_recessive",
+  "clingen_validity": "DEFINITIVE",
+  "curated_by": "community",
+  "curation_date": "2024-01-15",
+  "citation": "PMID:38459613",
+  "notes": "Use gnomAD v4.1 NFE population for European carrier screening. ΔF508 (rs113993960) dominates frequency.",
+  "recommended_filters": {
+    "lofHcEnabled": true,
+    "clinvarEnabled": true,
+    "clinvarStarThreshold": 1,
+    "missenseEnabled": false,
+    "excludeHomozygoteThreshold": 10
+  },
+  "founder_variants": [
+    {
+      "variant_id": "7-117559590-ATCT-A",
+      "population": "nfe",
+      "common_name": "ΔF508",
+      "note": "Most common CF variant in Europeans (~70% of alleles)"
+    }
+  ],
+  "penetrance": 1.0,
+  "population_notes": {
+    "fin": "Elevated in Finnish population due to founder effect",
+    "asj": "1/29 carrier rate in Ashkenazi Jewish population"
+  }
+}
+```
+
+### Required Fields (for PR validation)
+
+- `gene` (string, must match gnomAD gene symbol)
+- `condition` (string)
+- `inheritance` (enum: `autosomal_recessive`, `x_linked`)
+- `recommended_filters` (object, all filter keys present)
+- `curation_date` (ISO date)
+- `citation` (PMID or DOI)
+
+### Optional Fields
+
+- `hgnc_id`, `clingen_validity`, `notes`
+- `founder_variants` array
+- `penetrance` (default: 1.0)
+- `population_notes`
+
+---
+
+## CLI Design Patterns
+
+Based on VEP, bcftools, and bioinformatics CLI convention research.
+
+### Recommended Interface
+
+```bash
+# Single gene, JSON output
+gnomad-cf CFTR
+
+# Single gene, specific population, TSV output
+gnomad-cf CFTR --population nfe --format tsv
+
+# Single gene, clinical text output
+gnomad-cf CFTR --patient-status heterozygous --language de --output text
+
+# Batch mode from file
+gnomad-cf --batch genes.json --format jsonl
+
+# Batch mode from stdin (pipe-friendly)
+echo "CFTR\nSMN1\nHEXA" | gnomad-cf --batch - --format jsonl
+
+# Apply gene config
+gnomad-cf CFTR --use-gene-config
+
+# Full calculation with all improvements
+gnomad-cf CFTR --method hwe --exclude-homozygotes --prevalence
+```
+
+### Output Format: JSON (single gene)
+
+```json
+{
+  "gene": "CFTR",
+  "version": "gnomAD v4.1",
+  "method": "hwe_2pq",
+  "homozygote_excluded": true,
+  "q": 0.02234,
+  "carrier_frequency": {
+    "value": 0.04369,
+    "percent": "4.37%",
+    "ratio": "1:23"
+  },
+  "genetic_prevalence": {
+    "q_squared": 0.000499,
+    "ratio": "1:2004",
+    "bayesian": null
+  },
+  "populations": [
+    {
+      "code": "asj",
+      "label": "Ashkenazi Jewish",
+      "carrier_frequency": 0.0641,
+      "allele_count": 142,
+      "allele_number": 8864,
+      "is_founder_effect": true
+    }
+  ],
+  "variant_count": 12,
+  "shareable_url": "https://gnomad-carrier-frequency.kidney-genetics.org/?gene=CFTR&..."
+}
+```
 
 ---
 
 ## Sources
 
-### SEO & Indexing
-- [SPA SEO Strategies 2026](https://www.copebusiness.com/technical-seo/spa-seo-strategies/) -- SPA-specific SEO challenges and solutions
-- [Prerendering Vue SPAs for SEO](https://nuxtseo.com/learn-seo/vue/spa/prerendering) -- Vue-specific prerendering approaches
-- [Google JavaScript SEO Basics](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics) -- Official Google guidance on JS rendering
-- [VitePress Sitemap Generation](https://vitepress.dev/guide/sitemap-generation) -- Built-in sitemap support documentation
-- [FAQPage Structured Data](https://developers.google.com/search/docs/appearance/structured-data/faqpage) -- Google's FAQPage rich result requirements
-- [Schema.org Health and Medical Types](https://schema.org/docs/meddocs.html) -- Medical schema best practices
+### Calculation Methods
 
-### OG Images
-- [OG Image Sizes 2025 Guide](https://www.krumzi.com/blog/open-graph-image-sizes-for-social-media-the-complete-2025-guide) -- Format and dimension requirements
-- [OG Image Tips 2025](https://myogimage.com/blog/og-image-tips-2025-social-sharing-guide) -- PNG vs SVG, compression, platform compatibility
+- [Hardy-Weinberg Equilibrium — Biology LibreTexts](https://bio.libretexts.org/Workbench/Modern_Genetics/11:_Population_genetics/11.01:_Hardy-Weinberg_equilibrium) — HIGH confidence, foundational
+- [Hardy-Weinberg Carrier Frequency — Perinatology.com](https://www.perinatology.com/calculators/Hardy-Weinberg.htm) — MEDIUM, practical calculator
+- [Guo et al. 2022 — Robust pipeline for carrier frequency ranking, npj Genomic Medicine](https://pmc.ncbi.nlm.nih.gov/articles/PMC9763236/) — HIGH confidence, authoritative pipeline with VCR formula
+- [Schmitz et al. 2022 — Lessons from gnomAD, Clinical Genetics](https://onlinelibrary.wiley.com/doi/abs/10.1111/cge.14148) — HIGH confidence, peer-reviewed
+- [Kandolin et al. 2024 — ACMG carrier screening, AJMG Part A](https://onlinelibrary.wiley.com/doi/full/10.1002/ajmg.a.63588) — HIGH confidence, 2024, gnomAD v4
+- [Genetics in Medicine 2024 — gnomAD v4.0 carrier frequencies](https://www.gimjournal.org/article/S1098-3600(24)00238-7/fulltext) — HIGH confidence, 2024, peer-reviewed
+- [Variant Interpretation Using Population Databases, PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC9160216/) — HIGH confidence, gnomAD best practices
+- [CureFZ — Using Genetic Data to Estimate Disease Prevalence](https://www.curefzi.org/2019/06/05/using-genetic-data-to-estimate-disease-prevalence/) — MEDIUM, clear Bayesian explanation
 
-### CTA & Button Design
-- [Disabled Buttons in UI](https://uxplanet.org/disabled-buttons-in-user-interface-4dafda3e6fe7) -- Active vs disabled state patterns
-- [CTA Best Practices for UX & Accessibility](https://www.portent.com/blog/content/cta-best-practices-for-ux-design-web-accessibility-w-examples.htm) -- Color, contrast, and accessibility
-- [Button States Explained](https://www.uxpin.com/studio/blog/button-states/) -- How to design distinct button states
-- [Why You Should Not Gray Out Disabled Buttons](https://uxmovement.com/buttons/why-you-shouldnt-gray-out-disabled-buttons/) -- Use opacity of primary color instead
+### GeniE (Genetic Prevalence Estimator)
 
-### Onboarding
-- [Onboarding UX Patterns](https://www.appcues.com/blog/user-onboarding-ui-ux-patterns) -- Welcome messages, product tours, interactive learning
-- [Guide to Onboarding UX](https://www.toptal.com/designers/product-design/guide-to-onboarding-ux) -- First impressions and activation patterns
-- [Best User Onboarding Examples](https://www.appcues.com/blog/the-10-best-user-onboarding-experiences) -- Real-world patterns from successful products
+- [GeniE Announcement — gnomAD Blog, June 2024](https://gnomad.broadinstitute.org/news/2024-06-genie/) — HIGH confidence, official Broad Institute tool
+- [GeniE GitHub Repository](https://github.com/broadinstitute/genetic-prevalence-estimator) — HIGH confidence, open source
+- [GeniE Web App](https://genie.broadinstitute.org/) — authoritative
 
-### Competitor Analysis
-- [GeniE Genetic Prevalence Estimator](https://gnomad.broadinstitute.org/news/2024-06-genie/) -- Broad Institute's competing tool
-- [Omni Calculator Allele Frequency](https://www.omnicalculator.com/biology/allele-frequency) -- SEO-optimized competitor with FAQPage schema
-- [Perinatology Hardy-Weinberg Calculator](https://www.perinatology.com/calculators/Hardy-Weinberg.htm) -- #1 ranked static HTML competitor
+### gnomAD Tools
 
-### Project-Internal References
-- `.planning/SEO-REPORT.md` -- Comprehensive SEO audit with competitor deep-dive (2026-02-23)
-- `.planning/UI-UX-AUDIT.md` -- 12-category UX audit scoring 7.3/10 overall (2026-02-23)
+- [gnomAD-toolbox GitHub (Broad Institute)](https://github.com/broadinstitute/gnomad-toolbox) — HIGH confidence, official
+- [gnomAD Package on PyPI](https://pypi.org/project/gnomad/) — HIGH confidence, official
+
+### CLI Design Patterns
+
+- [Ensembl VEP — CLI Documentation](https://www.ensembl.org/vep) — HIGH confidence, reference CLI tool
+- [bcftools Documentation](https://samtools.github.io/bcftools/bcftools.html) — HIGH confidence, reference CLI tool
+- [Python Click CLI Guide — Real Python](https://realpython.com/python-click/) — MEDIUM, established library
+- [Click File and Stdin Arguments](https://thecodinginterface.com/blog/click-cli-file-and-stand-input-arguments/) — MEDIUM
+
+### Community Gene Curation
+
+- [ClinGen Community Curation (C3)](https://clinicalgenome.org/working-groups/clingen-community-curation-c3/) — HIGH confidence, authoritative
+- [Community data-driven founder variant identification — Human Genomics 2023](https://humgenomics.biomedcentral.com/articles/10.1186/s40246-023-00472-w) — MEDIUM confidence
+- [ACMG Technical Standard for Carrier Screening 2024](https://pubmed.ncbi.nlm.nih.gov/38814327/) — HIGH confidence, 2024
+
+### ACMG Thresholds
+
+- [ACMG Carrier Screening Practice Resource 2021](https://pmc.ncbi.nlm.nih.gov/articles/PMC8488021/) — HIGH confidence, 1/200 carrier frequency threshold for screening inclusion

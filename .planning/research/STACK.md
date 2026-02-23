@@ -1,560 +1,884 @@
-# Technology Stack: SEO & UX Polish (v1.4)
+# Stack Research: Monorepo Extraction, CLI, Testing, Gene Configs (v1.5)
 
-**Project:** gnomAD Carrier Frequency Calculator
+**Domain:** Monorepo extraction, CLI, testing, gene config schema — TypeScript genetic calculator
 **Researched:** 2026-02-23
-**Overall Confidence:** HIGH
-**Scope:** Stack additions for SEO indexing, structured data, OG image, VitePress sitemap, and Vuetify UX improvements
+**Confidence:** HIGH (bun workspaces, Vitest, commander), MEDIUM (tsdown maturity, bunup maturity)
 
 ---
 
-## Executive Summary
+## Context: What Already Exists
 
-This milestone requires **zero new npm dependencies**. Every capability needed is achievable through:
-1. Configuration changes to existing tools (VitePress sitemap, Vuetify theme)
-2. Build scripts using already-installed `sharp` (OG image conversion)
-3. Hand-authored static HTML in `index.html` (SEO seed content)
-4. Pure CSS/HTML patterns (skip-to-content, onboarding)
-5. Built-in Vuetify components (progress indicators, color system)
+The v1.4 stack is the baseline. DO NOT re-research or change:
 
-The discipline here is restraint: do not add libraries for problems that are solved by configuration or a few lines of code.
+| Package | Version | Purpose |
+|---------|---------|---------|
+| bun | 1.3.9 (packageManager) | Runtime, package manager |
+| Vue 3 | ^3.5.24 | Web app framework |
+| Vuetify 3 | ^3.8.1 | UI components |
+| Vite 7 | ^7.2.4 | Build tool for web app |
+| TypeScript | ~5.9.3 | Type system |
+| villus | ^3.3.4 | GraphQL client |
+| Pinia | ^3.0.4 | State management |
+| zod | ^4.3.5 | Validation (already used) |
+| VitePress | ^2.0.0-alpha.16 | Documentation site |
+| Playwright | ^1.58.2 | E2E testing (already installed) |
+| tsx | ^4.21.0 | TypeScript script runner (already installed) |
 
 ---
 
-## Recommended Stack Changes
+## Recommended Stack Additions
 
-### 1. SEO: Static HTML Seed Content
+### 1. Monorepo Structure: Bun Workspaces (Native)
 
-**Approach:** Hand-edit `index.html` to place static HTML inside `<div id="app">`
-**New dependencies:** NONE
+**Recommendation:** Use bun's native workspaces feature. No additional orchestration tool (Nx, Turborepo, moon) needed for a 3-package monorepo.
 
-**How it works:** Vue 3's `createApp().mount('#app')` replaces all innerHTML of the mount target when the app mounts. This means any static HTML placed inside `<div id="app">` is visible to crawlers on first load, then seamlessly replaced by the Vue app once JavaScript executes.
+**Rationale:** Bun 1.3.9 (already in use) has full workspace support including `--filter` for running scripts in specific packages, glob patterns for targeting packages, and `workspace:*` protocol for inter-package dependencies. For a 3-package monorepo (core, cli, web), the native tooling is sufficient. Nx/Turborepo add significant configuration overhead that is only justified at 5+ packages with complex dependency graphs.
 
-**This is the single most impactful SEO change.** The current body contains only `<div id="app"></div>` which gives Google zero indexable content. Adding ~300-500 words of keyword-rich static HTML solves the core indexing problem without any build tooling changes.
+**Directory structure:**
 
-```html
-<div id="app">
-  <!-- Static seed content: visible to crawlers, replaced by Vue on mount -->
-  <main>
-    <h1>Carrier Frequency Calculator - gnomAD Population Data</h1>
-    <p>Calculate carrier frequency and recurrence risk for autosomal
-       recessive conditions using real population data from the Genome
-       Aggregation Database (gnomAD).</p>
-    <!-- ... more educational content ... -->
-    <nav>
-      <a href="/docs/guide/">Documentation</a>
-      <a href="/docs/reference/methodology">Methodology</a>
-    </nav>
-  </main>
-  <noscript>
-    <p>This application requires JavaScript to run.</p>
-  </noscript>
-</div>
+```
+gnomad-carrier-frequency/          # monorepo root (private)
+├── package.json                   # workspace root: "workspaces": ["packages/*", "apps/*"]
+├── tsconfig.base.json             # shared compiler options (no paths, no include)
+├── bun.lockb                      # single lockfile for all workspaces
+├── packages/
+│   ├── core/                      # @gnomad-cf/core — calculation engine
+│   │   ├── package.json
+│   │   ├── tsconfig.json          # extends ../../tsconfig.base.json
+│   │   ├── tsdown.config.ts
+│   │   └── src/
+│   └── cli/                       # @gnomad-cf/cli — CLI tool
+│       ├── package.json
+│       ├── tsconfig.json
+│       ├── tsdown.config.ts
+│       └── src/
+└── apps/
+    └── web/                       # @gnomad-cf/web — current Vue app (moved from src/)
+        ├── package.json
+        ├── tsconfig.json
+        ├── vite.config.ts
+        └── src/
 ```
 
-**Why NOT prerender / SSR / vite-ssg:**
-- This is a single-page SPA with one URL (no routes). Prerendering tools are designed for multi-route apps.
-- SSR adds server infrastructure complexity for a GitHub Pages static deployment.
-- The static HTML seed approach is simpler, has zero build cost, and solves the exact problem (empty body for crawlers).
-- Vue replaces the seed content on mount -- there is no hydration mismatch risk because there is no hydration; it is a full replacement.
+**Root package.json pattern:**
 
-**Confidence:** HIGH -- This is a well-documented Vue.js pattern. Vue's mount behavior is authoritative: it replaces innerHTML of the mount element.
+```json
+{
+  "name": "gnomad-carrier-frequency",
+  "private": true,
+  "version": "1.5.0",
+  "packageManager": "bun@1.3.9",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev": "bun run --filter @gnomad-cf/web dev",
+    "build": "bun run --filter '*' --parallel build",
+    "build:core": "bun run --filter @gnomad-cf/core build",
+    "build:cli": "bun run --filter @gnomad-cf/cli build",
+    "build:web": "bun run --filter @gnomad-cf/web build",
+    "test": "bun run --filter '*' --parallel test",
+    "lint": "bun run --filter '*' --parallel lint",
+    "typecheck": "bun run --filter '*' --parallel typecheck"
+  }
+}
+```
 
-**Sources:**
-- [Vue.js Ways of Using Vue](https://vuejs.org/guide/extras/ways-of-using-vue)
-- [Nuxt SEO: SPA Patterns](https://nuxtseo.com/learn-seo/vue/spa)
+**Inter-package dependency (workspace protocol):**
+
+```json
+{
+  "name": "@gnomad-cf/cli",
+  "dependencies": {
+    "@gnomad-cf/core": "workspace:*"
+  }
+}
+```
+
+```json
+{
+  "name": "@gnomad-cf/web",
+  "dependencies": {
+    "@gnomad-cf/core": "workspace:*"
+  }
+}
+```
+
+**Bun workspace behavior (verified against official docs):**
+- `bun install` from root installs all workspace dependencies + links workspace packages via symlinks
+- `bun run --filter @gnomad-cf/core build` runs the `build` script in that specific package
+- `bun run --filter '*' --parallel test` runs test in all packages concurrently
+- `bun run --sequential --workspaces build` runs build sequentially across all workspaces
+- `workspace:*` resolves to the local package (symlink), not npm
+
+**Confidence:** HIGH — Verified against [bun.com/docs/pm/workspaces](https://bun.com/docs/pm/workspaces)
+
+**Known limitation:** Bun 1.3+ uses isolated installs by default for workspaces (each package only sees its declared dependencies). This is correct behavior but means each package.json must be complete — no implicit hoisting leakage.
 
 ---
 
-### 2. SEO: Canonical URL and Robots Meta
+### 2. Library Bundler for `packages/core` and `packages/cli`
 
-**Approach:** Add two `<meta>` / `<link>` tags to `index.html` `<head>`
-**New dependencies:** NONE
+**Recommendation:** `tsdown` v0.20.x
 
-```html
-<link rel="canonical" href="https://gnomad-carrier-frequency.kidney-genetics.org/" />
-<meta name="robots" content="index, follow" />
+**Rationale:**
+- `tsup` (the previous standard) is no longer actively maintained. The author recommends migrating to `tsdown`. Last tsup release: 8.5.1, but described as abandoned.
+- `tsdown` is the successor, built on Rolldown (Rust-based, faster). Same config API as tsup, smoother migration path.
+- `bunup` (bun-native bundler) is an option but is at v0.16.x and explicitly pre-1.0 — not recommended for production tooling in a real project yet.
+- `tsdown` is from the void(0) team (same people who built Vite, Vitest, Rolldown) — strong ecosystem alignment.
+
+**Install:**
+
+```bash
+bun add -D tsdown --cwd packages/core
+bun add -D tsdown --cwd packages/cli
 ```
 
-**Why not `@unhead/vue`:** The project has exactly one page (the SPA root). There are no dynamic routes requiring per-page meta management. A static canonical tag in `index.html` is all that is needed. Installing `@unhead/vue` for a single-page app with no router would be over-engineering.
-
-**Confidence:** HIGH
-
----
-
-### 3. SEO: Sitemap Strategy (Two Sitemaps)
-
-**Approach:** Hand-authored `public/sitemap.xml` for SPA + VitePress built-in sitemap for docs
-**New dependencies:** NONE
-
-#### 3a. SPA Sitemap: `public/sitemap.xml`
-
-The SPA has one URL. A hand-authored sitemap is appropriate:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://gnomad-carrier-frequency.kidney-genetics.org/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
-  </url>
-</urlset>
-```
-
-**Why NOT `vite-plugin-sitemap`:**
-- It scans the dist folder for generated HTML files. An SPA has exactly one: `index.html`.
-- A hand-written file with one `<url>` entry is simpler, faster, and has zero build overhead.
-- Adding a build-time plugin for a single URL is unnecessary complexity.
-
-#### 3b. VitePress Docs Sitemap: Built-in Configuration
-
-VitePress has built-in sitemap generation since v1.x. It is a one-line config change:
+**`packages/core/tsdown.config.ts`:**
 
 ```typescript
-// docs/.vitepress/config.ts
+import { defineConfig } from 'tsdown'
+
 export default defineConfig({
-  // ... existing config ...
-  sitemap: {
-    hostname: 'https://gnomad-carrier-frequency.kidney-genetics.org'
-  }
+  entry: ['./src/index.ts'],
+  format: ['esm'],
+  dts: true,                   // generate .d.ts files
+  clean: true,
+  sourcemap: true,
+  target: 'node20',
 })
 ```
 
-This generates `sitemap.xml` in the VitePress build output (`docs/.vitepress/dist/sitemap.xml`) containing all docs pages automatically. Since VitePress builds to `/docs/` base, URLs will be correctly prefixed.
+**`packages/core/package.json` exports field:**
 
-**Important:** The VitePress sitemap covers `/docs/*` pages. The SPA sitemap covers `/`. Both are needed. The `robots.txt` should reference both:
-
-```
-User-agent: *
-Allow: /
-
-Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/sitemap.xml
-Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/docs/sitemap.xml
-```
-
-Alternatively, combine into a single sitemap index file. The simpler approach (two Sitemap entries in robots.txt) is recommended.
-
-**Confidence:** HIGH -- VitePress sitemap is documented at [vitepress.dev/guide/sitemap-generation](https://vitepress.dev/guide/sitemap-generation). Vite's own docs use this exact pattern.
-
----
-
-### 4. SEO: OG Image (SVG to PNG Conversion)
-
-**Approach:** Build script using `sharp` (already installed as devDependency)
-**New dependencies:** NONE
-
-`sharp` is already in `devDependencies` at version `^0.34.5` and is used by `scripts/generate-screenshots.ts` for WebP conversion. It natively supports SVG-to-PNG conversion.
-
-**Build script pattern:**
-
-```typescript
-// scripts/generate-og-image.ts
-import sharp from 'sharp';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-await sharp(resolve(__dirname, '../public/og-image.svg'))
-  .resize(1200, 630)
-  .png()
-  .toFile(resolve(__dirname, '../public/og-image.png'));
-```
-
-Run with: `bun run tsx scripts/generate-og-image.ts`
-
-**Integration:** Add as a `prebuild` script or a standalone npm script. The generated `og-image.png` goes into `public/` and is committed to the repo (it is a static asset, not a build artifact).
-
-**Also required:** Update `index.html` to use absolute PNG URLs:
-```html
-<meta property="og:image" content="https://gnomad-carrier-frequency.kidney-genetics.org/og-image.png" />
-<meta name="twitter:image" content="https://gnomad-carrier-frequency.kidney-genetics.org/og-image.png" />
-```
-
-**Why not a dynamic OG image service (Vercel OG, Satori):**
-- The app is deployed on GitHub Pages (static hosting). No server-side rendering available.
-- The OG image content is static (app name, logo, tagline). It does not change per-page.
-- A one-time build script is far simpler than a dynamic image generation pipeline.
-
-**Confidence:** HIGH -- sharp SVG-to-PNG is well-documented. The project already uses sharp.
-
-**Sources:**
-- [sharp Output Options](https://sharp.pixelplumbing.com/api-output/)
-- [Convert SVG to PNG with sharp](https://techsparx.com/nodejs/graphics/svg-to-png.html)
-
----
-
-### 5. SEO: FAQPage Structured Data
-
-**Approach:** Expand existing JSON-LD in `index.html`
-**New dependencies:** NONE
-
-The project already has FAQPage structured data in `index.html` (6 Q&A pairs added in commit `1ae0bfd`). This is already done correctly as static JSON-LD in the `<head>`.
-
-**Remaining work:** Ensure FAQ content is also rendered as visible HTML in the seed content (not just in JSON-LD). Google prefers FAQ answers that are both in structured data AND visible on the page.
-
-**Confidence:** HIGH -- Already implemented, just needs visible HTML counterpart.
-
----
-
-### 6. UX: Vuetify Color System (CTA Fix)
-
-**Approach:** Modify Vuetify theme configuration in `src/main.ts`
-**New dependencies:** NONE
-
-#### The Problem (Quantified)
-
-The current primary color `#a09588` has a **2.94:1** contrast ratio for white text on the primary background. This fails WCAG AA minimum of 4.5:1 for normal text and 3:1 for large text/UI components. The CONTINUE button with white text on `#a09588` looks disabled.
-
-#### The Solution: Separate Brand Color from CTA Color
-
-Vuetify 3's theme system supports custom named colors beyond the defaults. The recommendation is to:
-
-1. **Keep `#a09588` as a brand/accent color** (it is distinctive and professional)
-2. **Add a new, saturated primary color for CTAs**
-3. **Use Vuetify's `color` prop** to apply the right color contextually
-
-**Recommended color: `#00796B` (Teal 700)**
-
-| Metric | #a09588 (current) | #00796B (recommended) |
-|--------|-------------------|----------------------|
-| White text contrast | 2.94:1 (FAIL AA) | 5.32:1 (PASS AA) |
-| On `#FAFAFA` background | 2.81:1 | 5.10:1 |
-| Visual impression | Muted, disabled-looking | Saturated, actionable |
-| Color-blind safe | N/A (too muted to register) | Distinguishable in all types |
-
-**Alternative options (all pass AA):**
-
-| Color | Hex | White text contrast | Character |
-|-------|-----|-------------------|-----------|
-| Teal 700 | `#00796B` | 5.32:1 | Calm, clinical, trustworthy |
-| Blue 800 | `#1565C0` | 5.75:1 | Authoritative, standard SaaS |
-| Green 800 | `#2E7D32` | 5.13:1 | Positive, growth, go/proceed |
-| Blue 900 | `#0D47A1` | 8.63:1 | Very high contrast, bold |
-
-**Recommendation: Teal 700 (`#00796B`)** because:
-- Medical/clinical tools conventionally use teal/green (trust, health)
-- High enough contrast (5.32:1) without being jarring
-- Pairs well with the warm gray `#a09588` brand accent
-- Works in both light and dark themes
-
-**Implementation in `src/main.ts`:**
-
-```typescript
-const vuetify = createVuetify({
-  components,
-  directives,
-  theme: {
-    defaultTheme: 'light',
-    themes: {
-      light: {
-        dark: false,
-        colors: {
-          primary: '#00796B',      // Teal 700 -- CTAs, active stepper, links
-          secondary: '#424242',
-          accent: '#a09588',       // Brand warm gray -- decorative, logo, borders
-          surface: '#FFFFFF',
-          background: '#FAFAFA',
-        }
-      },
-      dark: {
-        dark: true,
-        colors: {
-          primary: '#4DB6AC',      // Teal 200 -- lighter for dark backgrounds
-          secondary: '#757575',
-          accent: '#BDBDBD',
-        }
-      }
+```json
+{
+  "name": "@gnomad-cf/core",
+  "version": "1.5.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
     }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch"
   }
+}
+```
+
+**Why ESM-only for `core`:**
+The web app (Vite) and CLI (bun) both consume ESM natively. CJS is only needed for Node.js <18 or legacy tooling — not a constraint here. ESM-only simplifies the build and avoids dual-format complexity.
+
+**Confidence:** MEDIUM-HIGH — tsdown is actively maintained and ecosystem-aligned, but at v0.20.x (not 1.0). The risk is API changes before stable release. However, the tsup-to-tsdown migration guide confirms the config is stable enough for production use.
+
+**Sources:** [tsdown.dev/guide/getting-started](https://tsdown.dev/guide/getting-started), [Switching from tsup to tsdown](https://alan.norbauer.com/articles/tsdown-bundler/), [npm tsdown](https://www.npmjs.com/package/tsdown)
+
+---
+
+### 3. CLI Framework: Commander.js
+
+**Recommendation:** `commander` v14.0.x with `@clack/prompts` v1.0.x for interactive UX
+
+**Rationale:**
+
+| Framework | Version | Weekly DLs | TypeScript | Verdict |
+|-----------|---------|-----------|------------|---------|
+| commander | 14.0.3 | Very high | Built-in types | **Recommended** |
+| citty | ~0.1.6 | Medium | Built-in | Lightweight but fewer features |
+| yargs | ~17 | High | @types/yargs | Verbose config, older API |
+| bunli | 0.x | Very low | Unknown | Too immature |
+
+**Why commander:**
+- Most widely adopted Node.js CLI library (~6.2M weekly downloads)
+- v14 includes TypeScript definitions in the package itself (no `@types/commander` needed)
+- Supports subcommands, options, arguments, required/optional flags cleanly
+- Works identically under bun runtime (bun is Node.js-compatible for CLI usage)
+- The `@commander-js/extra-typings` optional package provides enhanced type inference for action handlers
+
+**Why `@clack/prompts` for interactive mode:**
+- When running without arguments (interactive batch mode), `@clack/prompts` provides beautiful, minimal terminal prompts
+- v1.0.1 (fresh release, actively maintained, 4000+ dependent packages)
+- ESM-first, full TypeScript support
+- Much lighter than `inquirer` for simple select/text prompts
+
+**Install:**
+
+```bash
+bun add commander --cwd packages/cli
+bun add @clack/prompts --cwd packages/cli
+```
+
+**`packages/cli/src/index.ts` pattern:**
+
+```typescript
+#!/usr/bin/env node
+import { Command } from 'commander'
+import { version } from '../package.json'
+
+const program = new Command()
+
+program
+  .name('gnomad-cf')
+  .description('Calculate carrier frequency from gnomAD data')
+  .version(version)
+
+program
+  .command('calculate <gene>')
+  .description('Calculate carrier frequency for a gene')
+  .option('-p, --population <pop>', 'Population', 'gnomad')
+  .option('-v, --gnomad-version <ver>', 'gnomAD version', 'v4')
+  .option('-o, --output <format>', 'Output format: json|text', 'text')
+  .action(async (gene, options) => {
+    // import from @gnomad-cf/core
+  })
+
+program
+  .command('batch <file>')
+  .description('Process multiple genes from CSV/JSON file')
+  .action(async (file, options) => { ... })
+
+program.parse()
+```
+
+**`packages/cli/package.json` bin field:**
+
+```json
+{
+  "name": "@gnomad-cf/cli",
+  "bin": {
+    "gnomad-cf": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "start": "bun src/index.ts"
+  }
+}
+```
+
+**Note on shebang:** `#!/usr/bin/env node` works when published to npm for `npx` usage. For bun-first execution during development, `bun run src/index.ts` works without a build step.
+
+**Confidence:** HIGH — commander 14.0.3 is the current version, TypeScript types included, widely used with bun runtime.
+
+**Sources:** [commander npm](https://www.npmjs.com/package/commander), [@clack/prompts npm](https://www.npmjs.com/package/@clack/prompts), [Building TypeScript CLI](https://pmbanugo.me/blog/build-cli-typescript-bun)
+
+---
+
+### 4. Testing Framework: Vitest 4
+
+**Recommendation:** `vitest` v4.0.x as the unified test runner for all packages
+
+**Rationale:**
+- Vitest 4.0 (latest: 4.0.18) is a major stable release with browser mode graduating to stable
+- Already used in the Vite/Vue ecosystem — no context-switching between Jest and Vitest
+- Native bun support: `bun run test` (NOT `bun test` which uses bun's own test runner)
+- The `projects` configuration (replacing deprecated `workspace`) allows a single root vitest config to discover and run all packages
+
+**Monorepo vitest configuration strategy:**
+
+Create a single root `vitest.config.ts`:
+
+```typescript
+// vitest.config.ts (root)
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    projects: [
+      'packages/core',   // discovers packages/core/vitest.config.ts
+      'packages/cli',    // discovers packages/cli/vitest.config.ts
+      'apps/web',        // discovers apps/web/vitest.config.ts
+    ],
+  },
 })
 ```
 
-**Key Vuetify theme facts:**
-- Custom color names (like `accent`) become usable as `color="accent"` on any Vuetify component
-- Vuetify auto-generates CSS custom properties: `--v-theme-primary`, `--v-theme-accent`, etc.
-- Vuetify auto-generates lighten/darken variants for each color
-- No SCSS compilation needed -- colors are injected as CSS variables at runtime
+Each package has its own config that extends a shared base:
 
-**PWA manifest update also needed:**
 ```typescript
-// vite.config.ts VitePWA manifest
-theme_color: '#00796B', // Match new primary
+// vitest.shared.ts (root)
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    globals: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+    },
+  },
+})
 ```
 
-**Confidence:** HIGH -- Vuetify 3 theme system is well-documented and the project already uses it.
+```typescript
+// packages/core/vitest.config.ts
+import { mergeConfig, defineConfig } from 'vitest/config'
+import shared from '../../vitest.shared'
 
-**Sources:**
-- [Vuetify Theme Configuration](https://vuetifyjs.com/en/features/theme/)
-- [WCAG 2.2 Contrast Requirements](https://www.makethingsaccessible.com/guides/contrast-requirements-for-wcag-2-2-level-aa/)
-- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
+export default mergeConfig(shared, defineConfig({
+  test: {
+    name: 'core',
+    environment: 'node',   // pure computation, no DOM needed
+    include: ['src/**/*.test.ts'],
+  },
+}))
+```
+
+```typescript
+// packages/cli/vitest.config.ts
+import { mergeConfig, defineConfig } from 'vitest/config'
+import shared from '../../vitest.shared'
+
+export default mergeConfig(shared, defineConfig({
+  test: {
+    name: 'cli',
+    environment: 'node',
+    include: ['src/**/*.test.ts'],
+  },
+}))
+```
+
+```typescript
+// apps/web/vitest.config.ts (Vue components need DOM)
+import { mergeConfig, defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
+import shared from '../../vitest.shared'
+
+export default mergeConfig(shared, defineConfig({
+  plugins: [vue()],
+  test: {
+    name: 'web',
+    environment: 'jsdom',   // see jsdom vs happy-dom below
+    include: ['src/**/*.test.ts'],
+    setupFiles: ['src/test-setup.ts'],
+  },
+}))
+```
+
+**jsdom vs happy-dom for Vue component tests:**
+
+Use `jsdom` for the web package. Reasons:
+- happy-dom is faster but has incomplete browser API coverage; Vue Test Utils sometimes hits these gaps
+- jsdom is more mature (used by Vue's own test suite)
+- For a medical tool where test accuracy matters, correctness > speed
+- The performance difference is negligible for a project this size
+
+**Install:**
+
+```bash
+bun add -D vitest @vitest/coverage-v8 --cwd packages/core
+bun add -D vitest @vitest/coverage-v8 --cwd packages/cli
+bun add -D vitest @vitest/coverage-v8 jsdom --cwd apps/web
+```
+
+**Important bun note:** Always use `bun run test` (not `bun test`) to invoke vitest. `bun test` uses bun's native test runner which ignores vitest configuration.
+
+**Confidence:** HIGH — Vitest 4.0.18 is the current stable release. `projects` configuration is the current recommended approach (workspace config deprecated in 3.2).
+
+**Sources:** [vitest.dev/guide/projects](https://vitest.dev/guide/projects), [Vitest 3 Monorepo Setup](https://www.thecandidstartup.org/2025/09/08/vitest-3-monorepo-setup.html), [Vitest 4.0 Release](https://vitest.dev/blog/vitest-4)
 
 ---
 
-### 7. UX: Onboarding Pattern
+### 5. Vue Component Testing: @vue/test-utils 2
 
-**Approach:** Custom Vue component using Vuetify built-in components (v-card, v-dialog, v-btn)
-**New dependencies:** NONE
+**Recommendation:** `@vue/test-utils` v2.4.6 (current stable)
 
-#### Why NOT a Tour Library
+**Rationale:**
+- Official Vue testing library, maintained by Vue core team
+- v2.4.6 is the current release (May 2024), still actively maintained with ongoing dependency updates
+- Works seamlessly with Vitest — the official Vue docs recommend this combination
+- Required for mounting Vue components in unit tests
 
-The project was evaluated for three onboarding libraries:
+**Install:**
 
-| Library | Version | Weekly DL | Vue 3 | TypeScript | Verdict |
-|---------|---------|-----------|-------|------------|---------|
-| v-onboarding | 2.12.2 | 13.8K | Yes | Yes | Overkill |
-| vue-onboarding-tour | 1.x | <1K | Yes | Partial | Immature |
-| vue-shepherd | 4.x | 7K | Yes | Yes | Heavy (Shepherd dep) |
-
-**Why these are all unnecessary:**
-
-The UX audit recommends a "brief welcome card" and a "Try with CFTR" quick-start button -- not a multi-step spotlight tour. This is a:
-- First-visit conditional card (check localStorage flag)
-- One or two sentences of explanation
-- A "Try with CFTR" CTA button that pre-fills the gene search
-- A "Got it" dismiss button that sets the localStorage flag
-
-This is 30-50 lines of Vue code using `v-card` and `v-btn`. Adding a 14KB+ dependency with Popper.js positioning and SVG overlays for a single card is unjustifiable.
-
-**Implementation pattern:**
-
-```vue
-<template>
-  <v-card v-if="showOnboarding" class="mb-4" variant="tonal" color="primary">
-    <v-card-title>Welcome to gCFCalc</v-card-title>
-    <v-card-text>
-      Calculate carrier frequency for autosomal recessive conditions
-      using real gnomAD population data.
-    </v-card-text>
-    <v-card-actions>
-      <v-btn @click="tryExample">Try with CFTR</v-btn>
-      <v-btn variant="text" @click="dismiss">Dismiss</v-btn>
-    </v-card-actions>
-  </v-card>
-</template>
+```bash
+bun add -D @vue/test-utils --cwd apps/web
 ```
 
-State persistence: use the existing `pinia-plugin-persistedstate` (already installed) or simple `localStorage.getItem('onboarding-dismissed')`.
+**Test-setup file pattern:**
 
-**Confidence:** HIGH -- Standard Vuetify components, no external dependencies needed.
+```typescript
+// apps/web/src/test-setup.ts
+import { config } from '@vue/test-utils'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+
+// Global Vuetify instance for component tests
+const vuetify = createVuetify({ components, directives })
+
+config.global.plugins = [vuetify]
+```
+
+**Confidence:** HIGH — Official Vue tooling, actively maintained, well-documented.
+
+**Sources:** [test-utils.vuejs.org](https://test-utils.vuejs.org/), [github.com/vuejs/test-utils](https://github.com/vuejs/test-utils)
 
 ---
 
-### 8. UX: Skip-to-Content
+### 6. E2E Testing: Playwright (Already Installed)
 
-**Approach:** Custom HTML/CSS element (6 lines of HTML, 10 lines of CSS)
-**New dependencies:** NONE
+**Status:** No new installation needed. `playwright` v1.58.2 is already a devDependency.
 
-#### Why NOT `@vue-a11y/skip-to`
+**What changes in monorepo context:**
 
-- The npm package was last updated 5 years ago (2021)
-- The Vue 3 compatible version is on `@next` tag, unclear maintenance status
-- Skip-to-content is a standard HTML/CSS pattern that requires no JavaScript framework
+In the monorepo, Playwright E2E tests belong in `apps/web/` alongside the web app. The playwright configuration needs to be moved from root to `apps/web/playwright.config.ts` and updated to point to the web app's dev server.
 
-**Implementation:**
+**`apps/web/playwright.config.ts`:**
 
-Add to `App.vue` as the first child of `<v-app>`:
+```typescript
+import { defineConfig, devices } from '@playwright/test'
 
-```html
-<a href="#main-content" class="skip-link">
-  Skip to main content
-</a>
+export default defineConfig({
+  testDir: './e2e',
+  webServer: {
+    command: 'bun run dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI,
+    cwd: '.',   // relative to apps/web/
+  },
+  use: {
+    baseURL: 'http://localhost:5173',
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  ],
+})
 ```
 
-```css
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--v-theme-primary);
-  color: white;
-  padding: 8px 16px;
-  z-index: 9999;
-  transition: top 0.2s;
+**Running E2E from monorepo root:**
+
+```bash
+bun run --filter @gnomad-cf/web e2e
+```
+
+**Confidence:** HIGH — Playwright 1.58.2 already installed and working. Configuration adjustment only.
+
+---
+
+### 7. Gene Config Schema: Zod (Already Installed) + YAML Loading
+
+**Recommendation:** Use `zod` v4.x (already installed at ^4.3.5) for schema validation. Add `js-yaml` for YAML config parsing.
+
+**Rationale:**
+
+The gene config files should support both JSON and YAML format (YAML is more human-readable for community contributors making PRs). Loading:
+- JSON: built into Node.js / bun (`JSON.parse`) — no library needed
+- YAML: `js-yaml` is the standard, lightweight library
+
+**Why Zod over JSON Schema + AJV:**
+- Zod is already installed in the project — zero new concepts
+- Zod schema can be the single source of truth for both TypeScript types AND runtime validation
+- AJV is faster for large-scale validation but has poor TypeScript integration; not needed here
+- The gene config files will be <100KB total — performance is irrelevant
+
+**Install:**
+
+```bash
+bun add js-yaml --cwd packages/core
+bun add -D @types/js-yaml --cwd packages/core
+```
+
+**Gene config schema pattern:**
+
+```typescript
+// packages/core/src/schemas/gene-config.ts
+import { z } from 'zod'
+
+export const GeneConfigSchema = z.object({
+  gene: z.string(),               // HGNC gene symbol
+  gnomadVersion: z.enum(['v4', 'v3', 'v2']).optional(),
+  defaultPopulation: z.string().optional(),
+  excludeHomozygotes: z.boolean().optional().default(false),
+  customVariants: z.array(z.object({
+    id: z.string(),
+    frequency: z.number().min(0).max(1),
+    description: z.string().optional(),
+    include: z.boolean().default(true),
+  })).optional(),
+  clinicalNotes: z.string().optional(),
+  // Hardy-Weinberg correction factors
+  founderEffect: z.object({
+    population: z.string(),
+    adjustedFrequency: z.number(),
+    source: z.string().optional(),
+  }).optional(),
+})
+
+export type GeneConfig = z.infer<typeof GeneConfigSchema>
+```
+
+**Loading pattern:**
+
+```typescript
+// packages/core/src/config/gene-config-loader.ts
+import { readFileSync } from 'fs'
+import yaml from 'js-yaml'
+import { GeneConfigSchema } from '../schemas/gene-config'
+
+export function loadGeneConfig(filePath: string): GeneConfig {
+  const content = readFileSync(filePath, 'utf-8')
+  const raw = filePath.endsWith('.yaml') || filePath.endsWith('.yml')
+    ? yaml.load(content)
+    : JSON.parse(content)
+  return GeneConfigSchema.parse(raw)  // throws on invalid config with clear errors
 }
-.skip-link:focus {
-  top: 0;
+```
+
+**Confidence:** HIGH — Zod is already project-validated, js-yaml is the standard YAML library.
+
+---
+
+### 8. TypeScript Configuration for Monorepo
+
+**Recommendation:** Shared base tsconfig + per-package extension. Use `moduleResolution: "bundler"` for packages consumed by Vite; `"node"` or `"node16"` for Node/CLI packages.
+
+**`tsconfig.base.json` (root):**
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "composite": true,
+    "incremental": true,
+    "erasableSyntaxOnly": true
+  }
 }
 ```
 
-Add `id="main-content"` and `tabindex="-1"` to the `<v-main>` element.
+**`packages/core/tsconfig.json`:**
 
-This is the pattern recommended by [Vue.js Accessibility Guide](https://vuejs.org/guide/best-practices/accessibility.html) and [WebAIM](https://webaim.org/techniques/skipnav/).
-
-**Confidence:** HIGH -- Standard WCAG pattern, no library needed.
-
-**Sources:**
-- [Vue.js Accessibility Best Practices](https://vuejs.org/guide/best-practices/accessibility.html)
-- [WebAIM Skip Navigation](https://webaim.org/techniques/skipnav/)
-
----
-
-### 9. UX: Step Transition Loading Indicator
-
-**Approach:** Vuetify `v-progress-linear` component (already available)
-**New dependencies:** NONE
-
-The UX audit identified that transitioning from Step 2 to Step 3 involves an API call with no visible loading indicator. The solution uses Vuetify's built-in `v-progress-linear` component in indeterminate mode.
-
-**Pattern:** Place a `v-progress-linear` at the top of the wizard stepper area, conditionally shown when a step transition involves async work:
-
-```vue
-<v-progress-linear
-  :active="isTransitioning"
-  indeterminate
-  color="primary"
-  height="3"
-/>
+```json
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
 ```
 
-This is the standard Material Design pattern for indicating background work. Vuetify's `v-progress-linear` supports:
-- `indeterminate` mode (no known progress amount)
-- `active` prop to show/hide without layout shift
-- Automatic color theming via `color="primary"`
+**`packages/cli/tsconfig.json`:**
 
-**No new components or libraries needed** -- `v-progress-linear` is part of the Vuetify core already imported in `main.ts` via `import * as components from 'vuetify/components'`.
+```json
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "references": [
+    { "path": "../core" }
+  ],
+  "include": ["src/**/*.ts"]
+}
+```
 
-**Confidence:** HIGH
+**`apps/web/tsconfig.json`:**
 
-**Sources:**
-- [Vuetify Progress Linear](https://vuetifyjs.com/en/components/progress-linear/)
+```json
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true
+  },
+  "references": [
+    { "path": "../../packages/core" }
+  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
+}
+```
+
+**Key constraint:** Do NOT put path aliases (`paths`) in `tsconfig.base.json`. Each package resolves its own paths. The `workspace:*` protocol handles cross-package imports; TypeScript project references handle type resolution.
+
+**Confidence:** HIGH — Verified against TypeScript documentation and bun workspace examples.
 
 ---
 
-## What NOT to Add (and Why)
+### 9. GitHub Actions: Updated for Monorepo
 
-| Rejected Dependency | Why Rejected |
-|-------------------|--------------|
-| `@unhead/vue` | Single-page app with no router. Static meta tags in `index.html` suffice. |
-| `vite-ssg` | SPA has one route. Static seed HTML in `index.html` achieves the same SEO benefit without SSG complexity. |
-| `vite-plugin-sitemap` | One-URL SPA. A hand-written 8-line XML file is simpler than a build plugin. |
-| `v-onboarding` / `vue-shepherd` | Onboarding is a single welcome card, not a multi-step spotlight tour. Vuetify's `v-card` handles this. |
-| `@vue-a11y/skip-to` | 5 years old, unmaintained Vue 3 support. Skip-to-content is 6 lines of HTML/CSS. |
-| `prerender-spa-plugin` | Abandoned (last update 2020). Also unnecessary -- static seed HTML solves the indexing problem. |
-| `schema-dts` / JSON-LD libraries | Structured data is hand-authored JSON in `index.html`. A 40KB+ type library for 50 lines of JSON is overkill. |
-| `vue-meta` / `@vueuse/head` | Both sunset/deprecated in favor of `@unhead/vue`, which itself is unnecessary (see above). |
+**No new Action versions needed.** The existing `oven-sh/setup-bun@v2` (official, now verified) handles everything. The workflow file needs updating to build core first, then web.
+
+**Updated deploy workflow pattern:**
+
+```yaml
+name: Deploy
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.9"
+
+      - name: Install all workspace dependencies
+        run: bun install
+
+      - name: Build core package
+        run: bun run --filter @gnomad-cf/core build
+
+      - name: Type check all packages
+        run: bun run --filter '*' typecheck
+
+      - name: Run unit tests (core + cli)
+        run: bun run --filter @gnomad-cf/core test && bun run --filter @gnomad-cf/cli test
+
+      - name: Build web app
+        run: bun run --filter @gnomad-cf/web build
+
+      - name: Build docs
+        run: bun run --filter @gnomad-cf/web docs:build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/dist
+
+  deploy:
+    needs: build-deploy
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+**Critical:** The web app build (`apps/web/dist`) is what gets deployed to GitHub Pages. The core package does NOT need to be in the artifact — it is bundled into the web app by Vite at build time. The `workspace:*` reference causes Vite to resolve the local package source directly during development and build.
+
+**Confidence:** HIGH — `oven-sh/setup-bun@v2` verified as the official GitHub Action (became verified May 2025). Bun handles `workspace:*` resolution during build.
+
+**Sources:** [bun.com/docs/guides/runtime/cicd](https://bun.com/docs/guides/runtime/cicd), [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun)
 
 ---
 
-## Complete Dependency Summary
+## Complete New Dependencies
 
 ### New Production Dependencies
 
-**NONE**
+| Package | Version | Location | Purpose |
+|---------|---------|----------|---------|
+| `commander` | ^14.0.3 | packages/cli | CLI framework — subcommands, options, help text |
+| `@clack/prompts` | ^1.0.1 | packages/cli | Interactive terminal prompts for batch mode |
+| `js-yaml` | ^4.1.0 | packages/core | YAML gene config file parsing |
 
 ### New Dev Dependencies
 
-**NONE**
+| Package | Version | Location | Purpose |
+|---------|---------|----------|---------|
+| `tsdown` | ^0.20.3 | packages/core, packages/cli | Library bundler (replaces no previous tool) |
+| `vitest` | ^4.0.18 | packages/core, packages/cli, apps/web | Unit test runner |
+| `@vitest/coverage-v8` | ^4.0.18 | packages/core, packages/cli, apps/web | Coverage reporting |
+| `jsdom` | ^26.x | apps/web | DOM environment for Vue component tests |
+| `@vue/test-utils` | ^2.4.6 | apps/web | Vue component mounting for unit tests |
+| `@types/js-yaml` | ^4.0.9 | packages/core | TypeScript types for js-yaml |
 
-### Existing Dependencies Leveraged
+### No Changes Required
 
-| Existing Package | Version | New Use |
-|-----------------|---------|---------|
-| `sharp` | ^0.34.5 (devDep) | SVG-to-PNG OG image conversion build script |
-| `vuetify` | ^3.8.1 | Theme color reconfiguration, `v-progress-linear` loading indicators |
-| `vitepress` | ^2.0.0-alpha.16 (devDep) | Built-in sitemap generation via config |
-| `pinia-plugin-persistedstate` | ^4.7.1 | Onboarding dismissal persistence |
-
-### Configuration-Only Changes
-
-| File | Change | Purpose |
-|------|--------|---------|
-| `index.html` | Add seed HTML inside `<div id="app">`, canonical, robots meta, absolute OG URLs | SEO indexing |
-| `src/main.ts` | Update Vuetify theme colors object | CTA contrast fix |
-| `docs/.vitepress/config.ts` | Add `sitemap: { hostname: '...' }` | Docs sitemap generation |
-| `public/robots.txt` | Add Sitemap directives | Sitemap discovery |
-| `public/sitemap.xml` | New hand-authored file | SPA sitemap |
-| `vite.config.ts` | Update PWA `theme_color` | Match new primary color |
-
-### New Files (Code)
-
-| File | Purpose |
-|------|---------|
-| `scripts/generate-og-image.ts` | Build script: SVG to PNG conversion |
-| `src/components/OnboardingCard.vue` | First-visit welcome card |
-| Skip-link HTML/CSS in `App.vue` | Keyboard accessibility |
+| Package | Reason |
+|---------|--------|
+| `playwright` | Already installed at ^1.58.2, just needs config relocation |
+| `tsx` | Already installed at ^4.21.0, used for scripts |
+| `zod` | Already installed at ^4.3.5, used for gene config schemas |
+| `vite` / `@vitejs/plugin-vue` | Stays in apps/web, no version changes needed |
 
 ---
 
-## Version Verification
+## Installation Commands
 
-All versions verified against npm registry and official documentation as of 2026-02-23:
+```bash
+# 1. From root: restructure into monorepo (manual file moves first)
 
-| Package | In Project | Latest Available | Action |
-|---------|-----------|-----------------|--------|
-| sharp | ^0.34.5 | 0.34.5 | No update needed |
-| vuetify | ^3.8.1 | 3.8.x | No update needed |
-| vitepress | ^2.0.0-alpha.16 | 2.0.0-alpha.16 | No update needed (sitemap supported) |
-| pinia-plugin-persistedstate | ^4.7.1 | 4.7.x | No update needed |
+# 2. Install commander + clack in CLI package
+bun add commander @clack/prompts --cwd packages/cli
+
+# 3. Install core deps
+bun add js-yaml --cwd packages/core
+bun add -D @types/js-yaml tsdown --cwd packages/core
+
+# 4. Install CLI dev deps
+bun add -D tsdown --cwd packages/cli
+
+# 5. Install testing everywhere
+bun add -D vitest @vitest/coverage-v8 --cwd packages/core
+bun add -D vitest @vitest/coverage-v8 --cwd packages/cli
+bun add -D vitest @vitest/coverage-v8 jsdom @vue/test-utils --cwd apps/web
+
+# 6. Reinstall all from root (resolves workspace links)
+bun install
+```
 
 ---
 
-## Integration Points
+## Alternatives Considered
 
-### How Color Change Ripples Through the App
+| Category | Recommended | Alternative | Why Not |
+|----------|-------------|-------------|---------|
+| Monorepo orchestration | Bun native workspaces | Turborepo, Nx | Overkill for 3 packages. Native bun `--filter` covers all use cases. Turborepo adds remote caching which is not needed at this scale. |
+| Monorepo orchestration | Bun native workspaces | moon | Excellent tool but significant config overhead. |
+| Library bundler | tsdown | tsup | tsup is abandoned by its author. Migration to tsdown is recommended. |
+| Library bundler | tsdown | bunup | bunup is at v0.16.x and pre-1.0. Promises great speed but stability risk for tooling. tsdown is more ecosystem-aligned. |
+| Library bundler | tsdown | unbuild | Older, less actively maintained. |
+| CLI framework | commander | citty | citty is lighter but has smaller community and fewer features. commander's stability and adoption are unmatched. |
+| CLI framework | commander | yargs | yargs has a more verbose configuration API and older design philosophy. commander is cleaner for TypeScript. |
+| CLI UX | @clack/prompts | inquirer | inquirer is heavier and older. @clack/prompts is minimal, modern, ESM-first. |
+| Test runner | vitest | jest | Jest requires more configuration for ESM modules. Vitest integrates with Vite and is already the standard in this ecosystem. |
+| Test runner | vitest | bun test | bun test is the built-in runner but bypasses vitest config. Using vitest ensures consistent behavior across packages and CI. |
+| DOM environment | jsdom | happy-dom | happy-dom is faster but has incomplete browser API coverage. For Vue component tests, jsdom is more reliable. |
+| YAML parsing | js-yaml | yaml | Both are viable. js-yaml is slightly more established in the Node.js ecosystem. Either works. |
+| Gene config validation | zod (existing) | ajv + json-schema | AJV is faster but TypeScript integration is poor. Zod is already installed and provides type inference. |
 
-Changing `primary` in the Vuetify theme affects ALL components that use `color="primary"`:
-- `v-btn` (CONTINUE, BACK buttons)
-- `v-stepper` (step circles, active indicator)
-- `v-progress-circular` (loading spinners)
-- `v-progress-linear` (new transition indicator)
-- `v-chip` (filter chips using primary color)
-- `v-autocomplete` (focused border color)
-- `v-radio` (selected state)
-- `v-alert` (if using primary color)
+---
 
-This is intentional -- the primary color should be the "action" color. The warm gray brand identity shifts to `accent` for decorative uses (app bar background, borders, logo area).
+## What NOT to Add
 
-**Components that may need manual `color="accent"` override:**
-- AppBar background (if currently using primary)
-- Logo/branding elements
-- Decorative borders or dividers
+| Package | Why Not |
+|---------|---------|
+| Nx / Turborepo | A 3-package monorepo does not need build orchestration. Bun's `--filter` covers script execution. Add if packages grow to 5+. |
+| `@commander-js/extra-typings` | Optional enhanced typing package for commander. Only worth it if complex option/action types become an issue. Start without it. |
+| `lerna` | Superseded by native workspace tooling in all major package managers. Do not use. |
+| `tsup` | Abandoned by author. Use tsdown instead. |
+| `bunup` | Pre-1.0, promising but not yet production-stable for tooling. |
+| `jest` | No reason to use jest when vitest is the ecosystem standard with Vite. |
+| `jest-environment-jsdom` | Jest-specific, not needed. |
+| `happy-dom` | Slightly faster than jsdom but has coverage gaps that cause Vue Test Utils failures. Use jsdom. |
+| `inquirer` | Replaced by @clack/prompts which is lighter and more modern. |
+| `chalk` | `@clack/prompts` and commander handle terminal output with color. chalk is only needed for custom formatting; defer until actually needed. |
 
-### How VitePress Sitemap Interacts with SPA Sitemap
+---
 
-The deployment creates this URL structure:
+## Stack Patterns by Feature
+
+### Pattern A: Core Package (Pure Computation)
+
+The core package has NO Vue, NO browser APIs, NO DOM. It is pure TypeScript.
+
 ```
-/                    -> SPA (index.html)
-/sitemap.xml         -> SPA sitemap (hand-authored)
-/docs/               -> VitePress docs
-/docs/sitemap.xml    -> VitePress sitemap (auto-generated)
+packages/core/src/
+├── index.ts                    # public API barrel export
+├── calculations/
+│   ├── carrier-frequency.ts    # Hardy-Weinberg 2pq
+│   ├── recurrence-risk.ts      # Autosomal recessive risk
+│   ├── genetic-prevalence.ts   # q² + Bayesian
+│   └── homozygote-exclusion.ts # Adjusted allele frequency
+├── gnomad/
+│   ├── client.ts               # fetch-based GraphQL (no villus — no Vue)
+│   └── queries.ts
+├── schemas/
+│   └── gene-config.ts          # Zod schemas
+├── config/
+│   └── gene-config-loader.ts   # YAML/JSON loading
+└── text/
+    └── template-renderer.ts    # Clinical text generation (no Pinia)
 ```
 
-Both sitemaps are referenced in `robots.txt`. Google treats each independently.
+**Key:** The core package uses native `fetch` (available in bun and modern Node.js) NOT villus. villus is a Vue-specific reactive library. The core's GraphQL client is a plain async function.
 
-### How Seed HTML Interacts with Vue Mount
+### Pattern B: CLI Package (Node/Bun runtime)
 
-1. Browser loads `index.html` -- user sees static seed content
-2. JavaScript bundles load and execute
-3. `createApp(App).mount('#app')` replaces ALL innerHTML of `#app`
-4. Vue app renders normally
+```
+packages/cli/src/
+├── index.ts              # commander program, bin entry point
+├── commands/
+│   ├── calculate.ts      # single gene calculation
+│   └── batch.ts          # batch processing from file
+├── formatters/
+│   ├── json.ts           # JSON output formatting
+│   └── text.ts           # human-readable text output
+└── prompts/
+    └── interactive.ts    # @clack/prompts interactive mode
+```
 
-The transition is seamless. There is no flash of unstyled content because:
-- The seed content has minimal styling (just semantic HTML)
-- Vue mounting happens fast (typically <500ms on modern devices)
-- The Vuetify CSS loads before the app mounts
+### Pattern C: Web App (Vue 3 + Vite)
 
-**Edge case:** If JavaScript fails to load entirely, the user sees the seed content plus `<noscript>` message. This is a graceful degradation, not a bug.
+The web app imports from `@gnomad-cf/core` for calculations. Vite resolves `workspace:*` to the local package at build time. villus and Pinia remain in the web app only.
+
+```
+apps/web/src/
+├── api/                  # villus GraphQL client (Vue-specific)
+├── components/           # Vue components
+├── composables/          # use* composables (call core functions reactively)
+├── stores/               # Pinia stores
+└── ...                   # rest of current src/ structure
+```
+
+---
+
+## Version Compatibility Matrix
+
+| Package | Required Version | Reason |
+|---------|-----------------|--------|
+| bun | >=1.3.0 | Isolated installs default, `--filter` for scripts |
+| TypeScript | ~5.9.x | `erasableSyntaxOnly` flag (5.5+), existing project requirement |
+| Node.js (for CI) | >=20.19 | tsdown requires Node 20.19+ |
+| vitest | ^4.0.18 | `projects` config (3.2+ for projects, 4.x for stability) |
+| @vue/test-utils | ^2.4.6 | Vue 3 compatible; v1 is for Vue 2 |
+| commander | ^14.0.3 | Built-in TypeScript types |
+| tsdown | ^0.20.3 | Latest stable; API stabilizing but pre-1.0 |
 
 ---
 
 ## Sources
 
-### Official Documentation
-- [VitePress Sitemap Generation](https://vitepress.dev/guide/sitemap-generation)
-- [Vuetify Theme Configuration](https://vuetifyjs.com/en/features/theme/)
-- [Vuetify Progress Linear](https://vuetifyjs.com/en/components/progress-linear/)
-- [Vue.js Accessibility](https://vuejs.org/guide/best-practices/accessibility.html)
-- [sharp API Documentation](https://sharp.pixelplumbing.com/api-output/)
-- [WCAG 2.2 Contrast Requirements](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html)
+### Official Documentation (HIGH confidence)
+- [Bun Workspaces](https://bun.com/docs/pm/workspaces) — workspace configuration, `--filter`, `workspace:*` protocol
+- [Bun CI/CD Guide](https://bun.com/docs/guides/runtime/cicd) — GitHub Actions `oven-sh/setup-bun@v2`
+- [Bun Workspace Config Guide](https://bun.com/docs/guides/install/workspaces) — monorepo setup walkthrough
+- [Vitest Projects Guide](https://vitest.dev/guide/projects) — `projects` configuration replacing workspace
+- [Vitest 4.0 Release](https://vitest.dev/blog/vitest-4) — stable browser mode, migration notes
+- [tsdown Getting Started](https://tsdown.dev/guide/getting-started) — configuration reference
+- [Vue Test Utils](https://test-utils.vuejs.org/) — `@vue/test-utils` v2 documentation
+- [commander npm](https://www.npmjs.com/package/commander) — v14.0.3 TypeScript support
 
-### Web Research (Verified)
-- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) -- used for contrast ratio calculations
-- [WebAIM Skip Navigation](https://webaim.org/techniques/skipnav/) -- skip-to-content pattern
-- [Vue SPA SEO Patterns](https://nuxtseo.com/learn-seo/vue/spa) -- seed content approach
-- [WCAG AA Contrast for Buttons](https://www.makethingsaccessible.com/guides/contrast-requirements-for-wcag-2-2-level-aa/)
+### Web Research (MEDIUM confidence — verified with official sources)
+- [Vitest 3 Monorepo Setup (Sep 2025)](https://www.thecandidstartup.org/2025/09/08/vitest-3-monorepo-setup.html) — monorepo `projects` pattern
+- [Switching from tsup to tsdown](https://alan.norbauer.com/articles/tsdown-bundler/) — tsup abandonment, tsdown migration
+- [Monorepo with Bun (DEV Community)](https://dev.to/vikkio88/monorepo-with-bun-474n) — complete workspace example
+- [Building TypeScript CLI with Bun](https://pmbanugo.me/blog/build-cli-typescript-bun) — commander + bun pattern
+- [Bun 1.3 Release Notes](https://bun.com/blog/bun-v1.3) — isolated installs as workspace default
+- [@clack/prompts npm](https://www.npmjs.com/package/@clack/prompts) — v1.0.1 release Feb 2026
 
-### npm Registry (Version Verification)
-- [sharp@0.34.5](https://www.npmjs.com/package/sharp)
-- [v-onboarding@2.12.2](https://www.npmjs.com/package/v-onboarding) -- evaluated and rejected
-- [@vue-a11y/skip-to](https://www.npmjs.com/package/@vue-a11y/skip-to) -- evaluated and rejected
+### Version Verification (npm registry — current as of 2026-02-23)
+- commander: 14.0.3 (latest, includes TypeScript types)
+- @clack/prompts: 1.0.1 (latest, 8 days old at research date)
+- tsdown: 0.20.3 (latest, 18 days old at research date)
+- vitest: 4.0.18 (latest, 1 month old at research date)
+- @vue/test-utils: 2.4.6 (latest, May 2024 — still actively maintained)
+- playwright: 1.58.2 (already in project, current)
