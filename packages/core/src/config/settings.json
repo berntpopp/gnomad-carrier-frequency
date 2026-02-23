@@ -1,0 +1,9 @@
+{
+  "founderEffectMultiplier": 5,
+  "lowSampleSizeThreshold": 1000,
+  "defaultCarrierFrequency": 0.01,
+  "debounceMs": 300,
+  "minSearchChars": 2,
+  "maxAutocompleteResults": 10,
+  "frequencyDecimalPlaces": 2
+}

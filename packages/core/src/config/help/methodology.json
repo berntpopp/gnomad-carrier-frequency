@@ -1,0 +1,58 @@
+{
+  "title": "Carrier Frequency Calculation Methodology",
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "content": "This calculator estimates carrier frequencies for autosomal recessive conditions using population allele frequency data from the Genome Aggregation Database (gnomAD). The calculation is based on the Hardy-Weinberg equilibrium principle."
+    },
+    {
+      "id": "hardy-weinberg",
+      "title": "Hardy-Weinberg Equilibrium",
+      "content": "The Hardy-Weinberg principle describes the relationship between allele frequencies and genotype frequencies in a large, randomly mating population. For a gene with two alleles (normal allele A with frequency p, and disease allele a with frequency q), where p + q = 1, the genotype frequencies at equilibrium are:",
+      "formula": {
+        "genotypes": [
+          { "genotype": "AA (homozygous normal)", "frequency": "p\u00b2" },
+          { "genotype": "Aa (heterozygous carrier)", "frequency": "2pq" },
+          { "genotype": "aa (homozygous affected)", "frequency": "q\u00b2" }
+        ]
+      }
+    },
+    {
+      "id": "calculation",
+      "title": "Carrier Frequency Calculation",
+      "content": "For diseases caused by multiple pathogenic variants, we sum the allele frequencies of all pathogenic variants to get the total disease allele frequency (q). The carrier frequency is then approximated as 2q (since 2pq \u2248 2q when q is small).",
+      "steps": [
+        "1. Identify pathogenic variants in the gene (LoF HC and/or ClinVar P/LP)",
+        "2. Sum allele frequencies: q = \u03a3(variant allele frequencies)",
+        "3. Calculate carrier frequency: 2q",
+        "4. For affected frequency: q\u00b2"
+      ]
+    },
+    {
+      "id": "assumptions",
+      "title": "Assumptions",
+      "content": "The Hardy-Weinberg equilibrium assumes:",
+      "list": [
+        "Random mating in the population",
+        "No new mutations occurring",
+        "No natural selection against carriers or affected individuals",
+        "Infinitely large population (no genetic drift)",
+        "No migration (gene flow)"
+      ]
+    },
+    {
+      "id": "limitations",
+      "title": "Limitations",
+      "content": "Important limitations to consider:",
+      "list": [
+        "Founder effects may cause higher frequencies in specific populations (e.g., CFTR in European populations)",
+        "Consanguinity increases risk beyond Hardy-Weinberg predictions",
+        "Some variants may have incomplete penetrance",
+        "gnomAD population categories may not precisely match patient ancestry",
+        "Rare variants may not be well-represented in gnomAD",
+        "Some pathogenic variants may not be annotated in ClinVar"
+      ]
+    }
+  ]
+}

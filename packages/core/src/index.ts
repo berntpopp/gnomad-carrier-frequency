@@ -2,3 +2,6 @@
 
 // Types
 export * from './types/index.js'
+
+// Config
+export * from './config/index.js'
