@@ -9,7 +9,7 @@ Requirements for the Discoverability & Polish milestone. Addresses two critical 
 
 ### SEO Indexing
 
-- [ ] **SEO-01**: Static HTML seed content (500+ words) inside `<div id="app">` with H1, feature list, and nav links to docs — replaced by Vue on mount
+- [ ] **SEO-01**: Static HTML seed content (500+ words) inside `<div id="app">` with H1, feature list, and nav links to docs -- replaced by Vue on mount
 - [ ] **SEO-02**: `<link rel="canonical">` with absolute URL including trailing slash
 - [ ] **SEO-03**: `<meta name="robots" content="index, follow">` directive
 - [ ] **SEO-04**: `public/sitemap.xml` with app root URL
@@ -106,49 +106,49 @@ Deferred to later milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEO-01 | TBD | Pending |
-| SEO-02 | TBD | Pending |
-| SEO-03 | TBD | Pending |
-| SEO-04 | TBD | Pending |
-| SEO-05 | TBD | Pending |
-| SEO-06 | TBD | Pending |
-| SEO-07 | TBD | Pending |
-| SEO-08 | TBD | Pending |
-| SEO-09 | TBD | Pending |
-| SEO-10 | TBD | Pending |
-| SEO-11 | TBD | Pending |
-| SEO-12 | TBD | Pending |
-| SOP-01 | TBD | Pending |
-| SOP-02 | TBD | Pending |
-| SOP-03 | TBD | Pending |
-| SOP-04 | TBD | Pending |
-| SOP-05 | TBD | Pending |
-| UXC-01 | TBD | Pending |
-| UXC-02 | TBD | Pending |
-| UXC-03 | TBD | Pending |
-| UXC-04 | TBD | Pending |
-| UXC-05 | TBD | Pending |
-| UXO-01 | TBD | Pending |
-| UXO-02 | TBD | Pending |
-| UXO-03 | TBD | Pending |
-| UXO-04 | TBD | Pending |
-| UXV-01 | TBD | Pending |
-| UXV-02 | TBD | Pending |
-| UXV-03 | TBD | Pending |
-| UXV-04 | TBD | Pending |
-| A11-01 | TBD | Pending |
-| A11-02 | TBD | Pending |
-| A11-03 | TBD | Pending |
-| A11-04 | TBD | Pending |
-| DOC-01 | TBD | Pending |
-| DOC-02 | TBD | Pending |
-| DOC-03 | TBD | Pending |
+| SEO-01 | Phase 21 | Pending |
+| SEO-02 | Phase 21 | Pending |
+| SEO-03 | Phase 21 | Pending |
+| SEO-04 | Phase 21 | Pending |
+| SEO-05 | Phase 21 | Pending |
+| SEO-06 | Phase 21 | Pending |
+| SEO-07 | Phase 21 | Pending |
+| SEO-08 | Phase 21 | Pending |
+| SEO-09 | Phase 21 | Pending |
+| SEO-10 | Phase 21 | Pending |
+| SEO-11 | Phase 21 | Pending |
+| SEO-12 | Phase 21 | Pending |
+| SOP-01 | Phase 21 | Pending |
+| SOP-02 | Phase 21 | Pending |
+| SOP-03 | Phase 21 | Pending |
+| SOP-04 | Phase 21 | Pending |
+| SOP-05 | Phase 21 | Pending |
+| UXC-01 | Phase 22 | Pending |
+| UXC-02 | Phase 22 | Pending |
+| UXC-03 | Phase 22 | Pending |
+| UXC-04 | Phase 22 | Pending |
+| UXC-05 | Phase 22 | Pending |
+| A11-01 | Phase 22 | Pending |
+| A11-02 | Phase 22 | Pending |
+| A11-03 | Phase 22 | Pending |
+| A11-04 | Phase 22 | Pending |
+| UXO-01 | Phase 23 | Pending |
+| UXO-02 | Phase 23 | Pending |
+| UXO-03 | Phase 23 | Pending |
+| UXO-04 | Phase 23 | Pending |
+| UXV-01 | Phase 23 | Pending |
+| UXV-02 | Phase 23 | Pending |
+| UXV-03 | Phase 23 | Pending |
+| UXV-04 | Phase 23 | Pending |
+| DOC-01 | Phase 24 | Pending |
+| DOC-02 | Phase 24 | Pending |
+| DOC-03 | Phase 24 | Pending |
 
 **Coverage:**
-- v1.4 requirements: 35 total
-- Mapped to phases: 0
-- Unmapped: 35 (pending roadmap creation)
+- v1.4 requirements: 37 total
+- Mapped to phases: 37
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after initial definition*
+*Last updated: 2026-02-23 after roadmap creation*
