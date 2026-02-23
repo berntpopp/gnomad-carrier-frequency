@@ -1,6 +1,6 @@
 # Citation
 
-If you use the gnomAD Carrier Frequency Calculator in your research or clinical work, please cite it using one of the formats below.
+If you use the gnomAD Carrier Frequency Calculator in your research, please cite it using one of the formats below.
 
 ## How to Cite
 

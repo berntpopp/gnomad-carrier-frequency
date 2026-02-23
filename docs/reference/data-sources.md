@@ -69,9 +69,9 @@ ClinGen validity status helps you assess confidence in the gene-disease relation
 
 ## External Resources
 
-- [gnomAD Browser](https://gnomad.broadinstitute.org/) — Explore variant data directly in the gnomAD interface
-- [ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/) — Search and review variant clinical significance submissions
-- [ClinGen](https://clinicalgenome.org/) — Gene-disease validity curation and clinical interpretation resources
+- [gnomAD Browser](https://gnomad.broadinstitute.org/) - Explore variant data directly in the gnomAD interface
+- [ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/) - Search and review variant clinical significance submissions
+- [ClinGen](https://clinicalgenome.org/) - Gene-disease validity curation and clinical interpretation resources
 
 ---
 

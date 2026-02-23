@@ -4,7 +4,7 @@ layout: home
 hero:
   name: gnomAD Carrier Frequency
   text: Calculator for Autosomal Recessive Conditions
-  tagline: Calculate carrier frequencies and recurrence risks from gnomAD population data with clinical documentation output
+  tagline: Calculate carrier frequencies and recurrence risks from gnomAD population data - for research use only
   actions:
     - theme: brand
       text: Open Calculator
@@ -21,12 +21,12 @@ features:
     title: Carrier Frequency Calculation
     details: Calculate carrier frequencies from allele frequencies using Hardy-Weinberg equilibrium with support for population-specific analysis and founder effect detection
   - icon: 📄
-    title: Clinical Text Generation
-    details: Generate ready-to-use German and English clinical documentation text from customizable templates with support for multiple clinical perspectives
+    title: Text Generation
+    details: Generate German and English documentation text from customizable templates with support for multiple perspectives
 ---
 
-A research tool for clinical researchers and genetic counselors to calculate carrier frequencies for autosomal recessive conditions using population data from the Genome Aggregation Database (gnomAD).
+A research tool for exploring carrier frequencies for autosomal recessive conditions using population data from the Genome Aggregation Database (gnomAD).
 
 ::: warning For Research Use Only
-The gnomAD Carrier Frequency Calculator is intended to support clinical documentation workflows and research. Results should be reviewed by a qualified clinician and do not constitute a diagnostic report. Always verify calculations against primary sources before clinical use.
+The gnomAD Carrier Frequency Calculator is intended for research and educational purposes only. It is not a validated clinical diagnostic tool. Any outputs must be independently reviewed and verified by qualified professionals before use in a clinical context.
 :::

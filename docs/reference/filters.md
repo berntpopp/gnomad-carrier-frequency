@@ -50,7 +50,7 @@ The default threshold is **2 stars**. Raising the threshold excludes variants wi
 
 Missense, inframe insertion, and inframe deletion variants are included only when they have ClinVar P/LP evidence.
 
-**Key point: Missense variants always require ClinVar P/LP classification.** Unlike LoF HC variants, a missense variant cannot be included based on computational prediction alone — it must have a ClinVar Pathogenic or Likely Pathogenic classification meeting the star threshold. This prevents unsupported missense inclusion, which would inflate carrier frequency estimates.
+**Key point: Missense variants always require ClinVar P/LP classification.** Unlike LoF HC variants, a missense variant cannot be included based on computational prediction alone - it must have a ClinVar Pathogenic or Likely Pathogenic classification meeting the star threshold. This prevents unsupported missense inclusion, which would inflate carrier frequency estimates.
 
 ::: warning LoF HC vs. Missense: Different Evidence Requirements
 LoF HC variants are included based on LOFTEE annotation alone (mechanism-based evidence). Missense variants require ClinVar P/LP classification (clinical evidence). This distinction reflects the higher predictive confidence for loss-of-function variants compared to missense variants.
@@ -63,12 +63,12 @@ LoF HC variants are included based on LOFTEE annotation alone (mechanism-based e
 
 ## Conflicting Classifications
 
-Some variants in ClinVar have submissions with mixed classifications — for example, some submitters classify a variant as Pathogenic while others classify it as a Variant of Uncertain Significance (VUS). These are listed in ClinVar as "conflicting classifications."
+Some variants in ClinVar have submissions with mixed classifications - for example, some submitters classify a variant as Pathogenic while others classify it as a Variant of Uncertain Significance (VUS). These are listed in ClinVar as "conflicting classifications."
 
 By default, conflicting variants are **excluded**. When you enable this option:
 
 - Only conflicting variants where the P/LP percentage meets the configured threshold are included
-- Default threshold: **80%** — at least 80% of submissions must classify the variant as P/LP
+- Default threshold: **80%** - at least 80% of submissions must classify the variant as P/LP
 - Example: A variant with 5 P/LP submissions and 1 VUS submission = 83% P/LP → included at the 80% threshold
 
 ::: warning Use Conflicting Classifications with Caution
@@ -83,7 +83,7 @@ In the variant table (Step 3 of the wizard), you can manually include or exclude
 - Including a variant you have independent clinical evidence for
 - Investigating how a single variant affects the total carrier frequency
 
-Manual overrides apply to the current calculation only — they do not change your global filter settings.
+Manual overrides apply to the current calculation only - they do not change your global filter settings.
 
 <figure class="screenshot-frame">
   <img src="/screenshots/variant-table.webp" alt="Variant table with individual variant checkboxes for include/exclude" />

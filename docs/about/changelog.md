@@ -6,11 +6,11 @@ Version history for the gnomAD Carrier Frequency Calculator.
 
 **Sharing and Mobile Optimization**
 
-- URL state sharing — share calculations via URL with encoded parameters
-- Progressive Web App (PWA) — offline support, installable on desktop and mobile
-- Manual variant exclusion — toggle individual variants in the variant table
+- URL state sharing - share calculations via URL with encoded parameters
+- Progressive Web App (PWA) - offline support, installable on desktop and mobile
+- Manual variant exclusion - toggle individual variants in the variant table
 - Mobile-responsive design optimization
-- Search history — automatically saves recent gene searches with one-click restore
+- Search history - automatically saves recent gene searches with one-click restore
 
 ## v1.1.0 (2026-01-19)
 
@@ -20,7 +20,7 @@ Version history for the gnomAD Carrier Frequency Calculator.
 - ClinGen gene-disease validity warnings
 - Configurable variant filters (LoF HC, ClinVar P/LP, missense, star threshold)
 - Export results functionality
-- Clinical text template editor with customizable sections
+- Text template editor with customizable sections
 - Event logging for debugging
 - Contextual help system
 - Lighthouse accessibility and performance optimized (90+ scores)
@@ -34,8 +34,8 @@ Version history for the gnomAD Carrier Frequency Calculator.
 - gnomAD GraphQL integration (v4.1, v3.1.2, v2.1.1)
 - Hardy-Weinberg carrier frequency calculation
 - Population-specific frequency breakdown with founder effect detection
-- German and English clinical text generation
-- Three clinical perspectives: affected patient, healthy carrier, family member
+- German and English text generation
+- Three text perspectives: affected individual, healthy carrier, family member
 - Gender-inclusive German language options (*, :, /, traditional)
 - Dark mode support (follows system preference)
 - GitHub Pages deployment

@@ -6,9 +6,12 @@
 ![Vuetify](https://img.shields.io/badge/Vuetify-1867C0?logo=vuetify&logoColor=fff)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-A web-based tool for genetic counselors to calculate carrier frequencies for autosomal recessive conditions using population allele frequency data from the Genome Aggregation Database (gnomAD).
+[![Live App](https://img.shields.io/badge/Live_App-gnomad--carrier--frequency-blue?logo=googlechrome&logoColor=white)](https://gnomad-carrier-frequency.kidney-genetics.org/)
+[![Documentation](https://img.shields.io/badge/Docs-VitePress-747bff?logo=vitepress&logoColor=white)](https://gnomad-carrier-frequency.kidney-genetics.org/docs/)
 
-**Live Demo:** [https://berntpopp.github.io/gnomad-carrier-frequency/](https://berntpopp.github.io/gnomad-carrier-frequency/)
+A research tool for exploring carrier frequencies for autosomal recessive conditions using population allele frequency data from the Genome Aggregation Database (gnomAD).
+
+> **For Research Use Only** - This tool is intended for research and educational purposes. It is not a validated clinical diagnostic tool. Any outputs must be independently reviewed and verified by qualified professionals before use in a clinical context.
 
 ## Features
 
@@ -18,7 +21,7 @@ A web-based tool for genetic counselors to calculate carrier frequencies for aut
 - **Variant Details** - View contributing variants with HGVS nomenclature and allele frequencies
 - **ClinGen Validation** - Automatic gene-disease validity checking against ClinGen curations
 - **Gene Constraint Scores** - Display pLI and LOEUF constraint metrics
-- **Clinical Text Generation** - Generate German clinical documentation text for patient letters
+- **Text Generation** - Generate German and English documentation text from customizable templates
 - **Dark/Light Theme** - Automatic theme detection with manual override
 
 ## Quick Start
@@ -58,19 +61,19 @@ bun run preview
 
 ## Usage
 
-1. **Select gnomAD Version** - Choose between v4.1 (GRCh38) or v2.1.1 (GRCh37)
+1. **Select gnomAD Version** - Choose between v4.1 (GRCh38), v3.1.2 (GRCh38), or v2.1.1 (GRCh37)
 2. **Search for Gene** - Enter a gene symbol (e.g., CFTR, SMN1, HBB)
 3. **Review Validation** - Check ClinGen AR association and gene constraint scores
-4. **Select Population** - Choose the population matching patient ancestry
+4. **Select Population** - Choose the population matching the ancestry of interest
 5. **Configure Filters** - Adjust variant filters if needed
 6. **View Results** - See carrier frequency, affected frequency, and contributing variants
-7. **Generate Text** - Copy clinical text for documentation
+7. **Generate Text** - Copy generated text for documentation purposes
 
 ## Data Sources
 
 | Source | Description | Version |
 |--------|-------------|---------|
-| [gnomAD](https://gnomad.broadinstitute.org/) | Population allele frequencies | v4.1 / v2.1.1 |
+| [gnomAD](https://gnomad.broadinstitute.org/) | Population allele frequencies | v4.1 / v3.1.2 / v2.1.1 |
 | [ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/) | Variant pathogenicity classifications | via gnomAD |
 | [ClinGen](https://clinicalgenome.org/) | Gene-disease validity curations | Live (30-day cache) |
 
@@ -82,7 +85,7 @@ Carrier frequency is calculated using the Hardy-Weinberg equilibrium principle:
 - **Carrier frequency** = 2q (heterozygote frequency)
 - **Affected frequency** = q^2 (homozygote frequency)
 
-For detailed methodology, see the Methodology section in the app.
+For detailed methodology, see the [Methodology documentation](https://gnomad-carrier-frequency.kidney-genetics.org/docs/reference/methodology).
 
 ## Technology Stack
 
@@ -92,6 +95,7 @@ For detailed methodology, see the Methodology section in the app.
 - **Language:** TypeScript 5
 - **State Management:** Pinia with persistence
 - **GraphQL Client:** Villus
+- **Documentation:** VitePress
 - **Deployment:** GitHub Pages
 
 ## Development
@@ -99,15 +103,15 @@ For detailed methodology, see the Methodology section in the app.
 ```bash
 # Run linting
 bun run lint
-# or: npm run lint
 
 # Run type checking
 bun run typecheck
-# or: npm run typecheck
 
 # Run build with type checking
 bun run build
-# or: npm run build
+
+# Run documentation dev server
+bun run docs:dev
 ```
 
 ### Project Structure
@@ -122,17 +126,19 @@ src/
 ├── stores/           # Pinia stores
 ├── types/            # TypeScript type definitions
 └── utils/            # Utility functions
+docs/                 # VitePress documentation site
 ```
 
 ## Disclaimer
 
 **For Research Use Only**
 
-This tool provides carrier frequency estimates based on gnomAD population data. Results are intended for research and educational purposes.
+This tool provides carrier frequency estimates based on gnomAD population data. Results are intended for research and educational purposes only.
 
-- Results should be verified by a clinical laboratory before use in patient care
-- This tool does not replace genetic counseling or clinical judgment
-- Population frequencies may not reflect specific patient ancestry
+- This tool is not a validated clinical diagnostic tool
+- Any outputs must be independently reviewed and verified by qualified professionals
+- Population frequencies may not reflect specific individual ancestry
+- This tool does not replace professional judgment or laboratory testing
 
 ## License
 

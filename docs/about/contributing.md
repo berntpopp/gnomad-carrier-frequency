@@ -88,7 +88,7 @@ docs/            # VitePress documentation site
 2. Make your changes with clear, focused commits
 3. Ensure all checks pass: lint, typecheck, build
 4. Open a pull request with a description of what changed and why
-5. Wait for review — the maintainer will review and merge or request changes
+5. Wait for review - the maintainer will review and merge or request changes
 
 ## Reporting Issues
 

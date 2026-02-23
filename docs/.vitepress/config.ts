@@ -39,8 +39,7 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/use-cases/' },
             { text: 'Carrier Screening', link: '/use-cases/carrier-screening' },
-            { text: 'Family Planning', link: '/use-cases/family-planning' },
-            { text: 'Clinical Letter', link: '/use-cases/clinical-letter' }
+            { text: 'Text Generation', link: '/use-cases/clinical-letter' }
           ]
         }
       ],
