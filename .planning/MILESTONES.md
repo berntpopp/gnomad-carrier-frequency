@@ -1,5 +1,33 @@
 # Project Milestones: gnomAD Carrier Frequency Calculator
 
+## v1.3 Documentation Site (Shipped: 2026-02-23)
+
+**Delivered:** Professional documentation site with auto-generated screenshots, deployed alongside the app on GitHub Pages at a custom domain.
+
+**Phases completed:** 16-20 (14 plans total)
+
+**Key accomplishments:**
+
+- VitePress documentation site with 17 content pages across 4 sections (Guide, Use Cases, Reference, About)
+- Playwright screenshot automation generating 14 WebP screenshots with API fixture mocking and CI auto-refresh
+- Clinical documentation coverage: Getting Started walkthrough, 3 use cases, and full reference material
+- Unified deployment pipeline merging app + docs into single GitHub Pages artifact at custom domain
+- CITATION.cff with CFF 1.2.0 standard, BibTeX entry, and "For Research Use Only" disclaimers
+- README streamlined to 57-line landing page directing to docs site
+
+**Stats:**
+
+- 125 files created/modified (+13,969 / -452 lines)
+- ~30,624 lines total project code
+- 5 phases, 14 plans, 52 requirements
+- 14 days from start to ship (2026-02-09 → 2026-02-23)
+
+**Git range:** `docs(16)` → `docs(20)`
+
+**What's next:** v1.4 Testing Infrastructure (Vitest, component tests, E2E tests)
+
+---
+
 ## v1.2 Sharing & Collaboration (Shipped: 2026-01-20)
 
 **Delivered:** Shareable calculation URLs, offline-capable PWA, manual variant exclusion, mobile-optimized UI, and search history with auto-save.
