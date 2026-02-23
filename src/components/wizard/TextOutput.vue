@@ -250,17 +250,17 @@ const labels = computed(() =>
         patientSex: 'Patient*in',
         perspectives: {
           affected: 'Betroffener Patient',
-          carrier: 'Anlagetrager/in',
+          carrier: 'Anlageträger/in',
           familyMember: 'Familienmitglied',
         },
         genderStyles: {
           '*': 'Genderstern (*)',
           ':': 'Doppelpunkt (:)',
-          '/': 'Schragstrich (/)',
+          '/': 'Schrägstrich (/)',
           traditional: 'Traditionell',
         },
         patientSexOptions: {
-          male: 'Mannlich (der Patient)',
+          male: 'Männlich (der Patient)',
           female: 'Weiblich (die Patientin)',
           neutral: 'Neutral (der/die Patient*in)',
         },
