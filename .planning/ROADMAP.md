@@ -40,7 +40,7 @@
 
 - [x] **Phase 16: VitePress Setup** - Documentation infrastructure with navigation, theming, and landing page ✓
 - [x] **Phase 17: Screenshot Automation** - Playwright-based screenshot generation covering all app states ✓
-- [ ] **Phase 18: Documentation Content** - Guide, use cases, reference, and about pages with embedded screenshots
+- [x] **Phase 18: Documentation Content** - Guide, use cases, reference, and about pages with embedded screenshots ✓
 - [ ] **Phase 19: CI/CD Integration** - Unified deployment pipeline and screenshot update automation
 - [ ] **Phase 20: README Streamlining** - Slim README to essentials with docs site link
 
@@ -90,11 +90,11 @@ Plans:
   5. All pages have working cross-links to related content and screenshots render correctly in the VitePress build
 **Plans:** 5 plans
 Plans:
-- [ ] 18-01-PLAN.md — Infrastructure (screenshot CSS, sidebar config) and Guide section (introduction + getting started walkthrough)
-- [ ] 18-02-PLAN.md — Use Cases section (overview, carrier screening, family planning, clinical letter)
-- [ ] 18-03-PLAN.md — Reference section (overview, methodology, data sources, filters, templates)
-- [ ] 18-04-PLAN.md — About section (overview, citation, changelog, contributing) and CITATION.cff
-- [ ] 18-05-PLAN.md — Landing page disclaimer, cross-link audit, and build verification
+- [x] 18-01-PLAN.md — Infrastructure (screenshot CSS, sidebar config) and Guide section (introduction + getting started walkthrough)
+- [x] 18-02-PLAN.md — Use Cases section (overview, carrier screening, family planning, clinical letter)
+- [x] 18-03-PLAN.md — Reference section (overview, methodology, data sources, filters, templates)
+- [x] 18-04-PLAN.md — About section (overview, citation, changelog, contributing) and CITATION.cff
+- [x] 18-05-PLAN.md — Landing page disclaimer, cross-link audit, and build verification
 
 ### Phase 19: CI/CD Integration
 **Goal**: Unified deployment pipeline merging the Vue app and VitePress docs into a single GitHub Pages artifact, with automated screenshot refresh when UI changes
@@ -130,10 +130,10 @@ Phases execute in numeric order: 16 --> 17 --> 18 --> 19 --> 20
 |-------|-----------|----------------|--------|-----------|
 | 16. VitePress Setup | v1.3 | 2/2 | Complete | 2026-02-09 |
 | 17. Screenshot Automation | v1.3 | 3/3 | Complete | 2026-02-09 |
-| 18. Documentation Content | v1.3 | 0/5 | Not started | - |
+| 18. Documentation Content | v1.3 | 5/5 | Complete | 2026-02-23 |
 | 19. CI/CD Integration | v1.3 | 0/3 | Not started | - |
 | 20. README Streamlining | v1.3 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-23 (Phase 19 planned)*
+*Last updated: 2026-02-23 (Phase 18 complete)*

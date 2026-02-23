@@ -44,31 +44,31 @@
 
 ### Documentation Content — Guide
 
-- [ ] **GUID-01**: Getting Started page with < 1 minute quick walkthrough
-- [ ] **GUID-02**: Getting Started includes 4-step screenshots with annotations
-- [ ] **GUID-03**: Gene Search detailed guide (gnomAD version selection, autocomplete, ClinGen notice, gene constraint)
-- [ ] **GUID-04**: Patient Status detailed guide (4 status options explained clinically)
-- [ ] **GUID-05**: Frequency Source detailed guide (gnomAD/Literature/Default tabs explained)
-- [ ] **GUID-06**: Results and Text detailed guide (population table, clinical text, export, sharing)
+- [x] **GUID-01**: Getting Started page with < 1 minute quick walkthrough
+- [x] **GUID-02**: Getting Started includes 4-step screenshots with annotations
+- [x] **GUID-03**: Gene Search detailed guide (gnomAD version selection, autocomplete, ClinGen notice, gene constraint)
+- [x] **GUID-04**: Patient Status detailed guide (4 status options explained clinically)
+- [x] **GUID-05**: Frequency Source detailed guide (gnomAD/Literature/Default tabs explained)
+- [x] **GUID-06**: Results and Text detailed guide (population table, clinical text, export, sharing)
 
 ### Documentation Content — Use Cases
 
-- [ ] **CASE-01**: Carrier screening counseling scenario (known carrier partner, CFTR example)
-- [ ] **CASE-02**: Recurrence risk / family planning scenario (affected child, future pregnancy)
-- [ ] **CASE-03**: Clinical letter generation scenario (template customization, DE/EN, gender-inclusive, copy-paste workflow)
+- [x] **CASE-01**: Carrier screening counseling scenario (known carrier partner, CFTR example)
+- [x] **CASE-02**: Recurrence risk / family planning scenario (affected child, future pregnancy)
+- [x] **CASE-03**: Clinical letter generation scenario (template customization, DE/EN, gender-inclusive, copy-paste workflow)
 
 ### Documentation Content — Reference
 
-- [ ] **REF-01**: Methodology page (Hardy-Weinberg calculation, allele frequency aggregation, population-specific calculations)
-- [ ] **REF-02**: Data sources page (gnomAD v4.1 vs v2.1.1, ClinVar classifications, ClinGen validity)
-- [ ] **REF-03**: Filters page (LoF HC, missense, ClinVar P/LP, star threshold, per-calculation override)
-- [ ] **REF-04**: Templates page ({{variable}} syntax, available variables, perspectives, sections, gender-inclusive styles)
+- [x] **REF-01**: Methodology page (Hardy-Weinberg calculation, allele frequency aggregation, population-specific calculations)
+- [x] **REF-02**: Data sources page (gnomAD v4.1 vs v2.1.1, ClinVar classifications, ClinGen validity)
+- [x] **REF-03**: Filters page (LoF HC, missense, ClinVar P/LP, star threshold, per-calculation override)
+- [x] **REF-04**: Templates page ({{variable}} syntax, available variables, perspectives, sections, gender-inclusive styles)
 
 ### Documentation Content — About
 
-- [ ] **ABOU-01**: Citation page with CITATION.cff file and BibTeX entry
-- [ ] **ABOU-02**: Changelog page (version history from v1.0 through v1.2)
-- [ ] **ABOU-03**: Contributing guide (development setup, PR process, code style)
+- [x] **ABOU-01**: Citation page with CITATION.cff file and BibTeX entry
+- [x] **ABOU-02**: Changelog page (version history from v1.0 through v1.2)
+- [x] **ABOU-03**: Contributing guide (development setup, PR process, code style)
 
 ### CI/CD Integration
 
@@ -147,22 +147,22 @@
 | SHOT-15 | Phase 17 | Complete |
 | SHOT-16 | Phase 17 | Complete |
 | SHOT-17 | Phase 17 | Complete |
-| GUID-01 | Phase 18 | Pending |
-| GUID-02 | Phase 18 | Pending |
-| GUID-03 | Phase 18 | Pending |
-| GUID-04 | Phase 18 | Pending |
-| GUID-05 | Phase 18 | Pending |
-| GUID-06 | Phase 18 | Pending |
-| CASE-01 | Phase 18 | Pending |
-| CASE-02 | Phase 18 | Pending |
-| CASE-03 | Phase 18 | Pending |
-| REF-01 | Phase 18 | Pending |
-| REF-02 | Phase 18 | Pending |
-| REF-03 | Phase 18 | Pending |
-| REF-04 | Phase 18 | Pending |
-| ABOU-01 | Phase 18 | Pending |
-| ABOU-02 | Phase 18 | Pending |
-| ABOU-03 | Phase 18 | Pending |
+| GUID-01 | Phase 18 | Complete |
+| GUID-02 | Phase 18 | Complete |
+| GUID-03 | Phase 18 | Complete |
+| GUID-04 | Phase 18 | Complete |
+| GUID-05 | Phase 18 | Complete |
+| GUID-06 | Phase 18 | Complete |
+| CASE-01 | Phase 18 | Complete |
+| CASE-02 | Phase 18 | Complete |
+| CASE-03 | Phase 18 | Complete |
+| REF-01 | Phase 18 | Complete |
+| REF-02 | Phase 18 | Complete |
+| REF-03 | Phase 18 | Complete |
+| REF-04 | Phase 18 | Complete |
+| ABOU-01 | Phase 18 | Complete |
+| ABOU-02 | Phase 18 | Complete |
+| ABOU-03 | Phase 18 | Complete |
 | CICD-01 | Phase 19 | Pending |
 | CICD-02 | Phase 19 | Pending |
 | CICD-03 | Phase 19 | Pending |
@@ -179,4 +179,4 @@
 
 ---
 *Requirements defined: 2026-02-09*
-*Last updated: 2026-02-09 (Phase 17 complete: 28 requirements satisfied)*
+*Last updated: 2026-02-23 (Phase 18 complete: 44 requirements satisfied)*
