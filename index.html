@@ -29,18 +29,92 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "gnomAD Carrier Frequency Calculator",
-      "alternateName": "gCFCalc",
-      "url": "https://gnomad-carrier-frequency.kidney-genetics.org/",
-      "description": "Calculate carrier frequency and recurrence risk for autosomal recessive conditions using gnomAD population data",
-      "applicationCategory": "HealthApplication",
-      "operatingSystem": "All",
-      "browserRequirements": "Requires JavaScript",
-      "author": {
-        "@type": "Person",
-        "name": "Bernt Popp"
-      }
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "gnomAD Carrier Frequency Calculator",
+          "alternateName": "gCFCalc",
+          "url": "https://gnomad-carrier-frequency.kidney-genetics.org/",
+          "description": "Calculate carrier frequency and recurrence risk for autosomal recessive conditions using gnomAD population data across multiple ancestries",
+          "applicationCategory": "HealthApplication",
+          "applicationSubCategory": "Genetics Calculator",
+          "operatingSystem": "All",
+          "browserRequirements": "Requires JavaScript",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "Bernt Popp",
+            "url": "https://github.com/berntpopp"
+          },
+          "softwareVersion": "1.2.0",
+          "featureList": [
+            "gnomAD allele frequency data (v4.1, v3.1.2, v2.1.1)",
+            "ClinVar pathogenic variant filtering",
+            "Hardy-Weinberg carrier frequency calculation",
+            "Population-specific analysis across multiple ancestries",
+            "Recurrence risk calculation",
+            "Clinical documentation text generation",
+            "Founder effect detection"
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is carrier frequency?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Carrier frequency is the proportion of individuals in a population who carry one copy of a recessive disease-causing allele. Carriers are typically unaffected but can pass the allele to their children. Using the Hardy-Weinberg equation, carrier frequency equals 2pq, where q is the disease allele frequency and p = 1 − q. For example, if q = 0.02, the carrier frequency is approximately 1 in 25 (4%)."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How is carrier frequency calculated from gnomAD data?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "This calculator retrieves all known pathogenic and loss-of-function variants for a gene from gnomAD, sums their allele frequencies to estimate the total disease allele frequency (q), then applies the Hardy-Weinberg equation (carrier frequency = 2pq). Unlike simple Hardy-Weinberg calculators that require manual input of disease prevalence, this tool uses real population allele frequency data from over 800,000 individuals sequenced in gnomAD."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the difference between carrier frequency and affected frequency?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Carrier frequency (2pq ≈ 2q) represents the proportion of individuals who carry one copy of a pathogenic variant but are unaffected. Affected frequency (q²) represents the proportion of individuals who carry two pathogenic variants and are affected by the condition. For rare recessive conditions, carrier frequency is much higher than affected frequency."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How is recurrence risk calculated?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "For autosomal recessive conditions, if both parents are carriers, each child has a 25% (1 in 4) chance of being affected. If one parent is affected and one is a carrier, the risk is 50%. The calculator shows carrier frequency to help estimate the probability that a partner is a carrier."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Which population should I use for carrier frequency?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Select the population that best matches your patient's genetic ancestry. If ancestry is unknown or mixed, consider using 'Global' frequencies. gnomAD provides frequencies for African/African American, Admixed American, Ashkenazi Jewish, East Asian, Finnish, Non-Finnish European, Middle Eastern, and South Asian populations. Note that self-reported ethnicity may not always match genetic ancestry."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I use these results for clinical decisions?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "This tool is intended for research and educational purposes. Results should be verified by a clinical laboratory before use in patient care. The calculator provides estimates based on population data and may not reflect individual patient risk accurately."
+              }
+            }
+          ]
+        }
+      ]
     }
     </script>
   </head>

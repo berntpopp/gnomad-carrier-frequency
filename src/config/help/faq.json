@@ -2,6 +2,22 @@
   "title": "Frequently Asked Questions",
   "categories": [
     {
+      "id": "basics",
+      "title": "Basics",
+      "questions": [
+        {
+          "id": "what-is-carrier-frequency",
+          "question": "What is carrier frequency?",
+          "answer": "Carrier frequency is the proportion of individuals in a population who carry one copy of a recessive disease-causing allele. Carriers are typically unaffected but can pass the allele to their children. Using the Hardy-Weinberg equation, carrier frequency equals 2pq, where q is the disease allele frequency and p = 1 − q. For example, if q = 0.02, the carrier frequency is approximately 1 in 25 (4%)."
+        },
+        {
+          "id": "how-calculated-from-gnomad",
+          "question": "How is carrier frequency calculated from gnomAD data?",
+          "answer": "This calculator retrieves all known pathogenic and loss-of-function variants for a gene from gnomAD, sums their allele frequencies to estimate the total disease allele frequency (q), then applies the Hardy-Weinberg equation (carrier frequency = 2pq). Unlike simple Hardy-Weinberg calculators that require manual input of disease prevalence, this tool uses real population allele frequency data from over 800,000 individuals sequenced in gnomAD."
+        }
+      ]
+    },
+    {
       "id": "gnomad-data",
       "title": "gnomAD Data",
       "questions": [
