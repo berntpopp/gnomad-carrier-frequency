@@ -13,11 +13,11 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 
 ## Current Position
 
-**Milestone:** v1.3 Documentation Site
-**Phase:** 19 of 20 (CI/CD Integration) — COMPLETE
-**Plan:** 3 of 3 complete
-**Status:** Phase 19 complete. All 3 plans executed. Deploy workflow builds app + docs into merged artifact. Both sites verified live. Screenshot automation workflow created.
-**Last activity:** 2026-02-23 -- Phase 19 verified and complete
+**Milestone:** v1.3 Documentation Site — COMPLETE
+**Phase:** 20 of 20 (README Streamlining) — COMPLETE
+**Plan:** 1 of 1 complete
+**Status:** Phase 20 complete. README rewritten as slim 57-line landing page. v1.3 milestone fully complete.
+**Last activity:** 2026-02-23 -- Phase 20 complete, v1.3 milestone SHIPPED
 
 ### Progress
 
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [█████████ ]  98% - Phase 19 COMPLETE (13/13 plans)
+v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 ```
 
-**Overall:** 73 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 74 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
@@ -84,6 +84,8 @@ Recent decisions affecting current work:
 - 19-02: Playwright cache keyed on bun.lockb hash; cache-miss installs --with-deps, cache-hit installs system deps only
 - 19-03: robots.txt added to public/ to fix Lighthouse SEO score (SPA fallback was serving index.html for /robots.txt)
 - 19-03: ESLint ignores VitePress cache/dist directories (generated files)
+- 20-01: README slimmed from 168 to 57 lines -- title, badges, description, disclaimer blockquote, hero screenshot, features, quick start, license & citation only
+- 20-01: Docs site is the authoritative reference; README is entry-point only with single docs link in Quick Start
 
 ### Pending Todos
 
@@ -100,12 +102,12 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-23
-**Completed:** Phase 19 — CI/CD Integration (all 3 plans + verification)
-**Status:** Phase 19 COMPLETE — Deploy builds app + docs into merged artifact. App live at root, docs live at /docs/. CI validates builds with bun. Screenshot workflow auto-updates on UI changes.
+**Completed:** Phase 20 — README Streamlining (1/1 plan complete)
+**Status:** Phase 20 COMPLETE. v1.3 Documentation Site milestone COMPLETE. README rewritten as 57-line slim landing page.
 
 ### Handoff Notes
 
-v1.3 Documentation Site milestone:
+v1.3 Documentation Site milestone — ALL PHASES COMPLETE:
 - Phase 16: VitePress Setup -- COMPLETE
 - Phase 17: Screenshot Automation -- COMPLETE
 - Phase 18: Documentation Content -- COMPLETE
@@ -113,7 +115,10 @@ v1.3 Documentation Site milestone:
   - 19-01: Base path fixes + unified deploy workflow -- COMPLETE
   - 19-02: CI workflow bun migration + screenshots automation workflow -- COMPLETE
   - 19-03: PAT secret setup + E2E deployment verification -- COMPLETE
-- Phase 20: README Streamlining (3 requirements) — NEXT
+- Phase 20: README Streamlining -- COMPLETE
+  - 20-01: Slim landing-page README -- COMPLETE
+
+v1.3 SHIPPED 2026-02-23
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
 Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
