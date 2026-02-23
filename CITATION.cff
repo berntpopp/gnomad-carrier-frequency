@@ -6,7 +6,7 @@ authors:
   - family-names: Popp
     given-names: Bernt
     orcid: "https://orcid.org/0000-0002-3679-1081"
-version: 1.3.0
+version: 1.4.0
 date-released: "2026-02-23"
 url: "https://gnomad-carrier-frequency.kidney-genetics.org/"
 repository-code: "https://github.com/berntpopp/gnomad-carrier-frequency"
