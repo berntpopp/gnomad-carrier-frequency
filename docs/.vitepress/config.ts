@@ -4,12 +4,12 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'gnomAD Carrier Frequency Docs',
   description: 'Calculate carrier frequencies for autosomal recessive conditions from gnomAD data',
-  base: '/gnomad-carrier-frequency/docs/',
+  base: '/docs/',
 
   appearance: true, // Dark mode follows system preference
 
   head: [
-    ['link', { rel: 'icon', href: '/gnomad-carrier-frequency/favicon.svg' }]
+    ['link', { rel: 'icon', href: '/favicon.svg' }]
   ],
 
   themeConfig: {
@@ -19,7 +19,7 @@ export default defineConfig({
       { text: 'Use Cases', link: '/use-cases/' },
       { text: 'Reference', link: '/reference/' },
       { text: 'About', link: '/about/' },
-      { text: 'Open Calculator', link: '/gnomad-carrier-frequency/', target: '_blank' }
+      { text: 'Open Calculator', link: 'https://gnomad-carrier-frequency.kidney-genetics.org/', target: '_blank' }
     ],
 
     // Sidebar configuration

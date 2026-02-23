@@ -25,7 +25,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const BASE_URL = 'http://localhost:5173/gnomad-carrier-frequency/';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:5173/';
 const OUTPUT_DIR = resolve(__dirname, '../docs/public/screenshots');
 const FIXTURES_DIR = resolve(__dirname, '../fixtures');
 const VIEWPORT_DESKTOP = { width: 1200, height: 800 };

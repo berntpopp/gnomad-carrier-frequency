@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: Open Calculator
-      link: /gnomad-carrier-frequency/
+      link: https://gnomad-carrier-frequency.kidney-genetics.org/
     - theme: alt
       text: Getting Started
       link: /guide/getting-started
