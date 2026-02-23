@@ -79,10 +79,14 @@ Plans:
   3. The web app results step shows genetic prevalence (q²) and Bayesian prevalence (penetrance-adjusted) alongside carrier frequency
   4. Running `bun run test --filter @gnomad-cf/core` executes unit tests for all calculation functions with CFTR, SMN1, and HEXA reference values and all tests pass
   5. No calculation change is merged without a corresponding golden-value test asserting the expected output against published reference values
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 26-01: TBD
+- [ ] 26-01-PLAN.md — Core calculation engine (HWE, VCR/GCR, prevalence) with golden-value TDD tests
+- [ ] 26-02-PLAN.md — GraphQL ac_hom extension, CalcConfig Pinia store, URL state sync
+- [ ] 26-03-PLAN.md — Composable & frequency-calc integration (wire formulas to reactive layer)
+- [ ] 26-04-PLAN.md — FilterPanel calc controls & StepResults prevalence display
+- [ ] 26-05-PLAN.md — Variant filter & template renderer unit tests (TEST-05, TEST-06)
 
 ---
 
@@ -151,7 +155,7 @@ Plans:
 | 16-20 | v1.3 | 14/14 | Complete | 2026-02-23 |
 | 21-24 | v1.4 | 12/12 | Complete | 2026-02-23 |
 | 25. Monorepo Foundation & Core Extraction | v1.5 | 0/TBD | Not started | - |
-| 26. Calculation Improvements in Core | v1.5 | 0/TBD | Not started | - |
+| 26. Calculation Improvements in Core | v1.5 | 0/5 | Planned | - |
 | 27. CLI Package | v1.5 | 0/TBD | Not started | - |
 | 28. Gene Config System | v1.5 | 0/TBD | Not started | - |
 | 29. Test Suite Completion & Web App Validation | v1.5 | 0/TBD | Not started | - |
@@ -160,4 +164,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-23 (v1.5 phases 25-29 added)*
+*Last updated: 2026-02-23 (Phase 26 planned: 5 plans in 2 waves)*
