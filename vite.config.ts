@@ -33,8 +33,8 @@ export default defineConfig({
         theme_color: '#a09588', // RequiForm palette
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: '/gnomad-carrier-frequency/',
-        scope: '/gnomad-carrier-frequency/',
+        start_url: '/',
+        scope: '/',
         icons: [
           {
             src: 'icons/pwa-192x192.png',
@@ -105,7 +105,7 @@ export default defineConfig({
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(pkg.version),
   },
-  base: '/gnomad-carrier-frequency/',  // GitHub Pages subdirectory
+  base: '/',  // Custom domain serves from root
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
