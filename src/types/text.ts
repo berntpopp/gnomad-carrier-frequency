@@ -7,10 +7,10 @@ export type Perspective = 'affected' | 'carrier' | 'familyMember';
 
 /**
  * Gender-inclusive language style for German text
- * - '*': Anlagetrager*innen
- * - ':': Anlagetrager:innen
- * - '/': Anlagetrager/-innen
- * - 'traditional': Anlagetragerinnen und Anlagetrager
+ * - '*': Anlageträger*innen
+ * - ':': Anlageträger:innen
+ * - '/': Anlageträger/-innen
+ * - 'traditional': Anlageträgerinnen und Anlageträger
  */
 export type GenderStyle = '*' | ':' | '/' | 'traditional';
 
@@ -87,7 +87,7 @@ export interface TemplateContext {
   /** PubMed ID for literature citations (optional) */
   pmid?: string;
 
-  /** Gender-inclusive suffix (e.g., "*innen", ":innen", "/-innen", "innen und Anlagetrager") */
+  /** Gender-inclusive suffix (e.g., "*innen", ":innen", "/-innen", "innen und Anlageträger") */
   genderSuffix: string;
 
   /** Formatted access date (e.g., "19.01.2026" for German, "January 19, 2026" for English) */

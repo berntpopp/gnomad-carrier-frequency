@@ -210,7 +210,7 @@ function buildStatusIntro(
       case 'compound_het_confirmed':
         return `Bei ${patientDative} wurden zwei pathogene Varianten im ${gene}-Gen im compound heterozygoten Zustand nachgewiesen.`;
       case 'compound_het_assumed':
-        return `Bei ${patientDative} wurden zwei pathogene Varianten im ${gene}-Gen nachgewiesen. Aufgrund des passenden Phanotyps erscheint ein compound heterozygotes Vorliegen wahrscheinlich.`;
+        return `Bei ${patientDative} wurden zwei pathogene Varianten im ${gene}-Gen nachgewiesen. Aufgrund des passenden Phänotyps erscheint ein compound heterozygotes Vorliegen wahrscheinlich.`;
     }
   } else {
     switch (indexStatus) {
