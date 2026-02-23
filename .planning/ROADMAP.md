@@ -97,15 +97,19 @@ Plans:
 - [ ] 18-05-PLAN.md — Landing page disclaimer, cross-link audit, and build verification
 
 ### Phase 19: CI/CD Integration
-**Goal**: Both the app and documentation site deploy automatically from a single GitHub Actions workflow, with screenshots updating when UI changes
+**Goal**: Unified deployment pipeline merging the Vue app and VitePress docs into a single GitHub Pages artifact, with automated screenshot refresh when UI changes
 **Depends on**: Phase 18 (docs content must exist for deployment verification)
 **Requirements**: CICD-01, CICD-02, CICD-03, CICD-04, CICD-05
 **Success Criteria** (what must be TRUE):
   1. Pushing to main triggers a deploy workflow that builds both the Vue app and the VitePress docs, merging them into a single GitHub Pages artifact
-  2. The app is accessible at https://berntpopp.github.io/gnomad-carrier-frequency/ and the docs at https://berntpopp.github.io/gnomad-carrier-frequency/docs/
+  2. The app is accessible at https://gnomad-carrier-frequency.kidney-genetics.org/ and the docs at https://gnomad-carrier-frequency.kidney-genetics.org/docs/
   3. A separate screenshot workflow triggers on UI component changes, regenerates screenshots, and auto-commits any changes
   4. Both sites render correctly at their respective URLs after deployment (no 404s, no broken assets)
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 19-01-PLAN.md — Base path fixes for custom domain + unified deploy workflow
+- [ ] 19-02-PLAN.md — CI workflow update with bun + screenshot automation workflow
+- [ ] 19-03-PLAN.md — PAT secret setup + end-to-end deployment verification
 
 ### Phase 20: README Streamlining
 **Goal**: README is concise and directs users to the documentation site for detailed information
@@ -127,9 +131,9 @@ Phases execute in numeric order: 16 --> 17 --> 18 --> 19 --> 20
 | 16. VitePress Setup | v1.3 | 2/2 | Complete | 2026-02-09 |
 | 17. Screenshot Automation | v1.3 | 3/3 | Complete | 2026-02-09 |
 | 18. Documentation Content | v1.3 | 0/5 | Not started | - |
-| 19. CI/CD Integration | v1.3 | 0/TBD | Not started | - |
+| 19. CI/CD Integration | v1.3 | 0/3 | Not started | - |
 | 20. README Streamlining | v1.3 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-23 (Phase 18 planned)*
+*Last updated: 2026-02-23 (Phase 19 planned)*
