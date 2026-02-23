@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 
 **Milestone:** v1.3 Documentation Site
 **Phase:** 18 of 20 (Documentation Content) — In progress
-**Plan:** 1 of ~5 complete
-**Status:** Phase 18 plan 01 complete. Guide section written. Ready for next content plan.
-**Last activity:** 2026-02-23 -- Completed 18-01-PLAN.md (screenshot CSS, Contributing sidebar, Guide intro + Getting Started)
+**Plan:** 2 of ~5 complete
+**Status:** Phase 18 plan 02 complete. Use Cases section written. Ready for Reference section plans.
+**Last activity:** 2026-02-23 -- Completed 18-02-PLAN.md (use-cases index, carrier-screening, family-planning, clinical-letter)
 
 ### Progress
 
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [██████    ]  60% - Phase 18 started (6/10 plans)
+v1.3 Docs:          [███████   ]  70% - Phase 18 plan 02 done (7/10 plans)
 ```
 
-**Overall:** 65 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 66 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 65
-- v1.3 plans completed: 6
+- Total plans completed: 66
+- v1.3 plans completed: 7
 
 ---
 
@@ -66,6 +66,10 @@ Recent decisions affecting current work:
 - 18-01: Research disclaimer ::: warning block at top of guide entry-point pages
 - 18-01: Hardy-Weinberg explanation included in Guide intro for broad clinical audience
 - 18-01: Risk divisors documented inline in Getting Started (carrier_frequency / 4 for heterozygous, / 2 for homozygous/compound het)
+- 18-02: Use case pages start with clinical scenario paragraph before any calculator steps (WHY before HOW)
+- 18-02: family-planning.md text-only (no screenshot) — carrier-screening already shows the variant table
+- 18-02: HFE clinical letter page uses markdown table for three-perspective comparison
+- 18-02: English text snippet shown in clinical-letter.md (docs are English; German mentioned as available)
 
 ### Pending Todos
 
@@ -82,17 +86,18 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-23
-**Completed:** Phase 18 Plan 01 — screenshot CSS, Contributing sidebar, Guide intro + Getting Started walkthrough
-**Status:** Plan 18-01 complete — ready for next content plan (Use Cases or Reference section)
+**Completed:** Phase 18 Plan 02 — use-cases index, carrier screening (CASE-01), family planning (CASE-02), clinical letter (CASE-03)
+**Status:** Plan 18-02 complete — Use Cases section done, ready for Reference section plans
 
 ### Handoff Notes
 
 v1.3 Documentation Site milestone:
 - Phase 16: VitePress Setup -- COMPLETE
 - Phase 17: Screenshot Automation -- COMPLETE
-- Phase 18: Documentation Content (16 requirements) — IN PROGRESS (plan 01 done)
+- Phase 18: Documentation Content (16 requirements) — IN PROGRESS (plan 02 done)
   - 18-01: Guide section (Introduction + Getting Started) -- COMPLETE
-  - Remaining: Use Cases, Reference section, About section, etc.
+  - 18-02: Use Cases section (carrier screening, family planning, clinical letter) -- COMPLETE
+  - Remaining: Reference section, About section, etc.
 - Phase 19: CI/CD Integration (5 requirements)
 - Phase 20: README Streamlining (3 requirements)
 - Branch: feature/v1.3-documentation
