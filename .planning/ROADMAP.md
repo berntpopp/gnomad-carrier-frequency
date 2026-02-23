@@ -61,10 +61,14 @@
   3. The deployed GitHub Pages app at the live URL loads and the CFTR wizard completes without errors, proving the web app's import path migration to `@gnomad-cf/core` is transparent to end users
   4. `packages/core` has zero imports from Vue, Pinia, or villus — verified by TypeScript compilation in an isolated `node` environment
   5. Vitest is configured at monorepo root with per-package project configs and `bun run test` runs without errors (even with zero tests yet)
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 25-01: TBD
+- [ ] 25-01-PLAN.md — Scaffold monorepo structure and move web app to apps/web/
+- [ ] 25-02-PLAN.md — Extract types, config, and queries to packages/core
+- [ ] 25-03-PLAN.md — Extract filters, calculations, and templates to packages/core
+- [ ] 25-04-PLAN.md — Create fetch client, rewire web imports to @gnomad-cf/core, delete duplicates
+- [ ] 25-05-PLAN.md — Update CI/deploy, cleanup, documentation, and human verification
 
 ---
 
@@ -154,7 +158,7 @@ Plans:
 | 11-15 | v1.2 | 15/15 | Complete | 2026-01-20 |
 | 16-20 | v1.3 | 14/14 | Complete | 2026-02-23 |
 | 21-24 | v1.4 | 12/12 | Complete | 2026-02-23 |
-| 25. Monorepo Foundation & Core Extraction | v1.5 | 0/TBD | Not started | - |
+| 25. Monorepo Foundation & Core Extraction | v1.5 | 0/5 | Planned | - |
 | 26. Calculation Improvements in Core | v1.5 | 0/5 | Planned | - |
 | 27. CLI Package | v1.5 | 0/TBD | Not started | - |
 | 28. Gene Config System | v1.5 | 0/TBD | Not started | - |
@@ -164,4 +168,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-24 (Phase 26 plans revised: dependency fix, SMN1->GJB2, precision improvements)*
+*Last updated: 2026-02-24 (Phase 25 planned: 5 plans in 5 waves, monorepo scaffold + extraction + rewiring + CI)*
