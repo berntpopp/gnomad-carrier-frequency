@@ -14,10 +14,10 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 ## Current Position
 
 **Milestone:** v1.3 Documentation Site
-**Phase:** 17 of 20 (Screenshot Automation) — COMPLETE
-**Plan:** 3 of 3 complete
-**Status:** Phase 17 complete. All 14 screenshots generated. Ready for Phase 18.
-**Last activity:** 2026-02-09 -- Phase 17 complete (3 plans, 14 WebP screenshots)
+**Phase:** 18 of 20 (Documentation Content) — In progress
+**Plan:** 1 of ~5 complete
+**Status:** Phase 18 plan 01 complete. Guide section written. Ready for next content plan.
+**Last activity:** 2026-02-23 -- Completed 18-01-PLAN.md (screenshot CSS, Contributing sidebar, Guide intro + Getting Started)
 
 ### Progress
 
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [█████     ]  50% - Phase 17 complete (5/10 plans)
+v1.3 Docs:          [██████    ]  60% - Phase 18 started (6/10 plans)
 ```
 
-**Overall:** 64 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 65 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 64
-- v1.3 plans completed: 5
+- Total plans completed: 65
+- v1.3 plans completed: 6
 
 ---
 
@@ -62,6 +62,10 @@ Recent decisions affecting current work:
 - 17-03: Click label text for Vuetify v-radio (more reliable than component click)
 - 17-03: emulateMedia for dark mode (avoids reload and wizard state loss)
 - 17-03: Simple timeouts over networkidle (SPA never settles with route interception)
+- 18-01: Screenshot embedding via <figure class="screenshot-frame"> with /screenshots/ absolute paths (no /public/ prefix)
+- 18-01: Research disclaimer ::: warning block at top of guide entry-point pages
+- 18-01: Hardy-Weinberg explanation included in Guide intro for broad clinical audience
+- 18-01: Risk divisors documented inline in Getting Started (carrier_frequency / 4 for heterozygous, / 2 for homozygous/compound het)
 
 ### Pending Todos
 
@@ -69,7 +73,7 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+- Local dev environment: node_modules installed by bun (Linux binaries) require @rollup/rollup-win32-x64-msvc for VitePress build under Windows node. Install with `npm install @rollup/rollup-win32-x64-msvc --no-save` if running builds in Windows shell (does not affect CI which uses ubuntu-latest).
 
 ---
 
@@ -77,19 +81,29 @@ None yet.
 
 ### Last Session
 
-**Date:** 2026-02-09
-**Completed:** Phase 17 Screenshot Automation (3 plans, 18 requirements)
-**Status:** Phase 17 complete — ready for Phase 18 planning
+**Date:** 2026-02-23
+**Completed:** Phase 18 Plan 01 — screenshot CSS, Contributing sidebar, Guide intro + Getting Started walkthrough
+**Status:** Plan 18-01 complete — ready for next content plan (Use Cases or Reference section)
 
 ### Handoff Notes
 
 v1.3 Documentation Site milestone:
 - Phase 16: VitePress Setup -- COMPLETE
 - Phase 17: Screenshot Automation -- COMPLETE
-- Phase 18: Documentation Content (16 requirements)
+- Phase 18: Documentation Content (16 requirements) — IN PROGRESS (plan 01 done)
+  - 18-01: Guide section (Introduction + Getting Started) -- COMPLETE
+  - Remaining: Use Cases, Reference section, About section, etc.
 - Phase 19: CI/CD Integration (5 requirements)
 - Phase 20: README Streamlining (3 requirements)
 - Branch: feature/v1.3-documentation
+
+Screenshot-frame CSS pattern established. All future doc plans embedding screenshots should use:
+```html
+<figure class="screenshot-frame">
+  <img src="/screenshots/filename.webp" alt="..." />
+  <figcaption>Caption text.</figcaption>
+</figure>
+```
 
 ---
 
