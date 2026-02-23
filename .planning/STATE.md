@@ -14,10 +14,10 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 ## Current Position
 
 **Milestone:** v1.3 Documentation Site
-**Phase:** 18 of 20 (Documentation Content) — COMPLETE
-**Plan:** 5 of 5 complete
-**Status:** Phase 18 complete. All 5 plans executed. Landing page disclaimer added. VitePress build verified with zero errors.
-**Last activity:** 2026-02-23 -- Completed 18-05-PLAN.md (Final quality gate: landing page disclaimer + build verification)
+**Phase:** 19 of 20 (CI/CD Integration) — In progress
+**Plan:** 1 of 5 complete
+**Status:** Phase 19 Plan 01 complete. Base paths fixed for custom domain. Unified deploy workflow with app + docs merge.
+**Last activity:** 2026-02-23 -- Completed 19-01-PLAN.md (Base path fixes + unified deploy workflow)
 
 ### Progress
 
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [█████████ ]  95% - Phase 18 COMPLETE (10/10 plans)
+v1.3 Docs:          [█████████ ]  96% - Phase 19 In Progress (1/5 plans)
 ```
 
-**Overall:** 70 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 71 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
@@ -76,6 +76,9 @@ Recent decisions affecting current work:
 - 18-03: Use <span v-pre>{{variable}}</span> in markdown to escape Vue interpolation (backtick code spans inside tables and ::: containers still processed by VitePress alpha 16)
 - 18-03: Avoid {{}} in ::: tip/warning/info container text — Vue processes container content as Vue template
 - 18-05: Landing page disclaimer placed as ::: warning block in content section after frontmatter (not inside frontmatter)
+- 19-01: Open Calculator nav link and hero action link use absolute URL https://gnomad-carrier-frequency.kidney-genetics.org/ (not relative /) — VitePress resolves relative / against base '/docs/', navigating to docs index not app root
+- 19-01: packageManager: "bun@1.3.9" in package.json is single source of truth; oven-sh/setup-bun@v2 reads it automatically (no bun-version input needed)
+- 19-01: Deploy workflow is self-contained with lint + typecheck gates before build steps
 
 ### Pending Todos
 
@@ -92,8 +95,8 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-23
-**Completed:** Phase 18 Plan 05 — Final quality gate (landing page disclaimer + build verification)
-**Status:** Phase 18 COMPLETE — All 5 plans executed. 17 pages, 14 screenshots, zero broken links verified.
+**Completed:** Phase 19 Plan 01 — Base path fixes + unified deploy workflow
+**Status:** 19-01 COMPLETE — Custom domain paths fixed, deploy.yml builds app + docs, merged artifact.
 
 ### Handoff Notes
 
@@ -106,11 +109,13 @@ v1.3 Documentation Site milestone:
   - 18-03: Reference section (overview, methodology, data sources, filters, templates) -- COMPLETE
   - 18-04: About section (overview, citation, changelog, contributing) + CITATION.cff -- COMPLETE
   - 18-05: Final quality gate (landing page disclaimer + build verification) -- COMPLETE
-- Phase 19: CI/CD Integration (5 requirements) — NEXT
+- Phase 19: CI/CD Integration — IN PROGRESS
+  - 19-01: Base path fixes + unified deploy workflow -- COMPLETE
+  - 19-02 through 19-05: NEXT
 - Phase 20: README Streamlining (3 requirements)
 - Branch: feature/v1.3-documentation
 
-Documentation site is verified and ready for Phase 19 CI/CD deployment pipeline setup.
+Deploy workflow now builds app + docs and merges into single artifact (app at root, docs at /docs/). Custom domain base paths correct. Ready for Phase 19 Plan 02.
 
 Template variable escaping pattern for VitePress: use `<span v-pre>{{variable}}</span>` for any {{}} in markdown docs. This is documented in 18-03-SUMMARY.md.
 
