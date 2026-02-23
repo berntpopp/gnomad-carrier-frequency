@@ -33,7 +33,7 @@ export const FACTORY_FILTER_DEFAULTS: FilterConfig = {
   lofHcEnabled: true,
   missenseEnabled: true,
   clinvarEnabled: true,
-  clinvarStarThreshold: 1,
+  clinvarStarThreshold: 2,
   clinvarIncludeConflicting: false,
   clinvarConflictingThreshold: 80,
 };
