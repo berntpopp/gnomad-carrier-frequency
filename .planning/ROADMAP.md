@@ -5,7 +5,7 @@
 - **v1.0 MVP** - Phases 1-4 (shipped 2026-01-19)
 - **v1.1 Release-Ready** - Phases 5-10 (shipped 2026-01-19)
 - **v1.2 Sharing** - Phases 11-15 (shipped 2026-01-20)
-- **v1.3 Documentation Site** - Phases 16-20 (in progress)
+- **v1.3 Documentation Site** - Phases 16-20 (shipped 2026-02-23)
 
 ## Phases
 
@@ -30,7 +30,7 @@
 
 </details>
 
-### v1.3 Documentation Site (In Progress)
+### v1.3 Documentation Site (SHIPPED 2026-02-23)
 
 **Milestone Goal:** Professional documentation site with auto-generated screenshots, deployed alongside the app on GitHub Pages.
 
@@ -42,7 +42,7 @@
 - [x] **Phase 17: Screenshot Automation** - Playwright-based screenshot generation covering all app states ✓
 - [x] **Phase 18: Documentation Content** - Guide, use cases, reference, and about pages with embedded screenshots ✓
 - [x] **Phase 19: CI/CD Integration** - Unified deployment pipeline and screenshot update automation ✓
-- [ ] **Phase 20: README Streamlining** - Slim README to essentials with docs site link
+- [x] **Phase 20: README Streamlining** - Slim README to essentials with docs site link ✓
 
 ## Phase Details
 
@@ -121,7 +121,7 @@ Plans:
   3. License and citation section references the docs citation page for full details
 **Plans:** 1 plan
 Plans:
-- [ ] 20-01-PLAN.md -- Rewrite README.md to slim landing-page format
+- [x] 20-01-PLAN.md -- Rewrite README.md to slim landing-page format
 
 ## Progress
 
@@ -134,8 +134,8 @@ Phases execute in numeric order: 16 --> 17 --> 18 --> 19 --> 20
 | 17. Screenshot Automation | v1.3 | 3/3 | Complete | 2026-02-09 |
 | 18. Documentation Content | v1.3 | 5/5 | Complete | 2026-02-23 |
 | 19. CI/CD Integration | v1.3 | 3/3 | Complete | 2026-02-23 |
-| 20. README Streamlining | v1.3 | 0/1 | Not started | - |
+| 20. README Streamlining | v1.3 | 1/1 | Complete | 2026-02-23 |
 
 ---
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-23 (Phase 19 complete)*
+*Last updated: 2026-02-23 (Phase 20 complete — v1.3 shipped)*

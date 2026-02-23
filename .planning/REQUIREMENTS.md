@@ -80,9 +80,9 @@
 
 ### README Streamlining
 
-- [ ] **READ-01**: README slimmed to essentials (title, badges, one-line description, hero screenshot, 3-step quick start)
-- [ ] **READ-02**: Documentation badge linking to docs site
-- [ ] **READ-03**: License and citation section with link to docs citation page
+- [x] **READ-01**: README slimmed to essentials (title, badges, one-line description, hero screenshot, 3-step quick start)
+- [x] **READ-02**: Documentation badge linking to docs site
+- [x] **READ-03**: License and citation section with link to docs citation page
 
 ## Future Requirements
 
@@ -168,9 +168,9 @@
 | CICD-03 | Phase 19 | Complete |
 | CICD-04 | Phase 19 | Complete |
 | CICD-05 | Phase 19 | Complete |
-| READ-01 | Phase 20 | Pending |
-| READ-02 | Phase 20 | Pending |
-| READ-03 | Phase 20 | Pending |
+| READ-01 | Phase 20 | Complete |
+| READ-02 | Phase 20 | Complete |
+| READ-03 | Phase 20 | Complete |
 
 **Coverage:**
 - v1.3 requirements: 52 total
@@ -179,4 +179,4 @@
 
 ---
 *Requirements defined: 2026-02-09*
-*Last updated: 2026-02-23 (Phase 19 complete: 49 requirements satisfied)*
+*Last updated: 2026-02-23 (Phase 20 complete: 52/52 requirements satisfied — v1.3 shipped)*
