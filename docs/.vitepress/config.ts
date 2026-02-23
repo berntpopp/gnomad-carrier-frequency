@@ -62,7 +62,8 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/about/' },
             { text: 'Citation', link: '/about/citation' },
-            { text: 'Changelog', link: '/about/changelog' }
+            { text: 'Changelog', link: '/about/changelog' },
+            { text: 'Contributing', link: '/about/contributing' }
           ]
         }
       ]
