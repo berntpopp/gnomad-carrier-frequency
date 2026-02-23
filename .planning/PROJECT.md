@@ -8,6 +8,24 @@ A progressive web application for genetic counselors to calculate carrier freque
 
 Accurate recurrence risk calculation from real gnomAD population data, with clinical documentation output that's ready to paste into patient letters.
 
+## Current Milestone: v1.4 Discoverability & Polish
+
+**Goal:** Fix Google indexing, improve search visibility with structured data and educational content, and polish the UI with better CTA colors, first-time onboarding, and mobile optimizations.
+
+**Target features:**
+- Static HTML seed content for Google indexing
+- Sitemap, canonical URLs, robots meta, preconnect hints
+- OG image PNG with absolute URLs
+- Expanded structured data (WebApplication + FAQPage schema)
+- Title tag + meta description optimization
+- VitePress sitemap generation + cross-linking (app ↔ docs)
+- 2-3 educational docs pages (carrier frequency, Hardy-Weinberg, FAQ)
+- CTA/primary color fix with clear disabled/enabled contrast
+- First-time onboarding (welcome card / "Try with CFTR")
+- Mobile title reduction + persistent gene context chip
+- Replace native alert()/confirm() with Vuetify dialogs
+- Skip-to-content link, footer icon labels, step transition loading
+
 ## Current State
 
 **Version:** v1.3 Documentation Site (shipped 2026-02-23)
@@ -77,7 +95,26 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 
 ### Active
 
-(None — define requirements for next milestone with `/gsd:new-milestone`)
+**SEO & Discoverability**
+- [ ] Static HTML seed content in index.html for crawler indexing
+- [ ] Sitemap.xml, canonical URL, robots meta
+- [ ] OG image PNG with absolute URLs
+- [ ] Expanded structured data (WebApplication + FAQPage)
+- [ ] Title tag + meta description optimization
+- [ ] VitePress sitemap generation
+- [ ] App ↔ docs cross-linking
+- [ ] Educational docs pages (carrier frequency, Hardy-Weinberg, FAQ)
+- [ ] Preconnect hints for gnomAD API
+
+**UI/UX Polish**
+- [ ] CTA/primary color fix with disabled/enabled contrast
+- [ ] First-time onboarding experience
+- [ ] Mobile title reduction
+- [ ] Persistent gene context chip (Steps 2-4)
+- [ ] Replace native alert()/confirm() with Vuetify dialogs
+- [ ] Skip-to-content link
+- [ ] Footer icon labels on desktop
+- [ ] Step transition loading indicator
 
 ### Future (v1.4+)
 
@@ -145,4 +182,4 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 | `<span v-pre>` for template vars | VitePress alpha processes {{}} in containers — v1.3 | ✓ Good |
 
 ---
-*Last updated: 2026-02-23 after v1.3 milestone*
+*Last updated: 2026-02-23 after v1.4 milestone started*
