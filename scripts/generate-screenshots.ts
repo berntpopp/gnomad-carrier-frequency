@@ -272,7 +272,7 @@ async function captureWizardFlow(page: Page): Promise<void> {
   await page.waitForTimeout(500);
 }
 
-async function captureFeatureScreenshots(page: Page, context: BrowserContext): Promise<void> {
+async function captureFeatureScreenshots(page: Page): Promise<void> {
   // --- SCREENSHOT 9: filter-chips ---
   console.log('\n[9/14] filter-chips (filter section)');
   // Scroll to the results summary card area where FilterPanel is embedded
@@ -379,7 +379,7 @@ async function main() {
     await captureWizardFlow(page);
 
     // Capture feature screenshots (9-14)
-    await captureFeatureScreenshots(page, context);
+    await captureFeatureScreenshots(page);
 
     console.log('\n============================');
     console.log('All 14 screenshots captured successfully!');
