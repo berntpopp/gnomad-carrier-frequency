@@ -32,6 +32,10 @@ dist-ssr
 # TypeScript
 *.tsbuildinfo
 
+# Package manager lockfiles (use bun.lock text format)
+bun.lockb
+package-lock.json
+
 # Environment
 .env
 .env.*
