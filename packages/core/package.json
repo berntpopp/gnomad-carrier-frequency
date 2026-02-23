@@ -17,6 +17,9 @@
   },
   "exports": {
     ".": "./dist/index.js",
+    "./config": "./dist/config.js",
+    "./queries": "./dist/queries.js",
+    "./types": "./dist/types.js",
     "./package.json": "./package.json"
   }
 }
