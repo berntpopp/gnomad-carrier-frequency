@@ -50,7 +50,7 @@
           <v-chip
             v-else
             size="small"
-            color="primary"
+            color="secondary"
             variant="flat"
             class="mx-1"
           >

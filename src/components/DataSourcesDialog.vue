@@ -55,7 +55,7 @@
             <div class="d-flex align-center gap-2">
               <v-chip
                 size="small"
-                color="primary"
+                color="secondary"
                 variant="tonal"
               >
                 Selected: {{ gnomadVersion }}

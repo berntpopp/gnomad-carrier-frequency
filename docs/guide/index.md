@@ -44,6 +44,10 @@ The calculator guides you through four steps from gene selection to text generat
   <figcaption>Step 1: After selecting a gene, constraint metrics help assess variant significance.</figcaption>
 </figure>
 
+## Get Started
+
+[Open Calculator](https://gnomad-carrier-frequency.kidney-genetics.org/){target="_blank" rel="noopener"} | [Getting Started Guide](./getting-started)
+
 ## Next Steps
 
 - [Getting Started](/guide/getting-started) - a step-by-step walkthrough of a complete calculation

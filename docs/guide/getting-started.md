@@ -102,3 +102,9 @@ The calculator is a Progressive Web App (PWA). After your first visit, the appli
 - See the [Carrier Screening](/use-cases/carrier-screening) use case for a CFTR scenario with variant exclusion
 - See the [Text Generation](/use-cases/clinical-letter) use case for generating documentation with HFE
 - Browse the [Reference](/reference/) section for methodology, filters, and template details
+
+## Start Calculating
+
+You now know the complete workflow. Open the calculator and try it with your gene of interest:
+
+[Open Calculator](https://gnomad-carrier-frequency.kidney-genetics.org/){target="_blank" rel="noopener"}

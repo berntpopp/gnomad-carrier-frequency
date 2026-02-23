@@ -30,7 +30,7 @@ export default defineConfig({
         name: 'gCFCalc - Carrier Frequency Calculator',
         short_name: 'gCFCalc',
         description: 'Calculate carrier frequency and recurrence risk for autosomal recessive conditions',
-        theme_color: '#a09588', // RequiForm palette
+        theme_color: '#117A7F', // Teal CTA palette
         background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',

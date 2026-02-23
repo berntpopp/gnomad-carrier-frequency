@@ -8,8 +8,21 @@ export default defineConfig({
 
   appearance: true, // Dark mode follows system preference
 
+  lastUpdated: true,
+
+  sitemap: {
+    // Must include /docs/ base path (VitePress does not auto-append base to hostname)
+    hostname: 'https://gnomad-carrier-frequency.kidney-genetics.org/docs/',
+  },
+
   head: [
-    ['link', { rel: 'icon', href: '/favicon.svg' }]
+    ['link', { rel: 'icon', href: '/favicon.svg' }],
+    ['meta', { property: 'og:image', content: 'https://gnomad-carrier-frequency.kidney-genetics.org/og-image.png' }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { property: 'og:image:type', content: 'image/png' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:image', content: 'https://gnomad-carrier-frequency.kidney-genetics.org/og-image.png' }],
   ],
 
   themeConfig: {

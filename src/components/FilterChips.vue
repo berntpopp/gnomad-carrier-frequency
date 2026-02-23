@@ -5,7 +5,7 @@
   >
     <v-chip
       v-if="filters.lofHcEnabled"
-      color="primary"
+      color="secondary"
       size="x-small"
       prepend-icon="mdi-check"
       data-testid="filter-chip-lof"

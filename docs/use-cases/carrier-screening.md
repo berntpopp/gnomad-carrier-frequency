@@ -59,6 +59,14 @@ After reviewing the carrier frequency:
 - Note the gnomAD version and ancestry group used
 - Use the text generation feature to produce documentation text
 
+## Try It Yourself
+
+Ready to calculate carrier frequency? Open the calculator pre-loaded with CFTR data:
+
+[Try with CFTR](https://gnomad-carrier-frequency.kidney-genetics.org/?gene=CFTR){target="_blank" rel="noopener"}
+
+Or start fresh with any gene: [Open Calculator](https://gnomad-carrier-frequency.kidney-genetics.org/){target="_blank" rel="noopener"}
+
 ## See Also
 
 - [Methodology](/reference/methodology) - Complete explanation of the carrier frequency and recurrence risk formulas

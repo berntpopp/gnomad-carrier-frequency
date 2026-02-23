@@ -23,7 +23,7 @@
             <div class="d-flex align-center">
               <v-switch
                 :model-value="modelValue.lofHcEnabled"
-                color="primary"
+                color="secondary"
                 label="LoF High Confidence"
                 :density="smAndDown ? 'default' : 'compact'"
                 hide-details

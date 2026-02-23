@@ -97,3 +97,9 @@ The risk divisor changes based on status: **รท4 for heterozygous carriers**, **ร
 ---
 
 See [Data Sources](/reference/data-sources) for details on gnomAD version selection and population coverage. See [Filters](/reference/filters) for how qualifying variants are selected before allele frequencies are summed.
+
+## Calculate Now
+
+Apply these methods with real gnomAD data:
+
+[Open Calculator](https://gnomad-carrier-frequency.kidney-genetics.org/){target="_blank" rel="noopener"}

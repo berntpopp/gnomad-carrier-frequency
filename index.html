@@ -6,24 +6,32 @@
     <link rel="icon" href="./favicon.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Calculate carrier frequency and recurrence risk for autosomal recessive conditions. Uses gnomAD population data to generate clinical documentation for genetic counseling." />
+    <meta name="description" content="Free carrier frequency calculator using gnomAD data across multiple ancestries. Calculate recurrence risk for autosomal recessive conditions." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://gnomad-carrier-frequency.kidney-genetics.org/" />
+    <link rel="preconnect" href="https://gnomad.broadinstitute.org" />
+    <link rel="dns-prefetch" href="https://gnomad.broadinstitute.org" />
 
     <!-- Open Graph tags -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="gnomAD Carrier Frequency Calculator" />
-    <meta property="og:description" content="Calculate carrier frequency and recurrence risk for autosomal recessive conditions. Uses gnomAD population data to generate clinical documentation for genetic counseling." />
-    <meta property="og:image" content="./og-image.svg" />
+    <meta property="og:description" content="Free carrier frequency calculator using real gnomAD population data across multiple ancestries. Calculate recurrence risk and generate clinical documentation." />
+    <meta property="og:image" content="https://gnomad-carrier-frequency.kidney-genetics.org/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="gnomAD Carrier Frequency Calculator showing carrier frequency results for CFTR gene across multiple populations" />
     <meta property="og:url" content="https://gnomad-carrier-frequency.kidney-genetics.org/" />
+    <meta property="og:site_name" content="gnomAD Carrier Frequency Calculator" />
 
     <!-- Twitter Card tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="gnomAD Carrier Frequency Calculator" />
-    <meta name="twitter:description" content="Calculate carrier frequency and recurrence risk for autosomal recessive conditions. Uses gnomAD population data to generate clinical documentation for genetic counseling." />
-    <meta name="twitter:image" content="./og-image.svg" />
+    <meta name="twitter:description" content="Free carrier frequency calculator using real gnomAD population data across multiple ancestries. Calculate recurrence risk and generate clinical documentation." />
+    <meta name="twitter:image" content="https://gnomad-carrier-frequency.kidney-genetics.org/og-image.png" />
+    <meta name="twitter:image:alt" content="gnomAD Carrier Frequency Calculator showing carrier frequency results" />
 
-    <title>gnomAD Carrier Frequency Calculator</title>
+    <title>Carrier Frequency Calculator | gnomAD Population Data | Free Clinical Tool</title>
 
     <!-- Structured data -->
     <script type="application/ld+json">
@@ -40,6 +48,9 @@
           "applicationSubCategory": "Genetics Calculator",
           "operatingSystem": "All",
           "browserRequirements": "Requires JavaScript",
+          "softwareVersion": "1.3.0",
+          "dateModified": "2026-02-23",
+          "screenshot": "https://gnomad-carrier-frequency.kidney-genetics.org/og-image.png",
           "offers": {
             "@type": "Offer",
             "price": "0",
@@ -50,7 +61,6 @@
             "name": "Bernt Popp",
             "url": "https://github.com/berntpopp"
           },
-          "softwareVersion": "1.2.0",
           "featureList": [
             "gnomAD allele frequency data (v4.1, v3.1.2, v2.1.1)",
             "ClinVar pathogenic variant filtering",
@@ -63,45 +73,62 @@
         },
         {
           "@type": "FAQPage",
+          "inLanguage": "en",
           "mainEntity": [
             {
               "@type": "Question",
               "name": "What is carrier frequency?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Carrier frequency is the proportion of individuals in a population who carry one copy of a recessive disease-causing allele. Carriers are typically unaffected but can pass the allele to their children. Using the Hardy-Weinberg equation, carrier frequency equals 2pq, where q is the disease allele frequency and p = 1 − q. For example, if q = 0.02, the carrier frequency is approximately 1 in 25 (4%)."
+                "text": "Carrier frequency is the proportion of individuals in a population who carry one copy of a recessive disease-causing allele. Carriers have one normal allele and one pathogenic allele; because one functional copy is sufficient, they are typically unaffected but can pass the variant to their children. Using the Hardy-Weinberg equation, carrier frequency equals 2pq, where q is the disease allele frequency and p = 1 minus q. For example, if q = 0.02, the carrier frequency is approximately 1 in 25 (4%)."
               }
             },
             {
               "@type": "Question",
-              "name": "How is carrier frequency calculated from gnomAD data?",
+              "name": "How do I calculate carrier frequency from gnomAD data?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "This calculator retrieves all known pathogenic and loss-of-function variants for a gene from gnomAD, sums their allele frequencies to estimate the total disease allele frequency (q), then applies the Hardy-Weinberg equation (carrier frequency = 2pq). Unlike simple Hardy-Weinberg calculators that require manual input of disease prevalence, this tool uses real population allele frequency data from over 800,000 individuals sequenced in gnomAD."
+                "text": "This calculator retrieves all high-confidence loss-of-function and ClinVar pathogenic variants for a gene from gnomAD, sums their allele frequencies to estimate the total disease allele frequency (q), then applies the Hardy-Weinberg equation: carrier frequency = 2pq, where p = 1 minus q. Unlike calculators requiring manual disease prevalence input, this tool uses real population allele frequency data from over 800,000 sequenced individuals in gnomAD v4.1, v3.1.2, and v2.1.1."
               }
             },
             {
               "@type": "Question",
-              "name": "What is the difference between carrier frequency and affected frequency?",
+              "name": "How does the Hardy-Weinberg equation work for carrier frequency?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Carrier frequency (2pq ≈ 2q) represents the proportion of individuals who carry one copy of a pathogenic variant but are unaffected. Affected frequency (q²) represents the proportion of individuals who carry two pathogenic variants and are affected by the condition. For rare recessive conditions, carrier frequency is much higher than affected frequency."
+                "text": "The Hardy-Weinberg principle states that in a large, randomly mating population, allele and genotype frequencies remain constant. For a recessive condition with disease allele frequency q and normal allele frequency p (where p + q = 1), the expected carrier frequency is 2pq. For rare variants where q is small, 2pq is approximately 2q. The affected (homozygous) frequency is q squared. This calculator sums gnomAD allele frequencies to derive q and computes carrier frequency automatically."
               }
             },
             {
               "@type": "Question",
-              "name": "How is recurrence risk calculated?",
+              "name": "What is the difference between carrier frequency and disease prevalence?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "For autosomal recessive conditions, if both parents are carriers, each child has a 25% (1 in 4) chance of being affected. If one parent is affected and one is a carrier, the risk is 50%. The calculator shows carrier frequency to help estimate the probability that a partner is a carrier."
+                "text": "Disease prevalence (q squared) is the proportion of individuals affected by a condition, while carrier frequency (2pq) is the proportion who carry one pathogenic allele without being affected. For rare autosomal recessive conditions, carrier frequency is far higher than disease prevalence. For example, cystic fibrosis has a carrier frequency of roughly 1 in 25 in European populations, but the disease affects only about 1 in 2,500 newborns."
               }
             },
             {
               "@type": "Question",
-              "name": "Which population should I use for carrier frequency?",
+              "name": "How is recurrence risk calculated for autosomal recessive conditions?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Select the population that best matches your patient's genetic ancestry. If ancestry is unknown or mixed, consider using 'Global' frequencies. gnomAD provides frequencies for African/African American, Admixed American, Ashkenazi Jewish, East Asian, Finnish, Non-Finnish European, Middle Eastern, and South Asian populations. Note that self-reported ethnicity may not always match genetic ancestry."
+                "text": "If both parents are confirmed carriers of the same autosomal recessive condition, each pregnancy has a 25% chance of inheriting both pathogenic alleles and being affected, a 50% chance of being a carrier, and a 25% chance of being unaffected and non-carrier. If one parent is affected (homozygous) and the other is a carrier, the risk per pregnancy rises to 50%. The calculator provides carrier frequency to help estimate the prior probability that an unscreened partner is a carrier."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Which gnomAD population should I select?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Select the population that best matches your patient's genetic ancestry. gnomAD provides frequencies for African/African American, Admixed American, Ashkenazi Jewish, East Asian, Finnish, Non-Finnish European, Middle Eastern, and South Asian groups. If ancestry is unknown or mixed, the global (combined) frequency provides a conservative estimate. Note that self-reported ethnicity does not always correspond precisely to genetic ancestry, so clinical judgment is required when selecting a population."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I exclude specific variants from the calculation?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. The calculator displays all qualifying variants with their allele frequencies and ClinVar classifications. You can review the variant list and deselect variants that are not relevant for your patient or gene context, for example variants classified as benign in a specific population or variants with conflicting evidence. The carrier frequency is recalculated in real time as you adjust the variant selection."
               }
             },
             {
@@ -109,7 +136,101 @@
               "name": "Can I use these results for clinical decisions?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "This tool is intended for research and educational purposes. Results should be verified by a clinical laboratory before use in patient care. The calculator provides estimates based on population data and may not reflect individual patient risk accurately."
+                "text": "This tool is designed to support clinical documentation and is used routinely in genetic counseling workflows. However, it is intended as a decision-support tool for research and educational purposes. Population-based estimates may not capture all pathogenic variants or reflect every individual patient's risk. Results should be interpreted by a qualified genetics professional and, where required, confirmed by an accredited clinical laboratory before inclusion in formal clinical reports."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is my patient data stored or transmitted?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No patient data is stored or transmitted. The calculator runs entirely in your browser. Gene names and the resulting carrier frequencies are calculated locally; only the gnomAD API query (gene symbol and variant lookup) is sent to the gnomAD server at the Broad Institute. No patient identifiers, clinical notes, or personal health information are ever entered into or transmitted by this tool."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What are the limitations of this calculator?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Key limitations: gnomAD allele frequencies are population-level estimates and may not reflect the full spectrum of pathogenic variants for every condition. Some variants may be absent from gnomAD due to rarity or sequencing coverage gaps. The tool includes only high-confidence loss-of-function and ClinVar pathogenic variants; variants of uncertain significance are excluded. Additionally, founder effects and population stratification can cause carrier frequency to vary substantially within a broad ancestry group. Always consult current literature and clinical guidelines when interpreting results."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "inLanguage": "de",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Was ist die Heterozygotenfrequenz (Carrier Frequency)?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Die Heterozygotenfrequenz gibt den Anteil der Personen in einer Bevoelkerungsgruppe an, die eine pathogene Variante eines rezessiven Krankheitsgens in heterozygoter Form tragen. Heterozygote Traeger haben ein normales und ein veraendertes Allel; da eine funktionierende Kopie ausreicht, sind sie in der Regel selbst nicht erkrankt. Gemaess dem Hardy-Weinberg-Gesetz berechnet sich die Heterozygotenfrequenz als 2pq, wobei q die Frequenz des Krankheitsallels und p = 1 minus q ist."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Wie berechne ich die Heterozygotenfrequenz aus gnomAD-Daten?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Der Rechner laedt alle hochkonfidenten Loss-of-Function- und ClinVar-pathogenen Varianten eines Gens aus der gnomAD-Datenbank, summiert deren Allelfrequenzen zur Gesamterkrankungsallelfrequenz q und wendet anschliessend das Hardy-Weinberg-Gesetz an: Heterozygotenfrequenz = 2pq, mit p = 1 minus q. Im Unterschied zu einfachen Rechnern, die eine manuelle Eingabe der Krankheitspraevalenz erfordern, werden hier reale Populationsdaten von ueber 800.000 sequenzierten Personen aus gnomAD v4.1, v3.1.2 und v2.1.1 genutzt."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Wie funktioniert das Hardy-Weinberg-Gesetz bei der Berechnung der Heterozygotenfrequenz?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Das Hardy-Weinberg-Gleichgewicht beschreibt, dass in einer grossen, zufaellig kreuzenden Population die Allel- und Genotypfrequenzen konstant bleiben. Fuer ein rezessives Leiden mit Krankheitsallelfrequenz q und Normalallelfrequenz p (p + q = 1) ergibt sich eine erwartete Heterozygotenfrequenz von 2pq. Bei seltenen Varianten mit kleinem q naeherungsweise 2q. Die Erkrankungsfrequenz (Homozygote) betraegt q hoch 2. Der Rechner ermittelt q automatisch aus den gnomAD-Allelfrequenzen und berechnet die Heterozygotenfrequenz in Echtzeit."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Wie wird das Wiederholungsrisiko bei autosomal-rezessiven Erkrankungen berechnet?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Wenn beide Elternteile Traeger derselben autosomal-rezessiven Erkrankung sind, betraegt das Wiederholungsrisiko pro Schwangerschaft 25 % (betroffenes Kind), 50 % (Traeger) und 25 % (nicht betroffen, kein Traeger). Ist ein Elternteil erkrankt (homozygot) und das andere Traeger, steigt das Risiko auf 50 %. Die Heterozygotenfrequenz aus dem Rechner hilft, die Wahrscheinlichkeit abzuschaetzen, dass ein nicht getesteter Partner Traeger ist."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Welche Population sollte ich fuer die Berechnung auswaehlen?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Waehlen Sie die Population, die am besten zur genetischen Herkunft Ihres Patienten passt. gnomAD stellt Frequenzen fuer afrikanische/afroamerikanische, admixed-amerikanische, aschkenasisch-juedische, ostasiatische, finnische, nicht-finnisch-europaeische, nahoeestliche und suedasiatische Gruppen bereit. Bei unbekannter oder gemischter Herkunft liefert die globale (kombinierte) Frequenz eine konservative Schaetzung. Beachten Sie, dass die selbst angegebene Ethnie nicht immer mit der genetischen Abstammung uebereinstimmt."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Kann ich bestimmte Varianten von der Berechnung ausschliessen?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Ja. Der Rechner zeigt alle qualifizierenden Varianten mit ihren Allelfrequenzen und ClinVar-Klassifikationen an. Sie koennen einzelne Varianten deselektieren, die fuer Ihren spezifischen Fall nicht relevant sind, etwa Varianten mit widerspruechlicher Evidenz oder solchen, die in einer bestimmten Population als benigne eingestuft werden. Die Heterozygotenfrequenz wird nach jeder Anpassung sofort neu berechnet."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Kann ich die Ergebnisse fuer die klinische Beratung verwenden?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Der Rechner unterstuetzt genetische Beratungsworkflows und wird in der klinischen Praxis eingesetzt. Er ist jedoch als Entscheidungshilfe fuer Forschungs- und Bildungszwecke konzipiert. Populationsbasierte Schaetzungen koennen nicht alle pathogenen Varianten abdecken und spiegeln moeglicherweise nicht das individuelle Risiko jedes Patienten wider. Ergebnisse sollten von einer qualifizierten Fachperson interpretiert und, sofern erforderlich, durch ein akkreditiertes klinisches Labor bestaetigt werden, bevor sie in formellen Berichten verwendet werden."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Werden Patientendaten gespeichert oder uebertragen?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Nein. Es werden keine Patientendaten gespeichert oder uebertragen. Der Rechner laeuft vollstaendig im Browser. Lediglich die gnomAD-API-Abfrage (Gensymbol und Variantensuche) wird an den gnomAD-Server des Broad Institute gesendet. Es werden keinerlei Patientenidentifikatoren, klinische Notizen oder personenbezogene Gesundheitsdaten in dieses Tool eingegeben oder von ihm uebertragen."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Was sind die Grenzen dieses Rechners?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Wesentliche Einschraenkungen: gnomAD-Allelfrequenzen sind Populationsschaetzungen und decken moeglicherweise nicht das gesamte Spektrum pathogener Varianten ab. Seltene oder in gnomAD nicht erfasste Varianten werden nicht beruecksichtigt. Der Rechner schliesst nur hochkonfidente Loss-of-Function- und ClinVar-pathogene Varianten ein; Varianten unsicherer Signifikanz (VUS) werden nicht verwendet. Gruendermutationen und Populationsstratifizierung koennen zu deutlichen Unterschieden innerhalb einer Abstammungsgruppe fuehren. Aktuelle Fachliteratur und klinische Leitlinien sollten stets in die Interpretation einbezogen werden."
               }
             }
           ]
@@ -117,9 +238,310 @@
       ]
     }
     </script>
+
+    <!-- Seed content styles (active only before Vue mounts) -->
+    <style>
+      .seed-header {
+        background: #117A7F;
+        color: #ffffff;
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .seed-header-logo {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-decoration: none;
+        letter-spacing: 0.03em;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+      .seed-nav {
+        display: flex;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .seed-nav a {
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        opacity: 0.9;
+      }
+      .seed-nav a:hover {
+        opacity: 1;
+        text-decoration: underline;
+      }
+      .seed-main {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #2c2c2c;
+        line-height: 1.6;
+      }
+      .seed-h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #5a4e46;
+        margin-bottom: 0.75rem;
+        line-height: 1.2;
+      }
+      .seed-subtitle {
+        font-size: 1.05rem;
+        color: #4a4a4a;
+        margin-bottom: 2rem;
+        max-width: 750px;
+      }
+      .seed-section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #5a4e46;
+        margin: 2rem 0 1rem 0;
+        border-bottom: 2px solid #e8e2de;
+        padding-bottom: 0.4rem;
+      }
+      .seed-features {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+      }
+      .seed-features li {
+        background: #f8f5f3;
+        border-left: 3px solid #117A7F;
+        padding: 0.75rem 1rem;
+        border-radius: 0 4px 4px 0;
+      }
+      .seed-features li strong {
+        display: block;
+        color: #5a4e46;
+        margin-bottom: 0.25rem;
+      }
+      .seed-steps {
+        padding-left: 1.5rem;
+        margin: 0;
+      }
+      .seed-steps li {
+        margin-bottom: 0.6rem;
+        padding-left: 0.25rem;
+      }
+      .seed-faq {
+        margin-top: 1rem;
+      }
+      .seed-faq-q {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #5a4e46;
+        margin: 1.5rem 0 0.4rem 0;
+      }
+      .seed-faq-a {
+        margin: 0;
+        color: #4a4a4a;
+      }
+      .seed-cta {
+        display: inline-block;
+        margin: 2rem 0 1.5rem 0;
+        padding: 0.75rem 2rem;
+        background: #117A7F;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        transition: background 0.15s;
+      }
+      .seed-cta:hover {
+        background: #0D5F63;
+      }
+      .seed-footer {
+        margin-top: 3rem;
+        padding: 1rem 0;
+        border-top: 1px solid #e8e2de;
+        font-size: 0.8rem;
+        color: #888;
+        text-align: center;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+      @media (max-width: 600px) {
+        .seed-h1 {
+          font-size: 1.5rem;
+        }
+        .seed-features {
+          grid-template-columns: 1fr;
+        }
+        .seed-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <header class="seed-header">
+        <a class="seed-header-logo" href="/">gCFCalc</a>
+        <nav aria-label="Main navigation">
+          <ul class="seed-nav">
+            <li><a href="/">Calculator</a></li>
+            <li><a href="/docs/">Documentation</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="/docs/about/">About</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <main class="seed-main">
+        <h1 class="seed-h1">gnomAD Carrier Frequency Calculator</h1>
+
+        <p class="seed-subtitle">
+          A free, browser-based tool for genetic counselors and clinical geneticists to calculate
+          carrier frequency and recurrence risk for autosomal recessive conditions. Powered by
+          real population allele frequency data from the Genome Aggregation Database (gnomAD),
+          the calculator provides population-specific estimates across multiple ancestries and
+          generates ready-to-use clinical documentation text in German and English.
+        </p>
+
+        <h2 class="seed-section-title">Key Features</h2>
+        <ul class="seed-features">
+          <li>
+            <strong>Real Population Data from gnomAD</strong>
+            Retrieves current allele frequencies directly from the gnomAD GraphQL API, covering
+            more than 800,000 sequenced individuals across gnomAD v4.1, v3.1.2, and v2.1.1.
+          </li>
+          <li>
+            <strong>Multiple Ancestries and Founder Effect Detection</strong>
+            Compare carrier frequencies across African/African American, Admixed American,
+            Ashkenazi Jewish, East Asian, Finnish, Non-Finnish European, Middle Eastern, and
+            South Asian populations. The tool automatically flags ancestries where carrier
+            frequency is significantly elevated, helping to identify potential founder effects.
+          </li>
+          <li>
+            <strong>Automated Variant Filtering</strong>
+            Automatically includes high-confidence loss-of-function variants (LoF HC) and
+            ClinVar pathogenic or likely pathogenic variants, applying the same evidence
+            standards used in clinical genetics practice. No manual literature curation required.
+          </li>
+          <li>
+            <strong>Clinical Text Generation</strong>
+            Generates structured documentation text ready to paste directly into patient letters
+            or genetic counseling reports. Supports German and English, with configurable
+            gender-inclusive language styles (using *, :, or / forms) to meet documentation
+            requirements in German-speaking countries.
+          </li>
+          <li>
+            <strong>Recurrence Risk Calculation</strong>
+            Calculates the probability that both parents are carriers and the resulting
+            recurrence risk for each pregnancy, following Hardy-Weinberg principles. Covers
+            affected patient, confirmed carrier, and family member scenarios.
+          </li>
+          <li>
+            <strong>Offline-Capable Progressive Web App</strong>
+            Installable on desktop and mobile as a PWA. Once installed, the interface works
+            without an internet connection; only the gnomAD API calls require connectivity.
+          </li>
+        </ul>
+
+        <h2 class="seed-section-title">How It Works</h2>
+        <ol class="seed-steps">
+          <li>
+            <strong>Search for a gene.</strong> Enter the HGNC gene symbol (for example, CFTR or
+            PKD1). The tool queries gnomAD and confirms the gene exists in the selected dataset.
+          </li>
+          <li>
+            <strong>Select the patient status.</strong> Choose whether the patient is an affected
+            individual, a confirmed carrier, or a family member. This determines which recurrence
+            risk scenario the output text will describe.
+          </li>
+          <li>
+            <strong>Review variants.</strong> The tool fetches all qualifying variants for the
+            gene and displays them with their allele frequencies by ancestry. You can inspect
+            the variant list and adjust filters if needed.
+          </li>
+          <li>
+            <strong>Get results.</strong> Carrier frequency and recurrence risk are calculated
+            per population. Choose the relevant ancestry, then copy the generated clinical
+            documentation text directly into your report.
+          </li>
+        </ol>
+
+        <section id="faq" class="seed-faq">
+          <h2 class="seed-section-title">Frequently Asked Questions</h2>
+
+          <h3 class="seed-faq-q">How do I calculate carrier frequency from gnomAD data?</h3>
+          <p class="seed-faq-a">
+            The calculator sums the allele frequencies of all pathogenic and high-confidence
+            loss-of-function variants for a gene to estimate the total disease allele frequency
+            (q). It then applies the Hardy-Weinberg equation: carrier frequency = 2pq, where
+            p = 1 - q. Because gnomAD covers hundreds of thousands of individuals, this approach
+            yields more reliable population-level estimates than using disease prevalence figures
+            from the literature alone.
+          </p>
+
+          <h3 class="seed-faq-q">What populations are available?</h3>
+          <p class="seed-faq-a">
+            gnomAD reports allele frequencies for eight ancestry groups: African/African American,
+            Admixed American, Ashkenazi Jewish, East Asian, Finnish, Non-Finnish European,
+            Middle Eastern, and South Asian. A global (combined) frequency is also available.
+            The calculator displays all populations simultaneously so you can select the one
+            that best matches your patient's genetic background. For patients with mixed or
+            unknown ancestry, the global frequency provides a conservative estimate.
+          </p>
+
+          <h3 class="seed-faq-q">Is this tool free to use?</h3>
+          <p class="seed-faq-a">
+            Yes, this tool is completely free. It is an open-source project hosted on GitHub
+            Pages and queries the publicly available gnomAD API directly from your browser.
+            No registration, subscription, or institutional login is required. The source code
+            is available on GitHub for review, adaptation, and contribution.
+          </p>
+
+          <h3 class="seed-faq-q">Can I use these results in clinical practice?</h3>
+          <p class="seed-faq-a">
+            The calculator is designed to support clinical documentation workflows and is used
+            routinely in genetic counseling. However, it is intended as a decision-support tool
+            for research and educational purposes. Population-based allele frequencies are
+            estimates and may not capture all pathogenic variants or reflect every patient's
+            individual risk. Results should be interpreted by a qualified genetics professional
+            and, where required, confirmed by an accredited clinical laboratory before use in
+            formal clinical reports.
+          </p>
+
+          <h3 class="seed-faq-q">What is carrier frequency?</h3>
+          <p class="seed-faq-a">
+            Carrier frequency is the proportion of individuals in a population who carry one
+            pathogenic copy of a recessive disease gene. Carriers have one normal allele and
+            one disease-causing allele. Because one functional copy is sufficient, carriers are
+            typically unaffected but can pass the pathogenic allele to their children. When two
+            carriers have children together, each pregnancy carries a 25 percent chance of the
+            child inheriting both pathogenic copies and being affected by the condition.
+          </p>
+        </section>
+
+        <a class="seed-cta" href="/">Open Calculator</a>
+      </main>
+
+      <footer class="seed-footer">
+        For Research Use Only &mdash; Not for direct clinical decision-making without professional interpretation.
+      </footer>
+    </div>
+    <noscript>
+      <p style="font-family: system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
+        This application requires JavaScript to run. Please enable JavaScript in your browser
+        to use the gnomAD Carrier Frequency Calculator.
+        The <a href="https://gnomad-carrier-frequency.kidney-genetics.org/docs/">documentation site</a>
+        is available without JavaScript.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

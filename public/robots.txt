@@ -1,2 +1,5 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/sitemap.xml
+Sitemap: https://gnomad-carrier-frequency.kidney-genetics.org/docs/sitemap.xml

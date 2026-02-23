@@ -76,6 +76,12 @@ Click the copy button above the generated text to copy it to your clipboard. The
 Generated text is a starting point for research documentation only. It must be reviewed, edited, and verified by qualified professionals before any use in a clinical or patient-facing context.
 :::
 
+## Try It Yourself
+
+Generate clinical documentation text for your gene of interest:
+
+[Open Calculator](https://gnomad-carrier-frequency.kidney-genetics.org/){target="_blank" rel="noopener"}
+
 ## See Also
 
 - [Templates](/reference/templates) - Full variable reference, section descriptions, and customization guide

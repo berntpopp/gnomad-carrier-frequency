@@ -42,8 +42,8 @@
 
 **Milestone Goal:** Fix Google indexing with static HTML seed content and structured data, improve CTA visibility with WCAG-compliant color system, add first-time onboarding experience, and expand documentation with educational content pages.
 
-- [ ] **Phase 21: SEO Foundation** - Make the site visible to Google and social media platforms
-- [ ] **Phase 22: CTA Color System & Accessibility** - WCAG-compliant interactive colors and accessibility improvements
+- [x] **Phase 21: SEO Foundation** - Make the site visible to Google and social media platforms
+- [x] **Phase 22: CTA Color System & Accessibility** - WCAG-compliant interactive colors and accessibility improvements
 - [ ] **Phase 23: Onboarding & Visual Polish** - First-time user guidance and native dialog replacement
 - [ ] **Phase 24: Documentation Content** - Educational pages for carrier frequency concepts
 
@@ -62,10 +62,10 @@
 **Plans**: 4 plans
 
 Plans:
-- [ ] 21-01-PLAN.md -- Static HTML seed content (500+ words), meta tags, canonical URL, robots directive, preconnect hints, noscript fallback
-- [ ] 21-02-PLAN.md -- OG image PNG generation, app sitemap.xml, robots.txt update, VitePress sitemap config
-- [ ] 21-03-PLAN.md -- Expanded JSON-LD structured data (WebApplication + bilingual FAQPage), OG/Twitter meta tag correction
-- [ ] 21-04-PLAN.md -- Cross-linking: app footer docs link, docs pages calculator CTAs with deep-links
+- [x] 21-01-PLAN.md -- Static HTML seed content (500+ words), meta tags, canonical URL, robots directive, preconnect hints, noscript fallback
+- [x] 21-02-PLAN.md -- OG image PNG generation, app sitemap.xml, robots.txt update, VitePress sitemap config
+- [x] 21-03-PLAN.md -- Expanded JSON-LD structured data (WebApplication + bilingual FAQPage), OG/Twitter meta tag correction
+- [x] 21-04-PLAN.md -- Cross-linking: app footer docs link, docs pages calculator CTAs with deep-links
 
 ### Phase 22: CTA Color System & Accessibility
 **Goal**: Interactive elements have clear visual hierarchy with WCAG AA contrast, and keyboard-only users can navigate efficiently
@@ -77,12 +77,12 @@ Plans:
   3. A keyboard user pressing Tab on first page load focuses a visible "Skip to main content" link that jumps past the AppBar to the wizard content
   4. Footer icons on desktop (sm+ breakpoint) display text labels alongside icons, improving discoverability of Settings, Docs, and other footer actions
   5. Transitioning between wizard steps shows a progress indicator during async data loading, providing feedback that the app is working
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 22-01: Primary color change (light + dark themes), secondary color assignment, PWA manifest update
-- [ ] 22-02: Visual audit of all `color="primary"` bindings, migrate non-CTA uses to secondary
-- [ ] 22-03: Skip-to-content link, main-content ID, footer labels, step transition loading indicator
+- [x] 22-01-PLAN.md -- Teal primary color (#117A7F/#4DB6AC), warm gray secondary (#a09588), PWA manifest, seed content CSS
+- [x] 22-02-PLAN.md -- Visual audit of all color="primary" bindings, migrate 8 non-CTA uses to secondary
+- [x] 22-03-PLAN.md -- Skip-to-content link, main-content ID, footer desktop labels, wizard step transition loading indicator
 
 ### Phase 23: Onboarding & Visual Polish
 **Goal**: First-time users receive guided entry into the tool, and the UI uses consistent Vuetify dialogs throughout
@@ -93,12 +93,12 @@ Plans:
   2. Returning users (onboarding dismissed) never see the welcome card again, and the dismissal state persists across browser sessions
   3. On mobile (xs breakpoint), the app title is hidden to save vertical space, and on Steps 2-4 a persistent gene context chip shows the selected gene and gnomAD version
   4. All former native `alert()` and `confirm()` calls (template import, template reset, log clear) use Vuetify dialogs via a `useConfirmDialog` composable
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 23-01: Welcome hero card, "Try with CFTR" quick-start, onboarding state in useAppStore
-- [ ] 23-02: Mobile title reduction, persistent gene context chip on Steps 2-4
-- [ ] 23-03: useConfirmDialog composable, migrate all native dialog calls to Vuetify dialogs
+- [ ] 23-01-PLAN.md -- Welcome hero card with CFTR quick-start, onboarding state in useAppStore, prefillGene in useGeneSearch
+- [ ] 23-02-PLAN.md -- Mobile title hiding on xs breakpoint, persistent gene context chip on Steps 2-4
+- [ ] 23-03-PLAN.md -- useConfirmDialog composable + ConfirmDialog.vue singleton, migrate all 4 native dialog calls
 
 ### Phase 24: Documentation Content
 **Goal**: Users searching for carrier frequency concepts find educational content that establishes the tool's authority and drives calculator usage
@@ -124,11 +124,11 @@ Phases execute sequentially: 21 -> 22 -> 23 -> 24
 | 5-10 | v1.1 | 27/27 | Complete | 2026-01-19 |
 | 11-15 | v1.2 | 15/15 | Complete | 2026-01-20 |
 | 16-20 | v1.3 | 14/14 | Complete | 2026-02-23 |
-| 21. SEO Foundation | v1.4 | 0/4 | Not started | - |
-| 22. CTA Color & A11y | v1.4 | 0/3 | Not started | - |
+| 21. SEO Foundation | v1.4 | 4/4 | Complete | 2026-02-23 |
+| 22. CTA Color & A11y | v1.4 | 3/3 | Complete | 2026-02-23 |
 | 23. Onboarding & Polish | v1.4 | 0/3 | Not started | - |
 | 24. Docs Content | v1.4 | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-23 (Phase 21 planned)*
+*Last updated: 2026-02-23 (Phase 22 complete)*

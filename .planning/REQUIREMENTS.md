@@ -9,26 +9,26 @@ Requirements for the Discoverability & Polish milestone. Addresses two critical 
 
 ### SEO Indexing
 
-- [ ] **SEO-01**: Static HTML seed content (500+ words) inside `<div id="app">` with H1, feature list, and nav links to docs -- replaced by Vue on mount
-- [ ] **SEO-02**: `<link rel="canonical">` with absolute URL including trailing slash
-- [ ] **SEO-03**: `<meta name="robots" content="index, follow">` directive
-- [ ] **SEO-04**: `public/sitemap.xml` with app root URL
-- [ ] **SEO-05**: Updated `public/robots.txt` with sitemap references
-- [ ] **SEO-06**: PNG OG image (1200x630px) generated from SVG via sharp build script
-- [ ] **SEO-07**: Absolute HTTPS URLs for `og:image` and `twitter:image` meta tags
-- [ ] **SEO-08**: `<noscript>` fallback placed outside `<div id="app">`
-- [ ] **SEO-09**: VitePress sitemap generation via `sitemap` config option
-- [ ] **SEO-10**: App footer "Docs" icon linking to `/docs/`
-- [ ] **SEO-11**: Static HTML nav with links to key docs pages (discoverable by crawlers)
-- [ ] **SEO-12**: Docs pages include contextual "Open Calculator" CTAs in content
+- [x] **SEO-01**: Static HTML seed content (500+ words) inside `<div id="app">` with H1, feature list, and nav links to docs -- replaced by Vue on mount
+- [x] **SEO-02**: `<link rel="canonical">` with absolute URL including trailing slash
+- [x] **SEO-03**: `<meta name="robots" content="index, follow">` directive
+- [x] **SEO-04**: `public/sitemap.xml` with app root URL
+- [x] **SEO-05**: Updated `public/robots.txt` with sitemap references
+- [x] **SEO-06**: PNG OG image (1200x630px) generated from SVG via sharp build script
+- [x] **SEO-07**: Absolute HTTPS URLs for `og:image` and `twitter:image` meta tags
+- [x] **SEO-08**: `<noscript>` fallback placed outside `<div id="app">`
+- [x] **SEO-09**: VitePress sitemap generation via `sitemap` config option
+- [x] **SEO-10**: App footer "Docs" icon linking to `/docs/`
+- [x] **SEO-11**: Static HTML nav with links to key docs pages (discoverable by crawlers)
+- [x] **SEO-12**: Docs pages include contextual "Open Calculator" CTAs in content
 
 ### SEO On-Page
 
-- [ ] **SOP-01**: Title tag optimized to lead with "Carrier Frequency Calculator"
-- [ ] **SOP-02**: Meta description with differentiators ("free", "real population data", "multiple ancestries")
-- [ ] **SOP-03**: Updated WebApplication structured data (version from package.json, `dateModified`, `screenshot`)
-- [ ] **SOP-04**: Expanded FAQPage structured data (8-10 questions)
-- [ ] **SOP-05**: `<link rel="preconnect">` for gnomAD API domain
+- [x] **SOP-01**: Title tag optimized to lead with "Carrier Frequency Calculator"
+- [x] **SOP-02**: Meta description with differentiators ("free", "real population data", "multiple ancestries")
+- [x] **SOP-03**: Updated WebApplication structured data (version from package.json, `dateModified`, `screenshot`)
+- [x] **SOP-04**: Expanded FAQPage structured data (8-10 questions)
+- [x] **SOP-05**: `<link rel="preconnect">` for gnomAD API domain
 
 ### UX Color & Theme
 
@@ -106,32 +106,32 @@ Deferred to later milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEO-01 | Phase 21 | Pending |
-| SEO-02 | Phase 21 | Pending |
-| SEO-03 | Phase 21 | Pending |
-| SEO-04 | Phase 21 | Pending |
-| SEO-05 | Phase 21 | Pending |
-| SEO-06 | Phase 21 | Pending |
-| SEO-07 | Phase 21 | Pending |
-| SEO-08 | Phase 21 | Pending |
-| SEO-09 | Phase 21 | Pending |
-| SEO-10 | Phase 21 | Pending |
-| SEO-11 | Phase 21 | Pending |
-| SEO-12 | Phase 21 | Pending |
-| SOP-01 | Phase 21 | Pending |
-| SOP-02 | Phase 21 | Pending |
-| SOP-03 | Phase 21 | Pending |
-| SOP-04 | Phase 21 | Pending |
-| SOP-05 | Phase 21 | Pending |
-| UXC-01 | Phase 22 | Pending |
-| UXC-02 | Phase 22 | Pending |
-| UXC-03 | Phase 22 | Pending |
-| UXC-04 | Phase 22 | Pending |
-| UXC-05 | Phase 22 | Pending |
-| A11-01 | Phase 22 | Pending |
-| A11-02 | Phase 22 | Pending |
-| A11-03 | Phase 22 | Pending |
-| A11-04 | Phase 22 | Pending |
+| SEO-01 | Phase 21 | Complete |
+| SEO-02 | Phase 21 | Complete |
+| SEO-03 | Phase 21 | Complete |
+| SEO-04 | Phase 21 | Complete |
+| SEO-05 | Phase 21 | Complete |
+| SEO-06 | Phase 21 | Complete |
+| SEO-07 | Phase 21 | Complete |
+| SEO-08 | Phase 21 | Complete |
+| SEO-09 | Phase 21 | Complete |
+| SEO-10 | Phase 21 | Complete |
+| SEO-11 | Phase 21 | Complete |
+| SEO-12 | Phase 21 | Complete |
+| SOP-01 | Phase 21 | Complete |
+| SOP-02 | Phase 21 | Complete |
+| SOP-03 | Phase 21 | Complete |
+| SOP-04 | Phase 21 | Complete |
+| SOP-05 | Phase 21 | Complete |
+| UXC-01 | Phase 22 | Complete |
+| UXC-02 | Phase 22 | Complete |
+| UXC-03 | Phase 22 | Complete |
+| UXC-04 | Phase 22 | Complete |
+| UXC-05 | Phase 22 | Complete |
+| A11-01 | Phase 22 | Complete |
+| A11-02 | Phase 22 | Complete |
+| A11-03 | Phase 22 | Complete |
+| A11-04 | Phase 22 | Complete |
 | UXO-01 | Phase 23 | Pending |
 | UXO-02 | Phase 23 | Pending |
 | UXO-03 | Phase 23 | Pending |
@@ -151,4 +151,4 @@ Deferred to later milestones.
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after roadmap creation*
+*Last updated: 2026-02-23 (Phase 22 complete)*

@@ -68,7 +68,7 @@
           >
             <template #prepend>
               <v-icon
-                color="primary"
+                color="secondary"
                 size="small"
               >
                 mdi-dna

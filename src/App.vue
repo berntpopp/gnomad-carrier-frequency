@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <VueAnnouncer class="sr-only" />
     <DisclaimerBanner />
     <AppBar
@@ -8,7 +9,7 @@
       @reset="handleReset"
     />
 
-    <v-main>
+    <v-main id="main-content" tabindex="-1">
       <v-container max-width="900">
         <h1 class="text-h4 mb-2">
           gnomAD Carrier Frequency Calculator
@@ -177,5 +178,21 @@ onMounted(() => {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  padding: 8px 16px;
+  background: rgb(var(--v-theme-primary));
+  color: white;
+  z-index: 9999;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 0 0 4px 0;
+}
+.skip-link:focus {
+  top: 0;
 }
 </style>

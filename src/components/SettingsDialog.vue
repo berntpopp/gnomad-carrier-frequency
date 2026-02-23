@@ -432,7 +432,7 @@
 
             <v-switch
               v-model="filterStore.defaults.lofHcEnabled"
-              color="primary"
+              color="secondary"
               label="LoF High Confidence"
               hint="Include variants with LOFTEE High Confidence annotation on canonical transcript"
               persistent-hint

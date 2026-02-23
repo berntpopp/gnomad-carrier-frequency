@@ -33,7 +33,7 @@
                 <template #prepend>
                   <v-chip
                     size="x-small"
-                    color="primary"
+                    color="secondary"
                     variant="flat"
                     class="mr-2"
                   >

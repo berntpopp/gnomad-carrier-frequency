@@ -33,7 +33,7 @@
         <div class="text-center mb-4">
           <v-icon
             size="64"
-            color="primary"
+            color="secondary"
           >
             mdi-dna
           </v-icon>

@@ -39,6 +39,14 @@
       />
     </v-stepper-header>
 
+    <v-progress-linear
+      v-if="isLoading"
+      indeterminate
+      color="primary"
+      height="3"
+      class="wizard-loading-bar"
+    />
+
     <v-stepper-window data-testid="wizard-content">
       <v-stepper-window-item :value="1">
         <StepGene
