@@ -14,10 +14,10 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 ## Current Position
 
 **Milestone:** v1.3 Documentation Site
-**Phase:** 19 of 20 (CI/CD Integration) — In progress
-**Plan:** 2 of 5 complete
-**Status:** Phase 19 Plan 02 complete. CI workflow migrated to bun with app + docs build validation. Screenshots automation workflow created.
-**Last activity:** 2026-02-23 -- Completed 19-02-PLAN.md (CI workflow bun migration + screenshots automation workflow)
+**Phase:** 19 of 20 (CI/CD Integration) — COMPLETE
+**Plan:** 3 of 3 complete
+**Status:** Phase 19 complete. All 3 plans executed. Deploy workflow builds app + docs into merged artifact. Both sites verified live. Screenshot automation workflow created.
+**Last activity:** 2026-02-23 -- Phase 19 verified and complete
 
 ### Progress
 
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-02-09)
 v1.0 MVP:           [##########] 100% - SHIPPED 2026-01-19
 v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
-v1.3 Docs:          [█████████ ]  97% - Phase 19 In Progress (2/5 plans)
+v1.3 Docs:          [█████████ ]  98% - Phase 19 COMPLETE (13/13 plans)
 ```
 
-**Overall:** 72 plans complete across v1.0 + v1.1 + v1.2 + v1.3
+**Overall:** 73 plans complete across v1.0 + v1.1 + v1.2 + v1.3
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 70
-- v1.3 plans completed: 11
+- Total plans completed: 73
+- v1.3 plans completed: 13
 
 ---
 
@@ -82,6 +82,8 @@ Recent decisions affecting current work:
 - 19-02: No [skip ci] in screenshot auto-commit — technically impossible to skip CI but allow deploy; paths allow-list + actor check handle loop prevention
 - 19-02: SCREENSHOTS_TOKEN PAT with GITHUB_TOKEN fallback — graceful degradation if PAT not configured (no cascade deploy, but no failure)
 - 19-02: Playwright cache keyed on bun.lockb hash; cache-miss installs --with-deps, cache-hit installs system deps only
+- 19-03: robots.txt added to public/ to fix Lighthouse SEO score (SPA fallback was serving index.html for /robots.txt)
+- 19-03: ESLint ignores VitePress cache/dist directories (generated files)
 
 ### Pending Todos
 
@@ -98,28 +100,23 @@ None yet.
 ### Last Session
 
 **Date:** 2026-02-23
-**Completed:** Phase 19 Plan 02 — CI workflow bun migration + screenshots automation workflow
-**Status:** 19-02 COMPLETE — CI validates app + docs build with bun. screenshots.yml created with path-filtered trigger, Playwright caching, auto-commit, cascade deploy, and failure alerting.
+**Completed:** Phase 19 — CI/CD Integration (all 3 plans + verification)
+**Status:** Phase 19 COMPLETE — Deploy builds app + docs into merged artifact. App live at root, docs live at /docs/. CI validates builds with bun. Screenshot workflow auto-updates on UI changes.
 
 ### Handoff Notes
 
 v1.3 Documentation Site milestone:
 - Phase 16: VitePress Setup -- COMPLETE
 - Phase 17: Screenshot Automation -- COMPLETE
-- Phase 18: Documentation Content (16 requirements) — COMPLETE
-  - 18-01: Guide section (Introduction + Getting Started) -- COMPLETE
-  - 18-02: Use Cases section (carrier screening, family planning, clinical letter) -- COMPLETE
-  - 18-03: Reference section (overview, methodology, data sources, filters, templates) -- COMPLETE
-  - 18-04: About section (overview, citation, changelog, contributing) + CITATION.cff -- COMPLETE
-  - 18-05: Final quality gate (landing page disclaimer + build verification) -- COMPLETE
-- Phase 19: CI/CD Integration — IN PROGRESS
+- Phase 18: Documentation Content -- COMPLETE
+- Phase 19: CI/CD Integration -- COMPLETE
   - 19-01: Base path fixes + unified deploy workflow -- COMPLETE
   - 19-02: CI workflow bun migration + screenshots automation workflow -- COMPLETE
-  - 19-03 through 19-05: NEXT
-- Phase 20: README Streamlining (3 requirements)
-- Branch: feature/v1.3-documentation
+  - 19-03: PAT secret setup + E2E deployment verification -- COMPLETE
+- Phase 20: README Streamlining (3 requirements) — NEXT
 
-SCREENSHOTS_TOKEN PAT setup is required for cascade deploy (screenshots commit → deploy.yml trigger). Without PAT, screenshots still auto-commit but deploy won't cascade. Set secret in GitHub repo settings as SCREENSHOTS_TOKEN with repo scope.
+App: https://gnomad-carrier-frequency.kidney-genetics.org/
+Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 
 Template variable escaping pattern for VitePress: use `<span v-pre>{{variable}}</span>` for any {{}} in markdown docs. This is documented in 18-03-SUMMARY.md.
 
