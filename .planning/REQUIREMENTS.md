@@ -1,0 +1,182 @@
+# Requirements: gnomAD Carrier Frequency Calculator v1.3
+
+**Defined:** 2026-02-09
+**Core Value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
+
+## v1.3 Requirements
+
+### VitePress Infrastructure
+
+- [x] **VITE-01**: VitePress installed and configured with `base: '/gnomad-carrier-frequency/docs/'`
+- [x] **VITE-02**: Navigation bar with Guide, Use Cases, Reference, About sections
+- [x] **VITE-03**: Sidebar with hierarchical page structure per section
+- [x] **VITE-04**: Theme colors matching app branding (#a09588)
+- [x] **VITE-05**: Landing page with hero image, tagline, feature cards, and call-to-action buttons
+- [x] **VITE-06**: Package.json scripts for `docs:dev`, `docs:build`, `docs:preview`
+- [x] **VITE-07**: `.vitepress/cache` and `.vitepress/dist` added to `.gitignore`
+- [x] **VITE-08**: PWA service worker denylist for `/docs/` path to prevent SW interception
+
+### Build Automation
+
+- [x] **MAKE-01**: Makefile introduced with targets: `make screenshots`, `make docs`, `make docs-dev`, `make docs-preview`
+- [x] **MAKE-02**: Makefile target `make screenshots` builds app, starts preview server, runs Playwright script, stops server
+- [x] **MAKE-03**: Makefile target `make docs` builds VitePress documentation site
+
+### Screenshot Automation
+
+- [x] **SHOT-01**: Playwright installed as dev dependency with screenshot generation script
+- [x] **SHOT-02**: Screenshot: hero preview (Step 1 with gene selected, light, 1200x800)
+- [x] **SHOT-03**: Screenshot: gene search autocomplete (typing "CFTR", dropdown visible)
+- [x] **SHOT-04**: Screenshot: gene selected with ClinGen notice and gene constraint card
+- [x] **SHOT-05**: Screenshot: patient status selection (Step 2 with heterozygous carrier selected)
+- [x] **SHOT-06**: Screenshot: frequency source (Step 3 with gnomAD tab showing 1:17)
+- [x] **SHOT-07**: Screenshot: results page (Step 4 with population table, filters, clinical text)
+- [x] **SHOT-08**: Screenshot: clinical text output (German text with section chips visible)
+- [x] **SHOT-09**: Screenshot: variant table modal (sortable columns, ClinVar links, star ratings)
+- [x] **SHOT-10**: Screenshot: filter section expanded with chip toggles
+- [x] **SHOT-11**: Screenshot: settings dialog (General tab with all sections visible)
+- [x] **SHOT-12**: Screenshot: dark mode (results page in dark theme)
+- [x] **SHOT-13**: Screenshot: mobile view (Step 4 results at 375x812)
+- [x] **SHOT-14**: Screenshot: population drill-down (Ashkenazi Jewish variant table)
+- [x] **SHOT-15**: Screenshot: search history panel open with entry
+- [x] **SHOT-16**: `data-testid` attributes added to key UI elements for reliable screenshot targeting
+- [x] **SHOT-17**: Clinical disclaimer auto-dismissed in screenshot script
+
+### Documentation Content — Guide
+
+- [x] **GUID-01**: Getting Started page with < 1 minute quick walkthrough
+- [x] **GUID-02**: Getting Started includes 4-step screenshots with annotations
+- [x] **GUID-03**: Gene Search detailed guide (gnomAD version selection, autocomplete, ClinGen notice, gene constraint)
+- [x] **GUID-04**: Patient Status detailed guide (4 status options explained clinically)
+- [x] **GUID-05**: Frequency Source detailed guide (gnomAD/Literature/Default tabs explained)
+- [x] **GUID-06**: Results and Text detailed guide (population table, clinical text, export, sharing)
+
+### Documentation Content — Use Cases
+
+- [x] **CASE-01**: Carrier screening counseling scenario (known carrier partner, CFTR example)
+- [x] **CASE-02**: Recurrence risk / family planning scenario (affected child, future pregnancy)
+- [x] **CASE-03**: Clinical letter generation scenario (template customization, DE/EN, gender-inclusive, copy-paste workflow)
+
+### Documentation Content — Reference
+
+- [x] **REF-01**: Methodology page (Hardy-Weinberg calculation, allele frequency aggregation, population-specific calculations)
+- [x] **REF-02**: Data sources page (gnomAD v4.1 vs v2.1.1, ClinVar classifications, ClinGen validity)
+- [x] **REF-03**: Filters page (LoF HC, missense, ClinVar P/LP, star threshold, per-calculation override)
+- [x] **REF-04**: Templates page ({{variable}} syntax, available variables, perspectives, sections, gender-inclusive styles)
+
+### Documentation Content — About
+
+- [x] **ABOU-01**: Citation page with CITATION.cff file and BibTeX entry
+- [x] **ABOU-02**: Changelog page (version history from v1.0 through v1.2)
+- [x] **ABOU-03**: Contributing guide (development setup, PR process, code style)
+
+### CI/CD Integration
+
+- [ ] **CICD-01**: Deploy workflow modified to build both app and docs
+- [ ] **CICD-02**: Merged artifact strategy (app at root, docs at /docs/)
+- [ ] **CICD-03**: Screenshot update workflow triggered on UI component changes
+- [ ] **CICD-04**: Screenshot workflow auto-commits updated screenshots if changed
+- [ ] **CICD-05**: Both app and docs verified working at their respective URLs
+
+### README Streamlining
+
+- [ ] **READ-01**: README slimmed to essentials (title, badges, one-line description, hero screenshot, 3-step quick start)
+- [ ] **READ-02**: Documentation badge linking to docs site
+- [ ] **READ-03**: License and citation section with link to docs citation page
+
+## Future Requirements
+
+### Testing Infrastructure (v1.4)
+
+- **TEST-01**: Vitest setup with coverage reporting
+- **TEST-02**: Unit tests for composables
+- **TEST-03**: Unit tests for utilities
+- **TEST-04**: Component tests with Vue Test Utils
+- **TEST-05**: Playwright E2E tests for critical flows
+- **TEST-06**: CI integration for test coverage reporting
+
+### Features (v1.4+)
+
+- **FEAT-01**: X-linked recessive inheritance calculation
+- **FEAT-02**: X-linked dominant inheritance calculation
+- **FEAT-03**: Bayesian residual risk for negative carrier test
+- **FEAT-04**: Batch processing for multiple genes
+- **FEAT-05**: Export results to PDF
+- **FEAT-06**: At-risk couple calculation (both partners)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Interactive Vue components in docs | Adds complexity; static screenshots sufficient for v1.3 |
+| Multi-language docs (i18n) | English docs first; German translation deferred |
+| API documentation / JSDoc | Internal code docs deferred to testing milestone |
+| Video tutorials | Screenshot walkthroughs sufficient for v1.3 |
+| Algolia search integration | VitePress built-in search sufficient |
+| Storybook setup | Not needed; Playwright screenshots cover UI states |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| MAKE-01 | Phase 16 | Complete |
+| MAKE-02 | Phase 17 | Complete |
+| MAKE-03 | Phase 16 | Complete |
+| VITE-01 | Phase 16 | Complete |
+| VITE-02 | Phase 16 | Complete |
+| VITE-03 | Phase 16 | Complete |
+| VITE-04 | Phase 16 | Complete |
+| VITE-05 | Phase 16 | Complete |
+| VITE-06 | Phase 16 | Complete |
+| VITE-07 | Phase 16 | Complete |
+| VITE-08 | Phase 16 | Complete |
+| SHOT-01 | Phase 17 | Complete |
+| SHOT-02 | Phase 17 | Complete |
+| SHOT-03 | Phase 17 | Complete |
+| SHOT-04 | Phase 17 | Complete |
+| SHOT-05 | Phase 17 | Complete |
+| SHOT-06 | Phase 17 | Complete |
+| SHOT-07 | Phase 17 | Complete |
+| SHOT-08 | Phase 17 | Complete |
+| SHOT-09 | Phase 17 | Complete |
+| SHOT-10 | Phase 17 | Complete |
+| SHOT-11 | Phase 17 | Complete |
+| SHOT-12 | Phase 17 | Complete |
+| SHOT-13 | Phase 17 | Complete |
+| SHOT-14 | Phase 17 | Complete |
+| SHOT-15 | Phase 17 | Complete |
+| SHOT-16 | Phase 17 | Complete |
+| SHOT-17 | Phase 17 | Complete |
+| GUID-01 | Phase 18 | Complete |
+| GUID-02 | Phase 18 | Complete |
+| GUID-03 | Phase 18 | Complete |
+| GUID-04 | Phase 18 | Complete |
+| GUID-05 | Phase 18 | Complete |
+| GUID-06 | Phase 18 | Complete |
+| CASE-01 | Phase 18 | Complete |
+| CASE-02 | Phase 18 | Complete |
+| CASE-03 | Phase 18 | Complete |
+| REF-01 | Phase 18 | Complete |
+| REF-02 | Phase 18 | Complete |
+| REF-03 | Phase 18 | Complete |
+| REF-04 | Phase 18 | Complete |
+| ABOU-01 | Phase 18 | Complete |
+| ABOU-02 | Phase 18 | Complete |
+| ABOU-03 | Phase 18 | Complete |
+| CICD-01 | Phase 19 | Pending |
+| CICD-02 | Phase 19 | Pending |
+| CICD-03 | Phase 19 | Pending |
+| CICD-04 | Phase 19 | Pending |
+| CICD-05 | Phase 19 | Pending |
+| READ-01 | Phase 20 | Pending |
+| READ-02 | Phase 20 | Pending |
+| READ-03 | Phase 20 | Pending |
+
+**Coverage:**
+- v1.3 requirements: 52 total
+- Mapped to phases: 52
+- Unmapped: 0
+
+---
+*Requirements defined: 2026-02-09*
+*Last updated: 2026-02-23 (Phase 18 complete: 44 requirements satisfied)*

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="step-gene">
     <h2 class="text-h6 mb-4">
       Select Gene
     </h2>
@@ -41,6 +41,7 @@
       <v-btn
         color="primary"
         :disabled="!modelValue"
+        data-testid="step-gene-next-btn"
         @click="$emit('complete')"
       >
         Continue

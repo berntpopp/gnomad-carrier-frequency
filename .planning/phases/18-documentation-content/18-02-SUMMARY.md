@@ -1,0 +1,113 @@
+---
+phase: 18-documentation-content
+plan: 02
+subsystem: docs
+tags: [vitepress, markdown, clinical-documentation, use-cases, cftr, hfe]
+
+# Dependency graph
+requires:
+  - phase: 18-01
+    provides: Screenshot-frame CSS pattern, guide section structure, getting-started page to cross-link to
+provides:
+  - Use cases overview page with hero screenshot and links to all 3 scenarios
+  - Carrier screening scenario (CASE-01): CFTR with c.1210-11T>G variant exclusion
+  - Family planning scenario (CASE-02): CFTR compound het status and /2 vs /4 risk divisor
+  - Clinical letter scenario (CASE-03): HFE C282Y/H63D with German text generation
+affects: [18-03, 18-04, 18-05, reference-section, about-section]
+
+# Tech tracking
+tech-stack:
+  added: []
+  patterns:
+    - "Use case pages: clinical scenario first, then calculator steps (WHY before HOW)"
+    - "VitePress ::: tip / ::: info / ::: warning admonition blocks for clinical context"
+    - "Markdown tables for comparing perspectives or options"
+
+key-files:
+  created: []
+  modified:
+    - docs/use-cases/index.md
+    - docs/use-cases/carrier-screening.md
+    - docs/use-cases/family-planning.md
+    - docs/use-cases/clinical-letter.md
+
+key-decisions:
+  - "Use cases start with clinical scenario paragraph before any calculator instructions"
+  - "family-planning.md is text-only (no screenshot) — carrier-screening already shows variant table"
+  - "HFE clinical letter page uses a markdown table to compare the three clinical perspectives"
+  - "English text snippet shown in clinical-letter.md (docs are English; German mentioned as available)"
+
+patterns-established:
+  - "Clinical scenario structure: The Scenario → Using the Calculator (subsections) → See Also"
+  - "Cross-links use absolute paths from docs root: /reference/filters, /reference/methodology, /reference/templates"
+  - "Admonition blocks (::: tip/::: info) for clinical nuance that breaks the narrative flow"
+
+# Metrics
+duration: 3min
+completed: 2026-02-23
+---
+
+# Phase 18 Plan 02: Use Cases Summary
+
+**Four use case pages covering CFTR carrier screening with c.1210-11T>G exclusion, CFTR recurrence risk with compound het /2 divisor, and HFE clinical letter generation with German gender-inclusive text**
+
+## Performance
+
+- **Duration:** 3 min
+- **Started:** 2026-02-23T13:46:07Z
+- **Completed:** 2026-02-23T13:48:45Z
+- **Tasks:** 2
+- **Files modified:** 4
+
+## Accomplishments
+
+- use-cases/index.md: Overview with hero-preview screenshot and card-style links to all 3 scenarios
+- carrier-screening.md (CASE-01): CFTR scenario with c.1210-11T>G disputed pathogenicity explanation, variant exclusion workflow, variant-table screenshot, cross-links to reference/filters and reference/methodology
+- family-planning.md (CASE-02): CFTR compound het scenario explaining /2 vs /4 risk divisor with obligate carrier reasoning; population-specific values; confirmed vs assumed compound het distinction
+- clinical-letter.md (CASE-03): HFE scenario with C282Y/H63D variant selection, three-perspective comparison table, four German gender styles, text-output screenshot, cross-link to reference/templates
+
+## Task Commits
+
+Each task was committed atomically:
+
+1. **Task 1: Write Use Cases overview and Carrier Screening page** - `66c61e4` (docs)
+2. **Task 2: Write Family Planning and Clinical Letter pages** - `3917017` (docs)
+
+**Plan metadata:** (pending)
+
+## Files Created/Modified
+
+- `docs/use-cases/index.md` - Overview with hero screenshot, links to 3 scenarios (34 lines)
+- `docs/use-cases/carrier-screening.md` - CFTR carrier screening scenario CASE-01 (62 lines)
+- `docs/use-cases/family-planning.md` - CFTR family planning scenario CASE-02 (60 lines)
+- `docs/use-cases/clinical-letter.md` - HFE clinical letter scenario CASE-03 (83 lines)
+
+## Decisions Made
+
+- Clinical scenario narrative comes first on each page before any calculator steps — "WHY before HOW" tone
+- family-planning.md has no screenshot (carrier-screening already demonstrates the variant table; this page focuses on the risk numbers)
+- HFE clinical letter page uses a markdown table to compare the three perspectives (Affected Patient / Healthy Carrier / Family Member) — clearer than prose
+- English text snippet shown in clinical-letter.md even though the scenario generates German text, because the documentation site is in English
+
+## Deviations from Plan
+
+None - plan executed exactly as written.
+
+## Issues Encountered
+
+None.
+
+## User Setup Required
+
+None - no external service configuration required.
+
+## Next Phase Readiness
+
+- All 4 use case pages complete with no placeholder text
+- Cross-links to /reference/filters, /reference/methodology, /reference/templates are in place (these pages are placeholders; they will be written in subsequent plans)
+- Screenshot paths (/screenshots/hero-preview.webp, /screenshots/variant-table.webp, /screenshots/text-output.webp) match the paths generated by the Phase 17 Playwright automation
+- Ready for Reference section plans (filters, methodology, templates pages)
+
+---
+*Phase: 18-documentation-content*
+*Completed: 2026-02-23*

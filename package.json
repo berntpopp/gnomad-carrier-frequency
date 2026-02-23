@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.2.0",
   "type": "module",
+  "packageManager": "bun@1.3.9",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
@@ -10,7 +11,10 @@
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",
     "lighthouse": "lhci autorun --config=lighthouserc.local.json",
-    "ci": "npm run lint && npm run typecheck && npm run build && npm run lighthouse"
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "ci": "npm run lint && npm run typecheck && npm run build && npm run docs:build && npm run lighthouse"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
@@ -36,12 +40,16 @@
     "@vue/tsconfig": "^0.8.1",
     "eslint": "^9.39.2",
     "eslint-plugin-vue": "^10.7.0",
+    "playwright": "^1.58.2",
     "sass": "^1.86.3",
+    "sharp": "^0.34.5",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.53.0",
     "vite": "^7.2.4",
     "vite-plugin-checker": "^0.12.0",
     "vite-plugin-pwa": "^1.2.0",
+    "vitepress": "^2.0.0-alpha.16",
     "vue-tsc": "^3.1.4"
   }
 }

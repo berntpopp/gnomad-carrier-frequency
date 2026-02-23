@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="variant-table">
     <v-text-field
       v-model="search"
       prepend-inner-icon="mdi-magnify"

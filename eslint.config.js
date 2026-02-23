@@ -6,7 +6,7 @@ import {
 
 export default defineConfigWithVueTs(
   {
-    ignores: ['node_modules/**', 'dist/**'],
+    ignores: ['node_modules/**', 'dist/**', 'docs/.vitepress/cache/**', 'docs/.vitepress/dist/**'],
   },
   pluginVue.configs['flat/recommended'],
   vueTsConfigs.recommended,

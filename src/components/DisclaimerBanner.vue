@@ -5,6 +5,7 @@
     persistent
     :scrim="true"
     aria-label="Clinical Disclaimer"
+    data-testid="disclaimer-dialog"
   >
     <v-card>
       <v-card-title class="d-flex align-center">
@@ -55,6 +56,7 @@
         <v-btn
           color="primary"
           variant="elevated"
+          data-testid="disclaimer-accept-btn"
           @click="acknowledge"
         >
           I Understand

@@ -5,7 +5,7 @@
       "startServerCommand": "bun run preview",
       "startServerReadyPattern": "Local:",
       "startServerReadyTimeout": 30000,
-      "url": ["http://localhost:4173/gnomad-carrier-frequency/"]
+      "url": ["http://localhost:4173/"]
     },
     "assert": {
       "assertions": {

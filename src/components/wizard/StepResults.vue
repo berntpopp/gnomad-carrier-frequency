@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="step-results">
     <h2 class="text-h6 mb-4">
       Results
     </h2>
@@ -30,6 +30,7 @@
     <v-card
       v-if="result"
       class="mb-4"
+      data-testid="results-summary-card"
     >
       <v-card-title class="d-flex align-center flex-wrap">
         {{ result.gene }} - Carrier Frequency Results
@@ -161,6 +162,7 @@
         density="compact"
         items-per-page="-1"
         class="elevation-1 results-table"
+        data-testid="population-table"
       >
         <template #item="{ item }">
           <tr

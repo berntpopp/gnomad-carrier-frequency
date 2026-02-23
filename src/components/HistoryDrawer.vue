@@ -5,6 +5,7 @@
     temporary
     :width="drawerWidth"
     class="history-drawer"
+    data-testid="history-drawer"
   >
     <div class="pa-4">
       <HistoryPanel

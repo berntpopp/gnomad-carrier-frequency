@@ -1,5 +1,8 @@
 <template>
-  <div class="history-panel">
+  <div
+    class="history-panel"
+    data-testid="history-panel"
+  >
     <div class="d-flex align-center mb-4">
       <h2 class="text-h6">
         Search History
@@ -60,6 +63,7 @@
             v-for="entry in group.entries"
             :key="entry.id"
             class="history-entry rounded mb-1"
+            data-testid="history-entry"
             @click="emit('restore', entry.id)"
           >
             <template #prepend>

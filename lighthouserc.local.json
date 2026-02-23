@@ -2,10 +2,10 @@
   "ci": {
     "collect": {
       "numberOfRuns": 1,
-      "startServerCommand": "npm run preview",
+      "startServerCommand": "bun run preview",
       "startServerReadyPattern": "Local:",
       "startServerReadyTimeout": 30000,
-      "url": ["http://localhost:4173/gnomad-carrier-frequency/"]
+      "url": ["http://localhost:4173/"]
     },
     "assert": {
       "assertions": {

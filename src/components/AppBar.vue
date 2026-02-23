@@ -37,6 +37,7 @@
             variant="text"
             title="Search history"
             aria-label="Search history"
+            data-testid="footer-history-btn"
             @click="emit('openHistory')"
           >
             <v-icon>mdi-history</v-icon>
@@ -75,6 +76,7 @@
             variant="text"
             title="Settings"
             aria-label="Settings"
+            data-testid="footer-settings-btn"
             @click="emit('openSettings')"
           >
             <v-icon>mdi-cog</v-icon>

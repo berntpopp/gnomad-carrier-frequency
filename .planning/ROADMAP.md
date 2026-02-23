@@ -1,0 +1,139 @@
+# Roadmap: gnomAD Carrier Frequency Calculator
+
+## Milestones
+
+- **v1.0 MVP** - Phases 1-4 (shipped 2026-01-19)
+- **v1.1 Release-Ready** - Phases 5-10 (shipped 2026-01-19)
+- **v1.2 Sharing** - Phases 11-15 (shipped 2026-01-20)
+- **v1.3 Documentation Site** - Phases 16-20 (in progress)
+
+## Phases
+
+<details>
+<summary>v1.0 MVP (Phases 1-4) - SHIPPED 2026-01-19</summary>
+
+4 phases, 15 plans, 32 requirements. See milestone archive.
+
+</details>
+
+<details>
+<summary>v1.1 Release-Ready (Phases 5-10) - SHIPPED 2026-01-19</summary>
+
+6 phases, 27 plans, 69 requirements. See milestone archive.
+
+</details>
+
+<details>
+<summary>v1.2 Sharing (Phases 11-15) - SHIPPED 2026-01-20</summary>
+
+5 phases, 15 plans, 38 requirements. See milestone archive.
+
+</details>
+
+### v1.3 Documentation Site (In Progress)
+
+**Milestone Goal:** Professional documentation site with auto-generated screenshots, deployed alongside the app on GitHub Pages.
+
+**Phase Numbering:**
+- Integer phases (16, 17, 18, 19, 20): Planned milestone work
+- Decimal phases (e.g., 17.1): Urgent insertions (marked with INSERTED)
+
+- [x] **Phase 16: VitePress Setup** - Documentation infrastructure with navigation, theming, and landing page ✓
+- [x] **Phase 17: Screenshot Automation** - Playwright-based screenshot generation covering all app states ✓
+- [x] **Phase 18: Documentation Content** - Guide, use cases, reference, and about pages with embedded screenshots ✓
+- [ ] **Phase 19: CI/CD Integration** - Unified deployment pipeline and screenshot update automation
+- [ ] **Phase 20: README Streamlining** - Slim README to essentials with docs site link
+
+## Phase Details
+
+### Phase 16: VitePress Setup
+**Goal**: Documentation site infrastructure is running locally with professional navigation, theming, and a landing page
+**Depends on**: Nothing (first phase of v1.3)
+**Requirements**: MAKE-01, MAKE-03, VITE-01, VITE-02, VITE-03, VITE-04, VITE-05, VITE-06, VITE-07, VITE-08
+**Success Criteria** (what must be TRUE):
+  1. Running `make docs-dev` (or `npm run docs:dev`) serves a VitePress site at localhost with working navigation between Guide, Use Cases, Reference, and About sections
+  2. The landing page displays a hero section with tagline, feature cards, and call-to-action buttons linking to the calculator and getting started guide
+  3. Sidebar navigation shows hierarchical page structure within each section (placeholder pages acceptable)
+  4. Theme colors match the app branding (#a09588) and the site renders correctly in both light and dark modes
+  5. The PWA service worker does not intercept requests to the /docs/ path
+  6. Makefile exists with `make docs`, `make docs-dev`, `make docs-preview` targets
+**Plans:** 2 plans
+Plans:
+- [x] 16-01-PLAN.md — VitePress infrastructure: install, config, theme, PWA denylist, build tooling
+- [x] 16-02-PLAN.md — Landing page and placeholder content pages for all 4 sections
+
+### Phase 17: Screenshot Automation
+**Goal**: Playwright script generates all required screenshots of the running app, producing assets ready for documentation pages
+**Depends on**: Phase 16 (screenshots saved to docs/public/screenshots/)
+**Requirements**: MAKE-02, SHOT-01, SHOT-02, SHOT-03, SHOT-04, SHOT-05, SHOT-06, SHOT-07, SHOT-08, SHOT-09, SHOT-10, SHOT-11, SHOT-12, SHOT-13, SHOT-14, SHOT-15, SHOT-16, SHOT-17
+**Success Criteria** (what must be TRUE):
+  1. Running `make screenshots` starts dev server, generates 14 WebP files in docs/public/screenshots/, and stops the server
+  2. Key UI elements have data-testid attributes enabling reliable element targeting by the script
+  3. The clinical disclaimer dialog is auto-dismissed before any screenshots are captured
+  4. Screenshots render at correct viewport sizes (1200x800 for desktop, 375x812 for mobile) with appropriate theme (light or dark as specified)
+  5. All screenshots show realistic data (CFTR gene with actual gnomAD results) rather than empty or error states
+**Plans:** 3 plans
+Plans:
+- [x] 17-01-PLAN.md — Install Playwright/sharp/tsx, create API fixtures, build script scaffold with server lifecycle and route interception
+- [x] 17-02-PLAN.md — Add data-testid attributes to all targeted Vue components
+- [x] 17-03-PLAN.md — Add all 14 screenshot captures to script and update Makefile target
+
+### Phase 18: Documentation Content
+**Goal**: All documentation pages are written with clinical accuracy, embedded screenshots, and cross-links forming a complete user guide
+**Depends on**: Phase 17 (screenshots must exist for embedding)
+**Requirements**: GUID-01, GUID-02, GUID-03, GUID-04, GUID-05, GUID-06, CASE-01, CASE-02, CASE-03, REF-01, REF-02, REF-03, REF-04, ABOU-01, ABOU-02, ABOU-03
+**Success Criteria** (what must be TRUE):
+  1. Getting Started page walks a new user through all 4 wizard steps in under 1 minute with annotated screenshots at each step
+  2. Three use case pages (carrier screening, family planning, clinical letter) each present a complete clinical scenario with step-by-step walkthrough and relevant screenshots
+  3. Reference pages for methodology, data sources, filters, and templates provide technically accurate details that a genetic counselor can cite (Hardy-Weinberg formula, gnomAD version differences, filter options, template syntax)
+  4. Citation page includes both CITATION.cff content and a BibTeX entry ready to copy
+  5. All pages have working cross-links to related content and screenshots render correctly in the VitePress build
+**Plans:** 5 plans
+Plans:
+- [x] 18-01-PLAN.md — Infrastructure (screenshot CSS, sidebar config) and Guide section (introduction + getting started walkthrough)
+- [x] 18-02-PLAN.md — Use Cases section (overview, carrier screening, family planning, clinical letter)
+- [x] 18-03-PLAN.md — Reference section (overview, methodology, data sources, filters, templates)
+- [x] 18-04-PLAN.md — About section (overview, citation, changelog, contributing) and CITATION.cff
+- [x] 18-05-PLAN.md — Landing page disclaimer, cross-link audit, and build verification
+
+### Phase 19: CI/CD Integration
+**Goal**: Unified deployment pipeline merging the Vue app and VitePress docs into a single GitHub Pages artifact, with automated screenshot refresh when UI changes
+**Depends on**: Phase 18 (docs content must exist for deployment verification)
+**Requirements**: CICD-01, CICD-02, CICD-03, CICD-04, CICD-05
+**Success Criteria** (what must be TRUE):
+  1. Pushing to main triggers a deploy workflow that builds both the Vue app and the VitePress docs, merging them into a single GitHub Pages artifact
+  2. The app is accessible at https://gnomad-carrier-frequency.kidney-genetics.org/ and the docs at https://gnomad-carrier-frequency.kidney-genetics.org/docs/
+  3. A separate screenshot workflow triggers on UI component changes, regenerates screenshots, and auto-commits any changes
+  4. Both sites render correctly at their respective URLs after deployment (no 404s, no broken assets)
+**Plans:** 3 plans
+Plans:
+- [ ] 19-01-PLAN.md — Base path fixes for custom domain + unified deploy workflow
+- [ ] 19-02-PLAN.md — CI workflow update with bun + screenshot automation workflow
+- [ ] 19-03-PLAN.md — PAT secret setup + end-to-end deployment verification
+
+### Phase 20: README Streamlining
+**Goal**: README is concise and directs users to the documentation site for detailed information
+**Depends on**: Phase 19 (docs site URL must be live)
+**Requirements**: READ-01, READ-02, READ-03
+**Success Criteria** (what must be TRUE):
+  1. README contains only essentials: title, badges, one-line description, hero screenshot, 3-step quick start, and link to full documentation
+  2. A documentation badge links directly to the live docs site
+  3. License and citation section references the docs citation page for full details
+**Plans**: TBD
+
+## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 16 --> 17 --> 18 --> 19 --> 20
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 16. VitePress Setup | v1.3 | 2/2 | Complete | 2026-02-09 |
+| 17. Screenshot Automation | v1.3 | 3/3 | Complete | 2026-02-09 |
+| 18. Documentation Content | v1.3 | 5/5 | Complete | 2026-02-23 |
+| 19. CI/CD Integration | v1.3 | 0/3 | Not started | - |
+| 20. README Streamlining | v1.3 | 0/TBD | Not started | - |
+
+---
+*Roadmap created: 2026-02-09*
+*Last updated: 2026-02-23 (Phase 18 complete)*
