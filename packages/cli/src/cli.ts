@@ -1,4 +1,6 @@
 import { Command } from 'commander'
+import { queryCommand } from './commands/query.js'
+import { batchCommand } from './commands/batch.js'
 
 const program = new Command()
 
@@ -6,10 +8,9 @@ program
   .name('gnomad-cf')
   .description('Query gnomAD carrier frequencies from the terminal')
   .version('1.5.0')
+  .addCommand(queryCommand)
+  .addCommand(batchCommand)
 
-// Subcommands will be added in subsequent plans:
-// - query: single gene lookup
-// - batch: multi-gene processing
-// - interactive: wizard mode
+// Interactive command will be added in a subsequent plan
 
 program.parseAsync(process.argv)
