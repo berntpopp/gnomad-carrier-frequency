@@ -176,7 +176,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 30-01-PLAN.md — Fix FilterConfig field names, add CLI to typecheck, delegate prevalence to core, add filter-effect test
+- [x] 30-01-PLAN.md — Fix FilterConfig field names, add CLI to typecheck, delegate prevalence to core, add filter-effect test
 
 ---
 
@@ -196,10 +196,10 @@ Plans:
 | 27. CLI Package | v1.5 | 7/7 | Complete | 2026-02-24 |
 | 28. Gene Config System | v1.5 | 4/4 | Complete | 2026-02-24 |
 | 29. Test Suite Completion & Web App Validation | v1.5 | 7/7 | Complete | 2026-02-24 |
-| 30. CLI Integration Fixes | v1.5 | 0/1 | Planned | — |
+| 30. CLI Integration Fixes | v1.5 | 1/1 | Complete | 2026-02-24 |
 
-**Total:** 111 plans complete across 30 phases in 6 milestones.
+**Total:** 112 plans complete across 30 phases in 6 milestones.
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-24 (Phase 29 gap closure complete: 7/7 plans, all verified)*
+*Last updated: 2026-02-24 (Phase 30 complete: 1/1 plans, all verified)*

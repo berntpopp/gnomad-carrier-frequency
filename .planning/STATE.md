@@ -37,8 +37,8 @@ v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-24 (Phase 30 audit gaps 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 106
-- v1.5 plans completed: 23
+- Total plans completed: 112
+- v1.5 plans completed: 24
 
 ---
 
