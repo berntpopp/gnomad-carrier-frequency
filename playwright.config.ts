@@ -1,18 +1,22 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
-  testMatch: ['test-gene-config-checkpoint.ts', 'test-debug.ts'],
-  timeout: 120000,
+  testDir: './apps/web/e2e',
+  fullyParallel: false,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 1 : 0,
+  timeout: 30_000,
   use: {
     baseURL: 'http://localhost:5173',
-    screenshot: 'only-on-failure',
-    trace: 'retain-on-failure',
+    trace: 'on-first-retry',
   },
   projects: [
-    {
-      name: 'chromium',
-      use: { browserName: 'chromium' },
-    },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
   ],
-  reporter: [['line']],
-});
+  webServer: {
+    command: 'bun run dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI,
+    timeout: 60_000,
+  },
+})
