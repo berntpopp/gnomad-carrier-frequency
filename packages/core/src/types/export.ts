@@ -1,6 +1,7 @@
 // Export data types for JSON and Excel file generation
 
 import type { FilterConfig } from './filter.js';
+import type { CalcConfig } from './calculations.js';
 import type { GnomadVersion } from '../config/types.js';
 
 /**
@@ -11,6 +12,8 @@ export interface ExportMetadata {
   gnomadVersion: GnomadVersion;
   gnomadDisplayName: string;
   filtersApplied: FilterConfig;
+  /** Calculation settings used to produce the carrier frequency result */
+  calcConfig: CalcConfig;
   appVersion: string;
 }
 

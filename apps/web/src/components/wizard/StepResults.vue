@@ -359,6 +359,7 @@ const { smAndDown } = useDisplay();
 import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@gnomad-cf/core/types';
 import type { ClinVarSubmission } from '@gnomad-cf/core/queries';
 import { useFilterStore } from '@/stores/useFilterStore';
+import { useCalcStore } from '@/stores/useCalcStore';
 import { useExport, useAppAnnouncer, useExclusionState } from '@/composables';
 import { filterPathogenicVariantsConfigurable } from '@gnomad-cf/core/filters';
 import { toDisplayVariants, filterVariantsByPopulation } from '@gnomad-cf/core/filters';
@@ -407,6 +408,8 @@ const emit = defineEmits<{
 
 // Get filter store for reset functionality
 const filterStore = useFilterStore();
+// Get calc store for export metadata
+const calcStore = useCalcStore();
 
 // Get exclusion state (singleton) for displaying excluded count and export data
 const { excludedCount, excluded, reasons } = useExclusionState();
@@ -455,6 +458,7 @@ function handleExport(format: 'json' | 'xlsx') {
     props.result,
     displayVariants,
     props.filterConfig,
+    calcStore.defaults,
     excludedSet.value,
     reasons
   );

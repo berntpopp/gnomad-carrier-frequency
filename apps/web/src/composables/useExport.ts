@@ -90,6 +90,18 @@ export function useExport(): UseExportReturn {
         field: 'ClinVar Star Threshold',
         value: String(data.metadata.filtersApplied.clinvarStarThreshold),
       },
+      {
+        field: 'Calc: HWE Formula',
+        value: String(data.metadata.calcConfig.useHWEFormula),
+      },
+      {
+        field: 'Calc: Homozygote Exclusion',
+        value: String(data.metadata.calcConfig.useHomExclusion),
+      },
+      {
+        field: 'Calc: Penetrance',
+        value: String(data.metadata.calcConfig.penetrance),
+      },
     ];
     const metadataWs = XLSX.utils.json_to_sheet(metadataRows);
     XLSX.utils.book_append_sheet(wb, metadataWs, 'Metadata');

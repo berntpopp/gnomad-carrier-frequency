@@ -5,6 +5,7 @@ import type {
   PopulationFrequency,
   DisplayVariant,
   FilterConfig,
+  CalcConfig,
   ExportSummary,
   ExportPopulation,
   ExportVariant,
@@ -151,7 +152,8 @@ export function buildExportVariants(
  */
 export function buildExportMetadata(
   version: GnomadVersion,
-  filters: FilterConfig
+  filters: FilterConfig,
+  calcConfig: CalcConfig
 ): ExportMetadata {
   const versionConfig = getGnomadVersion(version);
   return {
@@ -159,6 +161,7 @@ export function buildExportMetadata(
     gnomadVersion: version,
     gnomadDisplayName: versionConfig.displayName,
     filtersApplied: { ...filters },
+    calcConfig: { ...calcConfig },
     appVersion: import.meta.env.VITE_APP_VERSION || 'unknown',
   };
 }
@@ -170,6 +173,7 @@ export function buildExportData(
   result: CarrierFrequencyResult,
   variants: DisplayVariant[],
   filters: FilterConfig,
+  calcConfig: CalcConfig,
   excludedIds?: Set<string>,
   reasons?: Map<string, ExclusionReason>
 ): ExportData {
@@ -177,6 +181,6 @@ export function buildExportData(
     summary: buildExportSummary(result),
     populations: buildExportPopulations(result.populations),
     variants: buildExportVariants(variants, excludedIds, reasons),
-    metadata: buildExportMetadata(result.version, filters),
+    metadata: buildExportMetadata(result.version, filters, calcConfig),
   };
 }

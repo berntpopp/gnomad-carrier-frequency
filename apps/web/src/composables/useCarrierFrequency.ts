@@ -8,13 +8,21 @@ import {
   getConflictingVariantIds,
 } from '@gnomad-cf/core/filters';
 import {
-  aggregatePopulationFrequencies,
+  aggregatePopulationFrequenciesWithConfig,
   buildPopulationFrequencies,
+  calculateVCR,
+  calculateGCR,
+  calculateHWECarrierFrequency,
+  calculateSimplifiedCarrierFrequency,
+  calculateGeneticPrevalence,
+  calculateBayesianPrevalence,
+  formatCarrierFrequency,
+  formatPrevalence,
 } from '@gnomad-cf/core/calculations';
-import { formatCarrierFrequency } from '@gnomad-cf/core/calculations';
 import { config, type GnomadVersion } from '@gnomad-cf/core/config';
 import { useGnomadVersion } from '@/api';
 import { useFilterStore } from '@/stores/useFilterStore';
+import { useCalcStore } from '@/stores/useCalcStore';
 import type { ClinVarSubmission } from '@gnomad-cf/core/queries';
 import type {
   CarrierFrequencyResult,
@@ -45,6 +53,10 @@ export interface UseCarrierFrequencyReturn {
   qualifyingVariantCount: Ref<number>;
   hasFounderEffect: Ref<boolean>;
   usingDefault: Ref<boolean>;
+
+  // Prevalence (formatted)
+  geneticPrevalenceFormatted: Ref<{ ratio: string; percent: string } | null>;
+  bayesianPrevalenceFormatted: Ref<{ ratio: string; percent: string } | null>;
 
   // Raw variant data (for filtering UI)
   variants: Ref<GnomadVariant[]>;
@@ -89,6 +101,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   const geneSymbol = ref<string | null>(null);
   const { version } = useGnomadVersion();
   const filterStore = useFilterStore();
+  const calcStore = useCalcStore();
 
   const setGeneSymbol = (symbol: string | null) => {
     geneSymbol.value = symbol?.toUpperCase() ?? null;
@@ -234,36 +247,57 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     hasData.value && pathogenicVariants.value.length === 0
   );
 
-  // Aggregate population frequencies (uses config for population codes)
+  // Aggregate population frequencies using CalcConfig
+  // Reactivity: Vue computed automatically tracks calcStore.defaults
   const aggregatedPops = computed(() => {
     if (usingDefault.value) return null;
     if (!pathogenicVariants.value.length) return null;
-    return aggregatePopulationFrequencies(pathogenicVariants.value, version.value);
+    return aggregatePopulationFrequenciesWithConfig(
+      pathogenicVariants.value,
+      version.value,
+      calcStore.defaults
+    );
   });
 
-  // Calculate global statistics: carrier frequency, total AC, and representative AN
+  // Calculate global statistics: carrier frequency, total AC, representative AN, and prevalence.
   //
-  // Mathematical approach: Sum of allele frequencies
-  // - Each variant has its own AN due to varying call rate
-  // - For exome+genome (different cohorts): combine AC and AN → variant AF
-  // - For multiple variants (same cohort): sum the AFs
+  // Always compute:
+  //   sumAF = sum of per-variant combined allele frequencies
+  //   geneticPrevalence = q^2 where q = sumAF (NEVER from carrier frequency)
+  //   bayesianPrevalence = geneticPrevalence * penetrance
   //
-  // Formula: carrier_freq = 2 × Σ(variant_AF_i)
-  // where variant_AF = (exome_AC + genome_AC) / (exome_AN + genome_AN)
+  // Carrier frequency formula chosen by CalcConfig:
+  //   useHomExclusion=true:  VCR per variant then GCR aggregation
+  //   useHomExclusion=false + useHWEFormula=true:  2pq (HWE)
+  //   useHomExclusion=false + useHWEFormula=false: 2 * sumAF (simplified)
   //
   const globalStats = computed((): {
     carrierFrequency: number | null;
     totalAC: number;
     maxAN: number;
+    geneticPrevalence: number | null;
+    bayesianPrevalence: number | null;
+    formula: 'hwe' | 'simplified';
+    homExclusionActive: boolean;
   } => {
+    const defaultResult = {
+      carrierFrequency: null as number | null,
+      totalAC: 0,
+      maxAN: 0,
+      geneticPrevalence: null as number | null,
+      bayesianPrevalence: null as number | null,
+      formula: calcStore.defaults.useHWEFormula ? 'hwe' : 'simplified' as 'hwe' | 'simplified',
+      homExclusionActive: calcStore.defaults.useHomExclusion,
+    };
+
     if (usingDefault.value) {
-      return { carrierFrequency: defaultCarrierFrequency, totalAC: 0, maxAN: 0 };
+      return { ...defaultResult, carrierFrequency: defaultCarrierFrequency };
     }
-    if (!aggregatedPops.value || !pathogenicVariants.value.length) {
-      return { carrierFrequency: null, totalAC: 0, maxAN: 0 };
+    if (!pathogenicVariants.value.length) {
+      return defaultResult;
     }
 
-    // Sum allele frequencies across all pathogenic variants
+    // Sum allele frequencies across all pathogenic variants using combined exome+genome
     // Also track total AC and max AN for display
     let sumAF = 0;
     let totalAC = 0;
@@ -271,30 +305,81 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     let maxGenomeAN = 0;
 
     for (const variant of pathogenicVariants.value) {
-      // Combine exome and genome for this variant (different sample sets)
-      const exomeAC = variant.exome?.ac ?? 0;
-      const genomeAC = variant.genome?.ac ?? 0;
-      const exomeAN = variant.exome?.an ?? 0;
-      const genomeAN = variant.genome?.an ?? 0;
+      // Explicit null checks on wrapper — NOT optional chaining with ?? 0
+      const exomeAC = variant.exome !== null && variant.exome !== undefined ? variant.exome.ac : 0;
+      const genomeAC = variant.genome !== null && variant.genome !== undefined ? variant.genome.ac : 0;
+      const exomeAN = variant.exome !== null && variant.exome !== undefined ? variant.exome.an : 0;
+      const genomeAN = variant.genome !== null && variant.genome !== undefined ? variant.genome.an : 0;
 
       const combinedAC = exomeAC + genomeAC;
       const combinedAN = exomeAN + genomeAN;
 
-      // Track totals
       totalAC += combinedAC;
       maxExomeAN = Math.max(maxExomeAN, exomeAN);
       maxGenomeAN = Math.max(maxGenomeAN, genomeAN);
 
-      // Calculate this variant's AF and add to sum
       if (combinedAN > 0) {
         sumAF += combinedAC / combinedAN;
       }
     }
 
+    // Genetic prevalence always from raw q = sumAF (never from carrier frequency)
+    const geneticPrevalence = sumAF > 0 ? calculateGeneticPrevalence([sumAF]) : null;
+    const bayesianPrevalence =
+      geneticPrevalence !== null
+        ? calculateBayesianPrevalence(geneticPrevalence, calcStore.defaults.penetrance)
+        : null;
+
+    let carrierFrequency: number | null = null;
+    const homExclusionActive = calcStore.defaults.useHomExclusion;
+    let formula: 'hwe' | 'simplified' = calcStore.defaults.useHWEFormula ? 'hwe' : 'simplified';
+
+    if (sumAF > 0) {
+      if (homExclusionActive) {
+        // VCR/GCR path — compute VCR for each variant then aggregate via GCR
+        const vcrs: number[] = [];
+        for (const variant of pathogenicVariants.value) {
+          const exomeAC = variant.exome !== null && variant.exome !== undefined ? variant.exome.ac : 0;
+          const genomeAC = variant.genome !== null && variant.genome !== undefined ? variant.genome.ac : 0;
+          const exomeAN = variant.exome !== null && variant.exome !== undefined ? variant.exome.an : 0;
+          const genomeAN = variant.genome !== null && variant.genome !== undefined ? variant.genome.an : 0;
+          const exomeAcHom = variant.exome !== null && variant.exome !== undefined ? variant.exome.ac_hom : 0;
+          const genomeAcHom = variant.genome !== null && variant.genome !== undefined ? variant.genome.ac_hom : 0;
+
+          const combinedAC = exomeAC + genomeAC;
+          const combinedAN = exomeAN + genomeAN;
+          const combinedAcHom = exomeAcHom + genomeAcHom;
+
+          if (combinedAN > 0) {
+            vcrs.push(calculateVCR(combinedAC, combinedAN, combinedAcHom));
+          }
+        }
+        const gcr = calculateGCR(vcrs);
+        carrierFrequency = gcr > 0 ? gcr : null;
+        // formula label: when hom exclusion is ON, we report based on HWE toggle setting
+        // but the actual calculation used VCR/GCR (which is more accurate)
+        formula = calcStore.defaults.useHWEFormula ? 'hwe' : 'simplified';
+      } else if (calcStore.defaults.useHWEFormula) {
+        // HWE 2pq formula
+        const cf = calculateHWECarrierFrequency([sumAF]);
+        carrierFrequency = cf > 0 ? cf : null;
+        formula = 'hwe';
+      } else {
+        // Simplified 2 * sumAF
+        const cf = calculateSimplifiedCarrierFrequency([sumAF]);
+        carrierFrequency = cf > 0 ? cf : null;
+        formula = 'simplified';
+      }
+    }
+
     return {
-      carrierFrequency: sumAF > 0 ? 2 * sumAF : null,
+      carrierFrequency,
       totalAC,
       maxAN: maxExomeAN + maxGenomeAN,
+      geneticPrevalence,
+      bayesianPrevalence,
+      formula,
+      homExclusionActive,
     };
   });
 
@@ -302,12 +387,13 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   const globalCarrierFrequency = computed(() => globalStats.value.carrierFrequency);
 
   // Build population frequency array (uses config for labels/thresholds)
+  // aggregatedPops already has pre-computed carrierFrequency via CalcConfig
   const populations = computed((): PopulationFrequency[] => {
     if (!aggregatedPops.value || globalCarrierFrequency.value === null) return [];
     return buildPopulationFrequencies(
       aggregatedPops.value,
       globalCarrierFrequency.value,
-      version.value // Pass version for config lookup
+      version.value
     );
   });
 
@@ -320,6 +406,19 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   const globalFrequency = computed(() => {
     if (globalCarrierFrequency.value === null) return null;
     return formatCarrierFrequency(globalCarrierFrequency.value);
+  });
+
+  // Format prevalence values for display
+  const geneticPrevalenceFormatted = computed(() => {
+    const gp = globalStats.value.geneticPrevalence;
+    if (gp === null) return null;
+    return formatPrevalence(gp);
+  });
+
+  const bayesianPrevalenceFormatted = computed(() => {
+    const bp = globalStats.value.bayesianPrevalence;
+    if (bp === null) return null;
+    return formatPrevalence(bp);
   });
 
   // Build full result object
@@ -341,6 +440,10 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
       minFrequency: freqs.length ? Math.min(...freqs) : null,
       maxFrequency: freqs.length ? Math.max(...freqs) : null,
       hasFounderEffect: hasFounderEffect.value,
+      geneticPrevalence: globalStats.value.geneticPrevalence,
+      bayesianPrevalence: globalStats.value.bayesianPrevalence,
+      formula: globalStats.value.formula,
+      homExclusionActive: globalStats.value.homExclusionActive,
     };
   });
 
@@ -371,6 +474,8 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     qualifyingVariantCount,
     hasFounderEffect,
     usingDefault,
+    geneticPrevalenceFormatted,
+    bayesianPrevalenceFormatted,
     variants: normalizedVariants,
     clinvarVariants: normalizedClinvar,
     filterConfig,
