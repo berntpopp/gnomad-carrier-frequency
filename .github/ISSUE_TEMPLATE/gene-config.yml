@@ -1,0 +1,142 @@
+name: Gene Config Submission
+description: Propose a new community-curated gene configuration for the carrier frequency calculator
+title: "[Gene Config]: "
+labels: ["gene-config", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to propose a new gene configuration. Gene configs set recommended
+        variant filters, disease penetrance, and condition metadata so the calculator
+        produces clinically appropriate carrier frequencies for a gene.
+
+        See the [contributing guide](https://github.com/berntpopp/gnomad-carrier-frequency/blob/main/configs/CONTRIBUTING.md)
+        for full schema documentation and examples.
+
+  - type: input
+    id: gene-symbol
+    attributes:
+      label: Gene symbol
+      description: HGNC gene symbol (uppercase).
+      placeholder: e.g. PAH, HEXA, GBA1
+    validations:
+      required: true
+
+  - type: input
+    id: condition
+    attributes:
+      label: Condition name
+      description: Primary disease or condition associated with this gene.
+      placeholder: e.g. Phenylketonuria, Tay-Sachs disease
+    validations:
+      required: true
+
+  - type: dropdown
+    id: inheritance
+    attributes:
+      label: Inheritance pattern
+      options:
+        - Autosomal recessive (AR)
+        - Autosomal dominant (AD)
+        - X-linked recessive (XLR)
+        - X-linked dominant (XLD)
+    validations:
+      required: true
+
+  - type: input
+    id: omim-id
+    attributes:
+      label: OMIM phenotype ID
+      description: "OMIM phenotype MIM number (not gene MIM). Example: 219700 for Cystic Fibrosis."
+      placeholder: e.g. 219700
+    validations:
+      required: false
+
+  - type: input
+    id: mondo-id
+    attributes:
+      label: MONDO ID
+      description: "MONDO disease identifier, if available."
+      placeholder: e.g. MONDO:0009061
+    validations:
+      required: false
+
+  - type: textarea
+    id: filter-recommendations
+    attributes:
+      label: Recommended filter settings
+      description: |
+        What variant filter settings should the calculator use for this gene?
+      placeholder: |
+        - Include LoF (loss-of-function) variants: yes/no
+        - Include ClinVar pathogenic/likely pathogenic: yes/no
+        - ClinVar review star threshold: 0, 1, or 2
+        - Include missense variants: yes/no
+    validations:
+      required: true
+
+  - type: input
+    id: penetrance
+    attributes:
+      label: Disease penetrance (%)
+      description: "Estimated penetrance as a percentage (e.g. 100 for fully penetrant, 3 for low-penetrance). If multiple condition profiles exist, list each."
+      placeholder: e.g. 100 (or Classic CF: 100, CFTR-RD: 3)
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-carrier-frequency
+    attributes:
+      label: Expected carrier frequency (literature reference)
+      description: "Published carrier frequency for a reference population, with PMID or citation."
+      placeholder: |
+        ~1:25 in European (NFE) population
+        Source: Heim et al. 2023 (PMID: 37310422)
+    validations:
+      required: false
+
+  - type: textarea
+    id: clinical-rationale
+    attributes:
+      label: Clinical rationale
+      description: Why are these filter settings appropriate for this gene? Include any gene-specific curation considerations.
+      placeholder: |
+        Explain why certain variants should be included/excluded,
+        what the ClinVar curation landscape looks like for this gene,
+        and any expert panel recommendations that apply.
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: PMIDs or citations supporting your recommendations (one per line).
+      placeholder: |
+        PMID: 37310422
+        PMID: 36535936
+    validations:
+      required: true
+
+  - type: dropdown
+    id: will-submit-pr
+    attributes:
+      label: Will you submit a PR with the JSON config file?
+      description: "You can submit the config file yourself (see contributing guide) or a maintainer can create it from this issue."
+      options:
+        - "Yes, I will submit a PR"
+        - "No, please create the config from this issue"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked that no config exists for this gene in [configs/genes/](https://github.com/berntpopp/gnomad-carrier-frequency/tree/main/configs/genes)
+          required: true
+        - label: I have clinical or research expertise relevant to this gene
+          required: true
+        - label: My recommendations are supported by published evidence
+          required: true
