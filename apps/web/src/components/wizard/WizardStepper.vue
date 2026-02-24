@@ -125,7 +125,7 @@
 <script setup lang="ts">
 import { watch } from 'vue';
 import { useDisplay } from 'vuetify';
-import { useWizard, useCarrierFrequency, useAppAnnouncer } from '@/composables';
+import { useWizard, useCarrierFrequency, useAppAnnouncer, useGeneConfig } from '@/composables';
 import StepGene from './StepGene.vue';
 import StepStatus from './StepStatus.vue';
 import StepFrequency from './StepFrequency.vue';
@@ -134,6 +134,10 @@ import StepResults from './StepResults.vue';
 // Responsive breakpoint detection for mobile-friendly stepper
 // xs: < 600px (phones), sm: 600-960px (tablets)
 const { smAndDown, xs } = useDisplay();
+
+// Initialize gene config watcher early so configs load as soon as a gene is selected,
+// before the user navigates to step 4 where FilterPanel renders.
+useGeneConfig();
 
 // Wizard state management
 const {
