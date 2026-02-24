@@ -67,6 +67,7 @@ export {
   encodeFilterFlags,
   decodeFilterFlags,
   filtersMatchDefaults,
+  calcMatchesDefaults,
 } from './url-state';
 
 export type {

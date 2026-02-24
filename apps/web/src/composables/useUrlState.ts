@@ -8,11 +8,14 @@ import {
   encodeFilterFlags,
   decodeFilterFlags,
   filtersMatchDefaults,
+  calcMatchesDefaults,
   FACTORY_FILTER_DEFAULTS,
+  FACTORY_CALC_DEFAULTS,
 } from '@gnomad-cf/core/types';
 import type { UrlState } from '@gnomad-cf/core/types';
 import { useWizard } from './useWizard';
 import { useFilterStore } from '@/stores/useFilterStore';
+import { useCalcStore } from '@/stores/useCalcStore';
 import { useGeneSearch } from './useGeneSearch';
 import { useExclusionState } from './useExclusionState';
 import { encodeExclusions, decodeExclusions } from '@gnomad-cf/core/utils';
@@ -50,6 +53,7 @@ export function useUrlState(): UseUrlStateReturn {
   // Get references to wizard state and stores
   const { state: wizardState } = useWizard();
   const filterStore = useFilterStore();
+  const calcStore = useCalcStore();
   const geneSearch = useGeneSearch();
   const { excluded, setExclusions, excludedCount } = useExclusionState();
 
@@ -164,6 +168,17 @@ export function useUrlState(): UseUrlStateReturn {
         console.warn(
           '[URL State] Some exclusions were not included in the shared URL due to length limits'
         );
+      }
+
+      // Restore calc settings if present in URL
+      if (urlState.hweFormula !== undefined) {
+        calcStore.setUseHWEFormula(urlState.hweFormula === '1');
+      }
+      if (urlState.homExclusion !== undefined) {
+        calcStore.setUseHomExclusion(urlState.homExclusion === '1');
+      }
+      if (urlState.penetrance !== undefined) {
+        calcStore.setPenetrance(urlState.penetrance);
       }
     }
   }
@@ -290,6 +305,36 @@ export function useUrlState(): UseUrlStateReturn {
       delete params.excl;
       delete params.exclWarn;
     }
+
+    // Calc settings (only if different from factory defaults)
+    const currentCalc = calcStore.defaults;
+    if (!calcMatchesDefaults(currentCalc)) {
+      // HWE formula (only if different from default: true = '1')
+      if (currentCalc.useHWEFormula !== FACTORY_CALC_DEFAULTS.useHWEFormula) {
+        params.hweFormula = currentCalc.useHWEFormula ? '1' : '0';
+      } else {
+        delete params.hweFormula;
+      }
+
+      // Homozygote exclusion (only if different from default: true = '1')
+      if (currentCalc.useHomExclusion !== FACTORY_CALC_DEFAULTS.useHomExclusion) {
+        params.homExclusion = currentCalc.useHomExclusion ? '1' : '0';
+      } else {
+        delete params.homExclusion;
+      }
+
+      // Penetrance (only if different from default: 1.0)
+      if (currentCalc.penetrance !== FACTORY_CALC_DEFAULTS.penetrance) {
+        params.penetrance = currentCalc.penetrance.toString();
+      } else {
+        delete params.penetrance;
+      }
+    } else {
+      // All defaults - remove all calc-related params
+      delete params.hweFormula;
+      delete params.homExclusion;
+      delete params.penetrance;
+    }
   }
 
   // Set up watchers to update URL when state changes
@@ -305,6 +350,12 @@ export function useUrlState(): UseUrlStateReturn {
     { deep: true }
   );
 
+  watch(
+    () => calcStore.defaults,
+    () => updateUrlFromState(),
+    { deep: true }
+  );
+
   watch(excluded, () => updateUrlFromState(), { deep: true });
 
   // On mount, check for URL state and restore if present
@@ -313,7 +364,10 @@ export function useUrlState(): UseUrlStateReturn {
     if (isInitialized.value) return;
 
     // Check if URL has any state parameters
-    const hasUrlState = ['gene', 'step', 'status', 'source', 'filters', 'excl'].some(
+    const hasUrlState = [
+      'gene', 'step', 'status', 'source', 'filters', 'excl',
+      'hweFormula', 'homExclusion', 'penetrance',
+    ].some(
       (k) => params[k] !== undefined && params[k] !== null && params[k] !== ''
     );
 

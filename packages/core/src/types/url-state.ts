@@ -2,6 +2,8 @@
 import { z } from 'zod';
 import type { FilterConfig } from './filter';
 import { FACTORY_FILTER_DEFAULTS } from './filter';
+import type { CalcConfig } from './calculations';
+import { FACTORY_CALC_DEFAULTS } from './calculations';
 
 /**
  * Zod schema for URL state parameters
@@ -46,6 +48,15 @@ export const UrlStateSchema = z.object({
 
   /** Warning flag if exclusions were truncated from URL (1=truncated) */
   exclWarn: z.enum(['0', '1']).optional(),
+
+  /** HWE formula: '0'=simplified 2*SumAF, '1'=HWE 2pq (default) */
+  hweFormula: z.enum(['0', '1']).optional(),
+
+  /** Homozygote exclusion: '0'=off, '1'=on/VCR-GCR (default) */
+  homExclusion: z.enum(['0', '1']).optional(),
+
+  /** Penetrance fraction 0.0-1.0 (default 1.0) */
+  penetrance: z.coerce.number().min(0).max(1).optional(),
 });
 
 /**
@@ -131,5 +142,20 @@ export function filtersMatchDefaults(config: FilterConfig): boolean {
     config.clinvarStarThreshold === FACTORY_FILTER_DEFAULTS.clinvarStarThreshold &&
     config.clinvarIncludeConflicting === FACTORY_FILTER_DEFAULTS.clinvarIncludeConflicting &&
     config.clinvarConflictingThreshold === FACTORY_FILTER_DEFAULTS.clinvarConflictingThreshold
+  );
+}
+
+/**
+ * Check if calc config matches factory defaults
+ * Used to determine if calc params should be included in URL
+ *
+ * @param config - Current calculation configuration
+ * @returns True if all calc settings match factory defaults
+ */
+export function calcMatchesDefaults(config: CalcConfig): boolean {
+  return (
+    config.useHWEFormula === FACTORY_CALC_DEFAULTS.useHWEFormula &&
+    config.useHomExclusion === FACTORY_CALC_DEFAULTS.useHomExclusion &&
+    config.penetrance === FACTORY_CALC_DEFAULTS.penetrance
   );
 }
