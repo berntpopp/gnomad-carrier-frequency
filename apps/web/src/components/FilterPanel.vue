@@ -11,10 +11,32 @@
             v-if="!isExpanded"
             :filters="modelValue"
           />
+          <v-chip
+            v-if="configLoaded"
+            color="info"
+            size="x-small"
+            prepend-icon="mdi-dna"
+            closable
+            @click:close="resetConfig"
+          >
+            Gene config loaded
+          </v-chip>
         </div>
       </v-expansion-panel-title>
 
       <v-expansion-panel-text>
+        <v-select
+          v-if="configLoaded && availableProfiles.length > 1"
+          :model-value="activeProfile?.profileId"
+          :items="availableProfiles.map(p => ({ title: p.displayName, value: p.profileId }))"
+          label="Condition profile"
+          density="compact"
+          variant="outlined"
+          hide-details
+          class="mb-3"
+          @update:model-value="selectProfile($event)"
+        />
+
         <v-row dense>
           <v-col
             cols="12"
@@ -439,6 +461,9 @@ import { ref, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import FilterChips from './FilterChips.vue';
 import type { FilterConfig, CalcConfig } from '@gnomad-cf/core/types';
+import { useGeneConfig } from '@/composables/useGeneConfig';
+
+const { configLoaded, activeProfile, availableProfiles, selectProfile, resetConfig } = useGeneConfig();
 
 const props = defineProps<{
   modelValue: FilterConfig;
