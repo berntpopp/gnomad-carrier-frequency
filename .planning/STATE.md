@@ -14,10 +14,10 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 26 of 29 (Calculation Improvements in Core) — COMPLETE
+**Phase:** 25 of 29 (Monorepo Foundation) — COMPLETE
 **Plan:** 5 of 5 in current phase
-**Status:** Phase complete, verified
-**Last activity:** 2026-02-24 — Phase 26 verified (5/5 must-haves passed)
+**Status:** Phase 25 complete, human verification passed
+**Last activity:** 2026-02-24 — Phase 25 verified via Playwright (CFTR wizard flow 1:17, 9 populations, clinical text, 0 errors)
 
 ### Progress
 
@@ -27,18 +27,18 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [██████░░░░] ~50% - Phase 26 complete (10/10 plans done in phases 25-26)
+v1.5 Core & CLI:    [█████░░░░░] ~50% - Phase 25 complete (5/5 plans done)
 ```
 
-**Overall:** 93 plans complete across 26 phases in 5 milestones.
+**Overall:** 88 plans complete across 25 phases in 5 milestones.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 93
-- v1.5 plans completed: 10
+- Total plans completed: 88
+- v1.5 plans completed: 5
 
 ---
 
@@ -87,27 +87,26 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** Phase 26 — all 5 plans executed, verified (5/5 must-haves passed, 130 core tests passing)
-**Status:** Phase 26 complete. Next: Phase 27 (CLI Package) or Phase 28 (Gene Config System)
+**Completed:** Phase 25 — all 5 plans executed, human verification passed
+**Status:** Phase 25 (Monorepo Foundation) complete. Next: Phase 26 (Calculation Improvements)
 
 ### Handoff Notes
 
 v1.5 scope: monorepo extraction, HWE 2pq + homozygote exclusion + genetic prevalence, full CLI, gene configs, comprehensive test suite.
 
-Phase 26 delivered:
-- packages/core/src/calculations/ — carrier-frequency.ts, homozygote-exclusion.ts, prevalence.ts (pure TS, 0 Vue deps)
-- packages/core/src/types/calculations.ts — CalcConfig, CalcResult, FACTORY_CALC_DEFAULTS
-- 130 core tests passing (43 golden-value calc tests + 55 variant filter tests + 32 template renderer tests)
-- GraphQL query fetches ac_hom at all 4 levels
-- useCalcStore Pinia store with localStorage persistence + URL state sync
-- useCarrierFrequency composable reactively wired to CalcConfig
-- FilterPanel: HWE toggle, hom exclusion toggle, penetrance slider
-- StepResults: genetic/Bayesian prevalence display, warning chip, population table prevalence column
-- Export metadata captures CalcConfig
+Phase 25 delivered:
+- Monorepo structure: packages/core (pure TS), apps/web (Vue 3), packages/cli (stub)
+- Core extraction: variant-filters, template-renderer, calculations (carrier frequency, homozygote exclusion, prevalence) all in @gnomad-cf/core
+- CLI stub: @gnomad-cf/cli with basic type structure
+- Web rewired: all imports use @gnomad-cf/core aliases via tsconfig paths
+- CI pipeline: monorepo-aware GitHub Actions with separate core/web build steps
+- Documentation: CLAUDE.md updated for monorepo architecture
+- Human verification: CFTR wizard flow verified end-to-end via Playwright (1:17 carrier frequency, 9 populations, clinical text, 0 console errors)
 
 Next phases:
-- Phase 27 (CLI) depends on Phase 26 ✓
-- Phase 28 (Gene Configs) depends on Phase 26 ✓ — can run in parallel with 27
+- Phase 26 (Calculation Improvements) builds on monorepo foundation
+- Phase 27 (CLI Package) depends on Phase 25 ✓
+- Phase 28 (Gene Configs) depends on Phase 25 ✓
 - Phase 29 (Test Suite) depends on 25, 26, 27, 28
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
@@ -128,9 +127,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *25-03 complete: 2026-02-24*
 *25-04 complete: 2026-02-24*
 *25-05 complete: 2026-02-24*
-*26-01 complete: 2026-02-24*
-*26-02 complete: 2026-02-24*
-*26-03 complete: 2026-02-24*
-*26-04 complete: 2026-02-24*
-*26-05 complete: 2026-02-24*
-*Phase 26 verified: 2026-02-24*
+*Phase 25 verified: 2026-02-24*
