@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 29 (Test Suite Completion) — COMPLETE (5/5 plans done)
+**Current focus:** v1.5 Phase 29 (Test Suite Completion) — Gap closure plans 29-06 complete
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 29 of 29 (Test Suite Completion) — COMPLETE (5/5 plans done)
-**Plan:** 29-05 of 5 in phase 29 — COMPLETE
-**Status:** 380 tests passing across 25 test files + CI pipeline with coverage. v1.5 MILESTONE COMPLETE.
-**Last activity:** 2026-02-24 — Completed 29-05: GitHub Actions tests workflow + coverage config for core/CLI/web
+**Phase:** 29 of 29 (Test Suite Completion) — Gap closure in progress
+**Plan:** 29-06 of 7 in phase 29 — COMPLETE
+**Status:** History restore E2E test added (Gap 1 closed). 380+ tests + history restore E2E.
+**Last activity:** 2026-02-24 — Completed 29-06: History restore E2E test (apps/web/e2e/history-restore.spec.ts)
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [##########] 100% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 5/5 COMPLETE
+v1.5 Core & CLI:    [##########] 100% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 5/5 + gap closure 29-06 COMPLETE
 ```
 
-**Overall:** 107 plans complete across 29 phases in 5 milestones.
+**Overall:** 108 plans complete across 29 phases in 5 milestones.
 
 ---
 
@@ -126,6 +126,8 @@ Recent decisions for v1.5 (continued):
 - E2E gated to pull_request events targeting main — avoids playwright install overhead on every push (29-05)
 - playwright.config.ts uses isCI flag to switch between preview:4173 in CI and dev:5173 locally (29-05)
 - tests.yml is additive to ci.yml — tests-only workflow, ci.yml keeps lint/typecheck/build (29-05)
+- History restore E2E: stronger approach (reload page after Step 4 then restore) more convincingly proves cross-page-load persistence (29-06)
+- Route handlers re-registered after page.goto() — each navigation creates new interception context (29-06)
 
 ### Pending Todos
 
@@ -142,8 +144,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** Plan 29-05 — GitHub Actions tests workflow + v8 coverage config for all 3 packages. v1.5 COMPLETE.
-**Status:** Phase 29 complete (5/5). 380 tests passing. CI pipeline with per-package coverage and E2E gated to PRs to main. v1.5 milestone fully complete.
+**Completed:** Plan 29-06 — History restore E2E test (apps/web/e2e/history-restore.spec.ts). Gap 1 from 29-VERIFICATION.md closed.
+**Status:** 29-06 complete. History restore E2E verifies full HistoryDrawer restore flow. TEST-10 fully covered at E2E level.
 **Resume file:** None
 
 ### Handoff Notes
