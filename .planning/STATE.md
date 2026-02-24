@@ -48,7 +48,7 @@ v1.5 Core & CLI:    [█████████░] ~75% - Phase 28 Plan 2/4 co
 
 See PROJECT.md Key Decisions table for full history.
 
-Recent decisions for v1.5:
+Recent decisions for v1.5 (continued):
 - Monorepo with bun workspaces (packages/core, packages/cli, apps/web) — core logic reusable across CLI + web + tests
 - tsdown v0.20.x for library bundling (tsup successor, pin exact version — pre-1.0)
 - Calculation tests written alongside formula changes (not deferred to Phase 29)
@@ -91,6 +91,9 @@ Recent decisions for v1.5:
 - ClinVar star threshold 2 for Classic CF (expert panel level), 1 for CFTR-RD/HEXA/GJB2 — reflects clinical evidence hierarchy (28-02)
 - CFTR-RD penetrance 0.03 — empirically supported reduced penetrance for CFTR-related disorders (28-02)
 - Bun native TS execution for CI scripts — validation script imports schema source directly, no build step (28-02)
+- CLI-13 stub: --config flag prints deferral message to stderr and continues with defaults (not exit 1) (27-04)
+- gnomadVersion CLI flag remapped to 'version' key before mergeConfig — matches mergeConfig expected key (27-04)
+- filterConfig overrides applied post-mergeConfig for --lof/--no-lof — ensures CLI flags win over user config (27-04)
 
 ### Pending Todos
 
@@ -150,3 +153,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *27-03 complete: 2026-02-24*
 *28-01 complete: 2026-02-24*
 *28-02 complete: 2026-02-24*
+*27-04 complete: 2026-02-24*
