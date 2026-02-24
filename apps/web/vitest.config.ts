@@ -6,9 +6,11 @@ export default defineConfig({
   plugins: [vue()],
   test: {
     name: 'web',
-    environment: 'jsdom',
+    environment: 'happy-dom',
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.ts'],
+    // Mock CSS imports — Vuetify components import CSS files that vitest cannot transform
+    css: true,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json'],

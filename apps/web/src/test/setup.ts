@@ -1,20 +1,20 @@
 import { beforeAll, vi } from 'vitest'
 import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
-import 'vuetify/styles'
 
-export const vuetify = createVuetify({ components, directives })
+// Create a minimal Vuetify instance without pre-importing all components+directives.
+// This avoids triggering CSS imports from vuetify/components at module load time.
+// Component tests that need specific components can register them via global.components.
+export const vuetify = createVuetify()
 
 beforeAll(() => {
-  // Mock ResizeObserver — not available in jsdom
+  // Mock ResizeObserver — not available in happy-dom/jsdom
   global.ResizeObserver = vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn(),
   }))
 
-  // Mock matchMedia — not available in jsdom
+  // Mock matchMedia — not available in happy-dom/jsdom
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: vi.fn().mockImplementation((query: string) => ({
