@@ -1,0 +1,177 @@
+{
+  "data": {
+    "gene": {
+      "gene_id": "ENSG00000001626",
+      "symbol": "CFTR",
+      "variants": [
+        {
+          "variant_id": "7-117559593-ATCT-A",
+          "pos": 117559593,
+          "ref": "ATCT",
+          "alt": "A",
+          "exome": {
+            "ac": 1200,
+            "an": 250000,
+            "ac_hom": 5,
+            "populations": [
+              { "id": "nfe", "ac": 800, "an": 150000, "ac_hom": 3 },
+              { "id": "asj", "ac": 200, "an": 10000, "ac_hom": 1 },
+              { "id": "afr", "ac": 50, "an": 40000, "ac_hom": 0 },
+              { "id": "amr", "ac": 80, "an": 25000, "ac_hom": 0 },
+              { "id": "eas", "ac": 5, "an": 15000, "ac_hom": 0 },
+              { "id": "sas", "ac": 10, "an": 8000, "ac_hom": 0 },
+              { "id": "fin", "ac": 55, "an": 2000, "ac_hom": 1 }
+            ]
+          },
+          "genome": {
+            "ac": 300,
+            "an": 80000,
+            "ac_hom": 1,
+            "populations": [
+              { "id": "nfe", "ac": 200, "an": 50000, "ac_hom": 1 },
+              { "id": "asj", "ac": 50, "an": 3000, "ac_hom": 0 },
+              { "id": "afr", "ac": 20, "an": 15000, "ac_hom": 0 },
+              { "id": "amr", "ac": 20, "an": 8000, "ac_hom": 0 },
+              { "id": "eas", "ac": 2, "an": 4000, "ac_hom": 0 },
+              { "id": "sas", "ac": 3, "an": 2000, "ac_hom": 0 },
+              { "id": "fin", "ac": 5, "an": 500, "ac_hom": 0 }
+            ]
+          },
+          "transcript_consequence": {
+            "gene_symbol": "CFTR",
+            "transcript_id": "ENST00000003084",
+            "canonical": true,
+            "consequence_terms": ["frameshift_variant"],
+            "lof": "HC",
+            "lof_filter": null,
+            "lof_flags": null,
+            "hgvsc": "c.1521_1523delCTT",
+            "hgvsp": "p.Phe508del"
+          }
+        },
+        {
+          "variant_id": "7-117548628-G-A",
+          "pos": 117548628,
+          "ref": "G",
+          "alt": "A",
+          "exome": {
+            "ac": 120,
+            "an": 250000,
+            "ac_hom": 1,
+            "populations": [
+              { "id": "nfe", "ac": 90, "an": 150000, "ac_hom": 1 },
+              { "id": "asj", "ac": 15, "an": 10000, "ac_hom": 0 },
+              { "id": "afr", "ac": 5, "an": 40000, "ac_hom": 0 },
+              { "id": "amr", "ac": 5, "an": 25000, "ac_hom": 0 },
+              { "id": "eas", "ac": 0, "an": 15000, "ac_hom": 0 },
+              { "id": "sas", "ac": 2, "an": 8000, "ac_hom": 0 },
+              { "id": "fin", "ac": 3, "an": 2000, "ac_hom": 0 }
+            ]
+          },
+          "genome": {
+            "ac": 40,
+            "an": 80000,
+            "ac_hom": 0,
+            "populations": [
+              { "id": "nfe", "ac": 30, "an": 50000, "ac_hom": 0 },
+              { "id": "asj", "ac": 5, "an": 3000, "ac_hom": 0 },
+              { "id": "afr", "ac": 2, "an": 15000, "ac_hom": 0 },
+              { "id": "amr", "ac": 2, "an": 8000, "ac_hom": 0 },
+              { "id": "eas", "ac": 0, "an": 4000, "ac_hom": 0 },
+              { "id": "sas", "ac": 1, "an": 2000, "ac_hom": 0 },
+              { "id": "fin", "ac": 0, "an": 500, "ac_hom": 0 }
+            ]
+          },
+          "transcript_consequence": {
+            "gene_symbol": "CFTR",
+            "transcript_id": "ENST00000003084",
+            "canonical": true,
+            "consequence_terms": ["missense_variant"],
+            "lof": null,
+            "lof_filter": null,
+            "lof_flags": null,
+            "hgvsc": "c.1624G>T",
+            "hgvsp": "p.Gly542X"
+          }
+        },
+        {
+          "variant_id": "7-117531061-A-G",
+          "pos": 117531061,
+          "ref": "A",
+          "alt": "G",
+          "exome": {
+            "ac": 8,
+            "an": 250000,
+            "ac_hom": 0,
+            "populations": [
+              { "id": "nfe", "ac": 5, "an": 150000, "ac_hom": 0 },
+              { "id": "asj", "ac": 0, "an": 10000, "ac_hom": 0 },
+              { "id": "afr", "ac": 2, "an": 40000, "ac_hom": 0 },
+              { "id": "amr", "ac": 1, "an": 25000, "ac_hom": 0 },
+              { "id": "eas", "ac": 0, "an": 15000, "ac_hom": 0 },
+              { "id": "sas", "ac": 0, "an": 8000, "ac_hom": 0 },
+              { "id": "fin", "ac": 0, "an": 2000, "ac_hom": 0 }
+            ]
+          },
+          "genome": {
+            "ac": 2,
+            "an": 80000,
+            "ac_hom": 0,
+            "populations": [
+              { "id": "nfe", "ac": 1, "an": 50000, "ac_hom": 0 },
+              { "id": "asj", "ac": 0, "an": 3000, "ac_hom": 0 },
+              { "id": "afr", "ac": 1, "an": 15000, "ac_hom": 0 },
+              { "id": "amr", "ac": 0, "an": 8000, "ac_hom": 0 },
+              { "id": "eas", "ac": 0, "an": 4000, "ac_hom": 0 },
+              { "id": "sas", "ac": 0, "an": 2000, "ac_hom": 0 },
+              { "id": "fin", "ac": 0, "an": 500, "ac_hom": 0 }
+            ]
+          },
+          "transcript_consequence": {
+            "gene_symbol": "CFTR",
+            "transcript_id": "ENST00000003084",
+            "canonical": true,
+            "consequence_terms": ["missense_variant"],
+            "lof": null,
+            "lof_filter": null,
+            "lof_flags": null,
+            "hgvsc": "c.1009C>T",
+            "hgvsp": "p.Arg337Ter"
+          }
+        }
+      ],
+      "clinvar_variants": [
+        {
+          "variant_id": "7-117559593-ATCT-A",
+          "clinvar_variation_id": "7105",
+          "clinical_significance": "Pathogenic",
+          "gold_stars": 4,
+          "review_status": "reviewed by expert panel",
+          "pos": 117559593,
+          "ref": "ATCT",
+          "alt": "A"
+        },
+        {
+          "variant_id": "7-117548628-G-A",
+          "clinvar_variation_id": "53482",
+          "clinical_significance": "Pathogenic",
+          "gold_stars": 3,
+          "review_status": "reviewed by expert panel",
+          "pos": 117548628,
+          "ref": "G",
+          "alt": "A"
+        },
+        {
+          "variant_id": "7-117531061-A-G",
+          "clinvar_variation_id": "99999",
+          "clinical_significance": "Uncertain significance",
+          "gold_stars": 1,
+          "review_status": "criteria provided, single submitter",
+          "pos": 117531061,
+          "ref": "A",
+          "alt": "G"
+        }
+      ]
+    }
+  }
+}

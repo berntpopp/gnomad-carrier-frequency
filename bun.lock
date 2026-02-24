@@ -53,7 +53,7 @@
       "name": "@gnomad-cf/cli",
       "version": "1.5.0",
       "bin": {
-        "gnomad-cf": "dist/cli.js",
+        "gnomad-cf": "dist/cli.mjs",
       },
       "dependencies": {
         "@clack/prompts": "^1.0.1",
@@ -64,6 +64,7 @@
       "devDependencies": {
         "tsdown": "0.20.3",
         "typescript": "~5.9.3",
+        "vitest": "^3.2.0",
       },
     },
     "packages/core": {
