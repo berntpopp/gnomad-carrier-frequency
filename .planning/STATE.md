@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 27 — CLI Package (in progress)
+**Current focus:** v1.5 Phase 28 — Gene Config System (in progress)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 27 of 29 (CLI Package) — In progress
-**Plan:** 2 of 5 in current phase — COMPLETE
-**Status:** 27-02 complete — Gene query pipeline, withRetry, population aliases, user config loader
-**Last activity:** 2026-02-24 — Completed 27-02-PLAN.md (CLI pipeline utilities)
+**Phase:** 28 of 29 (Gene Config System) — In progress
+**Plan:** 1 of 4 in current phase — COMPLETE
+**Status:** 28-01 complete — GeneConfigSchema (Zod v4), platform-neutral loader, @gnomad-cf/core/gene-config subpath, 24 passing tests
+**Last activity:** 2026-02-24 — Completed 28-01-PLAN.md (gene-config module)
 
 ### Progress
 
@@ -27,7 +27,7 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [███████░░░] ~60% - Phase 27 Plan 2/5 complete
+v1.5 Core & CLI:    [████████░░] ~70% - Phase 28 Plan 1/4 complete
 ```
 
 **Overall:** 89 plans complete across 26 phases in 5 milestones.
@@ -80,6 +80,13 @@ Recent decisions for v1.5:
 - 429 rate limit errors not counted toward retry limit — dedicated always-retry path separate from transient 5xx retries (27-02)
 - Genetic prevalence always q^2 from raw globalSumAF — matches core convention, never derived from carrier frequency (27-02)
 - zod not added to CLI package.json — already a hoisted workspace dep from packages/core (27-02)
+- loadTemplateContent added to @gnomad-cf/core/templates (not CLI-local) — reusable by any consumer; node: built-ins are external in neutral core build, resolved by Node.js at runtime (27-03)
+- formatJson pretty:true by default — CLI output is human-friendly; machine processing can use jq (27-03)
+- Population Bayesian prevalence computed inline in formatters as geneticPrevalence * penetrance — not stored separately in PopulationFrequency (27-03)
+- Clinical formatter defaults: carrier perspective, * gender style, neutral patient sex (27-03)
+- FilterConfigOverrideSchema defined independently in schema.ts — avoids circular imports between tsdown entry points (28-01)
+- Gene config registry keys stored uppercase; loadGeneConfig normalizes with toUpperCase() for case-insensitive lookup (28-01)
+- Platform loader uses module-level variable injection — simple and sufficient for CLI fs use (28-01)
 
 ### Pending Todos
 
@@ -96,8 +103,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 27-02 — CLI pipeline utilities (queryGene, withRetry, population aliases, user config)
-**Status:** Phase 27 Plan 2 complete. Next: Plan 3 (formatters) and Plan 4 (batch command) — Wave 2 continuation
+**Completed:** 27-03 — Output formatters (text/JSON/TSV/clinical) + loadTemplateContent in core
+**Status:** Phase 27 Plan 3 complete. Next: Plan 4 (batch command) and Plan 5 (integration + CI)
 **Resume file:** None
 
 ### Handoff Notes
@@ -144,3 +151,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *Phase 25 verified: 2026-02-24*
 *27-01 complete: 2026-02-24*
 *27-02 complete: 2026-02-24*
+*27-03 complete: 2026-02-24*
