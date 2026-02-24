@@ -103,32 +103,25 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 27-03 — Output formatters (text/JSON/TSV/clinical) + loadTemplateContent in core
-**Status:** Phase 27 Plan 3 complete. Next: Plan 4 (batch command) and Plan 5 (integration + CI)
+**Completed:** 28-01 — GeneConfigSchema (Zod v4), platform-neutral loader with registry + injectable fs loader, @gnomad-cf/core/gene-config subpath, 24 passing unit tests
+**Status:** Phase 28 Plan 1 complete. Next: Plan 2 (seed gene configs CFTR/HEXA), Plan 3 (web auto-apply), Plan 4 (CI validation)
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.5 scope: monorepo extraction, HWE 2pq + homozygote exclusion + genetic prevalence, full CLI, gene configs, comprehensive test suite.
 
-Phase 27 Plan 01 delivered:
-- @gnomad-cf/cli workspace package with commander, @clack/prompts, p-limit
-- tsdown build: dist/cli.mjs with #!/usr/bin/env node shebang
-- gnomad-cf --version prints 1.5.0; gnomad-cf --help prints usage
-- packages/cli/src/types.ts: QueryResult, VariantDetail, QueryOptions interfaces
-- Root build:cli script and CLI added to main build chain
-- bun install resolves all workspace + npm dependencies
+Phase 28 Plan 01 delivered:
+- packages/core/src/gene-config/schema.ts: GeneConfigSchema, ConditionProfileSchema, DiseaseIdentifierSchema, FilterConfigOverrideSchema (Zod v4)
+- packages/core/src/gene-config/loader.ts: registry Map, registerGeneConfig, setPlatformLoader, loadGeneConfig (case-insensitive), getRegisteredGenes
+- packages/core/src/gene-config/index.ts: barrel re-export
+- @gnomad-cf/core/gene-config subpath: tsdown entry + package.json exports map + dist/gene-config.js verified
+- 24 passing unit tests covering all constraints and loader behaviors
 
-Phase 27 Plan 02 delivered:
-- packages/cli/src/utils/retry.ts: withRetry<T> with exponential backoff + 500ms jitter + 429/4xx/5xx classification
-- packages/cli/src/utils/population-aliases.ts: POPULATION_ALIASES Map, resolvePopulation(), getPopulationOptions()
-- packages/cli/src/utils/gene-query.ts: queryGene() full pipeline + searchGenes(); QueryResult from ../types.js
-- packages/cli/src/config/user-config.ts: Zod-strict schema, loadUserConfig(), mergeConfig() with priority merge
-
-Next plans in Phase 27:
-- 27-03: formatters (table, JSON, TSV output; imports QueryResult from types.ts)
-- 27-04: batch command (multi-gene CSV input, p-limit concurrency, uses queryGene)
-- 27-05: integration + CI
+Next plans in Phase 28:
+- 28-02: Seed gene config JSON files (CFTR, HEXA) registered via registerGeneConfig
+- 28-03: Web auto-apply — load gene config in wizard, pre-populate filter overrides
+- 28-04: CI validation script using GeneConfigSchema.safeParse
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
 Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
@@ -152,3 +145,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *27-01 complete: 2026-02-24*
 *27-02 complete: 2026-02-24*
 *27-03 complete: 2026-02-24*
+*28-01 complete: 2026-02-24*
