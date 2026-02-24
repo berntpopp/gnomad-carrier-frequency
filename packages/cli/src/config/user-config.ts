@@ -72,7 +72,7 @@ export async function loadUserConfig(): Promise<UserConfig> {
   if (!result.success) {
     process.stderr.write(
       `[gnomad-cf] Warning: ~/.gnomad-cf.json validation failed — using defaults\n` +
-        result.error.errors
+        result.error.issues
           .map((e) => `  ${e.path.join('.')}: ${e.message}`)
           .join('\n') +
         '\n'

@@ -107,13 +107,13 @@ export const queryCommand = new Command('query')
       // Commander sets boolean negatable flags: --lof -> true, --no-lof -> false
       const filterConfig = { ...merged.filterConfig }
       if (typeof opts['lof'] === 'boolean') {
-        filterConfig.includeLofHC = opts['lof']
+        filterConfig.lofHcEnabled = opts['lof']
       }
       if (typeof opts['clinvar'] === 'boolean') {
-        filterConfig.includeClinvarPathogenic = opts['clinvar']
+        filterConfig.clinvarEnabled = opts['clinvar']
       }
       if (typeof opts['starThreshold'] === 'number') {
-        filterConfig.clinvarMinStars = opts['starThreshold']
+        filterConfig.clinvarStarThreshold = opts['starThreshold']
       }
 
       // Query gnomAD

@@ -23,6 +23,8 @@ import {
   calculateSimplifiedCarrierFrequency,
   calculateGCR,
   calculateVCR,
+  calculateGeneticPrevalence,
+  calculateBayesianPrevalence,
 } from '@gnomad-cf/core/calculations'
 import {
   getDatasetId,
@@ -85,9 +87,17 @@ export async function queryGene(gene: string, opts: QueryOptions): Promise<Query
 
   const { variants, clinvar_variants } = geneData
 
+  // Normalize GeneVariant (null exome/genome) to GnomadVariant (undefined exome/genome)
+  // gnomAD API returns null for missing data; core filter functions expect undefined
+  const normalizedVariants = variants.map((v) => ({
+    ...v,
+    exome: v.exome ?? undefined,
+    genome: v.genome ?? undefined,
+  }))
+
   // 4. Filter to pathogenic variants
   const pathogenic = filterPathogenicVariantsConfigurable(
-    variants,
+    normalizedVariants,
     clinvar_variants,
     opts.filterConfig,
     new Map()
@@ -242,9 +252,12 @@ function computeGlobalStats(
   }
 
   // Genetic prevalence: always q^2 from raw sumAF (never from carrier frequency)
-  const geneticPrevalence = globalSumAF > 0 ? globalSumAF * globalSumAF : null
+  // Delegated to core functions for single source of truth
+  const geneticPrevalence = globalSumAF > 0 ? calculateGeneticPrevalence([globalSumAF]) : null
   const bayesianPrevalence =
-    geneticPrevalence !== null ? geneticPrevalence * calcConfig.penetrance : null
+    geneticPrevalence !== null && geneticPrevalence > 0
+      ? calculateBayesianPrevalence(geneticPrevalence, calcConfig.penetrance)
+      : null
 
   return {
     globalSumAF,

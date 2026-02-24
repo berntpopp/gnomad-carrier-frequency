@@ -77,7 +77,7 @@ export async function runInteractive(): Promise<void> {
     message: 'Enter a gene symbol:',
     placeholder: 'e.g. CFTR, HEXA, GJB2',
     validate: (v) => {
-      if (v.trim().length < 1) return 'Gene symbol required'
+      if (!v || v.trim().length < 1) return 'Gene symbol required'
       if (!/^[A-Za-z0-9_.-]+$/.test(v.trim())) return 'Invalid gene symbol'
     },
   })
@@ -217,7 +217,7 @@ export async function runInteractive(): Promise<void> {
       message: 'Penetrance (0–1, e.g. 0.85 for 85%):',
       placeholder: String(penetrance),
       validate: (v) => {
-        const n = parseFloat(v)
+        const n = parseFloat(v ?? '')
         if (isNaN(n) || n < 0 || n > 1) return 'Enter a number between 0 and 1'
       },
     })

@@ -152,10 +152,10 @@ export const batchCommand = new Command('batch')
     const merged = mergeConfig(userConfig, cliFlags)
 
     // Apply LoF / ClinVar / star-threshold CLI flags (override FilterConfig)
-    if (opts['lof'] !== undefined) merged.filterConfig.includeLofHC = Boolean(opts['lof'])
-    if (opts['clinvar'] !== undefined) merged.filterConfig.includeClinvar = Boolean(opts['clinvar'])
+    if (opts['lof'] !== undefined) merged.filterConfig.lofHcEnabled = Boolean(opts['lof'])
+    if (opts['clinvar'] !== undefined) merged.filterConfig.clinvarEnabled = Boolean(opts['clinvar'])
     if (opts['starThreshold'] !== undefined) {
-      merged.filterConfig.minClinvarStars = Number(opts['starThreshold'])
+      merged.filterConfig.clinvarStarThreshold = Number(opts['starThreshold'])
     }
 
     // Resolve optional population filter
