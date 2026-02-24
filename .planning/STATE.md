@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 30 (CLI Integration Fixes) — Gap closure phase from milestone audit
+**Current focus:** v1.5 COMPLETE — All milestone audit gaps closed
 
 ---
 
 ## Current Position
 
-**Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 30 of 30 (CLI Integration Fixes) — PLANNED
-**Plan:** 30-01 — Not yet planned
-**Status:** Phase 30 added from milestone audit gap closure. 3 integration issues + 1 broken flow to fix.
-**Last activity:** 2026-02-24 — Added Phase 30 from v1.5-MILESTONE-AUDIT.md gap closure
+**Milestone:** v1.5 Core Extraction & CLI — COMPLETE
+**Phase:** 30 of 30 (CLI Integration Fixes) — COMPLETE
+**Plan:** 30-01 — COMPLETE
+**Status:** All v1.5 audit gaps closed. FilterConfig field names fixed, CLI typecheck added, prevalence delegated to core, filter-effect test added.
+**Last activity:** 2026-02-24 — Completed 30-01-PLAN.md
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [#########-] 95% - Phases 25-29 complete, Phase 30 (audit gap closure) planned
+v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-24 (Phase 30 audit gaps closed)
 ```
 
-**Overall:** 111 plans complete across 30 phases in 6 milestones.
+**Overall:** 112 plans complete across 30 phases in 6 milestones.
 
 ---
 
@@ -130,6 +130,11 @@ Recent decisions for v1.5 (continued):
 - tests.yml is additive to ci.yml — tests-only workflow, ci.yml keeps lint/typecheck/build (29-05)
 - History restore E2E: stronger approach (reload page after Step 4 then restore) more convincingly proves cross-page-load persistence (29-06)
 - Route handlers re-registered after page.goto() — each navigation creates new interception context (29-06)
+- FilterConfig correct property names: lofHcEnabled, clinvarEnabled, clinvarStarThreshold — NOT includeLofHC/includeClinvarPathogenic/clinvarMinStars (30-01)
+- Root typecheck must include all 3 packages: tsc --build packages/core && tsc --build packages/cli && bun run --filter gnomad-cf-web typecheck (30-01)
+- ZodError.errors is deprecated in Zod v3 — use .issues instead (30-01)
+- GeneVariant.exome is null | GeneVariantExomeGenome; normalize with v.exome ?? undefined before passing to functions expecting GnomadVariant[] (30-01)
+- clack prompt validate callback receives string | undefined — always guard with !v || before calling string methods (30-01)
 
 ### Pending Todos
 
@@ -146,8 +151,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** Plan 29-07 — Real vitest coverage thresholds (core: 90, CLI: 80, web: 40) + CI continue-on-error. Gap 2 from 29-VERIFICATION.md closed.
-**Status:** ALL gap closure plans complete. Both VERIFICATION.md gaps closed. Phase 29 fully done. v1.5 milestone complete.
+**Completed:** Plan 30-01 — CLI FilterConfig field names fixed, CLI added to root typecheck, prevalence delegated to core, filter-effect integration test added. All v1.5 milestone audit gaps closed.
+**Status:** v1.5 FULLY COMPLETE. 112 plans across 30 phases. All audit gaps closed.
 **Resume file:** None
 
 ### Handoff Notes
@@ -213,3 +218,6 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *29-06 complete: 2026-02-24*
 *29-07 complete: 2026-02-24*
 *Phase 29 gap closure verified: 2026-02-24*
+*30-01 complete: 2026-02-24*
+*Phase 30 complete: 2026-02-24*
+*v1.5 milestone audit gaps closed: 2026-02-24*
