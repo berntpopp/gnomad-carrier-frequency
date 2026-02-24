@@ -157,8 +157,8 @@ Plans:
 - [x] 29-03-PLAN.md — Settings and chrome component tests (FilterPanel, AppBar, VersionSelector, SettingsDialog, TemplateEditor)
 - [x] 29-04-PLAN.md — Playwright E2E tests (CFTR wizard happy path, URL state roundtrip)
 - [x] 29-05-PLAN.md — CI pipeline workflow with coverage reporting and thresholds
-- [ ] 29-06-PLAN.md — Gap closure: History restore E2E test (TEST-10)
-- [ ] 29-07-PLAN.md — Gap closure: Set real coverage thresholds with warn-only CI (TEST-12)
+- [x] 29-06-PLAN.md — Gap closure: History restore E2E test (TEST-10)
+- [x] 29-07-PLAN.md — Gap closure: Set real coverage thresholds with warn-only CI (TEST-12)
 
 ---
 
@@ -177,10 +177,10 @@ Plans:
 | 26. Calculation Improvements in Core | v1.5 | 5/5 | Complete | 2026-02-24 |
 | 27. CLI Package | v1.5 | 7/7 | Complete | 2026-02-24 |
 | 28. Gene Config System | v1.5 | 4/4 | Complete | 2026-02-24 |
-| 29. Test Suite Completion & Web App Validation | v1.5 | 5/7 | Gap closure | - |
+| 29. Test Suite Completion & Web App Validation | v1.5 | 7/7 | Complete | 2026-02-24 |
 
-**Total:** 109 plans complete across 29 phases in 5 milestones. v1.5 in progress (Phase 29 gap closure).
+**Total:** 111 plans complete across 29 phases in 6 milestones. v1.5 complete.
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-24 (Phase 29 gap closure: 2 plans in wave 1)*
+*Last updated: 2026-02-24 (Phase 29 gap closure complete: 7/7 plans, all verified)*

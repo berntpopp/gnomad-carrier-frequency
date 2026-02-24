@@ -69,10 +69,10 @@
 - [ ] **TEST-06**: Core package unit tests for template renderer (variable substitution, perspective, gender)
 - [x] **TEST-07**: Core package unit tests for gene config loading and validation
 - [ ] **TEST-08**: CLI integration tests (single gene, batch mode, format flags, error handling)
-- [ ] **TEST-09**: Web app component tests with Vue Test Utils (wizard steps, settings, results display)
-- [ ] **TEST-10**: Playwright E2E tests for critical flows (wizard completion, URL sharing, history restore)
-- [ ] **TEST-11**: CI pipeline runs all tests on push/PR with coverage reporting
-- [ ] **TEST-12**: Coverage thresholds enforced (core: 90%+, CLI: 80%+, web: 60%+)
+- [x] **TEST-09**: Web app component tests with Vue Test Utils (wizard steps, settings, results display)
+- [x] **TEST-10**: Playwright E2E tests for critical flows (wizard completion, URL sharing, history restore)
+- [x] **TEST-11**: CI pipeline runs all tests on push/PR with coverage reporting
+- [x] **TEST-12**: Coverage thresholds enforced (core: 90%+, CLI: 80%+, web: 60%+)
 
 ## Future Requirements (v1.6+)
 
@@ -155,10 +155,10 @@
 | TEST-06 | Phase 26 | Complete |
 | TEST-07 | Phase 28 | Complete |
 | TEST-08 | Phase 27 | Complete |
-| TEST-09 | Phase 29 | Pending |
-| TEST-10 | Phase 29 | Pending |
-| TEST-11 | Phase 29 | Pending |
-| TEST-12 | Phase 29 | Pending |
+| TEST-09 | Phase 29 | Complete |
+| TEST-10 | Phase 29 | Complete |
+| TEST-11 | Phase 29 | Complete |
+| TEST-12 | Phase 29 | Complete |
 
 **Coverage:**
 - v1.5 requirements: 54 total
@@ -167,4 +167,4 @@
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-24 (Phase 28 requirements marked Complete: 7 GENE + 1 TEST = 8 requirements)*
+*Last updated: 2026-02-24 (Phase 29 requirements marked Complete: TEST-09, TEST-10, TEST-11, TEST-12)*

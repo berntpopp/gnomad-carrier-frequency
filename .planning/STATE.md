@@ -16,7 +16,7 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 **Milestone:** v1.5 Core Extraction & CLI
 **Phase:** 29 of 29 (Test Suite Completion) — FULLY COMPLETE (7/7 plans including gap closures)
 **Plan:** 29-07 of 7 in phase 29 — COMPLETE
-**Status:** All gaps closed. Coverage thresholds enforced (vitest) + warn-only in CI (continue-on-error). 380+ tests.
+**Status:** All gaps closed and verified (4/4 must-haves). Coverage thresholds enforced (vitest) + warn-only in CI. 380+ tests. Phase 29 VERIFIED.
 **Last activity:** 2026-02-24 — Completed 29-07: Real vitest coverage thresholds + CI continue-on-error (Gap 2 closed)
 
 ### Progress
@@ -30,7 +30,7 @@ v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 7/7 COMPLETE (incl. gap closure 29-06 + 29-07)
 ```
 
-**Overall:** 109 plans complete across 29 phases in 5 milestones.
+**Overall:** 111 plans complete across 29 phases in 6 milestones.
 
 ---
 
@@ -212,4 +212,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *v1.5 milestone complete: 2026-02-24*
 *29-06 complete: 2026-02-24*
 *29-07 complete: 2026-02-24*
-*Phase 29 gap closure complete: 2026-02-24*
+*Phase 29 gap closure verified: 2026-02-24*
