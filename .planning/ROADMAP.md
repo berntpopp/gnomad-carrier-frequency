@@ -7,7 +7,7 @@
 - **v1.2 Sharing** - Phases 11-15 (shipped 2026-01-20)
 - **v1.3 Documentation Site** - Phases 16-20 (shipped 2026-02-23)
 - **v1.4 Discoverability & Polish** - Phases 21-24 (shipped 2026-02-23)
-- **v1.5 Core Extraction & CLI** - Phases 25-29 (in progress)
+- **v1.5 Core Extraction & CLI** - Phases 25-30 (in progress)
 
 ## Phases
 
@@ -162,9 +162,27 @@ Plans:
 
 ---
 
+#### Phase 30: CLI Integration Fixes
+
+**Goal**: The CLI filter flags (`--lof`, `--no-lof`, `--clinvar`, `--no-clinvar`, `--star-threshold`) correctly modify variant filtering behavior, the root typecheck covers all packages, and CLI prevalence math delegates to core functions — closing all gaps identified by the v1.5 milestone audit.
+**Depends on**: Phase 27, Phase 29
+**Requirements**: (gap closure — no new requirements)
+**Gap Closure**: Closes all 3 integration issues + 1 broken flow from v1.5-MILESTONE-AUDIT.md
+**Success Criteria** (what must be TRUE):
+  1. `gnomad-cf query CFTR --no-lof` produces different output than `gnomad-cf query CFTR` — LoF variants are excluded when flag is passed
+  2. `bun run typecheck` at repo root type-checks packages/core, packages/cli, AND apps/web — a type error in CLI code fails the root typecheck
+  3. CLI `gene-query.ts` calls `calculateGeneticPrevalence()` and `calculateBayesianPrevalence()` from `@gnomad-cf/core/calculations` instead of inline math
+  4. A new CLI integration test asserts that filter flags change the variant filtering behavior on fixture data
+**Plans**: TBD
+
+Plans:
+- [ ] 30-01-PLAN.md — Fix FilterConfig field names, add CLI to typecheck, delegate prevalence to core, add filter-effect test
+
+---
+
 ## Progress
 
-**Execution Order:** 25 → 26 → 27 → 28 → 29
+**Execution Order:** 25 → 26 → 27 → 28 → 29 → 30
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -178,8 +196,9 @@ Plans:
 | 27. CLI Package | v1.5 | 7/7 | Complete | 2026-02-24 |
 | 28. Gene Config System | v1.5 | 4/4 | Complete | 2026-02-24 |
 | 29. Test Suite Completion & Web App Validation | v1.5 | 7/7 | Complete | 2026-02-24 |
+| 30. CLI Integration Fixes | v1.5 | 0/1 | Planned | — |
 
-**Total:** 111 plans complete across 29 phases in 6 milestones. v1.5 complete.
+**Total:** 111 plans complete across 30 phases in 6 milestones.
 
 ---
 *Roadmap created: 2026-01-18*

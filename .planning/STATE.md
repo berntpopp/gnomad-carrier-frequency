@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 29 (Test Suite Completion) — All gap closure plans complete (29-06 + 29-07)
+**Current focus:** v1.5 Phase 30 (CLI Integration Fixes) — Gap closure phase from milestone audit
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 29 of 29 (Test Suite Completion) — FULLY COMPLETE (7/7 plans including gap closures)
-**Plan:** 29-07 of 7 in phase 29 — COMPLETE
-**Status:** All gaps closed and verified (4/4 must-haves). Coverage thresholds enforced (vitest) + warn-only in CI. 380+ tests. Phase 29 VERIFIED.
-**Last activity:** 2026-02-24 — Completed 29-07: Real vitest coverage thresholds + CI continue-on-error (Gap 2 closed)
+**Phase:** 30 of 30 (CLI Integration Fixes) — PLANNED
+**Plan:** 30-01 — Not yet planned
+**Status:** Phase 30 added from milestone audit gap closure. 3 integration issues + 1 broken flow to fix.
+**Last activity:** 2026-02-24 — Added Phase 30 from v1.5-MILESTONE-AUDIT.md gap closure
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [##########] 100% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 7/7 COMPLETE (incl. gap closure 29-06 + 29-07)
+v1.5 Core & CLI:    [#########-] 95% - Phases 25-29 complete, Phase 30 (audit gap closure) planned
 ```
 
-**Overall:** 111 plans complete across 29 phases in 6 milestones.
+**Overall:** 111 plans complete across 30 phases in 6 milestones.
 
 ---
 
