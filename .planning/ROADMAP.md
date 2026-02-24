@@ -132,10 +132,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 28-01-PLAN.md — Core gene-config module: Zod schema, loader, tsdown entry point, and unit tests
-- [ ] 28-02-PLAN.md — Seed gene configs (CFTR, HEXA, GJB2) and CI validation workflow
-- [ ] 28-03-PLAN.md — Web app integration: auto-apply composable, FilterPanel indicator, profile selector
-- [ ] 28-04-PLAN.md — Contributing guide (configs/CONTRIBUTING.md and VitePress docs page)
+- [x] 28-01-PLAN.md — Core gene-config module: Zod schema, loader, tsdown entry point, and unit tests
+- [x] 28-02-PLAN.md — Seed gene configs (CFTR, HEXA, GJB2) and CI validation workflow
+- [x] 28-03-PLAN.md — Web app integration: auto-apply composable, FilterPanel indicator, profile selector
+- [x] 28-04-PLAN.md — Contributing guide (configs/CONTRIBUTING.md and VitePress docs page)
 
 ---
 
@@ -170,11 +170,11 @@ Plans:
 | 25. Monorepo Foundation & Core Extraction | v1.5 | 5/5 | Complete | 2026-02-24 |
 | 26. Calculation Improvements in Core | v1.5 | 5/5 | Complete | 2026-02-24 |
 | 27. CLI Package | v1.5 | 7/7 | Complete | 2026-02-24 |
-| 28. Gene Config System | v1.5 | 0/4 | Not started | - |
+| 28. Gene Config System | v1.5 | 4/4 | Complete | 2026-02-24 |
 | 29. Test Suite Completion & Web App Validation | v1.5 | 0/TBD | Not started | - |
 
-**Total:** 100 plans complete across 27 phases in 5 milestones. v1.5 in progress (3/5 phases complete).
+**Total:** 104 plans complete across 28 phases in 5 milestones. v1.5 in progress (4/5 phases complete).
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-24 (Phase 27 complete: 7/7 plans, CLI Package verified)*
+*Last updated: 2026-02-24 (Phase 28 complete: 4/4 plans, Gene Config System E2E verified)*

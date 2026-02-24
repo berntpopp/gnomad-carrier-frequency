@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 27 (CLI Package) — COMPLETE (7/7 plans) | Phase 28 (Gene Config System) — COMPLETE (4/4 plans)
+**Current focus:** v1.5 Phase 28 (Gene Config System) — COMPLETE (4/4 plans, E2E verified) | Phase 29 remaining
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 27 of 29 (CLI Package) — COMPLETE | 28 of 29 (Gene Config System) — COMPLETE
-**Plan:** 27-07 of 7 in phase 27 — COMPLETE | 28-04 of 4 in phase 28 — COMPLETE
-**Status:** 27-07 complete — 72 CLI integration/unit tests (formatters, queryGene, parseGeneListFile, batch processing)
-**Last activity:** 2026-02-24 — Completed 27-07-PLAN.md (CLI test suite)
+**Phase:** 28 of 29 (Gene Config System) — COMPLETE | Phase 29 (Test Suite) remaining
+**Plan:** 28-04 of 4 in phase 28 — COMPLETE
+**Status:** Phase 28 E2E verified — Playwright 10/10 gene config tests pass, 226 unit tests pass, full wizard flow confirmed
+**Last activity:** 2026-02-24 — E2E Playwright verification of Phases 27+28 against live dev server
 
 ### Progress
 
@@ -30,15 +30,15 @@ v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [██████████] ~95% - Phase 27 Plan 7/7 + Phase 28 Plan 4/4 complete (Phase 29 remaining)
 ```
 
-**Overall:** 100 plans complete across 27 phases in 5 milestones.
+**Overall:** 104 plans complete across 28 phases in 5 milestones.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 89
-- v1.5 plans completed: 6
+- Total plans completed: 104
+- v1.5 plans completed: 21
 
 ---
 
@@ -122,37 +122,27 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 27-07 — CLI test suite: 72 tests across 3 files (formatters.test.ts, query.test.ts, batch.test.ts), CFTR mock fixture, vitest config for CLI package, root bun run test now runs 226 tests (core + CLI)
-**Status:** Phase 27 Plan 7 complete. All 7 plans in Phase 27 complete. Phase 28 also complete (4/4). v1.5 only Phase 29 (comprehensive test suite) remains.
+**Completed:** E2E Playwright verification of Phases 27+28 against live dev server + gnomAD API
+**Status:** Phases 27 and 28 fully verified E2E. 10/10 Playwright gene config tests pass, 226 unit tests pass, full CFTR wizard flow confirmed with live API data.
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.5 scope: monorepo extraction, HWE 2pq + homozygote exclusion + genetic prevalence, full CLI, gene configs, comprehensive test suite.
 
-Phase 28 Plan 04 delivered:
-- configs/CONTRIBUTING.md: 12-section comprehensive guide for clinical geneticists
-  - Schema reference: all fields with type, required/optional, examples
-  - OMIM gene vs phenotype ID disambiguation table
-  - Complete examples: HEXA (simple), CFTR (multi-profile), PAH (minimal)
-  - CI validation table, FAQ, resources
-- apps/web/docs/guide/contributing-gene-configs.md: VitePress mirror with containers and collapsible FAQ
-- apps/web/docs/.vitepress/config.ts: Contributing Gene Configs in /guide/ sidebar
+E2E verification confirmed:
+- App loads, renders Vuetify + stepper, zero console errors
+- Gene search + selection works (CFTR, HEXA, GJB2, PKD1)
+- Full 4-step wizard flow: gene → status → freq → results with live gnomAD API
+- Gene config chip visible on Step 4 for config genes (CFTR, HEXA, GJB2)
+- CFTR profile dropdown: Classic CF (100% penetrance) + CFTR-RD (~3% penetrance)
+- Profile switching updates penetrance slider in real time
+- Chip dismiss resets filters to defaults
+- No state bleed between config and non-config genes
+- Clinical text generated with carrier frequency data
 
-Phase 27 CLI Package complete (7/7 plans):
-- 27-01: Setup (tsdown, Commander scaffold, types, p-limit)
-- 27-02: Calculation pipeline (gene-query.ts, retry, rate limiting)
-- 27-03: Output formatters (text, JSON, TSV, clinical)
-- 27-04: Query command (single-gene lookup, all flags)
-- 27-05: Batch command (parseGeneListFile, concurrency, fail-fast)
-- 27-06: Interactive command (wizard, searchGenes, buildEquivalentCommand)
-- 27-07: Test suite (72 tests: formatters, queryGene, parseGeneListFile, batch processing)
-
-Phase 28 Gene Config System complete (4/4 plans):
-- 28-01: GeneConfigSchema (Zod v4), loader, tests
-- 28-02: Seed gene configs (CFTR, HEXA, GJB2) + CI validation script
-- 28-03: Web auto-apply (useGeneConfig composable, wizard integration)
-- 28-04: Contributing guide (configs/CONTRIBUTING.md + VitePress page)
+Phase 27 CLI Package complete (7/7 plans)
+Phase 28 Gene Config System complete (4/4 plans)
 
 Remaining in v1.5:
 - Phase 29: Comprehensive test suite
@@ -187,3 +177,5 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *28-04 complete: 2026-02-24*
 *27-07 complete: 2026-02-24*
 *Phase 27 verified: 2026-02-24*
+*28-03 complete: 2026-02-24*
+*Phase 28 E2E verified: 2026-02-24*
