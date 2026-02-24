@@ -120,19 +120,22 @@ Plans:
 
 #### Phase 28: Gene Config System
 
-**Goal**: Community-curated per-gene configuration files exist for CFTR, HEXA, and SMN1, are loaded automatically in the web app on gene selection, and can be applied in the CLI — with a validated schema and a GitHub Actions CI workflow that checks contributed configs.
+**Goal**: Community-curated per-gene configuration files exist for CFTR, HEXA, and GJB2, are loaded automatically in the web app on gene selection, and can be applied in the CLI — with a validated schema and a GitHub Actions CI workflow that checks contributed configs.
 **Depends on**: Phase 26
 **Requirements**: GENE-01, GENE-02, GENE-03, GENE-04, GENE-05, GENE-06, GENE-07, TEST-07
 **Success Criteria** (what must be TRUE):
   1. Selecting CFTR in the web app automatically applies the curated recommended filter settings and shows a visible indicator that a gene config was loaded (with a user override option)
-  2. Running `gnomad-cf CFTR --config cftr` applies the CFTR gene config (recommended filters, penetrance) to the CLI calculation without requiring manual flags
-  3. A new JSON or YAML gene config file submitted via pull request triggers the GitHub Actions CI validation workflow, which fails with a descriptive error if the Zod schema is violated
-  4. The contributing guide describes the gene config schema fields, how to submit a PR, and what the CI checks validate
-  5. Vitest unit tests for gene config loading pass, covering schema validation errors, missing optional fields, and successful loading for CFTR, HEXA, and SMN1
-**Plans**: TBD
+  2. Running `gnomad-cf CFTR --config cftr` applies the CFTR gene config to the CLI calculation
+  3. A new JSON gene config file submitted via PR triggers CI validation workflow, which fails with a descriptive error if the Zod schema is violated
+  4. The contributing guide describes the gene config schema fields, how to submit a PR, and what CI validates
+  5. Vitest unit tests for gene config loading pass, covering schema validation errors, missing optional fields, and successful loading for CFTR, HEXA, and GJB2
+**Plans**: 4 plans
 
 Plans:
-- [ ] 28-01: TBD
+- [ ] 28-01-PLAN.md — Core gene-config module: Zod schema, loader, tsdown entry point, and unit tests
+- [ ] 28-02-PLAN.md — Seed gene configs (CFTR, HEXA, GJB2) and CI validation workflow
+- [ ] 28-03-PLAN.md — Web app integration: auto-apply composable, FilterPanel indicator, profile selector
+- [ ] 28-04-PLAN.md — Contributing guide (configs/CONTRIBUTING.md and VitePress docs page)
 
 ---
 
@@ -167,11 +170,11 @@ Plans:
 | 25. Monorepo Foundation & Core Extraction | v1.5 | 5/5 | Complete | 2026-02-24 |
 | 26. Calculation Improvements in Core | v1.5 | 5/5 | Complete | 2026-02-24 |
 | 27. CLI Package | v1.5 | 0/7 | Not started | - |
-| 28. Gene Config System | v1.5 | 0/TBD | Not started | - |
+| 28. Gene Config System | v1.5 | 0/4 | Not started | - |
 | 29. Test Suite Completion & Web App Validation | v1.5 | 0/TBD | Not started | - |
 
 **Total:** 93 plans complete across 26 phases in 5 milestones. v1.5 in progress (2/5 phases complete).
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-24 (Phase 27 planned: 7 plans in 4 waves for CLI package)*
+*Last updated: 2026-02-24 (Phase 28 planned: 4 plans in 2 waves for Gene Config System)*
