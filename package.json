@@ -10,7 +10,8 @@
   ],
   "scripts": {
     "dev": "bun run --filter gnomad-cf-web dev",
-    "build": "bun run --filter @gnomad-cf/core build && bun run --filter gnomad-cf-web build",
+    "build": "bun run --filter @gnomad-cf/core build && bun run --filter @gnomad-cf/cli build && bun run --filter gnomad-cf-web build",
+    "build:cli": "bun run --filter @gnomad-cf/core build && bun run --filter @gnomad-cf/cli build",
     "preview": "bun run --filter gnomad-cf-web preview",
     "test": "vitest --passWithNoTests",
     "lint": "bun run --filter gnomad-cf-web lint",
