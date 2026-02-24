@@ -1,0 +1,22 @@
+name: Validate Gene Configs
+
+on:
+  pull_request:
+    paths:
+      - 'configs/genes/**'
+      - 'packages/core/src/gene-config/**'
+      - 'scripts/validate-gene-configs.ts'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate gene configs
+        run: bun scripts/validate-gene-configs.ts
