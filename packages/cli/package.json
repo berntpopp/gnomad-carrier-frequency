@@ -3,7 +3,7 @@
   "version": "1.5.0",
   "type": "module",
   "private": true,
-  "bin": { "gnomad-cf": "dist/cli.js" },
+  "bin": { "gnomad-cf": "dist/cli.mjs" },
   "scripts": {
     "build": "tsdown",
     "dev": "bun run src/cli.ts"
