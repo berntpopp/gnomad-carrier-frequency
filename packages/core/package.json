@@ -5,7 +5,8 @@
   "private": true,
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsdown"
+    "build": "tsdown",
+    "test": "vitest run"
   },
   "dependencies": {
     "zod": "^4.3.5",
