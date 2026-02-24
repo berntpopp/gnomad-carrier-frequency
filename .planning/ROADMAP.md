@@ -105,10 +105,16 @@ Plans:
   3. `gnomad-cf` run without arguments launches an interactive prompt that guides the user through gene selection, population filter, and output format
   4. `gnomad-cf --help` and `gnomad-cf --version` print usage information and the current version without errors
   5. CLI integration tests with mocked gnomAD responses pass for single gene mode, batch mode, all format flags, and error handling edge cases
-**Plans**: TBD
+**Plans**: 7 plans
 
 Plans:
-- [ ] 27-01: TBD
+- [ ] 27-01-PLAN.md — Scaffold CLI package, build config, and commander entry point
+- [ ] 27-02-PLAN.md — Core pipeline utilities (gene query, retry, population aliases, user config)
+- [ ] 27-03-PLAN.md — Output formatters (text, JSON, TSV, clinical text)
+- [ ] 27-04-PLAN.md — Query subcommand (single gene lookup with all options)
+- [ ] 27-05-PLAN.md — Batch subcommand (multi-gene processing with concurrency)
+- [ ] 27-06-PLAN.md — Interactive wizard with @clack/prompts
+- [ ] 27-07-PLAN.md — CLI integration tests with mocked gnomAD responses
 
 ---
 
@@ -160,7 +166,7 @@ Plans:
 | 21-24 | v1.4 | 12/12 | Complete | 2026-02-23 |
 | 25. Monorepo Foundation & Core Extraction | v1.5 | 5/5 | Complete | 2026-02-24 |
 | 26. Calculation Improvements in Core | v1.5 | 5/5 | Complete | 2026-02-24 |
-| 27. CLI Package | v1.5 | 0/TBD | Not started | - |
+| 27. CLI Package | v1.5 | 0/7 | Not started | - |
 | 28. Gene Config System | v1.5 | 0/TBD | Not started | - |
 | 29. Test Suite Completion & Web App Validation | v1.5 | 0/TBD | Not started | - |
 
@@ -168,4 +174,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-24 (Phase 26 complete: HWE 2pq, VCR/GCR, prevalence, 130 core tests, UI controls)*
+*Last updated: 2026-02-24 (Phase 27 planned: 7 plans in 4 waves for CLI package)*
