@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 27 (CLI Package) — Plan 6 complete | Phase 28 (Gene Config System) — Plan 2 complete
+**Current focus:** v1.5 Phase 27 (CLI Package) — Plan 6 complete | Phase 28 (Gene Config System) — Plan 4 complete
 
 ---
 
@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Milestone:** v1.5 Core Extraction & CLI
 **Phase:** 27 of 29 (CLI Package) + 28 of 29 (Gene Config System) — both in progress
-**Plan:** 27-06 of 7 in phase 27 — COMPLETE | 28-02 of 4 in phase 28 — COMPLETE
-**Status:** 27-06 complete — interactive wizard with @clack/prompts: gene input+autocomplete, version/population/format selects, advanced options, spinner, equivalent-command echo
-**Last activity:** 2026-02-24 — Completed 27-06-PLAN.md (interactive command)
+**Plan:** 27-06 of 7 in phase 27 — COMPLETE | 28-04 of 4 in phase 28 — COMPLETE
+**Status:** 28-04 complete — comprehensive gene config contributing guide in configs/CONTRIBUTING.md and VitePress docs page at /guide/contributing-gene-configs
+**Last activity:** 2026-02-24 — Completed 28-04-PLAN.md (contributing guide)
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [█████████░] ~78% - Phase 27 Plan 6/7 + Phase 28 Plan 2/4 complete
+v1.5 Core & CLI:    [█████████░] ~82% - Phase 27 Plan 6/7 + Phase 28 Plan 4/4 complete
 ```
 
-**Overall:** 91 plans complete across 26 phases in 5 milestones.
+**Overall:** 92 plans complete across 26 phases in 5 milestones.
 
 ---
 
@@ -101,6 +101,8 @@ Recent decisions for v1.5 (continued):
 - Multi-population client-side filter in interactive: queryGene with undefined population (all), filter result.populations after — avoids multiple API calls (27-06)
 - buildEquivalentCommand omits flags matching defaults — produces minimal reproducible CLI command from wizard selections (27-06)
 - No-args TTY guard checks process.argv.length === 2 before parseAsync; pushes 'interactive' on TTY, prints help on non-TTY (27-06)
+- configs/CONTRIBUTING.md is the canonical contributing guide; VitePress docs page mirrors it with VitePress containers (28-04)
+- OMIM gene vs phenotype ID disambiguation given dedicated section with table and danger callout — most common contributor error (28-04)
 
 ### Pending Todos
 
@@ -117,36 +119,32 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 27-06 — interactive wizard with @clack/prompts: gene text input + searchGenes autocomplete, version select, population multiselect, format select, advanced options, spinner, equivalent-command echo, no-args TTY fallback in cli.ts
-**Status:** Phase 27 Plan 6 complete. Phase 27 Wave 3 (plans 04, 05, 06) all complete. Phase 28 Plan 2 also complete.
+**Completed:** 28-04 — Contributing guide for gene configs: configs/CONTRIBUTING.md (12 sections, schema reference, OMIM disambiguation, examples), VitePress page at /guide/contributing-gene-configs, sidebar updated, docs build passes
+**Status:** Phase 28 Plan 4 complete. All 4 plans in Phase 28 complete.
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.5 scope: monorepo extraction, HWE 2pq + homozygote exclusion + genetic prevalence, full CLI, gene configs, comprehensive test suite.
 
-Phase 27 Plan 06 delivered:
-- packages/cli/src/commands/interactive.ts: Full @clack/prompts wizard (383 lines)
-  - Gene: p.text + searchGenes + p.autocomplete disambiguation
-  - Version: p.select (v4/v3/v2)
-  - Population: p.multiselect (multi-pop client-side filtered)
-  - Format: p.select (text/json/tsv)
-  - Advanced: p.confirm -> HWE, hom exclusion, penetrance, variants breakdown
-  - Query with p.spinner()
-  - p.note() echoing equivalent gnomad-cf query command (minimal non-default flags)
-- packages/cli/src/cli.ts: Added interactiveCommand + no-args TTY/non-TTY fallback
+Phase 28 Plan 04 delivered:
+- configs/CONTRIBUTING.md: 12-section comprehensive guide for clinical geneticists
+  - Schema reference: all fields with type, required/optional, examples
+  - OMIM gene vs phenotype ID disambiguation table
+  - Complete examples: HEXA (simple), CFTR (multi-profile), PAH (minimal)
+  - CI validation table, FAQ, resources
+- apps/web/docs/guide/contributing-gene-configs.md: VitePress mirror with containers and collapsible FAQ
+- apps/web/docs/.vitepress/config.ts: Contributing Gene Configs in /guide/ sidebar
 
-Phase 27 CLI Package is feature-complete (Wave 1+2+3 done, 6/7 plans complete):
-- 27-01: scaffold, types
-- 27-02: gene-query pipeline, retry, population-aliases, user-config
-- 27-03: output formatters (text, json, tsv, clinical)
-- 27-04: query subcommand
-- 27-05: batch subcommand
-- 27-06: interactive wizard
+Phase 28 Gene Config System complete (4/4 plans):
+- 28-01: GeneConfigSchema (Zod v4), loader, tests
+- 28-02: Seed gene configs (CFTR, HEXA, GJB2) + CI validation script
+- 28-03: Web auto-apply (useGeneConfig composable, wizard integration)
+- 28-04: Contributing guide (configs/CONTRIBUTING.md + VitePress page)
 
-Next plans:
+Remaining in v1.5:
 - Phase 27: Plan 7 (test suite — unit tests for parseGeneListFile, formatters, calculations)
-- Phase 28: Plan 3 (web auto-apply gene configs), Plan 4 (remaining CI work)
+- Phase 29: Comprehensive test suite
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
 Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
@@ -175,3 +173,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *27-04 complete: 2026-02-24*
 *27-05 complete: 2026-02-24*
 *27-06 complete: 2026-02-24*
+*28-04 complete: 2026-02-24*
