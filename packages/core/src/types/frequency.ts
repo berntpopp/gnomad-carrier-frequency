@@ -16,6 +16,8 @@ export interface PopulationFrequency {
   alleleNumber: number;
   isLowSampleSize: boolean;
   isFounderEffect: boolean;
+  /** Per-population genetic prevalence (q^2) where q = sumAF for this population */
+  geneticPrevalence: number | null;
 }
 
 export interface CarrierFrequencyResult {
@@ -31,6 +33,14 @@ export interface CarrierFrequencyResult {
   minFrequency: number | null;
   maxFrequency: number | null;
   hasFounderEffect: boolean;
+  /** Genetic disease prevalence (q^2) from raw SumAF — always computed regardless of formula */
+  geneticPrevalence: number | null;
+  /** Bayesian prevalence = geneticPrevalence * penetrance */
+  bayesianPrevalence: number | null;
+  /** Which carrier frequency formula was used to produce globalCarrierFrequency */
+  formula: 'hwe' | 'simplified';
+  /** Whether VCR/GCR homozygote exclusion was applied */
+  homExclusionActive: boolean;
 }
 
 export interface RecurrenceRiskResult {

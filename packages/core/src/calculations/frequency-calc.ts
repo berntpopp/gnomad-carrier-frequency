@@ -9,6 +9,10 @@ import {
 } from '../config/index.js';
 import type { IndexPatientStatus, PopulationFrequency } from '../types/index.js';
 import type { VariantFrequencyData } from '../types/variant.js';
+import type { CalcConfig } from '../types/calculations.js';
+import { calculateHWECarrierFrequency, calculateSimplifiedCarrierFrequency } from './carrier-frequency.js';
+import { calculateVCR, calculateGCR } from './homozygote-exclusion.js';
+import { calculateGeneticPrevalence } from './prevalence.js';
 
 // All thresholds from config - NO MAGIC NUMBERS
 const { lowSampleSizeThreshold, founderEffectMultiplier } = config.settings;
@@ -49,110 +53,175 @@ export function calculateRecurrenceRisk(
 }
 
 /**
- * Aggregate population frequencies from multiple variants
+ * Aggregate population frequencies from multiple variants, respecting CalcConfig.
  *
- * Mathematical approach: Sum of allele frequencies per population
+ * Supports four combinations:
+ *   - useHomExclusion=true:  VCR/GCR per population (HWE toggle has no effect)
+ *   - useHomExclusion=false + useHWEFormula=true:   2pq (HWE) from sumAF
+ *   - useHomExclusion=false + useHWEFormula=false:  2 * sumAF (simplified)
  *
- * Why sum AFs instead of sum(AC)/sum(AN)?
- * - AN varies per variant due to call rate (coverage/quality differences)
- * - Summing AN would incorrectly weight variants
- * - Summing AFs correctly handles varying sample sizes
+ * Genetic prevalence (q^2) is ALWAYS computed from raw sumAF regardless of formula.
  *
- * For each population:
- * 1. For each variant: variant_AF = (exome_AC + genome_AC) / (exome_AN + genome_AN)
- * 2. Sum AFs across variants: total_AF = Σ(variant_AF_i)
- * 3. Carrier frequency = 2 × total_AF
+ * IMPORTANT: ac_hom access uses explicit null checks on the exome/genome wrapper,
+ * NOT optional chaining with ?? 0, to avoid masking missing data.
  *
- * We also track max AN for display purposes (to show representative sample size).
+ * Returns per-population aggregated data including sumAF, totalAC, maxAN,
+ * carrierFrequency, and geneticPrevalence.
  */
-export function aggregatePopulationFrequencies(
+export function aggregatePopulationFrequenciesWithConfig(
   variants: VariantFrequencyData[],
-  version: GnomadVersion
-): Map<string, { sumAF: number; totalAC: number; maxAN: number }> {
-  const result = new Map<
-    string,
-    { sumAF: number; totalAC: number; maxExomeAN: number; maxGenomeAN: number }
-  >();
-
-  // Get population codes from config for this version
+  version: GnomadVersion,
+  calcConfig: CalcConfig
+): Map<
+  string,
+  {
+    carrierFrequency: number | null;
+    sumAF: number;
+    totalAC: number;
+    maxAN: number;
+    geneticPrevalence: number | null;
+  }
+> {
   const populationCodes = getPopulationCodes(version);
 
-  // Initialize all populations from config
+  // Working accumulator per population
+  const acc = new Map<
+    string,
+    {
+      sumAF: number;
+      totalAC: number;
+      maxExomeAN: number;
+      maxGenomeAN: number;
+      vcrs: number[]; // Only populated when useHomExclusion=true
+    }
+  >();
+
   for (const pop of populationCodes) {
-    result.set(pop, { sumAF: 0, totalAC: 0, maxExomeAN: 0, maxGenomeAN: 0 });
+    acc.set(pop, { sumAF: 0, totalAC: 0, maxExomeAN: 0, maxGenomeAN: 0, vcrs: [] });
   }
 
   for (const variant of variants) {
-    // Build a map of population data for this variant
+    // Build population lookup maps for this variant
     const exomePops = new Map(
-      (variant.exome?.populations ?? []).map((p) => [p.id, p])
+      (variant.exome !== null && variant.exome !== undefined
+        ? variant.exome.populations
+        : []
+      ).map((p) => [p.id, p])
     );
     const genomePops = new Map(
-      (variant.genome?.populations ?? []).map((p) => [p.id, p])
+      (variant.genome !== null && variant.genome !== undefined
+        ? variant.genome.populations
+        : []
+      ).map((p) => [p.id, p])
     );
 
-    // For each population, calculate this variant's contribution
     for (const popCode of populationCodes) {
       const exomePop = exomePops.get(popCode);
       const genomePop = genomePops.get(popCode);
 
-      const exomeAC = exomePop?.ac ?? 0;
-      const genomeAC = genomePop?.ac ?? 0;
-      const exomeAN = exomePop?.an ?? 0;
-      const genomeAN = genomePop?.an ?? 0;
+      const exomeAC = exomePop !== undefined ? exomePop.ac : 0;
+      const genomeAC = genomePop !== undefined ? genomePop.ac : 0;
+      const exomeAN = exomePop !== undefined ? exomePop.an : 0;
+      const genomeAN = genomePop !== undefined ? genomePop.an : 0;
+      const exomeAcHom = exomePop !== undefined ? exomePop.ac_hom : 0;
+      const genomeAcHom = genomePop !== undefined ? genomePop.ac_hom : 0;
 
       const combinedAC = exomeAC + genomeAC;
       const combinedAN = exomeAN + genomeAN;
+      const combinedAcHom = exomeAcHom + genomeAcHom;
 
-      const current = result.get(popCode)!;
+      const current = acc.get(popCode)!;
 
-      // Sum AC for display
       current.totalAC += combinedAC;
-
-      // Track max AN per dataset for display
       current.maxExomeAN = Math.max(current.maxExomeAN, exomeAN);
       current.maxGenomeAN = Math.max(current.maxGenomeAN, genomeAN);
 
-      // Sum AF for this variant's contribution to the population
       if (combinedAN > 0) {
         current.sumAF += combinedAC / combinedAN;
+
+        if (calcConfig.useHomExclusion) {
+          // VCR uses per-population combined counts
+          const vcr = calculateVCR(combinedAC, combinedAN, combinedAcHom);
+          current.vcrs.push(vcr);
+        }
       }
     }
   }
 
-  // Convert to final format
-  const finalResult = new Map<
+  // Convert to final result map
+  const result = new Map<
     string,
-    { sumAF: number; totalAC: number; maxAN: number }
+    {
+      carrierFrequency: number | null;
+      sumAF: number;
+      totalAC: number;
+      maxAN: number;
+      geneticPrevalence: number | null;
+    }
   >();
-  for (const [code, data] of result) {
-    finalResult.set(code, {
+
+  for (const [popCode, data] of acc) {
+    const maxAN = data.maxExomeAN + data.maxGenomeAN;
+
+    // Genetic prevalence always from raw q = sumAF (never from carrier frequency)
+    const geneticPrevalence =
+      data.sumAF > 0 ? calculateGeneticPrevalence([data.sumAF]) : null;
+
+    let carrierFrequency: number | null = null;
+
+    if (data.sumAF > 0 || (calcConfig.useHomExclusion && data.vcrs.length > 0)) {
+      if (calcConfig.useHomExclusion) {
+        // VCR/GCR path — HWE toggle has no effect
+        const gcr = calculateGCR(data.vcrs);
+        carrierFrequency = gcr > 0 ? gcr : null;
+      } else if (calcConfig.useHWEFormula) {
+        // HWE 2pq formula
+        const cf = calculateHWECarrierFrequency([data.sumAF]);
+        carrierFrequency = cf > 0 ? cf : null;
+      } else {
+        // Simplified 2 * sumAF
+        const cf = calculateSimplifiedCarrierFrequency([data.sumAF]);
+        carrierFrequency = cf > 0 ? cf : null;
+      }
+    }
+
+    result.set(popCode, {
+      carrierFrequency,
       sumAF: data.sumAF,
       totalAC: data.totalAC,
-      maxAN: data.maxExomeAN + data.maxGenomeAN,
+      maxAN,
+      geneticPrevalence,
     });
   }
 
-  return finalResult;
+  return result;
 }
 
 /**
  * Build PopulationFrequency results from aggregated data
- * Applies founder effect and low sample size detection using config thresholds
+ * Applies founder effect and low sample size detection using config thresholds.
  *
- * Uses pre-computed sumAF from aggregation (mathematically correct for varying AN)
- * Carrier frequency = 2 × sumAF
+ * Accepts the extended map from aggregatePopulationFrequenciesWithConfig which
+ * includes pre-computed carrierFrequency and geneticPrevalence.
  */
 export function buildPopulationFrequencies(
-  aggregated: Map<string, { sumAF: number; totalAC: number; maxAN: number }>,
+  aggregated: Map<
+    string,
+    {
+      carrierFrequency: number | null;
+      sumAF: number;
+      totalAC: number;
+      maxAN: number;
+      geneticPrevalence: number | null;
+    }
+  >,
   globalCarrierFrequency: number | null,
   version: GnomadVersion
 ): PopulationFrequency[] {
   const results: PopulationFrequency[] = [];
 
   for (const [code, data] of aggregated) {
-    // Carrier frequency = 2 × sum(AF) - already computed correctly in aggregation
-    const carrierFreq = data.sumAF > 0 ? 2 * data.sumAF : null;
+    const carrierFreq = data.carrierFrequency;
 
     // Use thresholds from config
     const isFounderEffect =
@@ -162,12 +231,13 @@ export function buildPopulationFrequencies(
 
     results.push({
       code,
-      label: getPopulationLabel(code, version), // Label from config
+      label: getPopulationLabel(code, version),
       carrierFrequency: carrierFreq,
       alleleCount: data.totalAC,
-      alleleNumber: data.maxAN, // Display max AN as representative sample size
-      isLowSampleSize: data.maxAN < lowSampleSizeThreshold, // Threshold from config
+      alleleNumber: data.maxAN,
+      isLowSampleSize: data.maxAN < lowSampleSizeThreshold,
       isFounderEffect,
+      geneticPrevalence: data.geneticPrevalence,
     });
   }
 
