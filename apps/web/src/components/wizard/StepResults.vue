@@ -41,6 +41,15 @@
         >
           {{ sourceAttribution }}
         </v-chip>
+        <v-chip
+          v-if="!calcStore.defaults.useHWEFormula"
+          color="warning"
+          size="small"
+          class="ml-2"
+          prepend-icon="mdi-alert"
+        >
+          Simplified formula
+        </v-chip>
       </v-card-title>
 
       <v-card-text>
@@ -129,6 +138,70 @@
             </span>
           </v-tooltip>
         </div>
+
+        <!-- Genetic prevalence -->
+        <div
+          v-if="geneticPrevalenceFormatted"
+          class="text-body-2 mt-2 d-flex align-center flex-wrap"
+        >
+          Genetic Prevalence:
+          <strong class="ml-1">{{ geneticPrevalenceFormatted.ratio }}</strong>
+          <span class="text-medium-emphasis ml-1">({{ geneticPrevalenceFormatted.percent }})</span>
+          <v-tooltip
+            location="top"
+            aria-label="Information"
+          >
+            <template #activator="{ props: tooltipProps }">
+              <v-icon
+                v-bind="tooltipProps"
+                size="x-small"
+                class="ml-1"
+                aria-label="Genetic prevalence information"
+              >
+                mdi-information-outline
+              </v-icon>
+            </template>
+            <span class="tooltip-text">
+              <strong>Genetic Prevalence (q&sup2;)</strong><br>
+              The expected frequency of affected individuals in the population
+              under Hardy-Weinberg Equilibrium. Calculated as q&sup2; where
+              q is the sum of pathogenic allele frequencies. This is the
+              theoretical disease frequency before accounting for penetrance.
+            </span>
+          </v-tooltip>
+        </div>
+
+        <!-- Bayesian prevalence (only when penetrance < 100%) -->
+        <div
+          v-if="bayesianPrevalenceFormatted && calcStore.defaults.penetrance < 1"
+          class="text-body-2 mt-1 d-flex align-center flex-wrap"
+        >
+          Bayesian Prevalence ({{ Math.round(calcStore.defaults.penetrance * 100) }}% penetrance):
+          <strong class="ml-1">{{ bayesianPrevalenceFormatted.ratio }}</strong>
+          <span class="text-medium-emphasis ml-1">({{ bayesianPrevalenceFormatted.percent }})</span>
+          <v-tooltip
+            location="top"
+            aria-label="Information"
+          >
+            <template #activator="{ props: tooltipProps }">
+              <v-icon
+                v-bind="tooltipProps"
+                size="x-small"
+                class="ml-1"
+                aria-label="Bayesian prevalence information"
+              >
+                mdi-information-outline
+              </v-icon>
+            </template>
+            <span class="tooltip-text">
+              <strong>Bayesian Prevalence</strong><br>
+              Genetic prevalence adjusted for incomplete penetrance.
+              Calculated as genetic prevalence &times; penetrance fraction.
+              For example, with 80% penetrance, only 80% of genetically
+              affected individuals are expected to be clinically affected.
+            </span>
+          </v-tooltip>
+        </div>
       </v-card-text>
 
       <!-- Filter Panel -->
@@ -189,6 +262,9 @@
             </td>
             <td class="text-right">
               {{ formatRatio(item.carrierFrequency) }}
+            </td>
+            <td class="text-right">
+              {{ formatPrevalenceRatio(item.geneticPrevalence) }}
             </td>
             <td class="text-right">
               {{ item.recurrenceRisk }}
@@ -366,6 +442,7 @@ import { useExport, useAppAnnouncer, useExclusionState } from '@/composables';
 import { filterPathogenicVariantsConfigurable } from '@gnomad-cf/core/filters';
 import { toDisplayVariants, filterVariantsByPopulation } from '@gnomad-cf/core/filters';
 import { buildExportData } from '@/utils/export-utils';
+import { formatPrevalence } from '@gnomad-cf/core/calculations';
 import TextOutput from './TextOutput.vue';
 import FilterPanel from '@/components/FilterPanel.vue';
 import VariantModal from '@/components/VariantModal.vue';
@@ -376,6 +453,7 @@ interface TableItem {
   code: string; // Population code for drill-down
   carrierFrequency: number | null;
   ratioDenominator: number | null; // Numeric for sorting (e.g., 25 for "1:25")
+  geneticPrevalence: number | null; // Disease prevalence (q^2) for this population
   recurrenceRiskValue: number | null; // Numeric for sorting
   recurrenceRisk: string; // Formatted for display
   alleleCount: number;
@@ -410,8 +488,21 @@ const emit = defineEmits<{
 
 // Get filter store for reset functionality
 const filterStore = useFilterStore();
-// Get calc store for export metadata
+// Get calc store for export metadata and calc config access
 const calcStore = useCalcStore();
+
+// Formatted prevalence for display in summary card
+const geneticPrevalenceFormatted = computed(() => {
+  const gp = props.result?.geneticPrevalence ?? null;
+  if (gp === null) return null;
+  return formatPrevalence(gp);
+});
+
+const bayesianPrevalenceFormatted = computed(() => {
+  const bp = props.result?.bayesianPrevalence ?? null;
+  if (bp === null) return null;
+  return formatPrevalence(bp);
+});
 
 // Get exclusion state (singleton) for displaying excluded count and export data
 const { excludedCount, excluded, reasons } = useExclusionState();
@@ -549,6 +640,7 @@ const headers = ref([
   { title: 'Population', key: 'label', sortable: true },
   { title: 'Carrier Freq (%)', key: 'carrierFrequency', sortable: true, align: 'end' as const },
   { title: 'Ratio', key: 'ratioDenominator', sortable: true, align: 'end' as const },
+  { title: 'Prevalence', key: 'geneticPrevalence', sortable: true, align: 'end' as const },
   { title: 'Recurrence Risk', key: 'recurrenceRiskValue', sortable: true, align: 'end' as const },
   { title: 'AC', key: 'alleleCount', sortable: true, align: 'end' as const },
   { title: 'AN', key: 'alleleNumber', sortable: true, align: 'end' as const },
@@ -638,6 +730,7 @@ const tableItems = computed((): TableItem[] => {
       code: '', // Global has no population code
       carrierFrequency: globalCarrierFreq,
       ratioDenominator: globalCarrierFreq > 0 ? Math.round(1 / globalCarrierFreq) : null,
+      geneticPrevalence: props.result.geneticPrevalence,
       recurrenceRiskValue: risk,
       recurrenceRisk: riskString,
       alleleCount: props.result.globalAlleleCount,
@@ -661,6 +754,7 @@ const tableItems = computed((): TableItem[] => {
       ratioDenominator: pop.carrierFrequency !== null && pop.carrierFrequency > 0
         ? Math.round(1 / pop.carrierFrequency)
         : null,
+      geneticPrevalence: pop.geneticPrevalence,
       recurrenceRiskValue: risk,
       recurrenceRisk: riskString,
       alleleCount: pop.alleleCount,
@@ -698,6 +792,13 @@ function formatPercent(freq: number | null): string {
 function formatRatio(freq: number | null): string {
   if (freq === null || freq === 0) return '-';
   return `1:${Math.round(1 / freq).toLocaleString()}`;
+}
+
+// Format prevalence as ratio for table display (returns '-' for null/zero)
+function formatPrevalenceRatio(prevalence: number | null): string {
+  if (prevalence === null || prevalence === 0) return '-';
+  const formatted = formatPrevalence(prevalence);
+  return formatted.ratio;
 }
 </script>
 
