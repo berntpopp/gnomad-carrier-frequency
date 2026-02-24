@@ -127,19 +127,19 @@
 | CALC-07 | Phase 26 | Complete |
 | CALC-08 | Phase 26 | Complete |
 | CALC-09 | Phase 26 | Complete |
-| CLI-01 | Phase 27 | Pending |
-| CLI-02 | Phase 27 | Pending |
-| CLI-03 | Phase 27 | Pending |
-| CLI-04 | Phase 27 | Pending |
-| CLI-05 | Phase 27 | Pending |
-| CLI-06 | Phase 27 | Pending |
-| CLI-07 | Phase 27 | Pending |
-| CLI-08 | Phase 27 | Pending |
-| CLI-09 | Phase 27 | Pending |
-| CLI-10 | Phase 27 | Pending |
-| CLI-11 | Phase 27 | Pending |
-| CLI-12 | Phase 27 | Pending |
-| CLI-13 | Phase 27 | Pending |
+| CLI-01 | Phase 27 | Complete |
+| CLI-02 | Phase 27 | Complete |
+| CLI-03 | Phase 27 | Complete |
+| CLI-04 | Phase 27 | Complete |
+| CLI-05 | Phase 27 | Complete |
+| CLI-06 | Phase 27 | Complete |
+| CLI-07 | Phase 27 | Complete |
+| CLI-08 | Phase 27 | Complete |
+| CLI-09 | Phase 27 | Complete |
+| CLI-10 | Phase 27 | Complete |
+| CLI-11 | Phase 27 | Complete |
+| CLI-12 | Phase 27 | Complete |
+| CLI-13 | Phase 27 | Complete |
 | GENE-01 | Phase 28 | Pending |
 | GENE-02 | Phase 28 | Pending |
 | GENE-03 | Phase 28 | Pending |
@@ -154,7 +154,7 @@
 | TEST-05 | Phase 26 | Complete |
 | TEST-06 | Phase 26 | Complete |
 | TEST-07 | Phase 28 | Pending |
-| TEST-08 | Phase 27 | Pending |
+| TEST-08 | Phase 27 | Complete |
 | TEST-09 | Phase 29 | Pending |
 | TEST-10 | Phase 29 | Pending |
 | TEST-11 | Phase 29 | Pending |
@@ -167,4 +167,4 @@
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-24 (Phases 25-26 requirements marked Complete: 13 MONO + 9 CALC + 6 TEST = 28 requirements)*
+*Last updated: 2026-02-24 (Phase 27 requirements marked Complete: 13 CLI + 1 TEST = 14 requirements)*

@@ -108,13 +108,13 @@ Plans:
 **Plans**: 7 plans
 
 Plans:
-- [ ] 27-01-PLAN.md — Scaffold CLI package, build config, and commander entry point
-- [ ] 27-02-PLAN.md — Core pipeline utilities (gene query, retry, population aliases, user config)
-- [ ] 27-03-PLAN.md — Output formatters (text, JSON, TSV, clinical text)
-- [ ] 27-04-PLAN.md — Query subcommand (single gene lookup with all options)
-- [ ] 27-05-PLAN.md — Batch subcommand (multi-gene processing with concurrency)
-- [ ] 27-06-PLAN.md — Interactive wizard with @clack/prompts
-- [ ] 27-07-PLAN.md — CLI integration tests with mocked gnomAD responses
+- [x] 27-01-PLAN.md — Scaffold CLI package, build config, and commander entry point
+- [x] 27-02-PLAN.md — Core pipeline utilities (gene query, retry, population aliases, user config)
+- [x] 27-03-PLAN.md — Output formatters (text, JSON, TSV, clinical text)
+- [x] 27-04-PLAN.md — Query subcommand (single gene lookup with all options)
+- [x] 27-05-PLAN.md — Batch subcommand (multi-gene processing with concurrency)
+- [x] 27-06-PLAN.md — Interactive wizard with @clack/prompts
+- [x] 27-07-PLAN.md — CLI integration tests with mocked gnomAD responses
 
 ---
 
@@ -169,12 +169,12 @@ Plans:
 | 21-24 | v1.4 | 12/12 | Complete | 2026-02-23 |
 | 25. Monorepo Foundation & Core Extraction | v1.5 | 5/5 | Complete | 2026-02-24 |
 | 26. Calculation Improvements in Core | v1.5 | 5/5 | Complete | 2026-02-24 |
-| 27. CLI Package | v1.5 | 0/7 | Not started | - |
+| 27. CLI Package | v1.5 | 7/7 | Complete | 2026-02-24 |
 | 28. Gene Config System | v1.5 | 0/4 | Not started | - |
 | 29. Test Suite Completion & Web App Validation | v1.5 | 0/TBD | Not started | - |
 
-**Total:** 93 plans complete across 26 phases in 5 milestones. v1.5 in progress (2/5 phases complete).
+**Total:** 100 plans complete across 27 phases in 5 milestones. v1.5 in progress (3/5 phases complete).
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-24 (Phase 28 planned: 4 plans in 2 waves for Gene Config System)*
+*Last updated: 2026-02-24 (Phase 27 complete: 7/7 plans, CLI Package verified)*

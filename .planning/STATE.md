@@ -30,7 +30,7 @@ v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [██████████] ~95% - Phase 27 Plan 7/7 + Phase 28 Plan 4/4 complete (Phase 29 remaining)
 ```
 
-**Overall:** 93 plans complete across 26 phases in 5 milestones.
+**Overall:** 100 plans complete across 27 phases in 5 milestones.
 
 ---
 
@@ -186,3 +186,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *27-06 complete: 2026-02-24*
 *28-04 complete: 2026-02-24*
 *27-07 complete: 2026-02-24*
+*Phase 27 verified: 2026-02-24*
