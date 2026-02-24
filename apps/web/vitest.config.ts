@@ -1,0 +1,42 @@
+import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
+import { fileURLToPath, URL } from 'node:url'
+
+export default defineConfig({
+  plugins: [vue()],
+  test: {
+    name: 'web',
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    include: ['src/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json'],
+      include: ['src/**/*.{ts,vue}'],
+      exclude: [
+        'src/test/**',
+        'src/main.ts',
+        'src/api/client.ts',
+        'src/vite-env.d.ts',
+      ],
+      // Thresholds set to 0 (warn-only). Target: 40%+ web coverage
+      thresholds: {
+        lines: 0,
+        functions: 0,
+        branches: 0,
+        statements: 0,
+      },
+    },
+  },
+  resolve: {
+    alias: [
+      // Mirror all alias groups from vite.config.ts exactly
+      { find: '~gene-configs', replacement: fileURLToPath(new URL('../../configs/genes', import.meta.url)) },
+      {
+        find: /^@gnomad-cf\/core(\/.*)?$/,
+        replacement: fileURLToPath(new URL('../../packages/core/src', import.meta.url)) + '$1',
+      },
+      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+    ],
+  },
+})
