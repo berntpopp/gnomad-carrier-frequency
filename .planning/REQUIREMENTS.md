@@ -51,13 +51,13 @@
 
 ### Gene Config System
 
-- [ ] **GENE-01**: JSON per-gene config schema with Zod validation (gene symbol, condition, inheritance, recommended filters, founder variants, notes)
-- [ ] **GENE-02**: Gene config loading function in core package (`loadGeneConfig(symbol)`)
-- [ ] **GENE-03**: Starter configs for CFTR, HEXA, and SMN1 with recommended filters and founder effect notes
-- [ ] **GENE-04**: Gene configs auto-applied in web app when gene is selected (with user override)
-- [ ] **GENE-05**: Gene configs applied in CLI via `--config <gene>` flag
-- [ ] **GENE-06**: GitHub Actions CI validation workflow for gene config PRs (schema check, lint)
-- [ ] **GENE-07**: Contributing guide for community gene config submissions
+- [x] **GENE-01**: JSON per-gene config schema with Zod validation (gene symbol, condition, inheritance, recommended filters, founder variants, notes)
+- [x] **GENE-02**: Gene config loading function in core package (`loadGeneConfig(symbol)`)
+- [x] **GENE-03**: Starter configs for CFTR, HEXA, and GJB2 with recommended filters and founder effect notes
+- [x] **GENE-04**: Gene configs auto-applied in web app when gene is selected (with user override)
+- [x] **GENE-05**: Gene configs applied in CLI via `--config <gene>` flag (stub — prints deferral message, continues with defaults)
+- [x] **GENE-06**: GitHub Actions CI validation workflow for gene config PRs (schema check, lint)
+- [x] **GENE-07**: Contributing guide for community gene config submissions
 
 ### Testing
 
@@ -67,7 +67,7 @@
 - [ ] **TEST-04**: Core package unit tests for genetic prevalence (q², Bayesian)
 - [ ] **TEST-05**: Core package unit tests for variant filters (LoF HC, ClinVar pathogenic)
 - [ ] **TEST-06**: Core package unit tests for template renderer (variable substitution, perspective, gender)
-- [ ] **TEST-07**: Core package unit tests for gene config loading and validation
+- [x] **TEST-07**: Core package unit tests for gene config loading and validation
 - [ ] **TEST-08**: CLI integration tests (single gene, batch mode, format flags, error handling)
 - [ ] **TEST-09**: Web app component tests with Vue Test Utils (wizard steps, settings, results display)
 - [ ] **TEST-10**: Playwright E2E tests for critical flows (wizard completion, URL sharing, history restore)
