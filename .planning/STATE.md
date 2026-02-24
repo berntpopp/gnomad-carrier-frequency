@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Milestone:** v1.5 Core Extraction & CLI
 **Phase:** 28 of 29 (Gene Config System) — In progress
-**Plan:** 1 of 4 in current phase — COMPLETE
-**Status:** 28-01 complete — GeneConfigSchema (Zod v4), platform-neutral loader, @gnomad-cf/core/gene-config subpath, 24 passing tests
-**Last activity:** 2026-02-24 — Completed 28-01-PLAN.md (gene-config module)
+**Plan:** 2 of 4 in current phase — COMPLETE
+**Status:** 28-02 complete — seed gene configs (CFTR/HEXA/GJB2), CI validation script, GitHub Actions workflow
+**Last activity:** 2026-02-24 — Completed 28-02-PLAN.md (seed gene configs + CI validation)
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [████████░░] ~70% - Phase 28 Plan 1/4 complete
+v1.5 Core & CLI:    [█████████░] ~75% - Phase 28 Plan 2/4 complete
 ```
 
-**Overall:** 89 plans complete across 26 phases in 5 milestones.
+**Overall:** 90 plans complete across 26 phases in 5 milestones.
 
 ---
 
@@ -87,6 +87,10 @@ Recent decisions for v1.5:
 - FilterConfigOverrideSchema defined independently in schema.ts — avoids circular imports between tsdown entry points (28-01)
 - Gene config registry keys stored uppercase; loadGeneConfig normalizes with toUpperCase() for case-insensitive lookup (28-01)
 - Platform loader uses module-level variable injection — simple and sufficient for CLI fs use (28-01)
+- configs/genes/ placed at repo root — neutral location accessible to CLI, web, and scripts without cross-package imports (28-02)
+- ClinVar star threshold 2 for Classic CF (expert panel level), 1 for CFTR-RD/HEXA/GJB2 — reflects clinical evidence hierarchy (28-02)
+- CFTR-RD penetrance 0.03 — empirically supported reduced penetrance for CFTR-related disorders (28-02)
+- Bun native TS execution for CI scripts — validation script imports schema source directly, no build step (28-02)
 
 ### Pending Todos
 
@@ -103,25 +107,24 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 28-01 — GeneConfigSchema (Zod v4), platform-neutral loader with registry + injectable fs loader, @gnomad-cf/core/gene-config subpath, 24 passing unit tests
-**Status:** Phase 28 Plan 1 complete. Next: Plan 2 (seed gene configs CFTR/HEXA), Plan 3 (web auto-apply), Plan 4 (CI validation)
+**Completed:** 28-02 — seed gene configs (CFTR/HEXA/GJB2), Bun-native CI validation script, GitHub Actions PR workflow
+**Status:** Phase 28 Plan 2 complete. Next: Plan 3 (web auto-apply), Plan 4 (any remaining CI work)
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.5 scope: monorepo extraction, HWE 2pq + homozygote exclusion + genetic prevalence, full CLI, gene configs, comprehensive test suite.
 
-Phase 28 Plan 01 delivered:
-- packages/core/src/gene-config/schema.ts: GeneConfigSchema, ConditionProfileSchema, DiseaseIdentifierSchema, FilterConfigOverrideSchema (Zod v4)
-- packages/core/src/gene-config/loader.ts: registry Map, registerGeneConfig, setPlatformLoader, loadGeneConfig (case-insensitive), getRegisteredGenes
-- packages/core/src/gene-config/index.ts: barrel re-export
-- @gnomad-cf/core/gene-config subpath: tsdown entry + package.json exports map + dist/gene-config.js verified
-- 24 passing unit tests covering all constraints and loader behaviors
+Phase 28 Plan 02 delivered:
+- configs/genes/CFTR.json: Classic CF (default, penetrance 1.0) and CFTR-RD (penetrance 0.03) profiles
+- configs/genes/HEXA.json: Tay-Sachs disease profile (default, penetrance 1.0, AJ founder effect notes)
+- configs/genes/GJB2.json: DFNB1 nonsyndromic hearing loss profile (default, penetrance 1.0)
+- scripts/validate-gene-configs.ts: Bun-native TS validation script, Zod v4 .issues API, exits 1 on failure
+- .github/workflows/validate-gene-configs.yml: PR workflow with path filters for configs/genes/**, gene-config source, validation script
 
 Next plans in Phase 28:
-- 28-02: Seed gene config JSON files (CFTR, HEXA) registered via registerGeneConfig
 - 28-03: Web auto-apply — load gene config in wizard, pre-populate filter overrides
-- 28-04: CI validation script using GeneConfigSchema.safeParse
+- 28-04: (if any remaining CI/tooling work)
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
 Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
@@ -146,3 +149,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *27-02 complete: 2026-02-24*
 *27-03 complete: 2026-02-24*
 *28-01 complete: 2026-02-24*
+*28-02 complete: 2026-02-24*
