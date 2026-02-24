@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 27 (CLI Package) — Plan 6 complete | Phase 28 (Gene Config System) — Plan 4 complete
+**Current focus:** v1.5 Phase 27 (CLI Package) — COMPLETE (7/7 plans) | Phase 28 (Gene Config System) — COMPLETE (4/4 plans)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 27 of 29 (CLI Package) + 28 of 29 (Gene Config System) — both in progress
-**Plan:** 27-06 of 7 in phase 27 — COMPLETE | 28-04 of 4 in phase 28 — COMPLETE
-**Status:** 28-04 complete — comprehensive gene config contributing guide in configs/CONTRIBUTING.md and VitePress docs page at /guide/contributing-gene-configs
-**Last activity:** 2026-02-24 — Completed 28-04-PLAN.md (contributing guide)
+**Phase:** 27 of 29 (CLI Package) — COMPLETE | 28 of 29 (Gene Config System) — COMPLETE
+**Plan:** 27-07 of 7 in phase 27 — COMPLETE | 28-04 of 4 in phase 28 — COMPLETE
+**Status:** 27-07 complete — 72 CLI integration/unit tests (formatters, queryGene, parseGeneListFile, batch processing)
+**Last activity:** 2026-02-24 — Completed 27-07-PLAN.md (CLI test suite)
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [█████████░] ~82% - Phase 27 Plan 6/7 + Phase 28 Plan 4/4 complete
+v1.5 Core & CLI:    [██████████] ~95% - Phase 27 Plan 7/7 + Phase 28 Plan 4/4 complete (Phase 29 remaining)
 ```
 
-**Overall:** 92 plans complete across 26 phases in 5 milestones.
+**Overall:** 93 plans complete across 26 phases in 5 milestones.
 
 ---
 
@@ -103,6 +103,9 @@ Recent decisions for v1.5 (continued):
 - No-args TTY guard checks process.argv.length === 2 before parseAsync; pushes 'interactive' on TTY, prints help on non-TTY (27-06)
 - configs/CONTRIBUTING.md is the canonical contributing guide; VitePress docs page mirrors it with VitePress containers (28-04)
 - OMIM gene vs phenotype ID disambiguation given dedicated section with table and danger callout — most common contributor error (28-04)
+- withRetry mocked in CLI tests via vi.mock('../utils/retry.js') to bypass retry delays; mock calls fn() directly (27-07)
+- Batch processing tests simulate pLimit+Promise.all pattern directly — import parseGeneListFile as standalone function, no Commander machinery (27-07)
+- CLI vitest.config.ts follows same pattern as packages/core — name, environment: node, include pattern (27-07)
 
 ### Pending Todos
 
@@ -119,8 +122,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 28-04 — Contributing guide for gene configs: configs/CONTRIBUTING.md (12 sections, schema reference, OMIM disambiguation, examples), VitePress page at /guide/contributing-gene-configs, sidebar updated, docs build passes
-**Status:** Phase 28 Plan 4 complete. All 4 plans in Phase 28 complete.
+**Completed:** 27-07 — CLI test suite: 72 tests across 3 files (formatters.test.ts, query.test.ts, batch.test.ts), CFTR mock fixture, vitest config for CLI package, root bun run test now runs 226 tests (core + CLI)
+**Status:** Phase 27 Plan 7 complete. All 7 plans in Phase 27 complete. Phase 28 also complete (4/4). v1.5 only Phase 29 (comprehensive test suite) remains.
 **Resume file:** None
 
 ### Handoff Notes
@@ -136,6 +139,15 @@ Phase 28 Plan 04 delivered:
 - apps/web/docs/guide/contributing-gene-configs.md: VitePress mirror with containers and collapsible FAQ
 - apps/web/docs/.vitepress/config.ts: Contributing Gene Configs in /guide/ sidebar
 
+Phase 27 CLI Package complete (7/7 plans):
+- 27-01: Setup (tsdown, Commander scaffold, types, p-limit)
+- 27-02: Calculation pipeline (gene-query.ts, retry, rate limiting)
+- 27-03: Output formatters (text, JSON, TSV, clinical)
+- 27-04: Query command (single-gene lookup, all flags)
+- 27-05: Batch command (parseGeneListFile, concurrency, fail-fast)
+- 27-06: Interactive command (wizard, searchGenes, buildEquivalentCommand)
+- 27-07: Test suite (72 tests: formatters, queryGene, parseGeneListFile, batch processing)
+
 Phase 28 Gene Config System complete (4/4 plans):
 - 28-01: GeneConfigSchema (Zod v4), loader, tests
 - 28-02: Seed gene configs (CFTR, HEXA, GJB2) + CI validation script
@@ -143,7 +155,6 @@ Phase 28 Gene Config System complete (4/4 plans):
 - 28-04: Contributing guide (configs/CONTRIBUTING.md + VitePress page)
 
 Remaining in v1.5:
-- Phase 27: Plan 7 (test suite — unit tests for parseGeneListFile, formatters, calculations)
 - Phase 29: Comprehensive test suite
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
@@ -174,3 +185,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *27-05 complete: 2026-02-24*
 *27-06 complete: 2026-02-24*
 *28-04 complete: 2026-02-24*
+*27-07 complete: 2026-02-24*
