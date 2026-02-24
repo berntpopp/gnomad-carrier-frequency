@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 27 (CLI Package) + Phase 28 (Gene Config System) — both in progress
+**Current focus:** v1.5 Phase 27 (CLI Package) — Plan 6 complete | Phase 28 (Gene Config System) — Plan 2 complete
 
 ---
 
@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Milestone:** v1.5 Core Extraction & CLI
 **Phase:** 27 of 29 (CLI Package) + 28 of 29 (Gene Config System) — both in progress
-**Plan:** 27-05 of 7 in phase 27 — COMPLETE | 28-02 of 4 in phase 28 — COMPLETE
-**Status:** 27-05 complete — batch subcommand with p-limit concurrency, parseGeneListFile exported; 28-02 complete (from prior session)
-**Last activity:** 2026-02-24 — Completed 27-05-PLAN.md (batch command)
+**Plan:** 27-06 of 7 in phase 27 — COMPLETE | 28-02 of 4 in phase 28 — COMPLETE
+**Status:** 27-06 complete — interactive wizard with @clack/prompts: gene input+autocomplete, version/population/format selects, advanced options, spinner, equivalent-command echo
+**Last activity:** 2026-02-24 — Completed 27-06-PLAN.md (interactive command)
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [█████████░] ~75% - Phase 28 Plan 2/4 complete
+v1.5 Core & CLI:    [█████████░] ~78% - Phase 27 Plan 6/7 + Phase 28 Plan 2/4 complete
 ```
 
-**Overall:** 90 plans complete across 26 phases in 5 milestones.
+**Overall:** 91 plans complete across 26 phases in 5 milestones.
 
 ---
 
@@ -97,6 +97,10 @@ Recent decisions for v1.5 (continued):
 - parseGeneListFile exported as standalone function (not inline in action handler) — enables Plan 07 unit tests without Commander machinery (27-05)
 - JSON auto-detection in parseGeneListFile: SyntaxError falls back to plain text; structural errors re-thrown with Zod message (27-05)
 - Batch exit codes: 0 all success, 1 partial failure (some genes skipped), 2 fail-fast triggered or fatal error (27-05)
+- Interactive wizard gene input: p.text for initial input, searchGenes() for typeahead, p.autocomplete for disambiguation — more robust than live-async options for slow networks (27-06)
+- Multi-population client-side filter in interactive: queryGene with undefined population (all), filter result.populations after — avoids multiple API calls (27-06)
+- buildEquivalentCommand omits flags matching defaults — produces minimal reproducible CLI command from wizard selections (27-06)
+- No-args TTY guard checks process.argv.length === 2 before parseAsync; pushes 'interactive' on TTY, prints help on non-TTY (27-06)
 
 ### Pending Todos
 
@@ -113,30 +117,36 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 27-05 — batch subcommand with p-limit concurrency, parseGeneListFile (exported), progress tracking, fail-fast, partial-failure exit codes
-**Status:** Phase 27 Plan 5 complete. Phase 27 Plans 4-6 running in parallel (wave 3). Phase 28 Plan 2 also complete.
+**Completed:** 27-06 — interactive wizard with @clack/prompts: gene text input + searchGenes autocomplete, version select, population multiselect, format select, advanced options, spinner, equivalent-command echo, no-args TTY fallback in cli.ts
+**Status:** Phase 27 Plan 6 complete. Phase 27 Wave 3 (plans 04, 05, 06) all complete. Phase 28 Plan 2 also complete.
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.5 scope: monorepo extraction, HWE 2pq + homozygote exclusion + genetic prevalence, full CLI, gene configs, comprehensive test suite.
 
-Phase 27 Plan 05 delivered:
-- packages/cli/src/commands/batch.ts: batchCommand + parseGeneListFile (exported)
-  - parseGeneListFile: JSON string-array, JSON object-array, plain text (# comments, blank line skip)
-  - p-limit concurrency (default 3, 1-10 range)
-  - Progress: "N/M genes processed" with \r in-place updates to stderr
-  - --fail-fast: stop on first error (exit 2); default: skip with error summary (exit 1 partial, 0 all success)
-  - Formats: json (default), text (rule-separated blocks), tsv
+Phase 27 Plan 06 delivered:
+- packages/cli/src/commands/interactive.ts: Full @clack/prompts wizard (383 lines)
+  - Gene: p.text + searchGenes + p.autocomplete disambiguation
+  - Version: p.select (v4/v3/v2)
+  - Population: p.multiselect (multi-pop client-side filtered)
+  - Format: p.select (text/json/tsv)
+  - Advanced: p.confirm -> HWE, hom exclusion, penetrance, variants breakdown
+  - Query with p.spinner()
+  - p.note() echoing equivalent gnomad-cf query command (minimal non-default flags)
+- packages/cli/src/cli.ts: Added interactiveCommand + no-args TTY/non-TTY fallback
 
-Phase 28 Plan 02 also previously delivered:
-- configs/genes/CFTR.json, HEXA.json, GJB2.json: seed gene config files
-- scripts/validate-gene-configs.ts: CI validation script
-- .github/workflows/validate-gene-configs.yml: PR workflow
+Phase 27 CLI Package is feature-complete (Wave 1+2+3 done, 6/7 plans complete):
+- 27-01: scaffold, types
+- 27-02: gene-query pipeline, retry, population-aliases, user-config
+- 27-03: output formatters (text, json, tsv, clinical)
+- 27-04: query subcommand
+- 27-05: batch subcommand
+- 27-06: interactive wizard
 
 Next plans:
-- Phase 27: Plan 6 (interactive command), Plan 7 (test suite — imports parseGeneListFile directly)
-- Phase 28: Plan 3 (web auto-apply), Plan 4 (remaining CI work)
+- Phase 27: Plan 7 (test suite — unit tests for parseGeneListFile, formatters, calculations)
+- Phase 28: Plan 3 (web auto-apply gene configs), Plan 4 (remaining CI work)
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
 Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
@@ -164,3 +174,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *28-02 complete: 2026-02-24*
 *27-04 complete: 2026-02-24*
 *27-05 complete: 2026-02-24*
+*27-06 complete: 2026-02-24*
