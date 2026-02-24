@@ -141,8 +141,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { config, getGnomadVersion, type GnomadVersion } from '@/config';
-import type { CarrierFrequencyResult } from '@/types';
+import { config, getGnomadVersion, type GnomadVersion } from '@gnomad-cf/core/config';
+import type { CarrierFrequencyResult } from '@gnomad-cf/core/types';
 
 const props = defineProps<{
   result: CarrierFrequencyResult | null;

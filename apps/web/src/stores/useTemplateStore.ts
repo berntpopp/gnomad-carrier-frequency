@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
-import type { Perspective, GenderStyle, PatientSex, TemplateConfig } from '@/types';
-import defaultDe from '@/config/templates/de.json';
-import defaultEn from '@/config/templates/en.json';
+import type { Perspective, GenderStyle, PatientSex, TemplateConfig } from '@gnomad-cf/core/types';
+import defaultDe from '@gnomad-cf/core/config/templates/de.json';
+import defaultEn from '@gnomad-cf/core/config/templates/en.json';
 
 // Type assertion for imported JSON
 const templateDe = defaultDe as TemplateConfig;

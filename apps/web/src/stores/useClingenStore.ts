@@ -3,8 +3,8 @@ import type {
   ClingenCacheState,
   ClingenEntry,
   ClingenValidityResult,
-} from '@/types';
-import { CLINGEN_CACHE_EXPIRY_MS } from '@/types';
+} from '@gnomad-cf/core/types';
+import { CLINGEN_CACHE_EXPIRY_MS } from '@gnomad-cf/core/types';
 
 export const useClingenStore = defineStore('clingen', {
   state: (): ClingenCacheState => ({

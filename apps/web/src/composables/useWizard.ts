@@ -1,7 +1,7 @@
 // Wizard state management composable
 
 import { reactive, computed, watch } from 'vue';
-import type { WizardState, WizardStep, FrequencySource } from '@/types';
+import type { WizardState, WizardStep, FrequencySource } from '@gnomad-cf/core/types';
 
 // Singleton state - shared across all useWizard() calls
 const state = reactive<WizardState>({

@@ -113,7 +113,7 @@ import { computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import * as XLSX from 'xlsx';
 import VariantTable from './VariantTable.vue';
-import type { DisplayVariant } from '@/types';
+import type { DisplayVariant } from '@gnomad-cf/core/types';
 import { buildExportVariants, generateFilename } from '@/utils/export-utils';
 import { useExclusionState } from '@/composables';
 

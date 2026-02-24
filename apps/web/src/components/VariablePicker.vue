@@ -60,7 +60,7 @@ import { computed } from 'vue';
 import {
   TEMPLATE_VARIABLES,
   type TemplateVariable,
-} from '@/config/template-variables';
+} from '@gnomad-cf/core/config/template-variables';
 
 const emit = defineEmits<{
   select: [variableName: string];

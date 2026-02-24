@@ -4,8 +4,8 @@ import {
   parseSubmissionsResponse,
   type ClinVarSubmission,
   type ClinVarVariantWithSubmissions,
-} from '@/api/queries';
-import { getReferenceGenome } from '@/config';
+} from '@gnomad-cf/core/queries';
+import { getReferenceGenome } from '@gnomad-cf/core/config';
 
 /** Batch size for fetching submissions (to avoid query size limits) */
 const BATCH_SIZE = 50;

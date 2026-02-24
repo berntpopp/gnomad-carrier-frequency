@@ -1,14 +1,14 @@
 import { computed } from 'vue';
 import { useTemplateStore } from '@/stores/useTemplateStore';
-import { renderTemplate } from '@/utils/template-renderer';
+import { renderTemplate } from '@gnomad-cf/core/templates';
 import type {
   Perspective,
   TemplateContext,
   FrequencySource,
   IndexPatientStatus,
   CarrierFrequencyResult,
-} from '@/types';
-import { config } from '@/config';
+} from '@gnomad-cf/core/types';
+import { config } from '@gnomad-cf/core/config';
 
 interface TextGeneratorInput {
   result: CarrierFrequencyResult | null;

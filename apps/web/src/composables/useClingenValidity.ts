@@ -1,6 +1,6 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue';
 import { useClingenStore } from '@/stores/useClingenStore';
-import type { ClingenEntry, ClingenValidityResult } from '@/types';
+import type { ClingenEntry, ClingenValidityResult } from '@gnomad-cf/core/types';
 
 // ClinGen CSV - use local bundled copy to avoid CORS issues on GitHub Pages
 // The file is stored in public/data/ and updated periodically via GitHub Actions

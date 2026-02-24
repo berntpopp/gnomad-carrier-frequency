@@ -6,7 +6,7 @@ import {
   getApiEndpoint,
   getGnomadVersion,
   type GnomadVersion,
-} from '@/config';
+} from '@gnomad-cf/core/config';
 
 // Current version state (reactive)
 const currentVersion = ref<GnomadVersion>(getGnomadVersion().version);

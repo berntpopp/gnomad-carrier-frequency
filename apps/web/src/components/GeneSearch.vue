@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { useGeneSearch } from '@/composables';
-import type { GeneSearchResult } from '@/api/queries/types';
+import type { GeneSearchResult } from '@gnomad-cf/core/queries';
 
 defineProps<{
   disabled?: boolean;

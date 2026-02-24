@@ -9,13 +9,13 @@ import {
   decodeFilterFlags,
   filtersMatchDefaults,
   FACTORY_FILTER_DEFAULTS,
-} from '@/types';
-import type { UrlState } from '@/types';
+} from '@gnomad-cf/core/types';
+import type { UrlState } from '@gnomad-cf/core/types';
 import { useWizard } from './useWizard';
 import { useFilterStore } from '@/stores/useFilterStore';
 import { useGeneSearch } from './useGeneSearch';
 import { useExclusionState } from './useExclusionState';
-import { encodeExclusions, decodeExclusions } from '@/utils/exclusion-url';
+import { encodeExclusions, decodeExclusions } from '@gnomad-cf/core/utils';
 
 // Module-level singleton state
 const isInitialized = ref(false);

@@ -3,9 +3,9 @@ import { useFilterStore } from '@/stores/useFilterStore';
 import {
   filterPathogenicVariantsConfigurable,
   getConflictingVariantIds,
-} from '@/utils/variant-filters';
-import type { FilterConfig, GnomadVariant, ClinVarVariant } from '@/types';
-import type { ClinVarSubmission } from '@/api/queries';
+} from '@gnomad-cf/core/filters';
+import type { FilterConfig, GnomadVariant, ClinVarVariant } from '@gnomad-cf/core/types';
+import type { ClinVarSubmission } from '@gnomad-cf/core/queries';
 
 /**
  * Return type for useVariantFilters composable

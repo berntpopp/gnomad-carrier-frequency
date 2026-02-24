@@ -90,8 +90,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useTemplateStore } from '@/stores/useTemplateStore';
-import { parseTemplate } from '@/utils/template-parser';
-import type { Perspective } from '@/types';
+import { parseTemplate } from '@gnomad-cf/core/templates';
+import type { Perspective } from '@gnomad-cf/core/types';
 
 const templateStore = useTemplateStore();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,7 +1,7 @@
 // Composable for exporting calculation results as JSON or Excel
 
 import * as XLSX from 'xlsx';
-import type { ExportData, LogEntry, LogStats } from '@/types';
+import type { ExportData, LogEntry, LogStats } from '@gnomad-cf/core/types';
 import { generateFilename } from '@/utils/export-utils';
 
 /**

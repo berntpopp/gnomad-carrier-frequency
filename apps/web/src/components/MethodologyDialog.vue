@@ -108,7 +108,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import methodology from '@/config/help/methodology.json';
+import methodology from '@gnomad-cf/core/config/help/methodology.json';
 
 const dialog = ref(false);
 </script>

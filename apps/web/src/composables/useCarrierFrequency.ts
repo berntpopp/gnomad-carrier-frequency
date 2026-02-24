@@ -6,16 +6,16 @@ import { useExclusionState } from './useExclusionState';
 import {
   filterPathogenicVariantsConfigurable,
   getConflictingVariantIds,
-} from '@/utils/variant-filters';
+} from '@gnomad-cf/core/filters';
 import {
   aggregatePopulationFrequencies,
   buildPopulationFrequencies,
-} from '@/utils/frequency-calc';
-import { formatCarrierFrequency } from '@/utils/formatters';
-import { config, type GnomadVersion } from '@/config';
+} from '@gnomad-cf/core/calculations';
+import { formatCarrierFrequency } from '@gnomad-cf/core/calculations';
+import { config, type GnomadVersion } from '@gnomad-cf/core/config';
 import { useGnomadVersion } from '@/api';
 import { useFilterStore } from '@/stores/useFilterStore';
-import type { ClinVarSubmission } from '@/api/queries';
+import type { ClinVarSubmission } from '@gnomad-cf/core/queries';
 import type {
   CarrierFrequencyResult,
   IndexPatientStatus,
@@ -23,7 +23,7 @@ import type {
   GnomadVariant,
   ClinVarVariant,
   FilterConfig,
-} from '@/types';
+} from '@gnomad-cf/core/types';
 
 // Default fallback from config - NO MAGIC NUMBERS
 const { defaultCarrierFrequency } = config.settings;

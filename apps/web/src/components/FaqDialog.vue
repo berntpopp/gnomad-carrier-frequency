@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import faq from '@/config/help/faq.json';
+import faq from '@gnomad-cf/core/config/help/faq.json';
 
 const dialog = ref(false);
 const openPanels = ref<number[]>([]);

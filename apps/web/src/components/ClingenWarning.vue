@@ -158,7 +158,7 @@
 <script setup lang="ts">
 import { computed, watch, onMounted } from 'vue';
 import { useClingenValidity } from '@/composables';
-import type { ClingenValidityResult } from '@/types';
+import type { ClingenValidityResult } from '@gnomad-cf/core/types';
 
 const props = defineProps<{
   geneSymbol: string | null;

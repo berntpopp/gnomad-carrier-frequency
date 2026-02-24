@@ -1,12 +1,12 @@
 import { computed, type Ref } from 'vue';
 import { useQuery } from 'villus';
-import { GENE_VARIANTS_QUERY } from '@/api/queries/gene-variants';
+import { GENE_VARIANTS_QUERY } from '@gnomad-cf/core/queries';
 import type {
   GeneVariantsResponse,
   GeneVariant,
   GeneClinvarVariant,
-} from '@/api/queries/types';
-import { getDatasetId, getReferenceGenome, type GnomadVersion } from '@/config';
+} from '@gnomad-cf/core/queries';
+import { getDatasetId, getReferenceGenome, type GnomadVersion } from '@gnomad-cf/core/config';
 import { useGnomadVersion } from '@/api';
 
 export interface UseGeneVariantsReturn {

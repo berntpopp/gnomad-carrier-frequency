@@ -1,5 +1,5 @@
 import { useLogStore } from '@/stores/useLogStore';
-import type { LogLevel } from '@/types';
+import type { LogLevel } from '@gnomad-cf/core/types';
 
 /**
  * Return type for the useLogger composable

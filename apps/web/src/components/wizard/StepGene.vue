@@ -58,7 +58,7 @@ import VersionSelector from '@/components/VersionSelector.vue';
 import GeneConstraintCard from '@/components/GeneConstraintCard.vue';
 import ClingenWarning from '@/components/ClingenWarning.vue';
 import OfflineFallback from '@/components/OfflineFallback.vue';
-import type { GeneSearchResult } from '@/api/queries/types';
+import type { GeneSearchResult } from '@gnomad-cf/core/queries';
 import { useGeneSearch, useNetworkStatus, useExclusionState } from '@/composables';
 import { useGnomadVersion } from '@/api';
 

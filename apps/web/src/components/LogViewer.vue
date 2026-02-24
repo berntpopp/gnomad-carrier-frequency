@@ -152,7 +152,7 @@
 import { ref, computed } from 'vue';
 import { useLogStore } from '@/stores/useLogStore';
 import { useExport, useConfirmDialog } from '@/composables';
-import type { LogLevel, LogEntry } from '@/types';
+import type { LogLevel, LogEntry } from '@gnomad-cf/core/types';
 
 const emit = defineEmits<{
   close: [];

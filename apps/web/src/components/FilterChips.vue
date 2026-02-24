@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { FilterConfig } from '@/types';
+import type { FilterConfig } from '@gnomad-cf/core/types';
 
 const props = defineProps<{
   filters: FilterConfig;

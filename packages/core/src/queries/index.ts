@@ -1,7 +1,7 @@
 // GraphQL queries module exports
 
 // Queries
-export { GENE_SEARCH_QUERY } from './gene-search';
+export { GENE_SEARCH_QUERY, GENE_DETAILS_QUERY } from './gene-search';
 export { GENE_VARIANTS_QUERY } from './gene-variants';
 
 // ClinVar submissions (for conflicting classification resolution)
@@ -33,4 +33,7 @@ export type {
   GeneClinvarVariant,
   GeneData,
   GeneVariantsResponse,
+  GnomadConstraint,
+  GeneDetailsResult,
+  GeneDetailsResponse,
 } from './types';

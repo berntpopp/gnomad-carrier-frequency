@@ -1,6 +1,6 @@
 // Singleton composable for variant exclusion state management
 import { reactive, computed, type ComputedRef } from 'vue';
-import type { ExclusionState, ExclusionReason } from '@/types';
+import type { ExclusionState, ExclusionReason } from '@gnomad-cf/core/types';
 
 // Module-level singleton state - shared across all useExclusionState() calls
 const state = reactive<ExclusionState>({

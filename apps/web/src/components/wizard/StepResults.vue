@@ -352,16 +352,16 @@
 import { computed, ref } from 'vue';
 import { useClipboard } from '@vueuse/core';
 import { useDisplay } from 'vuetify';
-import { config, getGnomadVersion, getPopulationLabel } from '@/config';
+import { config, getGnomadVersion, getPopulationLabel } from '@gnomad-cf/core/config';
 
 // Responsive breakpoint detection
 const { smAndDown } = useDisplay();
-import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@/types';
-import type { ClinVarSubmission } from '@/api/queries';
+import type { CarrierFrequencyResult, IndexPatientStatus, FrequencySource, GnomadVariant, ClinVarVariant, DisplayVariant, FilterConfig } from '@gnomad-cf/core/types';
+import type { ClinVarSubmission } from '@gnomad-cf/core/queries';
 import { useFilterStore } from '@/stores/useFilterStore';
 import { useExport, useAppAnnouncer, useExclusionState } from '@/composables';
-import { filterPathogenicVariantsConfigurable } from '@/utils/variant-filters';
-import { toDisplayVariants, filterVariantsByPopulation } from '@/utils/variant-display';
+import { filterPathogenicVariantsConfigurable } from '@gnomad-cf/core/filters';
+import { toDisplayVariants, filterVariantsByPopulation } from '@gnomad-cf/core/filters';
 import { buildExportData } from '@/utils/export-utils';
 import TextOutput from './TextOutput.vue';
 import FilterPanel from '@/components/FilterPanel.vue';

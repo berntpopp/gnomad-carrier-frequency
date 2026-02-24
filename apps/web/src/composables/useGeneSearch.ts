@@ -1,15 +1,15 @@
 import { computed, ref, watch, type Ref } from 'vue';
 import { useQuery } from 'villus';
 import { useDebounceFn } from '@vueuse/core';
-import { GENE_SEARCH_QUERY, GENE_DETAILS_QUERY } from '@/api/queries/gene-search';
+import { GENE_SEARCH_QUERY, GENE_DETAILS_QUERY } from '@gnomad-cf/core/queries';
 import type {
   GeneSearchResponse,
   GeneSearchResult,
   GeneDetailsResponse,
-} from '@/api/queries/types';
-import { config, getReferenceGenome } from '@/config';
+} from '@gnomad-cf/core/queries';
+import { config, getReferenceGenome } from '@gnomad-cf/core/config';
 import { useGnomadVersion, graphqlClient } from '@/api';
-import type { GeneConstraint } from '@/types';
+import type { GeneConstraint } from '@gnomad-cf/core/types';
 
 // Get settings from config - NO HARDCODED VALUES
 const { debounceMs, minSearchChars, maxAutocompleteResults } = config.settings;

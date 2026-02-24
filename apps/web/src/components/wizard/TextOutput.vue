@@ -158,7 +158,7 @@ import type {
   FrequencySource,
   IndexPatientStatus,
   CarrierFrequencyResult,
-} from '@/types';
+} from '@gnomad-cf/core/types';
 
 // Responsive breakpoint detection
 const { smAndDown } = useDisplay();

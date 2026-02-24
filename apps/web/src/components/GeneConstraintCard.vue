@@ -177,8 +177,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { GeneConstraint } from '@/types';
-import { getLoeufInterpretation, getPliInterpretation } from '@/types';
+import type { GeneConstraint } from '@gnomad-cf/core/types';
+import { getLoeufInterpretation, getPliInterpretation } from '@gnomad-cf/core/types';
 
 const props = defineProps<{
   constraint: GeneConstraint | null;

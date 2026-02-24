@@ -168,7 +168,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import type { FrequencySource } from '@/types';
+import type { FrequencySource } from '@gnomad-cf/core/types';
 
 const props = defineProps<{
   source: FrequencySource;

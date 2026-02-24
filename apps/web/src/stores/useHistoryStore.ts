@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { HistoryEntry, HistoryStoreState } from '@/types';
+import type { HistoryEntry, HistoryStoreState } from '@gnomad-cf/core/types';
 
 export const useHistoryStore = defineStore('history', {
   state: (): HistoryStoreState => ({

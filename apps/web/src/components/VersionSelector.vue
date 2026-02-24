@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { getAvailableVersions, getGnomadVersion, type GnomadVersion } from '@/config';
+import { getAvailableVersions, getGnomadVersion, type GnomadVersion } from '@gnomad-cf/core/config';
 import { useGnomadVersion } from '@/api';
 
 const { version, setVersion } = useGnomadVersion();

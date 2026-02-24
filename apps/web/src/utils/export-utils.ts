@@ -11,10 +11,10 @@ import type {
   ExportMetadata,
   ExportData,
   ExclusionReason,
-} from '@/types';
-import type { GnomadVersion } from '@/config';
-import { getGnomadVersion, EXCLUSION_REASONS } from '@/config';
-import { config } from '@/config';
+} from '@gnomad-cf/core/types';
+import type { GnomadVersion } from '@gnomad-cf/core/config';
+import { getGnomadVersion, EXCLUSION_REASONS } from '@gnomad-cf/core/config';
+import { config } from '@gnomad-cf/core/config';
 
 /**
  * Sanitize filename by removing/replacing unsafe characters

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { LogLevel, LogEntry, LogSettings, LogStats } from '@/types';
+import type { LogLevel, LogEntry, LogSettings, LogStats } from '@gnomad-cf/core/types';
 
 interface LogStoreState {
   entries: LogEntry[];

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import type { FilterConfig, FilterDefaults } from '@/types';
-import { FACTORY_FILTER_DEFAULTS } from '@/types';
+import type { FilterConfig, FilterDefaults } from '@gnomad-cf/core/types';
+import { FACTORY_FILTER_DEFAULTS } from '@gnomad-cf/core/types';
 
 interface FilterStoreState {
   defaults: FilterDefaults;

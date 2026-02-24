@@ -292,9 +292,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import type { DisplayVariant } from '@/types';
-import { getClinvarColor, formatAlleleFrequency } from '@/utils/variant-display';
-import { getDatasetId, getReferenceGenome } from '@/config';
+import type { DisplayVariant } from '@gnomad-cf/core/types';
+import { getClinvarColor, formatAlleleFrequency } from '@gnomad-cf/core/filters';
+import { getDatasetId, getReferenceGenome } from '@gnomad-cf/core/config';
 import { useExclusionState } from '@/composables';
 
 const props = defineProps<{

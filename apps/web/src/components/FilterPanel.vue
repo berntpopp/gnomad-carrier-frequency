@@ -313,7 +313,7 @@
 import { ref, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import FilterChips from './FilterChips.vue';
-import type { FilterConfig } from '@/types';
+import type { FilterConfig } from '@gnomad-cf/core/types';
 
 const props = defineProps<{
   modelValue: FilterConfig;
