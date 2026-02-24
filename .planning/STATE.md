@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 28 — Gene Config System (in progress)
+**Current focus:** v1.5 Phase 27 (CLI Package) + Phase 28 (Gene Config System) — both in progress
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 28 of 29 (Gene Config System) — In progress
-**Plan:** 2 of 4 in current phase — COMPLETE
-**Status:** 28-02 complete — seed gene configs (CFTR/HEXA/GJB2), CI validation script, GitHub Actions workflow
-**Last activity:** 2026-02-24 — Completed 28-02-PLAN.md (seed gene configs + CI validation)
+**Phase:** 27 of 29 (CLI Package) + 28 of 29 (Gene Config System) — both in progress
+**Plan:** 27-05 of 7 in phase 27 — COMPLETE | 28-02 of 4 in phase 28 — COMPLETE
+**Status:** 27-05 complete — batch subcommand with p-limit concurrency, parseGeneListFile exported; 28-02 complete (from prior session)
+**Last activity:** 2026-02-24 — Completed 27-05-PLAN.md (batch command)
 
 ### Progress
 
@@ -94,6 +94,9 @@ Recent decisions for v1.5 (continued):
 - CLI-13 stub: --config flag prints deferral message to stderr and continues with defaults (not exit 1) (27-04)
 - gnomadVersion CLI flag remapped to 'version' key before mergeConfig — matches mergeConfig expected key (27-04)
 - filterConfig overrides applied post-mergeConfig for --lof/--no-lof — ensures CLI flags win over user config (27-04)
+- parseGeneListFile exported as standalone function (not inline in action handler) — enables Plan 07 unit tests without Commander machinery (27-05)
+- JSON auto-detection in parseGeneListFile: SyntaxError falls back to plain text; structural errors re-thrown with Zod message (27-05)
+- Batch exit codes: 0 all success, 1 partial failure (some genes skipped), 2 fail-fast triggered or fatal error (27-05)
 
 ### Pending Todos
 
@@ -110,24 +113,30 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 28-02 — seed gene configs (CFTR/HEXA/GJB2), Bun-native CI validation script, GitHub Actions PR workflow
-**Status:** Phase 28 Plan 2 complete. Next: Plan 3 (web auto-apply), Plan 4 (any remaining CI work)
+**Completed:** 27-05 — batch subcommand with p-limit concurrency, parseGeneListFile (exported), progress tracking, fail-fast, partial-failure exit codes
+**Status:** Phase 27 Plan 5 complete. Phase 27 Plans 4-6 running in parallel (wave 3). Phase 28 Plan 2 also complete.
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.5 scope: monorepo extraction, HWE 2pq + homozygote exclusion + genetic prevalence, full CLI, gene configs, comprehensive test suite.
 
-Phase 28 Plan 02 delivered:
-- configs/genes/CFTR.json: Classic CF (default, penetrance 1.0) and CFTR-RD (penetrance 0.03) profiles
-- configs/genes/HEXA.json: Tay-Sachs disease profile (default, penetrance 1.0, AJ founder effect notes)
-- configs/genes/GJB2.json: DFNB1 nonsyndromic hearing loss profile (default, penetrance 1.0)
-- scripts/validate-gene-configs.ts: Bun-native TS validation script, Zod v4 .issues API, exits 1 on failure
-- .github/workflows/validate-gene-configs.yml: PR workflow with path filters for configs/genes/**, gene-config source, validation script
+Phase 27 Plan 05 delivered:
+- packages/cli/src/commands/batch.ts: batchCommand + parseGeneListFile (exported)
+  - parseGeneListFile: JSON string-array, JSON object-array, plain text (# comments, blank line skip)
+  - p-limit concurrency (default 3, 1-10 range)
+  - Progress: "N/M genes processed" with \r in-place updates to stderr
+  - --fail-fast: stop on first error (exit 2); default: skip with error summary (exit 1 partial, 0 all success)
+  - Formats: json (default), text (rule-separated blocks), tsv
 
-Next plans in Phase 28:
-- 28-03: Web auto-apply — load gene config in wizard, pre-populate filter overrides
-- 28-04: (if any remaining CI/tooling work)
+Phase 28 Plan 02 also previously delivered:
+- configs/genes/CFTR.json, HEXA.json, GJB2.json: seed gene config files
+- scripts/validate-gene-configs.ts: CI validation script
+- .github/workflows/validate-gene-configs.yml: PR workflow
+
+Next plans:
+- Phase 27: Plan 6 (interactive command), Plan 7 (test suite — imports parseGeneListFile directly)
+- Phase 28: Plan 3 (web auto-apply), Plan 4 (remaining CI work)
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
 Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
@@ -154,3 +163,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *28-01 complete: 2026-02-24*
 *28-02 complete: 2026-02-24*
 *27-04 complete: 2026-02-24*
+*27-05 complete: 2026-02-24*
