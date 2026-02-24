@@ -14,10 +14,10 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 25 of 29 (Monorepo Foundation & Core Extraction)
-**Plan:** 5 of 5 in current phase (awaiting human-verify checkpoint)
-**Status:** Executing — paused at checkpoint
-**Last activity:** 2026-02-24 — Completed 25-05-PLAN.md Task 1 (CI/deploy updated, .gitignore cleaned, CLAUDE.md rewritten); paused at human-verify checkpoint
+**Phase:** 26 of 29 (Calculation Improvements in Core)
+**Plan:** 5 of 5 in current phase (complete)
+**Status:** Phase 26 complete
+**Last activity:** 2026-02-24 — Completed 26-05-PLAN.md (variant filter + template renderer unit tests)
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [█████░░░░░] ~25% - Phase 25 plan 5/5 in progress (checkpoint)
+v1.5 Core & CLI:    [██████░░░░] ~40% - Phase 26 complete (5/5 plans), Phase 27 next
 ```
 
-**Overall:** 87 plans complete across 24+ phases in 5 milestones.
+**Overall:** 92 plans complete across 26+ phases in 5 milestones.
 
 ---
 
@@ -80,8 +80,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 25-05-PLAN.md Task 1 — CI/deploy.yml updated for monorepo, .gitignore cleaned, CLAUDE.md rewritten, typecheck bug fixed
-**Status:** Phase 25 plan 5/5 in progress — paused at human-verify checkpoint (Task 2)
+**Completed:** 26-05-PLAN.md — 55 variant filter tests + 32 template renderer tests (all 130 tests passing)
+**Status:** Phase 26 complete — all 5 plans done. Ready for Phase 27 (CLI)
 
 ### Handoff Notes
 
