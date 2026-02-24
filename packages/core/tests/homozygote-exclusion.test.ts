@@ -51,8 +51,8 @@ describe('calculateGCR', () => {
 
   it('applies inclusion-exclusion for three variants', () => {
     // GCR = 1 - (1-0.02)*(1-0.01)*(1-0.005) = 1 - 0.98*0.99*0.995
-    // = 1 - 0.98 * 0.99 * 0.995 = 1 - 0.965169 = 0.034831...
-    expect(calculateGCR([0.02, 0.01, 0.005])).toBeCloseTo(0.03471, 5)
+    // = 1 - 0.965169 = 0.034651
+    expect(calculateGCR([0.02, 0.01, 0.005])).toBeCloseTo(0.034651, 5)
   })
 
   it('result is always less than simple sum of VCRs (inclusion-exclusion principle)', () => {

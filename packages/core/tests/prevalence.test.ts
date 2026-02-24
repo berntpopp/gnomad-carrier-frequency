@@ -38,12 +38,15 @@ describe('calculateGeneticPrevalence', () => {
   })
 
   it('is always computed from raw q (SumAF), NOT from carrier frequency', () => {
-    // Verify: q^2 != (2pq)^2 / 4
-    // For q=0.023: q^2 = 0.000529, but (2pq)^2/4 = (0.044942)^2/4 = 0.000505...
+    // Verify: q^2 != (2pq)^2 / 4 — both give different values
+    // For q=0.023: q^2 = 0.000529, but (2pq)^2/4 = (0.044942)^2/4 = 0.000505
+    // The difference is ~0.000024 — both are "similar" in magnitude but distinct
     const prevalence = calculateGeneticPrevalence([0.023])
     const incorrectFormula = Math.pow(2 * 0.977 * 0.023, 2) / 4
-    expect(prevalence).not.toBeCloseTo(incorrectFormula, 4)
+    // Use a stricter check: verify exact q^2 value, not "not equal to other formula"
     expect(prevalence).toBeCloseTo(0.000529, 6)
+    // The incorrect formula yields a meaningfully different value
+    expect(Math.abs(prevalence - incorrectFormula)).toBeGreaterThan(0.00002)
   })
 })
 

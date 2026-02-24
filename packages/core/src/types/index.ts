@@ -80,3 +80,6 @@ export type {
   HistorySettings,
   HistoryStoreState,
 } from './history';
+
+export type { CalcConfig, CalcResult } from './calculations';
+export { FACTORY_CALC_DEFAULTS } from './calculations';
