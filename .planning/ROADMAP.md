@@ -173,7 +173,7 @@ Plans:
   2. `bun run typecheck` at repo root type-checks packages/core, packages/cli, AND apps/web — a type error in CLI code fails the root typecheck
   3. CLI `gene-query.ts` calls `calculateGeneticPrevalence()` and `calculateBayesianPrevalence()` from `@gnomad-cf/core/calculations` instead of inline math
   4. A new CLI integration test asserts that filter flags change the variant filtering behavior on fixture data
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
 - [ ] 30-01-PLAN.md — Fix FilterConfig field names, add CLI to typecheck, delegate prevalence to core, add filter-effect test
