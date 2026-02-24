@@ -10,6 +10,7 @@ export default defineConfig({
     calculations: 'src/calculations/index.ts',
     templates:    'src/templates/index.ts',
     utils:        'src/utils/index.ts',
+    client:       'src/client/index.ts',
   },
   format: ['esm'],
   dts: true,

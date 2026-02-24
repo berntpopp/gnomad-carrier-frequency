@@ -20,3 +20,6 @@ export * from './templates/index.js'
 
 // Utils
 export * from './utils/index.js'
+
+// Client
+export * from './client/index.js'
