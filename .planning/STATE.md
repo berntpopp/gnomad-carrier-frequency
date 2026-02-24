@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 28 (Gene Config System) — COMPLETE (4/4 plans, E2E verified) | Phase 29 remaining
+**Current focus:** v1.5 Phase 29 (Test Suite Completion) — In progress (1/5 plans complete)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 28 of 29 (Gene Config System) — COMPLETE | Phase 29 (Test Suite) remaining
-**Plan:** 28-04 of 4 in phase 28 — COMPLETE
-**Status:** Phase 28 E2E verified — Playwright 10/10 gene config tests pass, 226 unit tests pass, full wizard flow confirmed
-**Last activity:** 2026-02-24 — E2E Playwright verification of Phases 27+28 against live dev server
+**Phase:** 29 of 29 (Test Suite Completion) — In progress (1/5 plans done)
+**Plan:** 29-01 of 5 in phase 29 — COMPLETE
+**Status:** Web vitest infrastructure + 88 Pinia store unit tests passing; 314 total tests across core/cli/web
+**Last activity:** 2026-02-24 — Completed 29-01: web test infrastructure + store unit tests
 
 ### Progress
 
@@ -27,18 +27,18 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [██████████] ~95% - Phase 27 Plan 7/7 + Phase 28 Plan 4/4 complete (Phase 29 remaining)
+v1.5 Core & CLI:    [██████████] ~97% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 1/5 complete
 ```
 
-**Overall:** 104 plans complete across 28 phases in 5 milestones.
+**Overall:** 105 plans complete across 29 phases in 5 milestones.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 104
-- v1.5 plans completed: 21
+- Total plans completed: 105
+- v1.5 plans completed: 22
 
 ---
 
@@ -106,6 +106,9 @@ Recent decisions for v1.5 (continued):
 - withRetry mocked in CLI tests via vi.mock('../utils/retry.js') to bypass retry delays; mock calls fn() directly (27-07)
 - Batch processing tests simulate pLimit+Promise.all pattern directly — import parseGeneListFile as standalone function, no Commander machinery (27-07)
 - CLI vitest.config.ts follows same pattern as packages/core — name, environment: node, include pattern (27-07)
+- happy-dom chosen over jsdom for apps/web tests — jsdom@28.1.0 ships html-encoding-sniffer@6.0.0 which require()s @exodus/bytes ESM, causing ERR_REQUIRE_ESM crash (29-01)
+- Minimal createVuetify() in test setup (no wildcard component import) — importing vuetify/components wholesale triggers ~200 CSS imports that vitest Node runner cannot handle (29-01)
+- Store unit tests use real createPinia() with setActivePinia in beforeEach — isolation without persistence plugin, not createTestingPinia (29-01)
 
 ### Pending Todos
 
@@ -122,8 +125,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** E2E Playwright verification of Phases 27+28 against live dev server + gnomAD API
-**Status:** Phases 27 and 28 fully verified E2E. 10/10 Playwright gene config tests pass, 226 unit tests pass, full CFTR wizard flow confirmed with live API data.
+**Completed:** Plan 29-01 — web vitest infrastructure + 88 Pinia store unit tests
+**Status:** 314 total tests passing (core 99 + cli 72 + web 88 + core-tests 55). apps/web has working vitest.config.ts, test setup/helpers, and 5 store test files.
 **Resume file:** None
 
 ### Handoff Notes
@@ -179,3 +182,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *Phase 27 verified: 2026-02-24*
 *28-03 complete: 2026-02-24*
 *Phase 28 E2E verified: 2026-02-24*
+*29-01 complete: 2026-02-24*
