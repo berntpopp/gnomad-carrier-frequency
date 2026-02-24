@@ -1,20 +1,20 @@
 # Phase 27: CLI Package - Research
 
 **Researched:** 2026-02-24
-**Domain:** Node.js/Bun CLI tooling — subcommand framework, interactive prompts, batch concurrency, tsdown build
-**Confidence:** HIGH (core stack), MEDIUM (gnomAD rate limits), HIGH (architecture patterns)
+**Domain:** Node.js/TypeScript CLI tool with interactive prompts, batch processing, and integration with @gnomad-cf/core
+**Confidence:** HIGH (core stack), HIGH (architecture patterns), MEDIUM (tsdown banner exact syntax), LOW (gnomAD rate limits)
 
 ---
 
 ## Summary
 
-Phase 27 builds `@gnomad-cf/cli` — a `gnomad-cf` binary living in `packages/cli/` — that reuses `@gnomad-cf/core` for all calculations, queries, and template rendering. The CLI has three modes: `query <gene>`, `batch <file>`, and `interactive` (launched automatically when run with no args). It outputs human-readable summary blocks by default, with `--format json|tsv` for machine-readable output, a `--variants` flag for per-variant breakdown, and a `--text`/`--clinical` flag for German/English clinical text via the existing template renderer.
+Phase 27 builds `@gnomad-cf/cli` — a `gnomad-cf` binary in `packages/cli/` — that reuses `@gnomad-cf/core` for all calculations, queries, and template rendering. The CLI has three modes: `query <gene>`, `batch <file>`, and `interactive` (auto-launched with no args). It outputs human-readable summary blocks by default, with `--format json|tsv` for machine-readable output, a `--variants` flag for per-variant breakdown, and a `--text`/`--clinical` flag for German/English clinical text via the existing template renderer.
 
-The standard stack for this domain in 2026 is: **commander v14** for subcommand parsing (most widely adopted, git/docker-style interface, excellent TypeScript types), **@clack/prompts v1.0.1** for interactive wizard prompts (the requirement CLI-10 calls this out by name, and v1.0 added the `autocomplete` and `autocompleteMultiselect` types needed for the gene search typeahead), **p-limit v7.3** for concurrency control in batch mode, and **zod v4** (already in `@gnomad-cf/core`) for `~/.gnomad-cf.json` config file validation. No separate progress bar library is needed — `@clack/prompts` provides `progress` built in.
+The standard stack for 2026: **commander v14.0.3** for subcommand parsing (281M weekly downloads, git-style subcommands, TypeScript built-in), **@clack/prompts v1.0.1** for interactive wizard (mandated by CLI-10; v1.0 added `autocomplete`, `progress`, and `multiselect` used by this phase), **p-queue v8.1.0** for concurrency-controlled batch processing (better fit than p-limit because it tracks active/pending counts and has queue draining semantics), and **zod v4.3.5** (already in `@gnomad-cf/core`) for `~/.gnomad-cf.json` config file validation.
 
-Build: tsdown with a `banner` callback to inject `#!/usr/bin/env node` shebang only on the CLI entry chunk. The `bin` field in `packages/cli/package.json` points to `dist/cli.js`. tsdown v0.20.x is already installed in the repo devDependencies and proven to work.
+Build: tsdown v0.20.3 (already in monorepo) with `banner: { js: '#!/usr/bin/env node' }` (ChunkAddon format) and `platform: 'node'`. The `bin` field in `packages/cli/package.json` points to `dist/cli.js`. The CLI package must have `"type": "module"` because both commander 14 and @clack/prompts 1.0 are ESM-only.
 
-**Primary recommendation:** Use commander v14 + @clack/prompts v1.0.1 + p-limit v7.3, build with tsdown (banner shebang), all core logic delegated to `@gnomad-cf/core` subpaths. Zero reimplementation of calculation logic.
+**Primary recommendation:** commander v14 + @clack/prompts v1.0.1 + p-queue v8.1 + tsdown with node platform + zod for config. Delegate ALL calculation logic to `@gnomad-cf/core` subpaths. The CLI is a thin I/O layer.
 
 ---
 
@@ -24,31 +24,36 @@ Build: tsdown with a `banner` callback to inject `#!/usr/bin/env node` shebang o
 
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
-| commander | 14.0.3 | Subcommand parsing, option handling, help generation | Most widely adopted, git-style subcommands, excellent TypeScript types, Node v20+ required (matches bun) |
-| @clack/prompts | 1.0.1 | Interactive wizard prompts (text, select, multiselect, autocomplete) | Named in CLI-10 requirement; v1.0 added `autocomplete` type needed for gene typeahead; ESM-only; bombshell-dev maintained |
-| p-limit | 7.3.0 | Concurrency control for batch mode (max N concurrent fetches) | Sindre Sorhus library, minimal API, `limit.activeCount` for progress tracking, ESM-only |
-| zod | 4.x (already in core) | Config file schema validation (`~/.gnomad-cf.json`) | Already a dependency in `@gnomad-cf/core`; reuse across packages; static type inference from schema |
+| `commander` | `^14.0.3` | Subcommand parsing, option handling, auto-help | 281M weekly downloads; git/docker-style subcommands; TypeScript types built-in; v14 stable (v15 ESM-only expected May 2026) |
+| `@clack/prompts` | `^1.0.1` | Interactive wizard (text, select, multiselect, autocomplete, spinner, progress) | Mandated by CLI-10; v1.0.0 added autocomplete + progress + ESM-only; 4,087 npm dependents; maintained by bombshell-dev |
+| `p-queue` | `^8.1.0` | Concurrency-limited parallel batch requests | Promise queue with `concurrency` option; ESM-only; tracks activeCount/pendingCount; supports timeout per task; maps directly to `--concurrency N` flag |
+| `zod` | `^4.3.5` | Config file schema validation for `~/.gnomad-cf.json` | Already in `@gnomad-cf/core` — reuse same dep; v4 stable (Aug 2025); 14x faster parsing; type inference for config schema |
+| `tsdown` | `0.20.3` | Bundle CLI source to executable with shebang | Already in monorepo devDeps; `banner` option for shebang; `platform: 'node'` enables node built-ins; proven in core package |
 
 ### Supporting
 
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| tsdown | 0.20.3 (already in devDeps) | Bundle `packages/cli/src/` to `dist/` with shebang banner | Build step; already proven in core package; supports `banner` callback for shebang injection |
-| @gnomad-cf/core (workspace) | 1.5.0 | ALL calculation logic, types, GraphQL client, templates | Import via subpaths: `/calculations`, `/client`, `/filters`, `/queries`, `/templates`, `/config`, `/types` |
+| `@gnomad-cf/core` (workspace) | `1.5.0` | ALL calculation, query, filter, template logic | Import via subpaths: `/calculations`, `/client`, `/filters`, `/queries`, `/templates`, `/config`, `/types` |
+| Node.js built-in `os` | — | `os.homedir()` for `~/.gnomad-cf.json` path | Config loader only; no external dep |
+| Node.js built-in `fs/promises` | — | Read batch input files, read config file | File I/O; no external dep |
+| Node.js built-in `path` | — | Path construction for config and output files | No external dep |
 
 ### Alternatives Considered
 
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
-| commander | citty v0.2 | citty (unjs) is lighter and ESM-only but less mature (v0.2.0), fewer users, GitHub issues open about unknown-option warnings. Commander 14 is the safer choice. |
-| commander | yargs | yargs has more built-in validation but heavier; commander has cleaner subcommand API |
-| p-limit | p-queue | p-queue has queue pausing/priority but adds complexity; p-limit's simple API matches the `--concurrency N` requirement exactly |
-| @clack/prompts autocomplete | inquirer autocomplete plugin | inquirer requires extra plugin for autocomplete; @clack/prompts v1.0 includes it natively |
+| `commander` | `citty` (unjs v0.2) | citty is lighter, ESM-only, TypeScript-first — but v0.2 is pre-stable with open GitHub issues about unknown-option handling; commander is safer |
+| `commander` | `yargs` | yargs more validation features; heavier; commander cleaner subcommand API; yargs has 148M weekly downloads vs 281M for commander |
+| `p-queue` | `p-limit` | p-limit is simpler (just limit concurrent calls) but lacks queue introspection, draining, and per-task timeouts that batch mode benefits from |
+| `@clack/prompts` | `inquirer` | inquirer requires extra plugin for autocomplete; @clack/prompts includes it natively in v1.0; CLI-10 mandates @clack/prompts anyway |
+| Zod for config | Manual type guards | Zod provides parse errors that name the bad field; static type inference from schema; already a dep |
 
 **Installation:**
 ```bash
-bun add commander @clack/prompts p-limit
-bun add -d tsdown typescript
+bun add commander @clack/prompts p-queue
+# zod already in @gnomad-cf/core — add to packages/cli if needed separately
+# bun add zod (if not pulled in via workspace)
 ```
 
 ---
@@ -60,34 +65,34 @@ bun add -d tsdown typescript
 ```
 packages/cli/
 ├── src/
-│   ├── cli.ts              # Entry point — commander program setup + shebang
+│   ├── cli.ts                   # Entry: commander program + shebang source
 │   ├── commands/
-│   │   ├── query.ts        # `gnomad-cf query <gene>` command handler
-│   │   ├── batch.ts        # `gnomad-cf batch <file>` command handler
-│   │   └── interactive.ts  # `gnomad-cf interactive` (also launched on no-args)
+│   │   ├── query.ts             # gnomad-cf query <gene>
+│   │   ├── batch.ts             # gnomad-cf batch <file>
+│   │   └── interactive.ts       # gnomad-cf interactive (wizard)
 │   ├── output/
-│   │   ├── text-formatter.ts   # Human-readable summary block renderer
-│   │   ├── json-formatter.ts   # JSON output serializer
-│   │   ├── tsv-formatter.ts    # TSV output serializer
+│   │   ├── text-formatter.ts    # Human-readable summary blocks
+│   │   ├── json-formatter.ts    # JSON serialization
+│   │   ├── tsv-formatter.ts     # TSV with field escaping
 │   │   └── clinical-formatter.ts # Clinical text via @gnomad-cf/core/templates
 │   ├── config/
-│   │   └── user-config.ts  # ~/.gnomad-cf.json loader + zod schema
+│   │   └── user-config.ts       # Zod schema + ~/.gnomad-cf.json loader
 │   └── utils/
-│       ├── population-aliases.ts  # "european" → "nfe" mapping
-│       ├── gene-query.ts          # Pure async function: gene + variants + calc
-│       └── retry.ts               # Exponential backoff wrapper for fetch
+│       ├── gene-query.ts         # Orchestrates fetch → filter → calc for one gene
+│       ├── population-aliases.ts # "european" → "nfe" mapping
+│       └── retry.ts              # Exponential backoff fetch wrapper
 ├── tsdown.config.ts
-└── package.json
+└── package.json                  # type:module, bin: {gnomad-cf: dist/cli.js}
 ```
 
 ### Pattern 1: Commander Subcommand Registration
 
-**What:** One `cli.ts` entry creates the `program`, registers three subcommands, and falls back to interactive when no args given.
+**What:** One `cli.ts` creates the root `program`, registers subcommands, and falls back to interactive when no args.
 **When to use:** Always — this is the entry point.
 
 ```typescript
 // src/cli.ts
-// Source: https://www.jsdocs.io/package/commander (commander v14)
+// Source: https://github.com/tj/commander.js (v14.0.3)
 import { Command } from 'commander'
 import { queryCommand } from './commands/query.js'
 import { batchCommand } from './commands/batch.js'
@@ -103,162 +108,205 @@ program
   .addCommand(batchCommand)
   .addCommand(interactiveCommand)
 
-// Launch interactive when no args given
+// No-args → interactive mode
 if (process.argv.length === 2) {
+  // Check TTY first — don't start wizard in piped contexts
+  if (!process.stdout.isTTY || !process.stdin.isTTY) {
+    console.error('No command given. Run with --help for usage.')
+    process.exit(1)
+  }
   process.argv.push('interactive')
 }
 
-program.parseAsync(process.argv)
+await program.parseAsync(process.argv)
+// MUST use parseAsync (not parse) when any action handler is async
 ```
 
 ### Pattern 2: Commander Subcommand with Options
 
-**What:** Each subcommand defined in its own file using `new Command()`.
+**What:** Each subcommand defined as its own `Command` instance in a separate file.
 
 ```typescript
 // src/commands/query.ts
-// Source: https://www.jsdocs.io/package/commander (commander v14)
+// Source: https://www.jsdocs.io/package/commander (v14)
 import { Command } from 'commander'
-import { resolvePopulation } from '../utils/population-aliases.js'
-import { loadUserConfig } from '../config/user-config.js'
 
 export const queryCommand = new Command('query')
   .description('Query carrier frequency for a single gene')
-  .argument('<gene>', 'Gene symbol (e.g. CFTR, HEXA)')
-  .option('-p, --population <id>', 'Filter to specific population (e.g. nfe, european)')
+  .argument('<gene>', 'Gene symbol (e.g. CFTR, HEXA, HBB)')
+  .option('-p, --population <id>', 'Restrict to population (short code or full name)')
   .option('-f, --format <fmt>', 'Output format: text|json|tsv', 'text')
-  .option('--variants', 'Include per-variant breakdown in output')
-  .option('--text', 'Generate clinical documentation text')
+  .option('--variants', 'Include per-variant breakdown')
+  .option('--text', 'Generate clinical documentation text (alias: --clinical)')
+  .option('--clinical', 'Generate clinical documentation text (alias: --text)')
   .option('--gnomad-version <ver>', 'gnomAD version: v4|v3|v2', 'v4')
-  .option('--hwe', 'Use HWE formula (default: on)', true)
-  .option('--exclude-homozygotes', 'Apply homozygote exclusion (default: on)', true)
+  .option('--hwe', 'Use HWE 2pq formula (default: VCR/GCR homozygote exclusion)')
+  .option('--no-exclude-homozygotes', 'Disable homozygote exclusion (use raw sumAF)')
   .option('--penetrance <n>', 'Penetrance fraction 0-1', parseFloat, 1.0)
+  .option('--lof', 'Include LoF HC variants (default: on)')
+  .option('--clinvar', 'Include ClinVar P/LP variants (default: on)')
+  .option('--star-threshold <n>', 'ClinVar star threshold 0-4', parseInt, 2)
   .option('-o, --output <path>', 'Write output to file (default: stdout)')
+  .option('--config <gene>', 'Apply community-curated gene config (Phase 28 feature)')
   .action(async (gene: string, opts) => {
+    const { loadUserConfig } = await import('../config/user-config.js')
     const userConfig = await loadUserConfig()
-    const pop = opts.population ? resolvePopulation(opts.population) : undefined
-    // delegate to gene-query utility
+    // CLI flags override userConfig defaults
+    await runQuery(gene, mergeOptions(userConfig, opts))
   })
 ```
 
 ### Pattern 3: Clack Interactive Wizard
 
-**What:** `@clack/prompts` drives the step-by-step wizard. Gene input uses `autocomplete` for typeahead search, populations use `multiselect`.
+**What:** Step-by-step wizard using `@clack/prompts` v1.0.1 components.
+**When to use:** `gnomad-cf interactive` or `gnomad-cf` with no args.
 
 ```typescript
 // src/commands/interactive.ts
-// Source: https://github.com/bombshell-dev/clack (v1.0.1)
+// Source: https://bomb.sh/docs/clack/packages/prompts (v1.0.1)
 import * as p from '@clack/prompts'
+import { getPopulations } from '@gnomad-cf/core/config'
 import { executeGraphQLQuery } from '@gnomad-cf/core/client'
 import { GENE_SEARCH_QUERY } from '@gnomad-cf/core/queries'
 
 export async function runInteractive() {
   p.intro('gnomad-cf — Carrier Frequency Calculator')
 
-  // Gene autocomplete: user types partial name, gets matching options
+  // Step 1: Gene search with autocomplete typeahead
   const gene = await p.autocomplete({
     message: 'Search for a gene:',
-    placeholder: 'Type a gene symbol (e.g. CFTR)',
+    placeholder: 'Type a gene symbol (min 2 chars, e.g. CFTR)',
+    maxItems: 10,
     options: async (input: string) => {
       if (!input || input.length < 2) return []
-      const results = await searchGenes(input)
-      return results.map(g => ({ label: g.symbol, value: g.symbol, hint: g.name }))
+      // Debounce handled externally or rely on @clack/prompts internal pacing
+      const result = await executeGraphQLQuery({
+        query: GENE_SEARCH_QUERY,
+        variables: { query: input, referenceGenome: 'GRCh38' },
+      })
+      const genes = result.data?.gene_search ?? []
+      return genes.map((g: { symbol: string }) => ({ label: g.symbol, value: g.symbol }))
     },
   })
-  if (p.isCancel(gene)) { p.cancel('Cancelled'); process.exit(0) }
+  if (p.isCancel(gene)) { p.cancel('Cancelled.'); process.exit(0) }
 
-  // Population multiselect
+  // Step 2: Population selection (multiselect)
+  const pops = getPopulations('v4')
   const populations = await p.multiselect({
-    message: 'Select populations (space to select, enter to confirm):',
-    options: getPopulationOptions(),
-    required: false,
+    message: 'Select populations (space to toggle, enter to confirm):',
+    options: pops.map(pop => ({ value: pop.code, label: pop.label })),
+    required: false, // empty = all populations
   })
-  if (p.isCancel(populations)) { p.cancel('Cancelled'); process.exit(0) }
+  if (p.isCancel(populations)) { p.cancel('Cancelled.'); process.exit(0) }
 
-  // Format selection
+  // Step 3: Output format
   const format = await p.select({
     message: 'Output format:',
     options: [
-      { value: 'text', label: 'Human-readable text' },
-      { value: 'json', label: 'JSON' },
-      { value: 'tsv', label: 'TSV (spreadsheet)' },
+      { value: 'text', label: 'Human-readable summary' },
+      { value: 'json', label: 'JSON (machine-readable)' },
+      { value: 'tsv', label: 'TSV (spreadsheet-ready)' },
     ],
   })
+  if (p.isCancel(format)) { p.cancel('Cancelled.'); process.exit(0) }
 
-  // Echo equivalent command for scripting graduation
-  const cmd = buildEquivalentCommand({ gene, populations, format })
-  p.note(cmd, 'Equivalent command for future use:')
+  // Echo equivalent CLI command for scripting graduation
+  const popArg = (populations as string[]).length > 0
+    ? (populations as string[]).map(pop => `-p ${pop}`).join(' ')
+    : ''
+  const equivalent = `gnomad-cf query ${gene} --format ${format} ${popArg}`.trim()
+  p.note(equivalent, 'Equivalent command for future use:')
 
-  p.outro('Query complete!')
+  // Run the query using same logic as `query` command
+  await runQuery(gene as string, {
+    gnomadVersion: 'v4',
+    format: format as string,
+    populations: populations as string[],
+    filterConfig: FACTORY_FILTER_DEFAULTS,
+    calcConfig: FACTORY_CALC_DEFAULTS,
+  })
+
+  p.outro('Done!')
 }
 ```
 
-### Pattern 4: Batch Processing with p-limit + Progress
+### Pattern 4: Batch Processing with p-queue + Progress
 
-**What:** `p-limit` controls concurrency; `@clack/prompts` `progress` tracks completion.
+**What:** `p-queue` controls concurrency; `@clack/prompts` `progress` tracks completion with ETA-style messages.
+**When to use:** `gnomad-cf batch <file>`.
 
 ```typescript
 // src/commands/batch.ts
-// Source: https://github.com/sindresorhus/p-limit (v7.3.0)
-import pLimit from 'p-limit'
+// Source: https://github.com/sindresorhus/p-queue (v8.1.0) + @clack/prompts
+import PQueue from 'p-queue'
 import * as p from '@clack/prompts'
+import { queryGene } from '../utils/gene-query.js'
 
 export async function runBatch(filePath: string, opts: BatchOptions) {
   const genes = await readGeneList(filePath) // auto-detect JSON or plain text
-  const limit = pLimit(opts.concurrency ?? 3)
+  const queue = new PQueue({ concurrency: opts.concurrency ?? 3 })
   const results: BatchResult[] = []
   const errors: BatchError[] = []
+  let processed = 0
 
-  const bar = p.progress()
+  const bar = p.progress({ max: genes.length })
   bar.start(`Processing ${genes.length} genes`, 0)
 
-  const tasks = genes.map((gene, i) =>
-    limit(async () => {
+  const tasks = genes.map(gene =>
+    queue.add(async () => {
       try {
-        const result = await queryGeneWithRetry(gene, opts)
+        const result = await queryGene(gene, opts)
         results.push({ gene, result })
       } catch (err) {
         errors.push({ gene, error: String(err) })
-        if (opts.failFast) throw err
+        if (opts.failFast) {
+          queue.clear() // stop remaining tasks
+          throw err
+        }
       } finally {
-        bar.advance(1, `${i + 1}/${genes.length} — ${gene}`)
+        processed++
+        bar.advance(1, `${processed}/${genes.length} — ${gene}`)
       }
     })
   )
 
   await Promise.all(tasks)
-  bar.stop('Done')
+  bar.stop(`Processed ${genes.length} genes`)
 
-  // Print failure summary
+  // Failure summary
   if (errors.length > 0) {
     p.log.warn(`${errors.length} gene(s) failed:`)
     for (const e of errors) p.log.error(`  ${e.gene}: ${e.error}`)
   }
+
+  return { results, errors }
 }
 ```
 
-### Pattern 5: tsdown Build with Shebang Banner
+### Pattern 5: tsdown Config for CLI Binary
 
-**What:** tsdown config adds `#!/usr/bin/env node` only to the CLI chunk, leaving the rest clean.
+**What:** tsdown configuration that produces a node executable with shebang.
+**When to use:** `packages/cli/tsdown.config.ts`.
 
 ```typescript
 // packages/cli/tsdown.config.ts
-// Source: https://rolldown.rs/reference/interface.outputoptions (banner option)
+// Source: https://tsdown.dev/reference/api/Interface.UserConfig (banner: ChunkAddon)
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
   entry: { cli: 'src/cli.ts' },
   format: ['esm'],
-  dts: false,          // CLI doesn't need declarations
+  platform: 'node',       // NOT 'neutral' — CLI targets Node.js only
+  dts: false,             // CLI binary doesn't need .d.ts declarations
   clean: true,
-  platform: 'node',   // NOT 'neutral' — CLI is node-specific
   banner: {
-    js: '#!/usr/bin/env node',
+    js: '#!/usr/bin/env node',  // ChunkAddon object form
   },
+  // minify: false (default) — keep for readable stack traces in errors
 })
 ```
 
-And in `packages/cli/package.json`:
+And `packages/cli/package.json`:
 ```json
 {
   "name": "@gnomad-cf/cli",
@@ -267,18 +315,28 @@ And in `packages/cli/package.json`:
   "bin": { "gnomad-cf": "dist/cli.js" },
   "scripts": {
     "build": "tsdown",
+    "postbuild": "chmod +x dist/cli.js",
     "dev": "bun run src/cli.ts"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "@clack/prompts": "^1.0.1",
+    "p-queue": "^8.1.0"
+  },
+  "devDependencies": {
+    "tsdown": "0.20.3",
+    "typescript": "~5.9.3"
   }
 }
 ```
 
-### Pattern 6: User Config File (Zod Schema)
+### Pattern 6: User Config File with Zod Schema
 
-**What:** `~/.gnomad-cf.json` sets per-user defaults; CLI flags override per-invocation.
+**What:** Load `~/.gnomad-cf.json`, validate with Zod, merge with CLI flag overrides. File absence is not an error.
 
 ```typescript
 // src/config/user-config.ts
-// Zod already in @gnomad-cf/core dependencies — reuse same version
+// Source: nodejs.org/api/os.html + zod.dev/v4
 import { z } from 'zod'
 import { homedir } from 'node:os'
 import { readFile } from 'node:fs/promises'
@@ -292,7 +350,11 @@ const UserConfigSchema = z.object({
   hwe: z.boolean().optional(),
   excludeHomozygotes: z.boolean().optional(),
   penetrance: z.number().min(0).max(1).optional(),
-}).strict()
+  lofEnabled: z.boolean().optional(),
+  clinvarEnabled: z.boolean().optional(),
+  clinvarStarThreshold: z.number().int().min(0).max(4).optional(),
+  language: z.enum(['de', 'en']).optional(),
+}).strict() // reject unknown keys — clear error message if user misspells a key
 
 export type UserConfig = z.infer<typeof UserConfigSchema>
 
@@ -301,18 +363,23 @@ export async function loadUserConfig(): Promise<UserConfig> {
   try {
     const raw = await readFile(path, 'utf-8')
     return UserConfigSchema.parse(JSON.parse(raw))
-  } catch {
-    return {} // No config file = all defaults
+  } catch (err) {
+    // No config file is fine. Parse error: warn but don't crash.
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+      process.stderr.write(`Warning: ~/.gnomad-cf.json is invalid — using defaults\n`)
+    }
+    return {}
   }
 }
 ```
 
-### Pattern 7: Exponential Backoff for gnomAD Fetch
+### Pattern 7: Exponential Backoff Retry
 
-**What:** gnomAD API has no documented rate limits. The web app has no retry logic. The CLI needs retry because batch jobs are long-running and transient failures must not abort the batch.
+**What:** Wrap `executeGraphQLQuery` calls with retry logic. gnomAD has no documented rate limits — treat 429/503 as retryable.
 
 ```typescript
 // src/utils/retry.ts
+// Source: https://oneuptime.com/blog/post/2026-01-06-nodejs-retry-exponential-backoff/
 export async function withRetry<T>(
   fn: () => Promise<T>,
   opts = { retries: 3, baseDelayMs: 1000, maxDelayMs: 16000 }
@@ -324,6 +391,7 @@ export async function withRetry<T>(
     } catch (err) {
       lastError = err
       if (attempt === opts.retries) break
+      // Exponential backoff with jitter: 1s, ~2s, ~4s, ~8s (capped at maxDelayMs)
       const delay = Math.min(
         opts.baseDelayMs * Math.pow(2, attempt) + Math.random() * 500,
         opts.maxDelayMs
@@ -335,14 +403,34 @@ export async function withRetry<T>(
 }
 ```
 
+### Pattern 8: Output to Stdout or File
+
+**What:** Write output to stdout by default; redirect to file when `--output <path>` given.
+
+```typescript
+// In each command handler
+import { writeFile } from 'node:fs/promises'
+
+async function writeOutput(content: string, outputPath?: string) {
+  if (outputPath) {
+    await writeFile(outputPath, content, 'utf-8')
+    p.log.success(`Output written to ${outputPath}`)
+  } else {
+    process.stdout.write(content)
+  }
+}
+```
+
 ### Anti-Patterns to Avoid
 
-- **Reimplementing calculation logic:** All frequency math lives in `@gnomad-cf/core/calculations`. The CLI imports and calls it. Never copy.
-- **Reimplementing the GraphQL client:** Use `executeGraphQLQuery` from `@gnomad-cf/core/client`. It uses native `fetch`, works in both bun and node.
-- **Using `platform: 'neutral'` for CLI tsdown:** The core package uses neutral because it targets both browser and node. The CLI is node-only — use `platform: 'node'` to enable node built-ins.
-- **Mixing CJS and ESM:** Both commander 14 and @clack/prompts 1.0.1 are ESM-only. The `packages/cli/package.json` must have `"type": "module"`. Never `require()`.
-- **Using bun's `#!/usr/bin/env bun` shebang:** The CLI should use `#!/usr/bin/env node` so it works when installed via `npm install -g @gnomad-cf/cli` by users who have node (not necessarily bun). Bun can run node-targeted ESM fine.
-- **Calling `p.isCancel()` only once at the end:** Check `isCancel` immediately after each prompt. Clack returns a `Symbol` sentinel when the user hits Ctrl+C; passing that to subsequent prompts causes confusing behavior.
+- **Reimplementing calculation logic:** Every frequency, prevalence, and formatter function exists in `@gnomad-cf/core/calculations`. Never copy.
+- **Using `platform: 'neutral'` for CLI tsdown:** Core uses neutral (browser+node). CLI is node-only — use `platform: 'node'`.
+- **Using `#!/usr/bin/env bun` shebang:** Use `#!/usr/bin/env node` for portability; bun runs node-targeted ESM fine. Users may not have bun.
+- **Missing `isCancel()` checks:** Every `@clack/prompts` function can return `Symbol(clack:cancel)`. Check immediately after each prompt with `p.isCancel(result)`.
+- **Using `.parse()` instead of `.parseAsync()`:** Commander's `.parse()` does not await async action handlers. Always use `.parseAsync()`.
+- **Skipping TTY check before interactive mode:** If `process.stdin.isTTY` is false (pipe/CI), @clack/prompts will hang or produce garbled output. Check before launching wizard.
+- **Mixing CJS and ESM:** commander v14 and @clack/prompts v1.0.1 are ESM-only. `packages/cli/package.json` must have `"type": "module"`.
+- **Writing errors to stdout:** Errors go to `process.stderr` / `p.log.error()`; data goes to `process.stdout`. This enables `gnomad-cf query CFTR --format json | jq .`.
 
 ---
 
@@ -350,16 +438,18 @@ export async function withRetry<T>(
 
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
-| Subcommand argument parsing | Custom `process.argv` parser | commander v14 | Help generation, validation, TypeScript types, hooks all built in |
-| Interactive gene typeahead | readline + filter loop | `@clack/prompts` `autocomplete` | Terminal escape sequences, cursor handling, async filtering all handled |
-| Multi-select population picker | Checkbox array in readline | `@clack/prompts` `multiselect` | Space-to-select, enter-to-confirm, disabled options — all built in |
-| Concurrency limiting | `Promise.all` chunk-slicing | p-limit v7.3 | activeCount/pendingCount introspection, clearQueue, correct back-pressure |
-| User config validation | Ad-hoc JSON type-checking | zod (already in core) | Parse errors surface the bad field name, types inferred, strict mode rejects unknown keys |
-| Clinical text rendering | New template system | `@gnomad-cf/core/templates` `renderTemplate` | Already handles `{{variable}}` substitution, German language, gender styles |
-| Population code normalization | Hard-coded switch | Population alias map + `getPopulations()` from core config | Core has all codes and labels; alias map adds "european" → "nfe" etc. on top |
-| Carrier frequency math | Any calculation | `@gnomad-cf/core/calculations` | HWE, VCR/GCR, prevalence, formatters all tested and correct |
+| Subcommand argument parsing + help | Custom `process.argv` parser | `commander` v14 | Auto-generates `--help`; handles option validation, TypeScript types, hooks |
+| Gene typeahead/autocomplete | `readline` + filter loop | `@clack/prompts` `autocomplete` | Terminal escape sequences, cursor, async filtering, keyboard handling all handled |
+| Population multi-select | Checkbox array in readline | `@clack/prompts` `multiselect` | Space-to-select, arrow navigation, required option — all built in |
+| Concurrency-limited batch | `Promise.all` chunk-slicing | `p-queue` | Backpressure, queue.clear(), activeCount/pendingCount, per-task timeout |
+| Progress bar | ANSI escape sequences | `@clack/prompts` `progress` | Terminal width handling, consistent styling, works with rest of clack UI |
+| Config schema validation | Ad-hoc `typeof` checks | `zod` (already in core) | Named field errors, type inference, strict mode rejects unknown keys |
+| Clinical text rendering | New template engine | `@gnomad-cf/core/templates` `renderTemplate` | Already implemented; handles German, gender styles, all template variables |
+| Population code normalization | Hard-coded `switch` | Alias map + `getPopulations()` from core | Core has authoritative codes; alias map adds full-name support on top |
+| Carrier frequency math | Any new calculation | `@gnomad-cf/core/calculations` | HWE, VCR/GCR, prevalence, homozygote exclusion — all tested |
+| Retry with exponential backoff | Simple `try/catch` | `withRetry()` utility (see pattern above) | Jitter prevents thundering herd; capped delay prevents infinite wait |
 
-**Key insight:** The CLI is primarily an I/O layer. It reads arguments, calls core, formats output. Every computation is already in `@gnomad-cf/core`.
+**Key insight:** The CLI is a thin I/O layer. It reads args, calls core, formats output. Every domain computation is already correct in `@gnomad-cf/core`.
 
 ---
 
@@ -367,71 +457,82 @@ export async function withRetry<T>(
 
 ### Pitfall 1: @clack/prompts Cancellation Not Checked
 
-**What goes wrong:** User hits Ctrl+C during any prompt. The prompt returns `Symbol(clack:cancel)`. If the code passes this to the next prompt (e.g., using it as `gene` in a fetch), it crashes cryptically.
-**Why it happens:** Developers check once at the end of all prompts or forget entirely.
-**How to avoid:** After every `await p.<prompt>()` call, immediately call `if (p.isCancel(result)) { p.cancel('Cancelled'); process.exit(0) }`.
-**Warning signs:** TypeScript type errors when passing prompt result to a typed function (the Symbol isn't assignable to string).
+**What goes wrong:** User hits Ctrl+C mid-wizard. The prompt returns `Symbol(clack:cancel)`. If passed to the next step or to a fetch function, the code crashes with a cryptic type error.
+**Why it happens:** Developers check once at the end of all prompts, or forget entirely.
+**How to avoid:** After every `await p.<prompt>()` call, immediately: `if (p.isCancel(result)) { p.cancel('Cancelled.'); process.exit(0) }`. Use `p.group()` with `onCancel` handler for grouped prompt flows.
+**Warning signs:** TypeScript errors ("Symbol not assignable to string") or runtime crashes in wizard code.
 
-### Pitfall 2: Shebang Stripped by Minifier
+### Pitfall 2: Shebang Stripped or Missing from Output
 
-**What goes wrong:** tsdown with minification active strips the `#!/usr/bin/env node` line, making the installed binary not self-executing on Unix.
-**Why it happens:** Minifiers treat the shebang as a comment and remove it.
-**How to avoid:** Either disable minification for CLI bundles (acceptable — not a library), or use a legal comment format. With tsdown, the `banner` option runs after minification in postBanner. In practice: keep `minify: false` for the CLI entry.
-**Warning signs:** `gnomad-cf: command not found` after `npm install -g`, or permission error on Unix because the file isn't recognized as executable.
+**What goes wrong:** The installed `gnomad-cf` binary fails with "bad interpreter" on Unix, or requires `node dist/cli.js` explicitly.
+**Why it happens:** tsdown doesn't add shebang automatically without configuration.
+**How to avoid:** Use `banner: { js: '#!/usr/bin/env node' }` in `tsdown.config.ts`. Verify: `head -1 dist/cli.js` should output `#!/usr/bin/env node`. Keep `minify: false` (default) — minifiers can strip comment-like lines.
+**Warning signs:** `gnomad-cf: bad interpreter` or `gnomad-cf: command not found` after `npm install -g`.
 
-### Pitfall 3: Missing `chmod +x` on dist Output
+### Pitfall 3: Missing `chmod +x` on the Built File
 
-**What goes wrong:** On Unix, the bundled `dist/cli.js` is not executable. `npm install -g` makes the bin symlink but the file has no execute permission.
+**What goes wrong:** On Unix, `dist/cli.js` exists but is not executable. Direct invocation fails.
 **Why it happens:** tsdown doesn't set file permissions.
-**How to avoid:** Add a postbuild step: `"postbuild": "chmod +x dist/cli.js"` in `packages/cli/package.json` scripts. Alternatively, npm/bun automatically sets executable bits on `bin` files during install — test this during development with `bun link`.
-**Warning signs:** `Permission denied` error when running `gnomad-cf`.
+**How to avoid:** Add `"postbuild": "chmod +x dist/cli.js"` to scripts. (npm/bun global installs set permissions via the `bin` field automatically — this pitfall is mainly during local `bun link` development.)
+**Warning signs:** `Permission denied: ./dist/cli.js` when running directly.
 
-### Pitfall 4: gnomAD API Has No Documented Rate Limits
+### Pitfall 4: gnomAD API Has Undocumented Rate Limits
 
-**What goes wrong:** Batch jobs with high `--concurrency` values hit 429 or connection-reset errors from gnomAD's API. The web app never encounters this because users manually click one gene at a time.
-**Why it happens:** gnomAD's public API has no published rate limit documentation. The default concurrency of 3 in the CONTEXT.md is empirical.
-**How to avoid:** Default `--concurrency 3`. Implement exponential backoff with jitter (see retry pattern above). On 429 response, back off and retry. On 5xx response, retry up to 3 times. On 4xx (not 429), treat as terminal error for that gene.
-**Warning signs:** Batch job producing many failures when running with `--concurrency 10+`.
+**What goes wrong:** Batch mode with `--concurrency 10+` triggers connection resets or 429 responses mid-batch. Genes silently fail.
+**Why it happens:** gnomAD's public GraphQL API has no published rate limit documentation. The web app never hits limits because it's one-at-a-time, user-driven.
+**How to avoid:** Default `--concurrency 3` (per STATE.md empirical decision). Implement full exponential backoff with jitter. Treat HTTP 429 and 5xx as retryable. Treat 4xx (except 429) as terminal per-gene errors.
+**Warning signs:** Batch job producing many failures with `--concurrency 10+`; error messages contain "connection reset" or "fetch failed".
 
-### Pitfall 5: TSV Output Breaking on Multi-Value Fields
+### Pitfall 5: Commander Option Scoping in Subcommands
 
-**What goes wrong:** Clinical text or population labels containing commas or newlines break TSV/CSV parsers downstream.
-**Why it happens:** Simple string concatenation doesn't escape special characters.
-**How to avoid:** For TSV: wrap every field value in quotes and escape internal quotes as `""`. For JSON: no escaping needed (JSON.stringify handles it). Clinical text only appears in `--format text`, never in TSV rows.
-**Warning signs:** Excel opens TSV with rows split incorrectly.
+**What goes wrong:** Global options (`--format`, `--gnomad-version`) defined on `program` are inaccessible inside subcommand action handlers.
+**Why it happens:** Commander scopes `.opts()` per command level. A subcommand's `.opts()` only returns that subcommand's options.
+**How to avoid:** Either (a) define common options on each subcommand individually, or (b) share via a context object that `parseAsync` hooks populate. Option (a) is simpler for a small number of global options.
+**Warning signs:** `options.format === undefined` inside a `query` action handler when `--format` is a root program option.
 
-### Pitfall 6: Batch File Format Auto-Detection Ambiguity
+### Pitfall 6: TSV Output Breaking on Special Characters
 
-**What goes wrong:** A plain-text file whose first non-whitespace character is `[` (e.g., `[CFTR, HEXA]` written as text) gets mistakenly parsed as JSON.
-**Why it happens:** Auto-detection based on `JSON.parse` attempts.
-**How to avoid:** Try `JSON.parse`; if it fails, fall back to line-by-line plain text. If JSON parses successfully but the result is an array of strings, treat as plain-text gene list. If it's an array of objects, treat as structured JSON with per-gene settings. Validate with zod after parsing.
-**Warning signs:** User reports that their gene list file "isn't being read correctly."
+**What goes wrong:** Population labels or gene names containing tabs or newlines corrupt the TSV structure downstream.
+**Why it happens:** Simple field concatenation with `\t` doesn't escape embedded characters.
+**How to avoid:** Escape TSV fields: replace `\t` → space, `\n` → space. Or quote all fields. Clinical text should never appear in TSV rows — it's only for `--format text`.
+**Warning signs:** Excel/awk parses TSV with incorrect column alignment.
 
-### Pitfall 7: Interactive Mode Launched Without TTY
+### Pitfall 7: Batch Input Auto-Detection Ambiguity
 
-**What goes wrong:** User pipes output (`gnomad-cf | jq`), and clack's prompts try to render to a non-TTY, causing garbled output or hanging.
-**Why it happens:** `@clack/prompts` needs an interactive terminal.
-**How to avoid:** Check `process.stdout.isTTY && process.stdin.isTTY` before launching interactive mode. If not a TTY and no subcommand given, print usage and exit with code 1 instead.
-**Warning signs:** CI pipelines hanging when `gnomad-cf` is called without arguments.
+**What goes wrong:** A plain-text file starting with `[` (e.g., `[CFTR\nHEXA]`) is mistakenly parsed as JSON.
+**Why it happens:** Auto-detection based on `JSON.parse` attempt.
+**How to avoid:** Try `JSON.parse`; if it succeeds and the result is an `Array<string>`, treat as plain-text gene list (not structured JSON). If result is `Array<object>`, treat as structured JSON with per-gene settings. Validate each path with zod.
+**Warning signs:** User reports that gene list "isn't being read correctly."
+
+### Pitfall 8: Interactive Mode Launched Without TTY
+
+**What goes wrong:** User pipes output (`gnomad-cf | jq`), or CI runs `gnomad-cf` without subcommand. Interactive wizard hangs waiting for stdin.
+**Why it happens:** @clack/prompts requires an interactive terminal.
+**How to avoid:** Check `process.stdout.isTTY && process.stdin.isTTY` before defaulting to interactive mode. If not a TTY and no subcommand given, print usage message to stderr and exit with code 1.
+**Warning signs:** CI pipelines hanging; no output.
+
+### Pitfall 9: @gnomad-cf/core Import Subpath Errors
+
+**What goes wrong:** Importing from wrong path (e.g., `@gnomad-cf/core` root instead of `@gnomad-cf/core/calculations`) returns undefined for expected functions.
+**Why it happens:** Core's root `index.ts` re-exports a limited set; most functions are subpath-only.
+**How to avoid:** Always use explicit subpaths: `@gnomad-cf/core/calculations`, `@gnomad-cf/core/client`, etc. Reference `packages/core/package.json` exports map for the definitive list.
+**Warning signs:** `undefined is not a function` when calling calculation functions.
 
 ---
 
 ## Code Examples
 
-### Complete gene query pipeline (the core CLI operation)
+### Complete Single Gene Query Pipeline
 
 ```typescript
 // src/utils/gene-query.ts
-// Sources: @gnomad-cf/core subpaths (all verified by reading source)
+// Sources: @gnomad-cf/core subpaths (read from source directly)
 import { executeGraphQLQuery } from '@gnomad-cf/core/client'
 import { GENE_VARIANTS_QUERY } from '@gnomad-cf/core/queries'
 import { filterPathogenicVariantsConfigurable } from '@gnomad-cf/core/filters'
 import {
   aggregatePopulationFrequenciesWithConfig,
   buildPopulationFrequencies,
-  formatCarrierFrequency,
-  formatPrevalence,
-  calculateBayesianPrevalence,
 } from '@gnomad-cf/core/calculations'
 import {
   getDatasetId,
@@ -442,115 +543,108 @@ import type { FilterConfig, CalcConfig } from '@gnomad-cf/core/types'
 import type { GeneVariantsResponse } from '@gnomad-cf/core/queries'
 import { withRetry } from './retry.js'
 
-export interface QueryOptions {
-  version: GnomadVersion
-  filterConfig: FilterConfig
-  calcConfig: CalcConfig
-  population?: string
-}
-
-export async function queryGene(gene: string, opts: QueryOptions) {
+export async function queryGene(gene: string, version: GnomadVersion, filterConfig: FilterConfig, calcConfig: CalcConfig) {
   const response = await withRetry(() =>
     executeGraphQLQuery<GeneVariantsResponse>({
       query: GENE_VARIANTS_QUERY,
       variables: {
         geneSymbol: gene.toUpperCase(),
-        dataset: getDatasetId(opts.version),
-        referenceGenome: getReferenceGenome(opts.version),
+        dataset: getDatasetId(version),
+        referenceGenome: getReferenceGenome(version),
       },
-    }, opts.version)
+    }, version)
   )
 
   if (response.errors?.length) {
     throw new Error(response.errors.map(e => e.message).join('; '))
   }
   if (!response.data?.gene) {
-    throw new Error(`Gene "${gene}" not found in gnomAD`)
+    throw new Error(`Gene "${gene}" not found in gnomAD ${version}`)
   }
 
   const { variants, clinvar_variants } = response.data.gene
+
   const pathogenic = filterPathogenicVariantsConfigurable(
-    variants as any,
-    clinvar_variants as any,
-    opts.filterConfig,
-    new Map()
+    variants,
+    clinvar_variants,
+    filterConfig
   )
 
   const aggregated = aggregatePopulationFrequenciesWithConfig(
     pathogenic,
-    opts.version,
-    opts.calcConfig
+    version,
+    calcConfig
   )
 
-  // Global carrier frequency (all populations combined)
-  // ... (follow same pattern as useCarrierFrequency.ts globalStats computed)
+  return buildPopulationFrequencies(aggregated, null, version)
 }
 ```
 
-### Human-readable text output format (summary blocks)
+### Human-Readable Text Output (Summary Blocks)
 
 ```
-Gene: CFTR  |  gnomAD v4.1  |  Variants: 12  |  Formula: HWE + Hom. exclusion
+Gene: CFTR  |  gnomAD v4.1  |  Qualifying Variants: 12
 
 === Non-Finnish European (nfe) ===
-  Carrier frequency:    1:29 (3.45%)
-  Genetic prevalence:   1:841
-  Bayesian prevalence:  1:841 (penetrance: 100%)
-  Allele count:         2,847
-  Allele number:        247,120
-  Sum allele freq:      0.01725
+  Carrier Frequency:    1:29
+  Genetic Prevalence:   1:841
+  Bayesian Prevalence:  1:841  (penetrance: 100%)
+  Allele Count:         2,847
+  Allele Number:        247,120
+  Sum Allele Freq:      0.01725
 
 === Ashkenazi Jewish (asj) ===
-  Carrier frequency:    1:25 (4.00%)  [!] Elevated — possible founder effect
+  Carrier Frequency:    1:25  [!] Elevated — possible founder effect
   ...
 ```
 
-### @clack/prompts autocomplete for gene search
+### TSV Output with Field Escaping
 
 ```typescript
-// Source: https://bomb.sh/docs/clack/packages/prompts (v1.0.1)
-import * as p from '@clack/prompts'
+// src/output/tsv-formatter.ts
+function escapeField(value: string): string {
+  return value.replace(/\t/g, ' ').replace(/\n/g, ' ').replace(/\r/g, '')
+}
 
-const gene = await p.autocomplete({
-  message: 'Search for a gene symbol:',
-  placeholder: 'Type at least 2 characters...',
-  options: async (input: string) => {
-    if (!input || input.length < 2) return []
-    // Use gnomAD gene search query from core
-    const results = await searchGenes(input)
-    return results.map(g => ({
-      label: g.symbol,
-      value: g.symbol,
-      hint: g.full_name,
-    }))
-  },
-})
-if (p.isCancel(gene)) { p.cancel('Cancelled'); process.exit(0) }
+export function formatTSV(gene: string, pops: PopulationFrequency[], version: string): string {
+  const headers = ['gene', 'gnomad_version', 'population_code', 'population_label',
+    'carrier_frequency', 'genetic_prevalence', 'allele_count', 'allele_number']
+  const rows = pops.map(pop => [
+    escapeField(gene),
+    escapeField(version),
+    escapeField(pop.code),
+    escapeField(pop.label),
+    pop.carrierFrequency?.toFixed(6) ?? 'NA',
+    pop.geneticPrevalence?.toFixed(8) ?? 'NA',
+    String(pop.alleleCount),
+    String(pop.alleleNumber),
+  ].join('\t'))
+  return [headers.join('\t'), ...rows].join('\n')
+}
 ```
 
-### Population alias mapping
+### Population Alias Map
 
 ```typescript
 // src/utils/population-aliases.ts
-// Source: packages/core/src/config/gnomad.json (verified)
+// Source: packages/core/src/config/gnomad.json (verified by reading source)
+// Accept full names ("european") or short codes ("nfe") — output is always the short code
 const POPULATION_ALIASES: Record<string, string> = {
-  // Full names → codes
-  african: 'afr',
-  european: 'nfe',
-  'ashkenazi-jewish': 'asj',
-  'ashkenazi jewish': 'asj',
+  african: 'afr', 'african-american': 'afr',
+  'admixed-american': 'amr', latino: 'amr', hispanic: 'amr',
+  ashkenazi: 'asj', 'ashkenazi-jewish': 'asj',
   'east-asian': 'eas',
-  'south-asian': 'sas',
   finnish: 'fin',
   'middle-eastern': 'mid',
-  'admixed-american': 'amr',
-  latino: 'amr',
-  // Short codes pass through
+  european: 'nfe', 'non-finnish-european': 'nfe',
+  'south-asian': 'sas',
+  amish: 'ami',   // v3 only
+  other: 'oth',   // v2 only
 }
 
 export function resolvePopulation(input: string): string {
-  const lower = input.toLowerCase().trim()
-  return POPULATION_ALIASES[lower] ?? lower
+  const lower = input.toLowerCase().trim().replace(/\s+/g, '-')
+  return POPULATION_ALIASES[lower] ?? lower // pass-through if already a short code
 }
 ```
 
@@ -560,41 +654,48 @@ export function resolvePopulation(input: string): string {
 
 | Old Approach | Current Approach | When Changed | Impact |
 |--------------|------------------|--------------|--------|
-| yargs for subcommands | commander v14 | ongoing evolution | commander has cleaner git-style subcommand API with better TypeScript inference |
-| inquirer for prompts | @clack/prompts v1.0.1 | Jan 2026 (v1.0 release) | clack provides better visual UX, built-in autocomplete, ESM-only |
-| hand-rolled retry | exponential-backoff or custom | 2025 | trivial to implement; no heavy library needed |
-| tsup (old) | tsdown v0.20 | late 2024 | tsdown is the tsup successor; repo already uses it for core |
-| CJS CLI bundles | ESM-only (commander 14+ & clack 1.0+) | 2026 | both key libraries now require ESM; CLI must be `"type": "module"` |
+| `@clack/prompts` v0.x (CJS+ESM) | v1.0.1 (ESM-only) | Jan 2026 | Autocomplete, progress, autocompleteMultiselect added; package must be `"type": "module"` |
+| Zod v3 | Zod v4.3.5 (stable) | Aug 2025 | Already in core; 14x faster; same API for simple schemas (z.string(), z.object()) |
+| Commander v13 | Commander v14.0.3 | May 2024 | Node.js v20+ required; v15 (ESM-only) expected May 2026 — don't use yet |
+| p-limit v7 | p-queue v8.1.0 | p-queue stable (2023+) | p-queue adds queue introspection (activeCount, pendingCount), timeout, priority — better for batch |
+| tsup (esbuild) | tsdown v0.20.3 (rolldown) | 2024-2025 | Already in monorepo; better tree-shaking; `banner` option for shebang |
+| Hand-rolled retry | `withRetry()` utility | ongoing | No library needed — simple pattern; avoid adding `exponential-backoff` npm dep |
 
 **Deprecated/outdated:**
-- `inquirer` v9+: Still valid but @clack/prompts is lighter and has better visual design for wizard-style flows
-- `ora` spinner: @clack/prompts includes spinner built-in; no separate library needed
-- `cli-progress`: @clack/prompts v1.0 includes `progress` built-in with the same functionality
-- `#!/usr/bin/env bun` shebang: Use `#!/usr/bin/env node` for portability; bun executes node-targeted ESM fine
+- `inquirer`: Still maintained; heavier; @clack/prompts is the modern standard for wizard-style flows
+- `ora` spinner: @clack/prompts includes spinner built-in since v1.0
+- `cli-progress`: @clack/prompts v1.0 includes `progress` built-in
+- `#!/usr/bin/env bun` shebang: Use `node` for portability; bun handles node-targeted ESM fine
+- Commander v15 (pre-release, ESM-only): Not yet stable as of Feb 2026; stick with v14
 
 ---
 
 ## Open Questions
 
-1. **gnomAD API rate limits**
-   - What we know: No public documentation. The web app makes requests sequentially (one gene at a time, user-driven). Default concurrency of 3 is the team's empirical conservative choice.
-   - What's unclear: Actual threshold before 429 responses. Whether there's IP-based throttling per second vs per minute.
-   - Recommendation: Default to `--concurrency 3`, implement full exponential backoff with 429 detection. If a 429 is received, treat it as a signal to reduce concurrency for the remaining batch.
+1. **tsdown `banner` exact ChunkAddon type signature**
+   - What we know: `UserConfig.banner?: ChunkAddon`; tsdown powered by Rolldown which uses `banner: { js: string }` (object) or `banner: string` (in some contexts). The tsdown docs page `/options/banner-footer` returned 404. DeepWiki confirms `banner` is supported.
+   - What's unclear: Whether `{ js: '#!/usr/bin/env node' }` or `'#!/usr/bin/env node'` is the correct ChunkAddon format for tsdown v0.20.3.
+   - Recommendation: Try `banner: { js: '#!/usr/bin/env node' }` first (Rolldown API format). Fallback: `banner: '#!/usr/bin/env node'`. Verify by checking `head -1 dist/cli.js` after build. Test as first task.
 
-2. **Gene autocomplete data source**
-   - What we know: The web app uses `GENE_SEARCH_QUERY` (from `@gnomad-cf/core/queries`) for gene search. This is a gnomAD API call.
-   - What's unclear: Latency of gene search query during interactive typeahead. If gnomAD search is slow (>300ms), the autocomplete UX may feel sluggish.
-   - Recommendation: Add a debounce of ~300ms before firing the API call in the autocomplete `options` callback. This is standard for search-as-you-type. Consider a minimum 2-character threshold before querying.
+2. **gnomAD API rate limits**
+   - What we know: Not documented. Default `--concurrency 3` is empirical per STATE.md. The web app makes no parallel requests.
+   - What's unclear: Actual threshold before 429 responses; per-second vs per-minute limiting.
+   - Recommendation: Default `--concurrency 3`. Full exponential backoff. If 429 received, halve concurrency for remaining batch. Log warnings on retry.
 
-3. **Windows executable permissions**
-   - What we know: The `chmod +x` postbuild step only applies on Unix. Windows uses `.cmd` wrapper files created by package managers.
-   - What's unclear: Whether bun installs the `bin` correctly on Windows when doing `bun link` during development.
-   - Recommendation: Test `bun link` on the dev machine (Windows 11) early in implementation. npm global installs on Windows create `.cmd` wrappers automatically — this should work fine.
+3. **Gene autocomplete response latency**
+   - What we know: `GENE_SEARCH_QUERY` is a live gnomAD API call. The web app debounces at 300ms (`debounceMs: 300` in `settings.json`).
+   - What's unclear: Whether @clack/prompts `autocomplete` has internal debounce or fires options callback on every keystroke.
+   - Recommendation: Add manual debounce inside the `options` callback (300ms matches existing web app setting). Minimum 2-character threshold before querying (matches `minSearchChars: 2` in `settings.json`).
 
-4. **@clack/prompts `autocomplete` options callback signature**
-   - What we know: Bombshell docs (bomb.sh) show `options: async (input: string) => Promise<Option[]>`. The v1.0.1 release notes confirm autocomplete support.
-   - What's unclear: Whether the options callback can be async (returning Promise) or must be sync. The documentation examples suggest async is supported.
-   - Recommendation: Write the implementation as async; test immediately after installation. If async isn't supported, cache gene search results in memory during the session.
+4. **@clack/prompts `autocomplete` async options signature**
+   - What we know: Bombshell docs show `options: async (input: string) => Promise<Option[]>`. The v1.0.0 CHANGELOG confirms the autocomplete component addition.
+   - What's unclear: TypeScript exact type signature of the `options` parameter (sync vs async function).
+   - Recommendation: Implement as async; TypeScript will surface a compile error if the signature is wrong. Verify immediately after installation by running interactive mode.
+
+5. **Windows `bun link` bin handling**
+   - What we know: `npm install -g` creates `.cmd` wrappers on Windows automatically via the `bin` field. The `chmod +x` postbuild step is Unix-only.
+   - What's unclear: Whether `bun link` (for local dev) creates the correct Windows wrapper.
+   - Recommendation: Test `bun link` on the dev machine (Windows 11) early. The `postbuild: chmod +x dist/cli.js` is harmless on Windows (exits silently on WSL; ignored by PowerShell).
 
 ---
 
@@ -602,33 +703,43 @@ export function resolvePopulation(input: string): string {
 
 ### Primary (HIGH confidence)
 
-- `@gnomad-cf/core` source code (read directly) — types, calculations, client, config, filters, templates
-- https://www.jsdocs.io/package/commander — commander v14.0.3 TypeScript API
-- https://github.com/sindresorhus/p-limit — p-limit v7.3.0 API and usage
-- https://rolldown.rs/reference/interface.outputoptions — banner/shebang option for tsdown
-- https://github.com/bombshell-dev/clack/releases — @clack/prompts v1.0.1 release notes confirming autocomplete
+- `@gnomad-cf/core` source (read directly) — all types, calculations, client, config, filters, templates
+  - `packages/core/src/client/index.ts` — `executeGraphQLQuery` signature
+  - `packages/core/src/calculations/` — HWE, VCR/GCR, prevalence, formatters
+  - `packages/core/src/types/calculations.ts` — `CalcConfig`, `FACTORY_CALC_DEFAULTS`
+  - `packages/core/src/types/filter.ts` — `FilterConfig`, `FACTORY_FILTER_DEFAULTS`
+  - `packages/core/src/config/gnomad.json` — versions (v4, v3, v2) + population codes
+  - `packages/core/package.json` — 9 subpath exports map
+- `https://bomb.sh/docs/clack/packages/prompts` — full @clack/prompts v1.0.1 API: autocomplete, multiselect, progress, spinner, tasks, group, confirm, isCancel
+- `https://github.com/bombshell-dev/clack/blob/main/packages/prompts/CHANGELOG.md` — v1.0.0 ESM-only + autocomplete + progress additions; v1.0.1 patch
+- `https://github.com/tj/commander.js/releases` — v14.0.3 is latest stable; v15 pre-release (ESM-only, May 2026)
+- `https://github.com/sindresorhus/p-queue` — p-queue v8.1.0 ESM-only, concurrency API, TypeScript usage
+- `https://tsdown.dev/reference/api/Interface.UserConfig` — `banner?: ChunkAddon`, `platform`, `format` confirmed
+- `https://zod.dev/v4` — Zod v4 stable release; current npm version 4.3.5
 
 ### Secondary (MEDIUM confidence)
 
-- https://bomb.sh/docs/clack/packages/prompts — @clack/prompts full prompt type list including `autocomplete` and `autocompleteMultiselect` APIs
-- https://github.com/bombshell-dev/clack/blob/main/packages/prompts/README.md — prompt type inventory
-- WebSearch for commander v14 + bun compatibility (multiple credible sources agree)
-- https://tsdown.dev/options/entry — tsdown entry configuration
+- `https://deepwiki.com/rolldown/tsdown` — ShebangPlugin description; banner/footer injection support
+- `https://github.com/lirantal/nodejs-cli-apps-best-practices` — exit codes (0=success), stderr for errors, stdout for data, POSIX signals, XDG Base Directory
+- `https://oneuptime.com/blog/post/2026-01-06-nodejs-retry-exponential-backoff/view` — exponential backoff with jitter pattern for 2026
+- WebSearch: commander 281M weekly downloads vs yargs 148M weekly downloads (multiple npm stats sources)
 
 ### Tertiary (LOW confidence)
 
-- WebSearch on gnomAD API rate limits: no authoritative source found; default concurrency 3 remains empirical
-- @clack/prompts `autocomplete` async options callback: documented in bomb.sh but could not verify from actual package source
+- gnomAD API rate limits: Not documented. `--concurrency 3` default is empirical only (STATE.md).
+- tsdown banner exact syntax: Documentation 404'd; inferred from Rolldown API + DeepWiki; needs task-time verification.
 
 ---
 
 ## Metadata
 
 **Confidence breakdown:**
-- Standard stack: HIGH — commander v14, @clack/prompts v1.0.1, p-limit v7.3 all verified via official sources
-- Architecture: HIGH — based directly on reading existing `@gnomad-cf/core` source + commander/clack official docs
-- Pitfalls: HIGH for shebang/ESM/TTY issues (established patterns); MEDIUM for gnomAD rate limits (empirical)
-- Core integration: HIGH — read actual source of all relevant core modules
+- Standard stack: HIGH — all libs verified via official npm/docs/releases with specific versions
+- Architecture patterns: HIGH — code examples based on verified API signatures from official sources
+- @gnomad-cf/core integration: HIGH — read actual source of all relevant core modules
+- @clack/prompts API: HIGH — verified via Bombshell docs site + CHANGELOG (v1.0.0 additions confirmed)
+- tsdown CLI binary banner: MEDIUM — UserConfig interface verified; ChunkAddon type syntax needs task-time test
+- gnomAD rate limits: LOW — undocumented; empirical default only
 
 **Research date:** 2026-02-24
-**Valid until:** 2026-03-24 (stable libraries); gnomAD rate limit info: validate on first real batch test
+**Valid until:** 2026-03-24 (30 days — stable libraries; @clack/prompts 1.0.1 very recent so small API changes possible)
