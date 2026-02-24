@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Milestone:** v1.5 Core Extraction & CLI
 **Phase:** 27 of 29 (CLI Package) — In progress
-**Plan:** 1 of 5 in current phase — COMPLETE
-**Status:** 27-01 complete — CLI scaffold with Commander skeleton, shared types, and tsdown build
-**Last activity:** 2026-02-24 — Completed 27-01-PLAN.md (CLI package scaffold)
+**Plan:** 2 of 5 in current phase — COMPLETE
+**Status:** 27-02 complete — Gene query pipeline, withRetry, population aliases, user config loader
+**Last activity:** 2026-02-24 — Completed 27-02-PLAN.md (CLI pipeline utilities)
 
 ### Progress
 
@@ -27,7 +27,7 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [██████░░░░] ~55% - Phase 27 Plan 1/5 complete
+v1.5 Core & CLI:    [███████░░░] ~60% - Phase 27 Plan 2/5 complete
 ```
 
 **Overall:** 89 plans complete across 26 phases in 5 milestones.
@@ -76,6 +76,10 @@ Recent decisions for v1.5:
 - CLI uses platform:node in tsdown (not neutral) — needs Node.js built-ins; dts:false (binary, not library) (27-01)
 - p-limit chosen over p-queue for batch concurrency — simpler API sufficient for rate limiting gnomAD calls (27-01)
 - Shared types (QueryResult, VariantDetail, QueryOptions) defined in Wave 1 (27-01) to prevent cross-plan deps in Wave 2 (27-01)
+- computeGlobalStats() applies same HWE/simplified/VCR branch logic as aggregatePopulationFrequenciesWithConfig — consistent global stats (27-02)
+- 429 rate limit errors not counted toward retry limit — dedicated always-retry path separate from transient 5xx retries (27-02)
+- Genetic prevalence always q^2 from raw globalSumAF — matches core convention, never derived from carrier frequency (27-02)
+- zod not added to CLI package.json — already a hoisted workspace dep from packages/core (27-02)
 
 ### Pending Todos
 
@@ -92,8 +96,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 27-01 — CLI package scaffold (Commander skeleton, tsdown build, shared types)
-**Status:** Phase 27 Plan 1 complete. Next: Plan 2 (gene-query command) and Plan 3 (formatters) — Wave 2, runnable in parallel
+**Completed:** 27-02 — CLI pipeline utilities (queryGene, withRetry, population aliases, user config)
+**Status:** Phase 27 Plan 2 complete. Next: Plan 3 (formatters) and Plan 4 (batch command) — Wave 2 continuation
 **Resume file:** None
 
 ### Handoff Notes
@@ -108,10 +112,15 @@ Phase 27 Plan 01 delivered:
 - Root build:cli script and CLI added to main build chain
 - bun install resolves all workspace + npm dependencies
 
+Phase 27 Plan 02 delivered:
+- packages/cli/src/utils/retry.ts: withRetry<T> with exponential backoff + 500ms jitter + 429/4xx/5xx classification
+- packages/cli/src/utils/population-aliases.ts: POPULATION_ALIASES Map, resolvePopulation(), getPopulationOptions()
+- packages/cli/src/utils/gene-query.ts: queryGene() full pipeline + searchGenes(); QueryResult from ../types.js
+- packages/cli/src/config/user-config.ts: Zod-strict schema, loadUserConfig(), mergeConfig() with priority merge
+
 Next plans in Phase 27:
-- 27-02: gene-query command (imports types.ts, uses @gnomad-cf/core/client + filters + calculations)
-- 27-03: formatters (table, JSON, CSV output; imports QueryResult)
-- 27-04: batch command (multi-gene CSV input, p-limit concurrency)
+- 27-03: formatters (table, JSON, TSV output; imports QueryResult from types.ts)
+- 27-04: batch command (multi-gene CSV input, p-limit concurrency, uses queryGene)
 - 27-05: integration + CI
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
@@ -134,3 +143,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *25-05 complete: 2026-02-24*
 *Phase 25 verified: 2026-02-24*
 *27-01 complete: 2026-02-24*
+*27-02 complete: 2026-02-24*
