@@ -14,7 +14,7 @@
     "preview": "bun run --filter gnomad-cf-web preview",
     "test": "vitest --passWithNoTests",
     "lint": "bun run --filter gnomad-cf-web lint",
-    "typecheck": "tsc --build",
+    "typecheck": "tsc --build packages/core && bun run --filter gnomad-cf-web typecheck",
     "lighthouse": "lhci autorun --config=lighthouserc.local.json",
     "docs:dev": "bun run --filter gnomad-cf-web docs:dev",
     "docs:build": "bun run --filter gnomad-cf-web docs:build",
