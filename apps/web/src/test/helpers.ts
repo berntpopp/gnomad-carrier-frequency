@@ -1,6 +1,7 @@
 import { mount, type MountingOptions } from '@vue/test-utils'
 import { createTestingPinia, type TestingOptions } from '@pinia/testing'
 import type { Component } from 'vue'
+import { vi } from 'vitest'
 import { vuetify } from './setup'
 
 interface MountWithPluginsOptions extends MountingOptions<Record<string, unknown>> {
@@ -23,6 +24,7 @@ export function mountWithPlugins(
       plugins: [
         vuetify,
         createTestingPinia({
+          createSpy: vi.fn,
           stubActions: true,
           initialState: storeInitialState,
           ...piniaOptions,

@@ -39,6 +39,8 @@ export default defineConfig({
         replacement: fileURLToPath(new URL('../../packages/core/src', import.meta.url)) + '$1',
       },
       { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+      // Mock Vite virtual modules that don't exist in test environment
+      { find: 'virtual:pwa-register', replacement: fileURLToPath(new URL('./src/test/mocks/virtual-pwa-register.ts', import.meta.url)) },
     ],
   },
 })
