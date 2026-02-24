@@ -22,6 +22,7 @@
     "./client": "./dist/client.js",
     "./config": "./dist/config.js",
     "./filters": "./dist/filters.js",
+    "./gene-config": "./dist/gene-config.js",
     "./queries": "./dist/queries.js",
     "./templates": "./dist/templates.js",
     "./types": "./dist/types.js",

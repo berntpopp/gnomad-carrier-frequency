@@ -23,3 +23,6 @@ export * from './utils/index.js'
 
 // Client
 export * from './client/index.js'
+
+// Gene Config
+export * from './gene-config/index.js'

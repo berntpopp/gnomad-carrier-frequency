@@ -11,6 +11,7 @@ export default defineConfig({
     templates:    'src/templates/index.ts',
     utils:        'src/utils/index.ts',
     client:       'src/client/index.ts',
+    'gene-config': 'src/gene-config/index.ts',
   },
   format: ['esm'],
   dts: true,
