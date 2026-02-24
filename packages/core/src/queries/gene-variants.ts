@@ -13,19 +13,23 @@ export const GENE_VARIANTS_QUERY = `
         exome {
           ac
           an
+          ac_hom
           populations {
             id
             ac
             an
+            ac_hom
           }
         }
         genome {
           ac
           an
+          ac_hom
           populations {
             id
             ac
             an
+            ac_hom
           }
         }
         transcript_consequence {

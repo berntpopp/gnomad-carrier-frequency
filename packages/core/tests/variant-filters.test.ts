@@ -45,7 +45,7 @@ function makeGnomadVariant(
     pos: 117559590,
     ref: 'A',
     alt: 'G',
-    exome: { ac: 10, an: 120000, populations: [] },
+    exome: { ac: 10, an: 120000, ac_hom: 0, populations: [] },
     genome: undefined,
     transcript_consequence: null,
     ...overrides,

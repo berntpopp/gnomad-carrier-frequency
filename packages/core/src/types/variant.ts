@@ -27,17 +27,20 @@ export interface VariantPopulation {
   id: string; // Population code from config
   ac: number;
   an: number;
+  ac_hom: number;
 }
 
 export interface VariantFrequencyData {
   exome?: {
     ac: number;
     an: number;
+    ac_hom: number;
     populations: VariantPopulation[];
   };
   genome?: {
     ac: number;
     an: number;
+    ac_hom: number;
     populations: VariantPopulation[];
   };
 }

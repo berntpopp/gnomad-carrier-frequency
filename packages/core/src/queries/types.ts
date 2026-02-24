@@ -13,11 +13,13 @@ export interface GeneVariantPopulation {
   id: string;
   ac: number;
   an: number;
+  ac_hom: number;
 }
 
 export interface GeneVariantExomeGenome {
   ac: number;
   an: number;
+  ac_hom: number;
   populations: GeneVariantPopulation[];
 }
 
