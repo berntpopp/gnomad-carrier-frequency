@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 29 (Test Suite Completion) — In progress (3/5 plans complete)
+**Current focus:** v1.5 Phase 29 (Test Suite Completion) — In progress (4/5 plans complete)
 
 ---
 
@@ -109,6 +109,11 @@ Recent decisions for v1.5 (continued):
 - happy-dom chosen over jsdom for apps/web tests — jsdom@28.1.0 ships html-encoding-sniffer@6.0.0 which require()s @exodus/bytes ESM, causing ERR_REQUIRE_ESM crash (29-01)
 - Minimal createVuetify() in test setup (no wildcard component import) — importing vuetify/components wholesale triggers ~200 CSS imports that vitest Node runner cannot handle (29-01)
 - Store unit tests use real createPinia() with setActivePinia in beforeEach — isolation without persistence plugin, not createTestingPinia (29-01)
+- virtual:pwa-register mocked via vitest resolve alias to test/mocks/virtual-pwa-register.ts — Vite plugin virtual module not available in test env (29-02)
+- createTestingPinia requires createSpy: vi.fn — auto-detection of vi.fn fails without explicit config (29-02)
+- Vuetify disabled state: btn.attributes('disabled') returns "false" string when enabled (not undefined) — check === '' || === 'true' for disabled (29-02)
+- Composable mocks must return real Vue ref() not plain objects — Vue watch() requires ref/reactive/getter, plain {value:x} causes Invalid watch source warning (29-02)
+- vi.mock('vuetify', ...) with factory: useDisplay requires display injection not provided by minimal createVuetify() in test setup — override just useDisplay, spread rest of actual module (29-02)
 - page.route('https://gnomad.broadinstitute.org/api') exact URL — glob ** prefix/suffix unnecessary for exact match (29-04)
 - Vuetify stub rendering in happy-dom: v-btn inside v-tooltip activator slots not rendered — test via html() string contains on tooltip text, not data-testid (29-03)
 - useGeneConfig mock must return Vue ref() objects not plain {value: false} — template v-if needs real reactive ref for auto-unwrap to work (29-03)
@@ -133,8 +138,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** Plan 29-03 — Settings/chrome component tests (FilterPanel, AppBar, VersionSelector, SettingsDialog, TemplateEditor)
-**Status:** 380 tests passing across 25 test files. Vuetify stub rendering behavior documented. Vue ref mock pattern established. TemplateEditor stubActions: false pattern established.
+**Completed:** Plan 29-02 — Wizard step component tests (StepGene, StepStatus, StepFrequency, StepResults, WizardStepper, TextOutput) — 33 wizard tests + infrastructure fixes
+**Status:** 154 tests passing across 16 test files (web). Vuetify useDisplay mock pattern established. virtual:pwa-register mock added. Disabled state assertion pattern for Vuetify documented.
 **Resume file:** None
 
 ### Handoff Notes
