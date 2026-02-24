@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Milestone:** v1.5 Core Extraction & CLI
 **Phase:** 25 of 29 (Monorepo Foundation & Core Extraction)
-**Plan:** 3 of 5 in current phase
+**Plan:** 4 of 5 in current phase
 **Status:** Executing
-**Last activity:** 2026-02-24 — Completed 25-03-PLAN.md (filters, calculations, templates, and utils extraction to core)
+**Last activity:** 2026-02-24 — Completed 25-04-PLAN.md (fetch client in core, all web imports rewired to @gnomad-cf/core/*, duplicate source files deleted)
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [███░░░░░░░] ~15% - Phase 25 plan 3/5 complete
+v1.5 Core & CLI:    [████░░░░░░] ~20% - Phase 25 plan 4/5 complete
 ```
 
-**Overall:** 86 plans complete across 24+ phases in 5 milestones.
+**Overall:** 87 plans complete across 24+ phases in 5 milestones.
 
 ---
 
@@ -38,7 +38,7 @@ v1.5 Core & CLI:    [███░░░░░░░] ~15% - Phase 25 plan 3/5 co
 
 **Velocity:**
 - Total plans completed: 86
-- v1.5 plans completed: 3
+- v1.5 plans completed: 4
 
 ---
 
@@ -58,6 +58,8 @@ Recent decisions for v1.5:
 - vitest `--passWithNoTests` in root script — prevents CI failures before Phase 29 test suite
 - export-utils.ts stays in apps/web (uses import.meta.env.VITE_APP_VERSION — Vite-specific, not portable to neutral core)
 - variant-display.ts placed in core/filters/ (co-located with variant-filters.ts it imports from)
+- Core client (packages/core/src/client/) uses fetch API — platform-neutral, no villus dependency; villus stays only in apps/web/src/api/client.ts
+- JSON deep-path imports (@gnomad-cf/core/config/templates/de.json) work via Vite regex alias + tsconfig resolveJsonModule — no separate JSON export needed
 
 ### Pending Todos
 
@@ -77,8 +79,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 25-03-PLAN.md — filters, calculations, templates, and utils extracted to packages/core/src/, all @/ imports fixed to relative ESM paths, tsc and tsdown builds verified (8 subpath bundles)
-**Status:** Phase 25 plan 3/5 complete, ready for plan 4
+**Completed:** 25-04-PLAN.md — fetch-based core GraphQL client created, all web app imports rewired from @/ to @gnomad-cf/core/*, 37 duplicate source files deleted from apps/web/src/
+**Status:** Phase 25 plan 4/5 complete, ready for plan 5
 
 ### Handoff Notes
 
@@ -88,19 +90,21 @@ Phase order is dependency-driven: Core must exist before CLI or tests can be mea
 
 GitHub issues addressed: #1 (HWE 2pq), #2 (tests), #3 (homozygote exclusion), #7 (genetic prevalence), #14 (gene configs), #16 (monorepo).
 
-Monorepo state after plan 25-03:
-- `packages/core/src/types/` — 14 type files, fully extracted (no @/ imports)
+Monorepo state after plan 25-04:
+- `packages/core/src/types/` — 14 type files, fully extracted
 - `packages/core/src/config/` — 8 files + help/ + templates/ subdirs, fully extracted
-- `packages/core/src/queries/` — 5 query files, fully extracted
+- `packages/core/src/queries/` — 5 query files, fully extracted (+ GENE_DETAILS_QUERY, GeneDetailsResponse exported)
 - `packages/core/src/filters/` — variant-filters.ts, variant-display.ts, fully extracted
 - `packages/core/src/calculations/` — frequency-calc.ts, formatters.ts, fully extracted
 - `packages/core/src/templates/` — template-renderer.ts, template-parser.ts, fully extracted
 - `packages/core/src/utils/` — exclusion-url.ts, fully extracted
-- `packages/core/tsdown.config.ts` — 8 entry points: index, types, config, queries, filters, calculations, templates, utils
-- `packages/core/package.json` exports — auto-updated by tsdown with all 8 subpath exports
-- `bun run build` — builds core (dist/ with 8 subpath bundles) then web, both verified
-- Web app still uses @/ imports from apps/web/src/ (rewiring is Plan 25-04)
-- `apps/web/src/utils/export-utils.ts` — left in web (uses import.meta.env.VITE_APP_VERSION)
+- `packages/core/src/client/` — index.ts with executeGraphQLQuery (fetch-based, platform-neutral)
+- `packages/core/tsdown.config.ts` — 9 entry points: index, types, config, queries, filters, calculations, templates, utils, client
+- `packages/core/package.json` exports — auto-updated by tsdown with all 9 subpath exports
+- `apps/web/src/` — Vue-specific code only: composables, stores, components, api/client.ts (villus), utils/export-utils.ts
+- All 12 composables, 5 stores, 15+ components rewired to @gnomad-cf/core/*
+- `bun run build` — builds core (dist/ with 9 subpath bundles) then web, both verified
+- `vue-tsc --noEmit` — passes with zero errors
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
 Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
@@ -118,3 +122,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *25-01 complete: 2026-02-24*
 *25-02 complete: 2026-02-24*
 *25-03 complete: 2026-02-24*
+*25-04 complete: 2026-02-24*
