@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 29 (Test Suite Completion) — In progress (2/5 plans complete)
+**Current focus:** v1.5 Phase 29 (Test Suite Completion) — In progress (3/5 plans complete)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 29 of 29 (Test Suite Completion) — In progress (2/5 plans done)
-**Plan:** 29-04 of 5 in phase 29 — COMPLETE
-**Status:** Playwright E2E tests passing: CFTR wizard happy path (4-step flow) + URL state roundtrip (2 tests); 3 total E2E tests
-**Last activity:** 2026-02-24 — Completed 29-04: Playwright E2E tests for CFTR wizard and URL roundtrip
+**Phase:** 29 of 29 (Test Suite Completion) — In progress (3/5 plans done)
+**Plan:** 29-03 of 5 in phase 29 — COMPLETE
+**Status:** 380 total tests passing (25 test files): store tests + wizard step tests + settings/chrome component tests + E2E tests
+**Last activity:** 2026-02-24 — Completed 29-03: Settings/chrome component tests (FilterPanel, AppBar, VersionSelector, SettingsDialog, TemplateEditor)
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [██████████] ~98% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 2/5 complete
+v1.5 Core & CLI:    [██████████] ~98% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 3/5 complete
 ```
 
-**Overall:** 106 plans complete across 29 phases in 5 milestones.
+**Overall:** 107 plans complete across 29 phases in 5 milestones.
 
 ---
 
@@ -110,6 +110,9 @@ Recent decisions for v1.5 (continued):
 - Minimal createVuetify() in test setup (no wildcard component import) — importing vuetify/components wholesale triggers ~200 CSS imports that vitest Node runner cannot handle (29-01)
 - Store unit tests use real createPinia() with setActivePinia in beforeEach — isolation without persistence plugin, not createTestingPinia (29-01)
 - page.route('https://gnomad.broadinstitute.org/api') exact URL — glob ** prefix/suffix unnecessary for exact match (29-04)
+- Vuetify stub rendering in happy-dom: v-btn inside v-tooltip activator slots not rendered — test via html() string contains on tooltip text, not data-testid (29-03)
+- useGeneConfig mock must return Vue ref() objects not plain {value: false} — template v-if needs real reactive ref for auto-unwrap to work (29-03)
+- TemplateEditor requires createTestingPinia stubActions: false — getEffectiveTemplate() is a store action called from computed; stub returns undefined which crashes parseTemplate() (29-03)
 - DisclaimerBanner is persistent v-dialog; dismissDisclaimer() helper required before any page interaction in E2E tests (29-04)
 - v-autocomplete data-testid is on outer div wrapper; use .locator('input') to target actual <input> element (29-04)
 - gnomAD gene search returns CFTR, CFTRP1, CFTRP2 etc.; use .first() + regex /^CFTR\b/ to avoid strict mode violation (29-04)
@@ -130,8 +133,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** Plan 29-04 — Playwright E2E tests for CFTR wizard happy path and URL state roundtrip
-**Status:** 3 Playwright E2E tests passing (22.4s): CFTR 4-step wizard + 2 URL roundtrip tests. All gnomAD API mocked via page.route. DisclaimerBanner + autocomplete input quirks discovered and fixed.
+**Completed:** Plan 29-03 — Settings/chrome component tests (FilterPanel, AppBar, VersionSelector, SettingsDialog, TemplateEditor)
+**Status:** 380 tests passing across 25 test files. Vuetify stub rendering behavior documented. Vue ref mock pattern established. TemplateEditor stubActions: false pattern established.
 **Resume file:** None
 
 ### Handoff Notes
@@ -189,3 +192,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *Phase 28 E2E verified: 2026-02-24*
 *29-01 complete: 2026-02-24*
 *29-04 complete: 2026-02-24*
+*29-03 complete: 2026-02-24*
