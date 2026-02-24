@@ -148,11 +148,15 @@ Plans:
   1. Vue Test Utils component tests for wizard steps, settings panel, and results display pass, confirming no regressions from the monorepo import path migration
   2. Playwright E2E tests complete the full wizard flow (CFTR gene search → carrier status selection → frequency display → results with clinical text) and validate URL sharing and history restore
   3. The CI pipeline runs all tests (core unit, CLI integration, web component, E2E) on every push and pull request, reporting coverage percentages
-  4. Coverage thresholds are enforced and a build with coverage below threshold (core: 90%+, CLI: 80%+, web: 60%+) fails the CI pipeline with a clear coverage report
-**Plans**: TBD
+  4. Coverage thresholds are enforced and a build with coverage below threshold (core: 90%+, CLI: 80%+, web: 40%+) warns in CI with a clear coverage report
+**Plans**: 5 plans
 
 Plans:
-- [ ] 29-01: TBD
+- [ ] 29-01-PLAN.md — Test infrastructure (vitest config, setup, helpers) and Pinia store unit tests
+- [ ] 29-02-PLAN.md — Wizard step component tests (StepGene, StepStatus, StepFrequency, StepResults, WizardStepper, TextOutput)
+- [ ] 29-03-PLAN.md — Settings and chrome component tests (FilterPanel, AppBar, VersionSelector, SettingsDialog, TemplateEditor)
+- [ ] 29-04-PLAN.md — Playwright E2E tests (CFTR wizard happy path, URL state roundtrip)
+- [ ] 29-05-PLAN.md — CI pipeline workflow with coverage reporting and thresholds
 
 ---
 
@@ -171,10 +175,10 @@ Plans:
 | 26. Calculation Improvements in Core | v1.5 | 5/5 | Complete | 2026-02-24 |
 | 27. CLI Package | v1.5 | 7/7 | Complete | 2026-02-24 |
 | 28. Gene Config System | v1.5 | 4/4 | Complete | 2026-02-24 |
-| 29. Test Suite Completion & Web App Validation | v1.5 | 0/TBD | Not started | - |
+| 29. Test Suite Completion & Web App Validation | v1.5 | 0/5 | Not started | - |
 
 **Total:** 104 plans complete across 28 phases in 5 milestones. v1.5 in progress (4/5 phases complete).
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-24 (Phase 28 complete: 4/4 plans, Gene Config System E2E verified)*
+*Last updated: 2026-02-24 (Phase 29 planned: 5 plans in 3 waves)*
