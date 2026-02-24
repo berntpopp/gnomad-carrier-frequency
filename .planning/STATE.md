@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 25 — Monorepo Foundation & Core Extraction
+**Current focus:** v1.5 Phase 26 — Calculation Improvements in Core
 
 ---
 
@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Milestone:** v1.5 Core Extraction & CLI
 **Phase:** 26 of 29 (Calculation Improvements in Core)
-**Plan:** 5 of 5 in current phase (complete)
-**Status:** Phase 26 complete
-**Last activity:** 2026-02-24 — Completed 26-05-PLAN.md (variant filter + template renderer unit tests)
+**Plan:** 2 of 5 in current phase (in progress)
+**Status:** Executing
+**Last activity:** 2026-02-24 — Completed 26-02-PLAN.md (ac_hom in GraphQL/types, CalcConfig store, URL state extension)
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [██████░░░░] ~40% - Phase 26 complete (5/5 plans), Phase 27 next
+v1.5 Core & CLI:    [████░░░░░░] ~30% - Phase 26 plan 2/5 in progress
 ```
 
-**Overall:** 92 plans complete across 26+ phases in 5 milestones.
+**Overall:** 88 plans complete across 26+ phases in 5 milestones.
 
 ---
 
@@ -64,6 +64,9 @@ Recent decisions for v1.5:
 - GCR uses inclusion-exclusion product (1 - ∏(1-VCRi)), not sum, to avoid double-counting compound heterozygotes (26-01)
 - Genetic prevalence always from raw q=SumAF (never derived from carrier frequency 2pq) to avoid compounding approximation errors (26-01)
 - formatPrevalence uses en-US locale for thousands separator in ratio format (26-01)
+- ac_hom is required (not optional) on all variant interfaces — gnomAD API always returns 0 when no homozygotes, never null (26-02)
+- UrlStateSchema lives in @gnomad-cf/core/types (not web-only) — shared core type usable by CLI and web (26-02)
+- URL boolean params use '0'/'1' string encoding for consistency with existing conflicting param pattern (26-02)
 
 ### Pending Todos
 
@@ -73,7 +76,7 @@ None.
 
 - Phase 25 bun.lock resolved: text format confirmed working (migrated from package-lock.json)
 - Phase 25 Vite alias resolved: `@gnomad-cf/core` regex alias works alongside `@/`
-- Phase 26: Confirm gnomAD GraphQL response field name for homozygote count per variant per population before writing updated types
+- Phase 26: ac_hom confirmed as gnomAD field name (26-02 resolved this concern)
 - Phase 27: gnomAD API rate limits undocumented — default `--concurrency 3` is empirical; make user-configurable
 
 ---
@@ -83,8 +86,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 26-05-PLAN.md — 55 variant filter tests + 32 template renderer tests (all 130 tests passing)
-**Status:** Phase 26 complete — all 5 plans done. Ready for Phase 27 (CLI)
+**Completed:** 26-02-PLAN.md — ac_hom added to GraphQL query and types; CalcConfig Pinia store created; URL state extended with calc params
+**Status:** Phase 26 plan 2/5 complete. Plans 3-5 remain (calculation composable, UI controls, tests)
 
 ### Handoff Notes
 
@@ -128,3 +131,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *25-03 complete: 2026-02-24*
 *25-04 complete: 2026-02-24*
 *26-01 complete: 2026-02-24*
+*26-02 complete: 2026-02-24*
