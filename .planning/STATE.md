@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 29 (Test Suite Completion) — In progress (1/5 plans complete)
+**Current focus:** v1.5 Phase 29 (Test Suite Completion) — In progress (2/5 plans complete)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 29 of 29 (Test Suite Completion) — In progress (1/5 plans done)
-**Plan:** 29-01 of 5 in phase 29 — COMPLETE
-**Status:** Web vitest infrastructure + 88 Pinia store unit tests passing; 314 total tests across core/cli/web
-**Last activity:** 2026-02-24 — Completed 29-01: web test infrastructure + store unit tests
+**Phase:** 29 of 29 (Test Suite Completion) — In progress (2/5 plans done)
+**Plan:** 29-04 of 5 in phase 29 — COMPLETE
+**Status:** Playwright E2E tests passing: CFTR wizard happy path (4-step flow) + URL state roundtrip (2 tests); 3 total E2E tests
+**Last activity:** 2026-02-24 — Completed 29-04: Playwright E2E tests for CFTR wizard and URL roundtrip
 
 ### Progress
 
@@ -27,18 +27,18 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [██████████] ~97% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 1/5 complete
+v1.5 Core & CLI:    [██████████] ~98% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 2/5 complete
 ```
 
-**Overall:** 105 plans complete across 29 phases in 5 milestones.
+**Overall:** 106 plans complete across 29 phases in 5 milestones.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 105
-- v1.5 plans completed: 22
+- Total plans completed: 106
+- v1.5 plans completed: 23
 
 ---
 
@@ -109,6 +109,11 @@ Recent decisions for v1.5 (continued):
 - happy-dom chosen over jsdom for apps/web tests — jsdom@28.1.0 ships html-encoding-sniffer@6.0.0 which require()s @exodus/bytes ESM, causing ERR_REQUIRE_ESM crash (29-01)
 - Minimal createVuetify() in test setup (no wildcard component import) — importing vuetify/components wholesale triggers ~200 CSS imports that vitest Node runner cannot handle (29-01)
 - Store unit tests use real createPinia() with setActivePinia in beforeEach — isolation without persistence plugin, not createTestingPinia (29-01)
+- page.route('https://gnomad.broadinstitute.org/api') exact URL — glob ** prefix/suffix unnecessary for exact match (29-04)
+- DisclaimerBanner is persistent v-dialog; dismissDisclaimer() helper required before any page interaction in E2E tests (29-04)
+- v-autocomplete data-testid is on outer div wrapper; use .locator('input') to target actual <input> element (29-04)
+- gnomAD gene search returns CFTR, CFTRP1, CFTRP2 etc.; use .first() + regex /^CFTR\b/ to avoid strict mode violation (29-04)
+- StepFrequency success alert text: "Carrier frequency calculated from gnomAD data." (verified from source) (29-04)
 
 ### Pending Todos
 
@@ -125,8 +130,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** Plan 29-01 — web vitest infrastructure + 88 Pinia store unit tests
-**Status:** 314 total tests passing (core 99 + cli 72 + web 88 + core-tests 55). apps/web has working vitest.config.ts, test setup/helpers, and 5 store test files.
+**Completed:** Plan 29-04 — Playwright E2E tests for CFTR wizard happy path and URL state roundtrip
+**Status:** 3 Playwright E2E tests passing (22.4s): CFTR 4-step wizard + 2 URL roundtrip tests. All gnomAD API mocked via page.route. DisclaimerBanner + autocomplete input quirks discovered and fixed.
 **Resume file:** None
 
 ### Handoff Notes
@@ -183,3 +188,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *28-03 complete: 2026-02-24*
 *Phase 28 E2E verified: 2026-02-24*
 *29-01 complete: 2026-02-24*
+*29-04 complete: 2026-02-24*
