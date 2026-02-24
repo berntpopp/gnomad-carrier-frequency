@@ -64,11 +64,11 @@
 **Plans**: 5 plans
 
 Plans:
-- [ ] 25-01-PLAN.md — Scaffold monorepo structure and move web app to apps/web/
-- [ ] 25-02-PLAN.md — Extract types, config, and queries to packages/core
-- [ ] 25-03-PLAN.md — Extract filters, calculations, and templates to packages/core
-- [ ] 25-04-PLAN.md — Create fetch client, rewire web imports to @gnomad-cf/core, delete duplicates
-- [ ] 25-05-PLAN.md — Update CI/deploy, cleanup, documentation, and human verification
+- [x] 25-01-PLAN.md — Scaffold monorepo structure and move web app to apps/web/
+- [x] 25-02-PLAN.md — Extract types, config, and queries to packages/core
+- [x] 25-03-PLAN.md — Extract filters, calculations, and templates to packages/core
+- [x] 25-04-PLAN.md — Create fetch client, rewire web imports to @gnomad-cf/core, delete duplicates
+- [x] 25-05-PLAN.md — Update CI/deploy, cleanup, documentation, and human verification
 
 ---
 
@@ -86,11 +86,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 26-01-PLAN.md — Core calculation engine (HWE, VCR/GCR, prevalence) with golden-value TDD tests
-- [ ] 26-02-PLAN.md — GraphQL ac_hom extension, CalcConfig Pinia store, URL state sync
-- [ ] 26-03-PLAN.md — Composable & frequency-calc integration (wire formulas to reactive layer)
-- [ ] 26-04-PLAN.md — FilterPanel calc controls & StepResults prevalence display
-- [ ] 26-05-PLAN.md — Variant filter & template renderer unit tests (TEST-05, TEST-06)
+- [x] 26-01-PLAN.md — Core calculation engine (HWE, VCR/GCR, prevalence) with golden-value TDD tests
+- [x] 26-02-PLAN.md — GraphQL ac_hom extension, CalcConfig Pinia store, URL state sync
+- [x] 26-03-PLAN.md — Composable & frequency-calc integration (wire formulas to reactive layer)
+- [x] 26-04-PLAN.md — FilterPanel calc controls & StepResults prevalence display
+- [x] 26-05-PLAN.md — Variant filter & template renderer unit tests (TEST-05, TEST-06)
 
 ---
 
@@ -158,14 +158,14 @@ Plans:
 | 11-15 | v1.2 | 15/15 | Complete | 2026-01-20 |
 | 16-20 | v1.3 | 14/14 | Complete | 2026-02-23 |
 | 21-24 | v1.4 | 12/12 | Complete | 2026-02-23 |
-| 25. Monorepo Foundation & Core Extraction | v1.5 | 0/5 | Planned | - |
-| 26. Calculation Improvements in Core | v1.5 | 0/5 | Planned | - |
+| 25. Monorepo Foundation & Core Extraction | v1.5 | 5/5 | Complete | 2026-02-24 |
+| 26. Calculation Improvements in Core | v1.5 | 5/5 | Complete | 2026-02-24 |
 | 27. CLI Package | v1.5 | 0/TBD | Not started | - |
 | 28. Gene Config System | v1.5 | 0/TBD | Not started | - |
 | 29. Test Suite Completion & Web App Validation | v1.5 | 0/TBD | Not started | - |
 
-**Total:** 83 plans complete across 24 phases in 5 milestones. v1.5 planning in progress (5 phases, 54 requirements).
+**Total:** 93 plans complete across 26 phases in 5 milestones. v1.5 in progress (2/5 phases complete).
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-24 (Phase 25 planned: 5 plans in 5 waves, monorepo scaffold + extraction + rewiring + CI)*
+*Last updated: 2026-02-24 (Phase 26 complete: HWE 2pq, VCR/GCR, prevalence, 130 core tests, UI controls)*
