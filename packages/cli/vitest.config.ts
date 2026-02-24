@@ -10,9 +10,9 @@ export default defineConfig({
       reporter: ['text', 'json'],
       include: ['src/**/*.ts'],
       exclude: ['src/__tests__/**'],
-      // Target: 80%+ (warn-only — thresholds at 0 so build doesn't fail)
+      // Warn-only: vitest prints violation; CI uses continue-on-error
       thresholds: {
-        lines: 0,
+        lines: 80,
         functions: 0,
         branches: 0,
         statements: 0,

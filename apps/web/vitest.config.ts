@@ -21,9 +21,9 @@ export default defineConfig({
         'src/api/client.ts',
         'src/vite-env.d.ts',
       ],
-      // Thresholds set to 0 (warn-only). Target: 40%+ web coverage
+      // Warn-only: vitest prints violation; CI uses continue-on-error
       thresholds: {
-        lines: 0,
+        lines: 40,
         functions: 0,
         branches: 0,
         statements: 0,
