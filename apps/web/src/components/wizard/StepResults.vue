@@ -134,10 +134,12 @@
       <!-- Filter Panel -->
       <FilterPanel
         v-model="filters"
+        :calc-config="calcStore.defaults"
         :variant-count="filteredCount"
         :conflicting-count="props.conflictingVariantIds.length"
         :is-loading-submissions="props.isLoadingSubmissions"
         :submissions-progress="props.submissionsProgress"
+        @update:calc-config="calcStore.setDefaults($event)"
         @reset="resetFilters"
       />
     </v-card>
@@ -493,7 +495,7 @@ const filteredVariants = computed(() => {
 // Count of filtered variants
 const filteredCount = computed(() => filteredVariants.value.length);
 
-// Reset local filters to store defaults
+// Reset local filters and calc settings to store defaults
 function resetFilters() {
   const defaults = filterStore.defaults;
   emit('update:filterConfig', {
@@ -504,6 +506,7 @@ function resetFilters() {
     clinvarIncludeConflicting: defaults.clinvarIncludeConflicting,
     clinvarConflictingThreshold: defaults.clinvarConflictingThreshold,
   });
+  calcStore.resetToFactoryDefaults();
 }
 
 // Variant modal state

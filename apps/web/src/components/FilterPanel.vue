@@ -285,6 +285,131 @@
               </div>
             </v-alert>
           </v-col>
+
+          <!-- Calculation settings -->
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <div class="d-flex align-center">
+              <v-switch
+                :model-value="calcConfig.useHWEFormula"
+                color="primary"
+                label="HWE Formula (2pq)"
+                :density="smAndDown ? 'default' : 'compact'"
+                hide-details
+                @update:model-value="updateCalcConfig('useHWEFormula', $event)"
+              />
+              <v-tooltip
+                location="top"
+                aria-label="Calculation information"
+              >
+                <template #activator="{ props: tooltipProps }">
+                  <v-icon
+                    v-bind="tooltipProps"
+                    size="x-small"
+                    class="ml-1"
+                    aria-label="HWE formula information"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                <span class="tooltip-text">
+                  <strong>Hardy-Weinberg Equilibrium Formula</strong><br>
+                  When enabled (default), carrier frequency is calculated as
+                  2pq where p = 1 - q and q = sum of pathogenic allele frequencies.
+                  This is the standard epidemiological approach.<br><br>
+                  When disabled, the simplified formula 2 * SumAF is used instead.
+                  This underestimates carrier frequency slightly but matches some
+                  published methods.
+                </span>
+              </v-tooltip>
+            </div>
+          </v-col>
+
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <div class="d-flex align-center">
+              <v-switch
+                :model-value="calcConfig.useHomExclusion"
+                color="primary"
+                label="Homozygote Exclusion"
+                :density="smAndDown ? 'default' : 'compact'"
+                hide-details
+                @update:model-value="updateCalcConfig('useHomExclusion', $event)"
+              />
+              <v-tooltip
+                location="top"
+                aria-label="Calculation information"
+              >
+                <template #activator="{ props: tooltipProps }">
+                  <v-icon
+                    v-bind="tooltipProps"
+                    size="x-small"
+                    class="ml-1"
+                    aria-label="Homozygote exclusion information"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                <span class="tooltip-text">
+                  <strong>Homozygote Exclusion (VCR/GCR)</strong><br>
+                  When enabled (default), uses Variant Carrier Rate (VCR) per variant
+                  and Gene Carrier Rate (GCR) aggregation. This accounts for observed
+                  homozygotes in gnomAD data and avoids double-counting compound
+                  heterozygotes.<br><br>
+                  When disabled, carrier frequency is computed directly from the
+                  HWE or simplified formula without homozygote correction.
+                </span>
+              </v-tooltip>
+            </div>
+          </v-col>
+
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <div class="d-flex align-start">
+              <v-slider
+                :model-value="penetrancePercent"
+                :min="0"
+                :max="100"
+                :step="5"
+                label="Penetrance %"
+                :density="smAndDown ? 'default' : 'compact'"
+                thumb-label
+                color="primary"
+                class="flex-grow-1"
+                @update:model-value="updatePenetrance($event)"
+              />
+              <v-tooltip
+                location="top"
+                aria-label="Calculation information"
+              >
+                <template #activator="{ props: tooltipProps }">
+                  <v-icon
+                    v-bind="tooltipProps"
+                    size="x-small"
+                    class="ml-1 mt-3"
+                    aria-label="Penetrance information"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </template>
+                <span class="tooltip-text">
+                  <strong>Penetrance</strong><br>
+                  The proportion of individuals with the disease genotype who
+                  actually express the disease phenotype. Default is 100% (fully
+                  penetrant).<br><br>
+                  Reducing penetrance scales the Bayesian prevalence accordingly.
+                  For example, 80% penetrance means only 80% of genetically affected
+                  individuals are expected to be clinically affected.
+                </span>
+              </v-tooltip>
+            </div>
+          </v-col>
         </v-row>
 
         <v-divider class="my-3" />
@@ -313,10 +438,11 @@
 import { ref, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import FilterChips from './FilterChips.vue';
-import type { FilterConfig } from '@gnomad-cf/core/types';
+import type { FilterConfig, CalcConfig } from '@gnomad-cf/core/types';
 
 const props = defineProps<{
   modelValue: FilterConfig;
+  calcConfig: CalcConfig;
   variantCount: number;
   conflictingCount?: number;
   isLoadingSubmissions?: boolean;
@@ -325,6 +451,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: FilterConfig];
+  'update:calcConfig': [value: CalcConfig];
   reset: [];
 }>();
 
@@ -351,6 +478,9 @@ const tickLabels = {
   4: '4',
 };
 
+// Penetrance displayed as 0-100% integer
+const penetrancePercent = computed(() => Math.round(props.calcConfig.penetrance * 100));
+
 function updateFilter<K extends keyof FilterConfig>(
   key: K,
   value: FilterConfig[K]
@@ -359,6 +489,14 @@ function updateFilter<K extends keyof FilterConfig>(
     ...props.modelValue,
     [key]: value,
   });
+}
+
+function updateCalcConfig<K extends keyof CalcConfig>(key: K, value: CalcConfig[K]) {
+  emit('update:calcConfig', { ...props.calcConfig, [key]: value });
+}
+
+function updatePenetrance(percentValue: number) {
+  updateCalcConfig('penetrance', percentValue / 100);
 }
 </script>
 
