@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Milestone:** v1.5 Core Extraction & CLI
 **Phase:** 26 of 29 (Calculation Improvements in Core)
-**Plan:** 3 of 5 in current phase (in progress)
-**Status:** Executing
-**Last activity:** 2026-02-24 — Completed 26-03-PLAN.md (CalcConfig wired into useCarrierFrequency composable, prevalence fields, export metadata)
+**Plan:** 4 of 5 in current phase
+**Status:** In progress
+**Last activity:** 2026-02-24 — Completed 26-04-PLAN.md (UI controls for calc settings + prevalence display in StepResults)
 
 ### Progress
 
@@ -27,7 +27,7 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [█████░░░░░] ~40% - Phase 26 plan 3/5 in progress
+v1.5 Core & CLI:    [█████░░░░░] ~44% - Phase 26 plan 4/5 complete
 ```
 
 **Overall:** 89 plans complete across 26+ phases in 5 milestones.
@@ -70,6 +70,9 @@ Recent decisions for v1.5:
 - aggregatePopulationFrequencies removed; replaced by aggregatePopulationFrequenciesWithConfig — CalcConfig applied once in aggregation, not duplicated in buildPopulationFrequencies (26-03)
 - buildPopulationFrequencies signature changed: accepts extended map with pre-computed carrierFrequency and geneticPrevalence — signature break is intentional, sole caller updated (26-03)
 - When homExclusion ON, formula label still reports useHWEFormula setting — homExclusionActive documents mechanism; formula documents user intent for documentation (26-03)
+- FilterPanel receives calcConfig prop + emits update:calcConfig (same pattern as FilterConfig modelValue) — store access stays in StepResults, not FilterPanel (26-04)
+- Penetrance slider operates in 0-100% integer space in UI; converts to 0-1 fraction via updatePenetrance() before emit (26-04)
+- Bayesian prevalence row displayed only when calcStore.defaults.penetrance < 1 (26-04)
 
 ### Pending Todos
 
@@ -89,8 +92,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 26-03-PLAN.md — CalcConfig store wired into useCarrierFrequency; aggregatePopulationFrequenciesWithConfig added; prevalence fields in types; export metadata captures CalcConfig
-**Status:** Phase 26 plan 3/5 complete. Plans 4-5 remain (UI controls for calc settings, tests)
+**Completed:** 26-04-PLAN.md — UI controls for calc settings in FilterPanel; prevalence display + warning chip in StepResults; population table Prevalence column
+**Status:** Phase 26 plan 4/5 complete. Plan 5 remains (tests for Phase 26)
 
 ### Handoff Notes
 
@@ -136,3 +139,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *26-01 complete: 2026-02-24*
 *26-02 complete: 2026-02-24*
 *26-03 complete: 2026-02-24*
+*26-04 complete: 2026-02-24*
