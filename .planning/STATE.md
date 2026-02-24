@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 27 — CLI Package (next)
+**Current focus:** v1.5 Phase 27 — CLI Package (in progress)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 25 of 29 (Monorepo Foundation) — COMPLETE
-**Plan:** 5 of 5 in current phase
-**Status:** Phase 25 complete, human verification passed
-**Last activity:** 2026-02-24 — Phase 25 verified via Playwright (CFTR wizard flow 1:17, 9 populations, clinical text, 0 errors)
+**Phase:** 27 of 29 (CLI Package) — In progress
+**Plan:** 1 of 5 in current phase — COMPLETE
+**Status:** 27-01 complete — CLI scaffold with Commander skeleton, shared types, and tsdown build
+**Last activity:** 2026-02-24 — Completed 27-01-PLAN.md (CLI package scaffold)
 
 ### Progress
 
@@ -27,18 +27,18 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [█████░░░░░] ~50% - Phase 25 complete (5/5 plans done)
+v1.5 Core & CLI:    [██████░░░░] ~55% - Phase 27 Plan 1/5 complete
 ```
 
-**Overall:** 88 plans complete across 25 phases in 5 milestones.
+**Overall:** 89 plans complete across 26 phases in 5 milestones.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 88
-- v1.5 plans completed: 5
+- Total plans completed: 89
+- v1.5 plans completed: 6
 
 ---
 
@@ -71,6 +71,11 @@ Recent decisions for v1.5:
 - FilterPanel receives calcConfig prop + emits update:calcConfig — store access stays in StepResults, not FilterPanel (26-04)
 - Penetrance slider operates in 0-100% integer space in UI; converts to 0-1 fraction before emit (26-04)
 - Bayesian prevalence row displayed only when penetrance < 1 (26-04)
+- CLI tsdown outputs dist/cli.mjs (not cli.js) on Windows with ESM — bin path must point to .mjs extension (27-01)
+- CLI tsconfig is standalone (not extending root tsconfig.json) — root is references-only with no compilerOptions (27-01)
+- CLI uses platform:node in tsdown (not neutral) — needs Node.js built-ins; dts:false (binary, not library) (27-01)
+- p-limit chosen over p-queue for batch concurrency — simpler API sufficient for rate limiting gnomAD calls (27-01)
+- Shared types (QueryResult, VariantDetail, QueryOptions) defined in Wave 1 (27-01) to prevent cross-plan deps in Wave 2 (27-01)
 
 ### Pending Todos
 
@@ -78,7 +83,7 @@ None.
 
 ### Blockers/Concerns
 
-- Phase 27: gnomAD API rate limits undocumented — default `--concurrency 3` is empirical; make user-configurable
+- Phase 27: gnomAD API rate limits undocumented — default `--concurrency 3` is empirical; make user-configurable (plans 27-02, 27-04)
 
 ---
 
@@ -87,27 +92,27 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** Phase 25 — all 5 plans executed, human verification passed
-**Status:** Phase 25 (Monorepo Foundation) complete. Next: Phase 26 (Calculation Improvements)
+**Completed:** 27-01 — CLI package scaffold (Commander skeleton, tsdown build, shared types)
+**Status:** Phase 27 Plan 1 complete. Next: Plan 2 (gene-query command) and Plan 3 (formatters) — Wave 2, runnable in parallel
+**Resume file:** None
 
 ### Handoff Notes
 
 v1.5 scope: monorepo extraction, HWE 2pq + homozygote exclusion + genetic prevalence, full CLI, gene configs, comprehensive test suite.
 
-Phase 25 delivered:
-- Monorepo structure: packages/core (pure TS), apps/web (Vue 3), packages/cli (stub)
-- Core extraction: variant-filters, template-renderer, calculations (carrier frequency, homozygote exclusion, prevalence) all in @gnomad-cf/core
-- CLI stub: @gnomad-cf/cli with basic type structure
-- Web rewired: all imports use @gnomad-cf/core aliases via tsconfig paths
-- CI pipeline: monorepo-aware GitHub Actions with separate core/web build steps
-- Documentation: CLAUDE.md updated for monorepo architecture
-- Human verification: CFTR wizard flow verified end-to-end via Playwright (1:17 carrier frequency, 9 populations, clinical text, 0 console errors)
+Phase 27 Plan 01 delivered:
+- @gnomad-cf/cli workspace package with commander, @clack/prompts, p-limit
+- tsdown build: dist/cli.mjs with #!/usr/bin/env node shebang
+- gnomad-cf --version prints 1.5.0; gnomad-cf --help prints usage
+- packages/cli/src/types.ts: QueryResult, VariantDetail, QueryOptions interfaces
+- Root build:cli script and CLI added to main build chain
+- bun install resolves all workspace + npm dependencies
 
-Next phases:
-- Phase 26 (Calculation Improvements) builds on monorepo foundation
-- Phase 27 (CLI Package) depends on Phase 25 ✓
-- Phase 28 (Gene Configs) depends on Phase 25 ✓
-- Phase 29 (Test Suite) depends on 25, 26, 27, 28
+Next plans in Phase 27:
+- 27-02: gene-query command (imports types.ts, uses @gnomad-cf/core/client + filters + calculations)
+- 27-03: formatters (table, JSON, CSV output; imports QueryResult)
+- 27-04: batch command (multi-gene CSV input, p-limit concurrency)
+- 27-05: integration + CI
 
 App: https://gnomad-carrier-frequency.kidney-genetics.org/
 Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
@@ -128,3 +133,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *25-04 complete: 2026-02-24*
 *25-05 complete: 2026-02-24*
 *Phase 25 verified: 2026-02-24*
+*27-01 complete: 2026-02-24*
