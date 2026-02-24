@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 Phase 29 (Test Suite Completion) — Gap closure plans 29-06 complete
+**Current focus:** v1.5 Phase 29 (Test Suite Completion) — All gap closure plans complete (29-06 + 29-07)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 29 of 29 (Test Suite Completion) — Gap closure in progress
-**Plan:** 29-06 of 7 in phase 29 — COMPLETE
-**Status:** History restore E2E test added (Gap 1 closed). 380+ tests + history restore E2E.
-**Last activity:** 2026-02-24 — Completed 29-06: History restore E2E test (apps/web/e2e/history-restore.spec.ts)
+**Phase:** 29 of 29 (Test Suite Completion) — FULLY COMPLETE (7/7 plans including gap closures)
+**Plan:** 29-07 of 7 in phase 29 — COMPLETE
+**Status:** All gaps closed. Coverage thresholds enforced (vitest) + warn-only in CI (continue-on-error). 380+ tests.
+**Last activity:** 2026-02-24 — Completed 29-07: Real vitest coverage thresholds + CI continue-on-error (Gap 2 closed)
 
 ### Progress
 
@@ -27,10 +27,10 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [##########] 100% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 5/5 + gap closure 29-06 COMPLETE
+v1.5 Core & CLI:    [##########] 100% - Phase 27 7/7 + Phase 28 4/4 + Phase 29 7/7 COMPLETE (incl. gap closure 29-06 + 29-07)
 ```
 
-**Overall:** 108 plans complete across 29 phases in 5 milestones.
+**Overall:** 109 plans complete across 29 phases in 5 milestones.
 
 ---
 
@@ -123,6 +123,8 @@ Recent decisions for v1.5 (continued):
 - gnomAD gene search returns CFTR, CFTRP1, CFTRP2 etc.; use .first() + regex /^CFTR\b/ to avoid strict mode violation (29-04)
 - StepFrequency success alert text: "Carrier frequency calculated from gnomAD data." (verified from source) (29-04)
 - Coverage thresholds at 0 in vitest (warn-only) — advisory targets 90%/80%/40% in comments and CI summary step (29-05)
+- Vitest line-coverage thresholds activated (core: 90, CLI: 80, web: 40) + CI continue-on-error for warn-only behavior (29-07)
+- Lines-only threshold strategy — functions/branches/statements at 0 to avoid false positives on untargeted metrics (29-07)
 - E2E gated to pull_request events targeting main — avoids playwright install overhead on every push (29-05)
 - playwright.config.ts uses isCI flag to switch between preview:4173 in CI and dev:5173 locally (29-05)
 - tests.yml is additive to ci.yml — tests-only workflow, ci.yml keeps lint/typecheck/build (29-05)
@@ -144,8 +146,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** Plan 29-06 — History restore E2E test (apps/web/e2e/history-restore.spec.ts). Gap 1 from 29-VERIFICATION.md closed.
-**Status:** 29-06 complete. History restore E2E verifies full HistoryDrawer restore flow. TEST-10 fully covered at E2E level.
+**Completed:** Plan 29-07 — Real vitest coverage thresholds (core: 90, CLI: 80, web: 40) + CI continue-on-error. Gap 2 from 29-VERIFICATION.md closed.
+**Status:** ALL gap closure plans complete. Both VERIFICATION.md gaps closed. Phase 29 fully done. v1.5 milestone complete.
 **Resume file:** None
 
 ### Handoff Notes
@@ -208,3 +210,6 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *29-05 complete: 2026-02-24*
 *Phase 29 complete: 2026-02-24*
 *v1.5 milestone complete: 2026-02-24*
+*29-06 complete: 2026-02-24*
+*29-07 complete: 2026-02-24*
+*Phase 29 gap closure complete: 2026-02-24*
