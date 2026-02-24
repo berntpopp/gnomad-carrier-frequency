@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0",
+  "geneSymbol": "HEXA",
+  "displayName": "Hexosaminidase A",
+  "omimGeneId": "606869",
+  "inheritance": "AR",
+  "profiles": [
+    {
+      "profileId": "tay-sachs",
+      "displayName": "Tay-Sachs Disease",
+      "isDefault": true,
+      "disease": {
+        "omimId": "272800",
+        "mondoId": "MONDO:0019530",
+        "name": "Tay-Sachs disease"
+      },
+      "penetrance": 1.0,
+      "filterOverrides": {
+        "lofHcEnabled": true,
+        "missenseEnabled": true,
+        "clinvarEnabled": true,
+        "clinvarStarThreshold": 1
+      },
+      "notes": "Tay-Sachs disease is a fully penetrant autosomal recessive lysosomal storage disorder caused by HEXA deficiency. Classic infantile form results in progressive neurodegeneration and death in early childhood. A well-characterized Ashkenazi Jewish founder effect exists (carrier frequency ~1/30 in AJ population vs ~1/300 in general population). Carrier screening is recommended for individuals of Ashkenazi Jewish ancestry.",
+      "references": [
+        "https://pubmed.ncbi.nlm.nih.gov/8490627/",
+        "https://pubmed.ncbi.nlm.nih.gov/12900791/",
+        "https://pubmed.ncbi.nlm.nih.gov/20301406/"
+      ]
+    }
+  ]
+}

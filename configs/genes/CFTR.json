@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "1.0",
+  "geneSymbol": "CFTR",
+  "displayName": "Cystic Fibrosis Transmembrane Conductance Regulator",
+  "omimGeneId": "602421",
+  "inheritance": "AR",
+  "profiles": [
+    {
+      "profileId": "classic-cf",
+      "displayName": "Classic Cystic Fibrosis",
+      "isDefault": true,
+      "disease": {
+        "omimId": "219700",
+        "mondoId": "MONDO:0009061",
+        "name": "Cystic fibrosis"
+      },
+      "penetrance": 1.0,
+      "filterOverrides": {
+        "lofHcEnabled": true,
+        "missenseEnabled": true,
+        "clinvarEnabled": true,
+        "clinvarStarThreshold": 2
+      },
+      "variantExclusions": [],
+      "notes": "Classic cystic fibrosis is fully penetrant (penetrance 1.0). Pathogenic variants in CFTR cause progressive multisystem disease including obstructive lung disease, exocrine pancreatic insufficiency, and male infertility. ClinVar star threshold 2 (reviewed by expert panel or multiple submitters) is recommended to minimize false positives in carrier frequency calculations.",
+      "references": [
+        "https://pubmed.ncbi.nlm.nih.gov/11158515/",
+        "https://pubmed.ncbi.nlm.nih.gov/10189363/",
+        "https://pubmed.ncbi.nlm.nih.gov/32666735/",
+        "https://pubmed.ncbi.nlm.nih.gov/28952621/"
+      ]
+    },
+    {
+      "profileId": "cftr-rd",
+      "displayName": "CFTR-Related Disorder",
+      "isDefault": false,
+      "disease": {
+        "omimId": "277180",
+        "name": "CFTR-related disorder"
+      },
+      "penetrance": 0.03,
+      "filterOverrides": {
+        "lofHcEnabled": true,
+        "missenseEnabled": true,
+        "clinvarEnabled": true,
+        "clinvarStarThreshold": 1
+      },
+      "notes": "CFTR-related disorders (CFTR-RD) represent a spectrum of conditions with reduced penetrance (~3%) compared to classic CF. Includes congenital bilateral absence of the vas deferens (CBAVD), bronchiectasis, and pancreatitis. Often caused by combinations of severe and mild/variable CFTR variants. Penetrance is approximate and varies by condition and variant combination.",
+      "references": [
+        "https://pubmed.ncbi.nlm.nih.gov/23757202/",
+        "https://pubmed.ncbi.nlm.nih.gov/31860684/"
+      ]
+    }
+  ]
+}
