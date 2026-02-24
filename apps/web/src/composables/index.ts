@@ -54,3 +54,6 @@ export type { UseHistoryRestoreReturn } from './useHistoryRestore';
 
 export { useConfirmDialog } from './useConfirmDialog';
 export type { ConfirmDialogOptions } from './useConfirmDialog';
+
+export { useGeneConfig } from './useGeneConfig';
+export type { UseGeneConfigReturn } from './useGeneConfig';

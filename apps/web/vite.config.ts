@@ -109,12 +109,23 @@ export default defineConfig({
   base: '/',  // Custom domain serves from root
   resolve: {
     alias: [
+      { find: '~gene-configs', replacement: fileURLToPath(new URL('../../configs/genes', import.meta.url)) },
       {
         find: /^@gnomad-cf\/core(\/.*)?$/,
         replacement: fileURLToPath(new URL('../../packages/core/src', import.meta.url)) + '$1',
       },
       { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
     ],
+  },
+  build: {
+    rollupOptions: {
+      // Treat Node.js built-ins as external — they appear in @gnomad-cf/core/templates
+      // (load-templates.ts) which is CLI-only code reachable only in Node.js contexts.
+      // The browser never calls loadTemplateContent; tree-shaking removes the call sites
+      // but rollup still resolves the module. Marking node:* as external prevents the
+      // browser bundle error without requiring architectural changes to core.
+      external: [/^node:/],
+    },
   },
   server: {
     // WSL2 with Windows filesystem requires polling for file watching

@@ -2,14 +2,15 @@
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
 
     /* Paths */
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
       "@gnomad-cf/core": ["../../packages/core/src/index.ts"],
-      "@gnomad-cf/core/*": ["../../packages/core/src/*"]
+      "@gnomad-cf/core/*": ["../../packages/core/src/*"],
+      "~gene-configs/*": ["../../configs/genes/*"]
     },
 
     /* JSON imports */
