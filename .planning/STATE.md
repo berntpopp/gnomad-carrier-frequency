@@ -61,6 +61,9 @@ Recent decisions for v1.5:
 - Core client (packages/core/src/client/) uses fetch API — platform-neutral, no villus dependency; villus stays only in apps/web/src/api/client.ts
 - JSON deep-path imports (@gnomad-cf/core/config/templates/de.json) work via Vite regex alias + tsconfig resolveJsonModule — no separate JSON export needed
 - Root typecheck script must use `tsc --build packages/core && bun run --filter gnomad-cf-web typecheck` — plain `tsc --build` fails on .vue files
+- GCR uses inclusion-exclusion product (1 - ∏(1-VCRi)), not sum, to avoid double-counting compound heterozygotes (26-01)
+- Genetic prevalence always from raw q=SumAF (never derived from carrier frequency 2pq) to avoid compounding approximation errors (26-01)
+- formatPrevalence uses en-US locale for thousands separator in ratio format (26-01)
 
 ### Pending Todos
 
@@ -124,3 +127,4 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *25-02 complete: 2026-02-24*
 *25-03 complete: 2026-02-24*
 *25-04 complete: 2026-02-24*
+*26-01 complete: 2026-02-24*
