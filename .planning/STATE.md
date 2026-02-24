@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Milestone:** v1.5 Core Extraction & CLI
 **Phase:** 25 of 29 (Monorepo Foundation & Core Extraction)
-**Plan:** 4 of 5 in current phase
-**Status:** Executing
-**Last activity:** 2026-02-24 — Completed 25-04-PLAN.md (fetch client in core, all web imports rewired to @gnomad-cf/core/*, duplicate source files deleted)
+**Plan:** 5 of 5 in current phase (awaiting human-verify checkpoint)
+**Status:** Executing — paused at checkpoint
+**Last activity:** 2026-02-24 — Completed 25-05-PLAN.md Task 1 (CI/deploy updated, .gitignore cleaned, CLAUDE.md rewritten); paused at human-verify checkpoint
 
 ### Progress
 
@@ -27,7 +27,7 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [████░░░░░░] ~20% - Phase 25 plan 4/5 complete
+v1.5 Core & CLI:    [█████░░░░░] ~25% - Phase 25 plan 5/5 in progress (checkpoint)
 ```
 
 **Overall:** 87 plans complete across 24+ phases in 5 milestones.
@@ -60,6 +60,7 @@ Recent decisions for v1.5:
 - variant-display.ts placed in core/filters/ (co-located with variant-filters.ts it imports from)
 - Core client (packages/core/src/client/) uses fetch API — platform-neutral, no villus dependency; villus stays only in apps/web/src/api/client.ts
 - JSON deep-path imports (@gnomad-cf/core/config/templates/de.json) work via Vite regex alias + tsconfig resolveJsonModule — no separate JSON export needed
+- Root typecheck script must use `tsc --build packages/core && bun run --filter gnomad-cf-web typecheck` — plain `tsc --build` fails on .vue files
 
 ### Pending Todos
 
@@ -79,8 +80,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-24
-**Completed:** 25-04-PLAN.md — fetch-based core GraphQL client created, all web app imports rewired from @/ to @gnomad-cf/core/*, 37 duplicate source files deleted from apps/web/src/
-**Status:** Phase 25 plan 4/5 complete, ready for plan 5
+**Completed:** 25-05-PLAN.md Task 1 — CI/deploy.yml updated for monorepo, .gitignore cleaned, CLAUDE.md rewritten, typecheck bug fixed
+**Status:** Phase 25 plan 5/5 in progress — paused at human-verify checkpoint (Task 2)
 
 ### Handoff Notes
 
