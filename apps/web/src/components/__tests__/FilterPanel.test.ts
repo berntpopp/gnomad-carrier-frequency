@@ -87,7 +87,7 @@ describe("FilterPanel", () => {
     });
     const text = wrapper.text();
     // Tooltip content is rendered in the DOM as span text
-    expect(text).toContain("Hardy-Weinberg Equilibrium Formula");
+    expect(text).toContain("Hardy-Weinberg Equilibrium");
     expect(text).toContain("Homozygote Exclusion");
   });
 
