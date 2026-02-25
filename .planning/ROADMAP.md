@@ -7,7 +7,7 @@
 - **v1.2 Sharing** - Phases 11-15 (shipped 2026-01-20)
 - **v1.3 Documentation Site** - Phases 16-20 (shipped 2026-02-23)
 - **v1.4 Discoverability & Polish** - Phases 21-24 (shipped 2026-02-23)
-- **v1.5 Core Extraction & CLI** - Phases 25-30 (in progress)
+- **v1.5 Core Extraction & CLI** - Phases 25-31 (in progress)
 
 ## Phases
 
@@ -180,9 +180,27 @@ Plans:
 
 ---
 
+#### Phase 31: Runtime Gene Config Loading & Submission Modal
+
+**Goal**: Gene configs are loaded at runtime from GitHub (so merged configs are immediately available without app redeploy), bundled configs are auto-discovered via glob imports, and users can propose new gene configs directly from the app via a pre-filled GitHub issue.
+**Depends on**: Phase 28
+**Requirements**: (enhancement — extends GENE-01 through GENE-07)
+**Success Criteria** (what must be TRUE):
+  1. Adding a new JSON file to `configs/genes/` on the main branch makes it available in the web app at runtime without any code change or redeploy
+  2. Bundled configs (CFTR, HEXA, GJB2) still load instantly offline via eager glob imports
+  3. A loading spinner appears in the FilterPanel while a gene config is being fetched
+  4. Clicking "Suggest Gene Config" opens a dialog pre-filled with the current gene, filter settings, penetrance, and excluded variants, and "Open on GitHub" opens a correctly pre-filled GitHub issue
+  5. The platform loader result is cached in the core registry so the same gene is never fetched twice
+**Plans**: 1 plan
+
+Plans:
+- [x] 31-01-PLAN.md — Runtime GitHub loader, glob imports, configLoading state, submission dialog with variant exclusions, PWA cache rule
+
+---
+
 ## Progress
 
-**Execution Order:** 25 → 26 → 27 → 28 → 29 → 30
+**Execution Order:** 25 → 26 → 27 → 28 → 29 → 30 → 31
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -197,9 +215,10 @@ Plans:
 | 28. Gene Config System | v1.5 | 4/4 | Complete | 2026-02-24 |
 | 29. Test Suite Completion & Web App Validation | v1.5 | 7/7 | Complete | 2026-02-24 |
 | 30. CLI Integration Fixes | v1.5 | 1/1 | Complete | 2026-02-24 |
+| 31. Runtime Gene Config Loading & Submission Modal | v1.5 | 1/1 | Complete | 2026-02-25 |
 
-**Total:** 112 plans complete across 30 phases in 6 milestones.
+**Total:** 113 plans complete across 31 phases in 6 milestones.
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-24 (Phase 30 complete: 1/1 plans, all verified)*
+*Last updated: 2026-02-25 (Phase 31 complete: 1/1 plans, runtime gene config loading + submission modal)*

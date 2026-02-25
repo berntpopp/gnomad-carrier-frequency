@@ -54,6 +54,7 @@ export async function loadGeneConfig(symbol: string): Promise<GeneConfig | null>
       const raw = await platformLoader(symbol)
       const result = GeneConfigSchema.safeParse(raw)
       if (result.success) {
+        registry.set(upperSymbol, result.data)
         return result.data
       } else {
         console.warn(

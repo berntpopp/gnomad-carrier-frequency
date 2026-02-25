@@ -434,6 +434,30 @@ describe('loadGeneConfig', () => {
     // Reset platform loader
     setPlatformLoader(async () => null)
   })
+
+  it('caches platform loader result so loader is only called once per gene', async () => {
+    let callCount = 0
+    const validConfig = makeMinimalConfig({ geneSymbol: 'CACHE_TEST' })
+
+    setPlatformLoader(async (_symbol: string) => {
+      callCount++
+      return validConfig
+    })
+
+    // First call — platform loader invoked
+    const first = await loadGeneConfig('CACHE_TEST')
+    expect(first).not.toBeNull()
+    expect(callCount).toBe(1)
+
+    // Second call — served from registry, loader NOT called again
+    const second = await loadGeneConfig('CACHE_TEST')
+    expect(second).not.toBeNull()
+    expect(second?.geneSymbol).toBe('CACHE_TEST')
+    expect(callCount).toBe(1)
+
+    // Reset platform loader
+    setPlatformLoader(async () => null)
+  })
 })
 
 // ---------------------------------------------------------------------------

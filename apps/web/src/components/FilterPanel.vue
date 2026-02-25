@@ -12,7 +12,21 @@
             :filters="modelValue"
           />
           <v-chip
-            v-if="configLoaded"
+            v-if="configLoading"
+            color="info"
+            size="x-small"
+            variant="outlined"
+          >
+            <v-progress-circular
+              indeterminate
+              size="12"
+              width="2"
+              class="mr-1"
+            />
+            Loading config
+          </v-chip>
+          <v-chip
+            v-else-if="configLoaded"
             color="info"
             size="x-small"
             prepend-icon="mdi-dna"
@@ -441,15 +455,32 @@
             <strong>{{ variantCount }}</strong> qualifying variant(s)
           </div>
 
-          <v-btn
-            variant="text"
-            :size="smAndDown ? 'default' : 'small'"
-            :min-height="smAndDown ? 44 : undefined"
-            prepend-icon="mdi-refresh"
-            @click="emit('reset')"
-          >
-            Reset to Defaults
-          </v-btn>
+          <div class="d-flex align-center flex-wrap ga-2">
+            <v-btn
+              variant="text"
+              :size="smAndDown ? 'default' : 'small'"
+              :min-height="smAndDown ? 44 : undefined"
+              prepend-icon="mdi-refresh"
+              @click="emit('reset')"
+            >
+              Reset to Defaults
+            </v-btn>
+
+            <GeneConfigSubmitDialog>
+              <template #activator="{ props: dialogProps }">
+                <v-btn
+                  v-bind="dialogProps"
+                  variant="text"
+                  :size="smAndDown ? 'default' : 'small'"
+                  :min-height="smAndDown ? 44 : undefined"
+                  prepend-icon="mdi-flask-outline"
+                  :disabled="!selectedGene"
+                >
+                  {{ configLoaded ? 'Suggest Config Update' : 'Suggest Gene Config' }}
+                </v-btn>
+              </template>
+            </GeneConfigSubmitDialog>
+          </div>
         </div>
       </v-expansion-panel-text>
     </v-expansion-panel>
@@ -460,10 +491,13 @@
 import { ref, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import FilterChips from './FilterChips.vue';
+import GeneConfigSubmitDialog from './GeneConfigSubmitDialog.vue';
 import type { FilterConfig, CalcConfig } from '@gnomad-cf/core/types';
 import { useGeneConfig } from '@/composables/useGeneConfig';
+import { useGeneSearch } from '@/composables/useGeneSearch';
 
-const { configLoaded, activeProfile, availableProfiles, selectProfile, resetConfig } = useGeneConfig();
+const { configLoaded, configLoading, activeProfile, availableProfiles, selectProfile, resetConfig } = useGeneConfig();
+const { selectedGene } = useGeneSearch();
 
 const props = defineProps<{
   modelValue: FilterConfig;

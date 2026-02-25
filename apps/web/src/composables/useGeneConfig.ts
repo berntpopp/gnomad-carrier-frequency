@@ -13,11 +13,13 @@ import { useCalcStore } from '@/stores/useCalcStore';
 const activeGeneConfig: Ref<GeneConfig | null> = ref(null);
 const activeProfile: Ref<ConditionProfile | null> = ref(null);
 const configLoaded: Ref<boolean> = ref(false);
+const configLoading: Ref<boolean> = ref(false);
 
 export interface UseGeneConfigReturn {
   activeGeneConfig: Ref<GeneConfig | null>;
   activeProfile: Ref<ConditionProfile | null>;
   configLoaded: Ref<boolean>;
+  configLoading: Ref<boolean>;
   availableProfiles: Ref<ConditionProfile[]>;
   selectProfile: (profileId: string) => void;
   resetConfig: () => void;
@@ -58,12 +60,15 @@ export function useGeneConfig(): UseGeneConfigReturn {
         activeGeneConfig.value = null;
         activeProfile.value = null;
         configLoaded.value = false;
+        configLoading.value = false;
         filterStore.resetToFactoryDefaults();
         calcStore.resetToFactoryDefaults();
         return;
       }
 
+      configLoading.value = true;
       const config = await loadGeneConfig(gene.symbol);
+      configLoading.value = false;
 
       // Gene has no config — reset to factory defaults to prevent state bleed
       if (config === null) {
@@ -120,6 +125,7 @@ export function useGeneConfig(): UseGeneConfigReturn {
     activeGeneConfig,
     activeProfile,
     configLoaded,
+    configLoading,
     availableProfiles,
     selectProfile,
     resetConfig,

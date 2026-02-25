@@ -5,16 +5,23 @@ import FilterPanel from '../FilterPanel.vue'
 import type { FilterConfig, CalcConfig } from '@gnomad-cf/core/types'
 import { FACTORY_FILTER_DEFAULTS, FACTORY_CALC_DEFAULTS } from '@gnomad-cf/core/types'
 
-// FilterPanel uses useGeneConfig composable which uses useGeneSearch + stores internally.
-// Mock the composable to isolate FilterPanel rendering from store dependencies.
+// FilterPanel uses useGeneConfig and useGeneSearch composables internally.
+// Mock both to isolate FilterPanel rendering from store/villus dependencies.
 // Must return actual Vue refs so reactive template conditionals work correctly.
 vi.mock('@/composables/useGeneConfig', () => ({
   useGeneConfig: () => ({
     configLoaded: ref(false),
+    configLoading: ref(false),
     activeProfile: ref(null),
     availableProfiles: ref([]),
     selectProfile: vi.fn(),
     resetConfig: vi.fn(),
+  }),
+}))
+
+vi.mock('@/composables/useGeneSearch', () => ({
+  useGeneSearch: () => ({
+    selectedGene: ref(null),
   }),
 }))
 

@@ -96,6 +96,21 @@ export default defineConfig({
               },
             },
           },
+          {
+            // Gene config JSON from GitHub (runtime loading)
+            urlPattern: /^https:\/\/raw\.githubusercontent\.com\/berntpopp\/gnomad-carrier-frequency\/main\/configs\/genes\//,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'gene-config-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 3600, // 1 hour
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
         ],
       },
       devOptions: {
