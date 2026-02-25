@@ -26,7 +26,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:5173/';
-const OUTPUT_DIR = resolve(__dirname, '../docs/public/screenshots');
+const OUTPUT_DIR = resolve(__dirname, '../apps/web/docs/public/screenshots');
 const FIXTURES_DIR = resolve(__dirname, '../fixtures');
 const VIEWPORT_DESKTOP = { width: 1200, height: 800 };
 const VIEWPORT_MOBILE = { width: 375, height: 812 };
@@ -49,7 +49,7 @@ function loadFixture(path: string): unknown {
 async function startDevServer(): Promise<ChildProcess> {
   console.log('Starting dev server...');
 
-  const server = spawn('npm', ['run', 'dev'], {
+  const server = spawn('bun', ['run', 'dev'], {
     cwd: resolve(__dirname, '..'),
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: false,

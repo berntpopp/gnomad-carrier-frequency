@@ -13,35 +13,119 @@
             "ac": 15682,
             "an": 245532,
             "populations": [
-              { "id": "afr", "ac": 231, "an": 18920 },
-              { "id": "amr", "ac": 583, "an": 27840 },
-              { "id": "asj", "ac": 2947, "an": 9234 },
-              { "id": "eas", "ac": 72, "an": 17382 },
-              { "id": "fin", "ac": 238, "an": 16454 },
-              { "id": "nfe", "ac": 10876, "an": 132458 },
-              { "id": "sas", "ac": 598, "an": 20186 },
-              { "id": "remaining", "ac": 137, "an": 3058 }
-            ]
+              {
+                "id": "afr",
+                "ac": 231,
+                "an": 18920,
+                "ac_hom": 2
+              },
+              {
+                "id": "amr",
+                "ac": 583,
+                "an": 27840,
+                "ac_hom": 5
+              },
+              {
+                "id": "asj",
+                "ac": 2947,
+                "an": 9234,
+                "ac_hom": 29
+              },
+              {
+                "id": "eas",
+                "ac": 72,
+                "an": 17382,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 238,
+                "an": 16454,
+                "ac_hom": 2
+              },
+              {
+                "id": "nfe",
+                "ac": 10876,
+                "an": 132458,
+                "ac_hom": 108
+              },
+              {
+                "id": "sas",
+                "ac": 598,
+                "an": 20186,
+                "ac_hom": 5
+              },
+              {
+                "id": "remaining",
+                "ac": 137,
+                "an": 3058,
+                "ac_hom": 1
+              }
+            ],
+            "ac_hom": 156
           },
           "genome": {
             "ac": 4238,
             "an": 68764,
             "populations": [
-              { "id": "afr", "ac": 89, "an": 14208 },
-              { "id": "amr", "ac": 312, "an": 9876 },
-              { "id": "asj", "ac": 784, "an": 2634 },
-              { "id": "eas", "ac": 18, "an": 4982 },
-              { "id": "fin", "ac": 86, "an": 5124 },
-              { "id": "nfe", "ac": 2782, "an": 28456 },
-              { "id": "sas", "ac": 134, "an": 2796 },
-              { "id": "remaining", "ac": 33, "an": 688 }
-            ]
+              {
+                "id": "afr",
+                "ac": 89,
+                "an": 14208,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 312,
+                "an": 9876,
+                "ac_hom": 3
+              },
+              {
+                "id": "asj",
+                "ac": 784,
+                "an": 2634,
+                "ac_hom": 7
+              },
+              {
+                "id": "eas",
+                "ac": 18,
+                "an": 4982,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 86,
+                "an": 5124,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 2782,
+                "an": 28456,
+                "ac_hom": 27
+              },
+              {
+                "id": "sas",
+                "ac": 134,
+                "an": 2796,
+                "ac_hom": 1
+              },
+              {
+                "id": "remaining",
+                "ac": 33,
+                "an": 688,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 42
           },
           "transcript_consequence": {
             "gene_symbol": "CFTR",
             "transcript_id": "ENST00000003084",
             "canonical": true,
-            "consequence_terms": ["frameshift_variant"],
+            "consequence_terms": [
+              "frameshift_variant"
+            ],
             "lof": "HC",
             "lof_filter": null,
             "lof_flags": null,
@@ -58,35 +142,119 @@
             "ac": 1823,
             "an": 245642,
             "populations": [
-              { "id": "afr", "ac": 21, "an": 18946 },
-              { "id": "amr", "ac": 67, "an": 27854 },
-              { "id": "asj", "ac": 234, "an": 9238 },
-              { "id": "eas", "ac": 8, "an": 17388 },
-              { "id": "fin", "ac": 18, "an": 16458 },
-              { "id": "nfe", "ac": 1398, "an": 132482 },
-              { "id": "sas", "ac": 64, "an": 20194 },
-              { "id": "remaining", "ac": 13, "an": 3082 }
-            ]
+              {
+                "id": "afr",
+                "ac": 21,
+                "an": 18946,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 67,
+                "an": 27854,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 234,
+                "an": 9238,
+                "ac_hom": 2
+              },
+              {
+                "id": "eas",
+                "ac": 8,
+                "an": 17388,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 18,
+                "an": 16458,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 1398,
+                "an": 132482,
+                "ac_hom": 13
+              },
+              {
+                "id": "sas",
+                "ac": 64,
+                "an": 20194,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 13,
+                "an": 3082,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 18
           },
           "genome": {
             "ac": 482,
             "an": 68798,
             "populations": [
-              { "id": "afr", "ac": 8, "an": 14218 },
-              { "id": "amr", "ac": 34, "an": 9882 },
-              { "id": "asj", "ac": 67, "an": 2638 },
-              { "id": "eas", "ac": 2, "an": 4986 },
-              { "id": "fin", "ac": 7, "an": 5128 },
-              { "id": "nfe", "ac": 348, "an": 28472 },
-              { "id": "sas", "ac": 14, "an": 2802 },
-              { "id": "remaining", "ac": 2, "an": 672 }
-            ]
+              {
+                "id": "afr",
+                "ac": 8,
+                "an": 14218,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 34,
+                "an": 9882,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 67,
+                "an": 2638,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 2,
+                "an": 4986,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 7,
+                "an": 5128,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 348,
+                "an": 28472,
+                "ac_hom": 3
+              },
+              {
+                "id": "sas",
+                "ac": 14,
+                "an": 2802,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 2,
+                "an": 672,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 4
           },
           "transcript_consequence": {
             "gene_symbol": "CFTR",
             "transcript_id": "ENST00000003084",
             "canonical": true,
-            "consequence_terms": ["stop_gained"],
+            "consequence_terms": [
+              "stop_gained"
+            ],
             "lof": "HC",
             "lof_filter": null,
             "lof_flags": null,
@@ -103,35 +271,119 @@
             "ac": 987,
             "an": 245534,
             "populations": [
-              { "id": "afr", "ac": 12, "an": 18922 },
-              { "id": "amr", "ac": 43, "an": 27842 },
-              { "id": "asj", "ac": 178, "an": 9236 },
-              { "id": "eas", "ac": 5, "an": 17384 },
-              { "id": "fin", "ac": 9, "an": 16456 },
-              { "id": "nfe", "ac": 698, "an": 132462 },
-              { "id": "sas", "ac": 38, "an": 20188 },
-              { "id": "remaining", "ac": 4, "an": 3044 }
-            ]
+              {
+                "id": "afr",
+                "ac": 12,
+                "an": 18922,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 43,
+                "an": 27842,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 178,
+                "an": 9236,
+                "ac_hom": 1
+              },
+              {
+                "id": "eas",
+                "ac": 5,
+                "an": 17384,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 9,
+                "an": 16456,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 698,
+                "an": 132462,
+                "ac_hom": 6
+              },
+              {
+                "id": "sas",
+                "ac": 38,
+                "an": 20188,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 4,
+                "an": 3044,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 9
           },
           "genome": {
             "ac": 264,
             "an": 68772,
             "populations": [
-              { "id": "afr", "ac": 4, "an": 14212 },
-              { "id": "amr", "ac": 18, "an": 9878 },
-              { "id": "asj", "ac": 48, "an": 2636 },
-              { "id": "eas", "ac": 1, "an": 4984 },
-              { "id": "fin", "ac": 3, "an": 5126 },
-              { "id": "nfe", "ac": 182, "an": 28464 },
-              { "id": "sas", "ac": 7, "an": 2798 },
-              { "id": "remaining", "ac": 1, "an": 674 }
-            ]
+              {
+                "id": "afr",
+                "ac": 4,
+                "an": 14212,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 18,
+                "an": 9878,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 48,
+                "an": 2636,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 1,
+                "an": 4984,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 3,
+                "an": 5126,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 182,
+                "an": 28464,
+                "ac_hom": 1
+              },
+              {
+                "id": "sas",
+                "ac": 7,
+                "an": 2798,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 1,
+                "an": 674,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 2
           },
           "transcript_consequence": {
             "gene_symbol": "CFTR",
             "transcript_id": "ENST00000003084",
             "canonical": true,
-            "consequence_terms": ["splice_acceptor_variant"],
+            "consequence_terms": [
+              "splice_acceptor_variant"
+            ],
             "lof": "HC",
             "lof_filter": null,
             "lof_flags": null,
@@ -148,35 +400,119 @@
             "ac": 643,
             "an": 245556,
             "populations": [
-              { "id": "afr", "ac": 8, "an": 18928 },
-              { "id": "amr", "ac": 29, "an": 27846 },
-              { "id": "asj", "ac": 112, "an": 9238 },
-              { "id": "eas", "ac": 3, "an": 17386 },
-              { "id": "fin", "ac": 6, "an": 16458 },
-              { "id": "nfe", "ac": 456, "an": 132478 },
-              { "id": "sas", "ac": 26, "an": 20192 },
-              { "id": "remaining", "ac": 3, "an": 3030 }
-            ]
+              {
+                "id": "afr",
+                "ac": 8,
+                "an": 18928,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 29,
+                "an": 27846,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 112,
+                "an": 9238,
+                "ac_hom": 1
+              },
+              {
+                "id": "eas",
+                "ac": 3,
+                "an": 17386,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 6,
+                "an": 16458,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 456,
+                "an": 132478,
+                "ac_hom": 4
+              },
+              {
+                "id": "sas",
+                "ac": 26,
+                "an": 20192,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 3,
+                "an": 3030,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 6
           },
           "genome": {
             "ac": 172,
             "an": 68786,
             "populations": [
-              { "id": "afr", "ac": 3, "an": 14216 },
-              { "id": "amr", "ac": 12, "an": 9880 },
-              { "id": "asj", "ac": 32, "an": 2638 },
-              { "id": "eas", "ac": 1, "an": 4986 },
-              { "id": "fin", "ac": 2, "an": 5128 },
-              { "id": "nfe", "ac": 118, "an": 28468 },
-              { "id": "sas", "ac": 4, "an": 2800 },
-              { "id": "remaining", "ac": 0, "an": 670 }
-            ]
+              {
+                "id": "afr",
+                "ac": 3,
+                "an": 14216,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 12,
+                "an": 9880,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 32,
+                "an": 2638,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 1,
+                "an": 4986,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 2,
+                "an": 5128,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 118,
+                "an": 28468,
+                "ac_hom": 1
+              },
+              {
+                "id": "sas",
+                "ac": 4,
+                "an": 2800,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 0,
+                "an": 670,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 1
           },
           "transcript_consequence": {
             "gene_symbol": "CFTR",
             "transcript_id": "ENST00000003084",
             "canonical": true,
-            "consequence_terms": ["stop_gained"],
+            "consequence_terms": [
+              "stop_gained"
+            ],
             "lof": "HC",
             "lof_filter": null,
             "lof_flags": null,
@@ -193,35 +529,119 @@
             "ac": 512,
             "an": 245548,
             "populations": [
-              { "id": "afr", "ac": 6, "an": 18926 },
-              { "id": "amr", "ac": 23, "an": 27844 },
-              { "id": "asj", "ac": 89, "an": 9236 },
-              { "id": "eas", "ac": 2, "an": 17384 },
-              { "id": "fin", "ac": 4, "an": 16456 },
-              { "id": "nfe", "ac": 362, "an": 132472 },
-              { "id": "sas", "ac": 24, "an": 20190 },
-              { "id": "remaining", "ac": 2, "an": 3040 }
-            ]
+              {
+                "id": "afr",
+                "ac": 6,
+                "an": 18926,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 23,
+                "an": 27844,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 89,
+                "an": 9236,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 2,
+                "an": 17384,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 4,
+                "an": 16456,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 362,
+                "an": 132472,
+                "ac_hom": 3
+              },
+              {
+                "id": "sas",
+                "ac": 24,
+                "an": 20190,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 2,
+                "an": 3040,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 5
           },
           "genome": {
             "ac": 138,
             "an": 68780,
             "populations": [
-              { "id": "afr", "ac": 2, "an": 14214 },
-              { "id": "amr", "ac": 9, "an": 9878 },
-              { "id": "asj", "ac": 26, "an": 2636 },
-              { "id": "eas", "ac": 1, "an": 4984 },
-              { "id": "fin", "ac": 1, "an": 5126 },
-              { "id": "nfe", "ac": 94, "an": 28466 },
-              { "id": "sas", "ac": 5, "an": 2798 },
-              { "id": "remaining", "ac": 0, "an": 678 }
-            ]
+              {
+                "id": "afr",
+                "ac": 2,
+                "an": 14214,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 9,
+                "an": 9878,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 26,
+                "an": 2636,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 1,
+                "an": 4984,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 1,
+                "an": 5126,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 94,
+                "an": 28466,
+                "ac_hom": 0
+              },
+              {
+                "id": "sas",
+                "ac": 5,
+                "an": 2798,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 0,
+                "an": 678,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 1
           },
           "transcript_consequence": {
             "gene_symbol": "CFTR",
             "transcript_id": "ENST00000003084",
             "canonical": true,
-            "consequence_terms": ["missense_variant"],
+            "consequence_terms": [
+              "missense_variant"
+            ],
             "lof": null,
             "lof_filter": null,
             "lof_flags": null,
@@ -238,35 +658,119 @@
             "ac": 423,
             "an": 245542,
             "populations": [
-              { "id": "afr", "ac": 5, "an": 18924 },
-              { "id": "amr", "ac": 19, "an": 27842 },
-              { "id": "asj", "ac": 72, "an": 9236 },
-              { "id": "eas", "ac": 2, "an": 17386 },
-              { "id": "fin", "ac": 3, "an": 16456 },
-              { "id": "nfe", "ac": 298, "an": 132468 },
-              { "id": "sas", "ac": 22, "an": 20190 },
-              { "id": "remaining", "ac": 2, "an": 3040 }
-            ]
+              {
+                "id": "afr",
+                "ac": 5,
+                "an": 18924,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 19,
+                "an": 27842,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 72,
+                "an": 9236,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 2,
+                "an": 17386,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 3,
+                "an": 16456,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 298,
+                "an": 132468,
+                "ac_hom": 2
+              },
+              {
+                "id": "sas",
+                "ac": 22,
+                "an": 20190,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 2,
+                "an": 3040,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 4
           },
           "genome": {
             "ac": 114,
             "an": 68782,
             "populations": [
-              { "id": "afr", "ac": 2, "an": 14214 },
-              { "id": "amr", "ac": 8, "an": 9880 },
-              { "id": "asj", "ac": 21, "an": 2636 },
-              { "id": "eas", "ac": 0, "an": 4984 },
-              { "id": "fin", "ac": 1, "an": 5126 },
-              { "id": "nfe", "ac": 78, "an": 28468 },
-              { "id": "sas", "ac": 4, "an": 2798 },
-              { "id": "remaining", "ac": 0, "an": 676 }
-            ]
+              {
+                "id": "afr",
+                "ac": 2,
+                "an": 14214,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 8,
+                "an": 9880,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 21,
+                "an": 2636,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 0,
+                "an": 4984,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 1,
+                "an": 5126,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 78,
+                "an": 28468,
+                "ac_hom": 0
+              },
+              {
+                "id": "sas",
+                "ac": 4,
+                "an": 2798,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 0,
+                "an": 676,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 1
           },
           "transcript_consequence": {
             "gene_symbol": "CFTR",
             "transcript_id": "ENST00000003084",
             "canonical": true,
-            "consequence_terms": ["missense_variant"],
+            "consequence_terms": [
+              "missense_variant"
+            ],
             "lof": null,
             "lof_filter": null,
             "lof_flags": null,
@@ -283,35 +787,119 @@
             "ac": 378,
             "an": 245538,
             "populations": [
-              { "id": "afr", "ac": 4, "an": 18922 },
-              { "id": "amr", "ac": 17, "an": 27842 },
-              { "id": "asj", "ac": 64, "an": 9236 },
-              { "id": "eas", "ac": 1, "an": 17384 },
-              { "id": "fin", "ac": 3, "an": 16456 },
-              { "id": "nfe", "ac": 267, "an": 132466 },
-              { "id": "sas", "ac": 20, "an": 20192 },
-              { "id": "remaining", "ac": 2, "an": 3040 }
-            ]
+              {
+                "id": "afr",
+                "ac": 4,
+                "an": 18922,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 17,
+                "an": 27842,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 64,
+                "an": 9236,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 1,
+                "an": 17384,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 3,
+                "an": 16456,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 267,
+                "an": 132466,
+                "ac_hom": 2
+              },
+              {
+                "id": "sas",
+                "ac": 20,
+                "an": 20192,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 2,
+                "an": 3040,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 3
           },
           "genome": {
             "ac": 102,
             "an": 68776,
             "populations": [
-              { "id": "afr", "ac": 1, "an": 14212 },
-              { "id": "amr", "ac": 7, "an": 9878 },
-              { "id": "asj", "ac": 18, "an": 2636 },
-              { "id": "eas", "ac": 0, "an": 4984 },
-              { "id": "fin", "ac": 1, "an": 5126 },
-              { "id": "nfe", "ac": 71, "an": 28466 },
-              { "id": "sas", "ac": 4, "an": 2798 },
-              { "id": "remaining", "ac": 0, "an": 676 }
-            ]
+              {
+                "id": "afr",
+                "ac": 1,
+                "an": 14212,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 7,
+                "an": 9878,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 18,
+                "an": 2636,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 0,
+                "an": 4984,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 1,
+                "an": 5126,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 71,
+                "an": 28466,
+                "ac_hom": 0
+              },
+              {
+                "id": "sas",
+                "ac": 4,
+                "an": 2798,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 0,
+                "an": 676,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 1
           },
           "transcript_consequence": {
             "gene_symbol": "CFTR",
             "transcript_id": "ENST00000003084",
             "canonical": true,
-            "consequence_terms": ["splice_donor_variant"],
+            "consequence_terms": [
+              "splice_donor_variant"
+            ],
             "lof": "HC",
             "lof_filter": null,
             "lof_flags": null,
@@ -328,35 +916,119 @@
             "ac": 312,
             "an": 245544,
             "populations": [
-              { "id": "afr", "ac": 3, "an": 18924 },
-              { "id": "amr", "ac": 14, "an": 27842 },
-              { "id": "asj", "ac": 53, "an": 9236 },
-              { "id": "eas", "ac": 1, "an": 17386 },
-              { "id": "fin", "ac": 2, "an": 16456 },
-              { "id": "nfe", "ac": 221, "an": 132470 },
-              { "id": "sas", "ac": 16, "an": 20190 },
-              { "id": "remaining", "ac": 2, "an": 3040 }
-            ]
+              {
+                "id": "afr",
+                "ac": 3,
+                "an": 18924,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 14,
+                "an": 27842,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 53,
+                "an": 9236,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 1,
+                "an": 17386,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 2,
+                "an": 16456,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 221,
+                "an": 132470,
+                "ac_hom": 2
+              },
+              {
+                "id": "sas",
+                "ac": 16,
+                "an": 20190,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 2,
+                "an": 3040,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 3
           },
           "genome": {
             "ac": 84,
             "an": 68778,
             "populations": [
-              { "id": "afr", "ac": 1, "an": 14214 },
-              { "id": "amr", "ac": 6, "an": 9880 },
-              { "id": "asj", "ac": 15, "an": 2636 },
-              { "id": "eas", "ac": 0, "an": 4984 },
-              { "id": "fin", "ac": 1, "an": 5126 },
-              { "id": "nfe", "ac": 58, "an": 28466 },
-              { "id": "sas", "ac": 3, "an": 2798 },
-              { "id": "remaining", "ac": 0, "an": 674 }
-            ]
+              {
+                "id": "afr",
+                "ac": 1,
+                "an": 14214,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 6,
+                "an": 9880,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 15,
+                "an": 2636,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 0,
+                "an": 4984,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 1,
+                "an": 5126,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 58,
+                "an": 28466,
+                "ac_hom": 0
+              },
+              {
+                "id": "sas",
+                "ac": 3,
+                "an": 2798,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 0,
+                "an": 674,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 0
           },
           "transcript_consequence": {
             "gene_symbol": "CFTR",
             "transcript_id": "ENST00000003084",
             "canonical": true,
-            "consequence_terms": ["frameshift_variant"],
+            "consequence_terms": [
+              "frameshift_variant"
+            ],
             "lof": "HC",
             "lof_filter": null,
             "lof_flags": null,
@@ -373,35 +1045,119 @@
             "ac": 267,
             "an": 245540,
             "populations": [
-              { "id": "afr", "ac": 3, "an": 18922 },
-              { "id": "amr", "ac": 12, "an": 27842 },
-              { "id": "asj", "ac": 45, "an": 9236 },
-              { "id": "eas", "ac": 1, "an": 17384 },
-              { "id": "fin", "ac": 2, "an": 16456 },
-              { "id": "nfe", "ac": 189, "an": 132470 },
-              { "id": "sas", "ac": 14, "an": 20190 },
-              { "id": "remaining", "ac": 1, "an": 3040 }
-            ]
+              {
+                "id": "afr",
+                "ac": 3,
+                "an": 18922,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 12,
+                "an": 27842,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 45,
+                "an": 9236,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 1,
+                "an": 17384,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 2,
+                "an": 16456,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 189,
+                "an": 132470,
+                "ac_hom": 1
+              },
+              {
+                "id": "sas",
+                "ac": 14,
+                "an": 20190,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 1,
+                "an": 3040,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 2
           },
           "genome": {
             "ac": 72,
             "an": 68780,
             "populations": [
-              { "id": "afr", "ac": 1, "an": 14214 },
-              { "id": "amr", "ac": 5, "an": 9880 },
-              { "id": "asj", "ac": 13, "an": 2636 },
-              { "id": "eas", "ac": 0, "an": 4984 },
-              { "id": "fin", "ac": 1, "an": 5126 },
-              { "id": "nfe", "ac": 50, "an": 28466 },
-              { "id": "sas", "ac": 2, "an": 2798 },
-              { "id": "remaining", "ac": 0, "an": 676 }
-            ]
+              {
+                "id": "afr",
+                "ac": 1,
+                "an": 14214,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 5,
+                "an": 9880,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 13,
+                "an": 2636,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 0,
+                "an": 4984,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 1,
+                "an": 5126,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 50,
+                "an": 28466,
+                "ac_hom": 0
+              },
+              {
+                "id": "sas",
+                "ac": 2,
+                "an": 2798,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 0,
+                "an": 676,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 0
           },
           "transcript_consequence": {
             "gene_symbol": "CFTR",
             "transcript_id": "ENST00000003084",
             "canonical": true,
-            "consequence_terms": ["splice_donor_variant"],
+            "consequence_terms": [
+              "splice_donor_variant"
+            ],
             "lof": "HC",
             "lof_filter": null,
             "lof_flags": null,
@@ -418,35 +1174,119 @@
             "ac": 198,
             "an": 245542,
             "populations": [
-              { "id": "afr", "ac": 2, "an": 18924 },
-              { "id": "amr", "ac": 9, "an": 27842 },
-              { "id": "asj", "ac": 34, "an": 9236 },
-              { "id": "eas", "ac": 0, "an": 17386 },
-              { "id": "fin", "ac": 1, "an": 16456 },
-              { "id": "nfe", "ac": 142, "an": 132468 },
-              { "id": "sas", "ac": 9, "an": 20190 },
-              { "id": "remaining", "ac": 1, "an": 3040 }
-            ]
+              {
+                "id": "afr",
+                "ac": 2,
+                "an": 18924,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 9,
+                "an": 27842,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 34,
+                "an": 9236,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 0,
+                "an": 17386,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 1,
+                "an": 16456,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 142,
+                "an": 132468,
+                "ac_hom": 1
+              },
+              {
+                "id": "sas",
+                "ac": 9,
+                "an": 20190,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 1,
+                "an": 3040,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 1
           },
           "genome": {
             "ac": 53,
             "an": 68778,
             "populations": [
-              { "id": "afr", "ac": 1, "an": 14214 },
-              { "id": "amr", "ac": 4, "an": 9880 },
-              { "id": "asj", "ac": 10, "an": 2636 },
-              { "id": "eas", "ac": 0, "an": 4984 },
-              { "id": "fin", "ac": 0, "an": 5126 },
-              { "id": "nfe", "ac": 37, "an": 28466 },
-              { "id": "sas", "ac": 1, "an": 2798 },
-              { "id": "remaining", "ac": 0, "an": 674 }
-            ]
+              {
+                "id": "afr",
+                "ac": 1,
+                "an": 14214,
+                "ac_hom": 0
+              },
+              {
+                "id": "amr",
+                "ac": 4,
+                "an": 9880,
+                "ac_hom": 0
+              },
+              {
+                "id": "asj",
+                "ac": 10,
+                "an": 2636,
+                "ac_hom": 0
+              },
+              {
+                "id": "eas",
+                "ac": 0,
+                "an": 4984,
+                "ac_hom": 0
+              },
+              {
+                "id": "fin",
+                "ac": 0,
+                "an": 5126,
+                "ac_hom": 0
+              },
+              {
+                "id": "nfe",
+                "ac": 37,
+                "an": 28466,
+                "ac_hom": 0
+              },
+              {
+                "id": "sas",
+                "ac": 1,
+                "an": 2798,
+                "ac_hom": 0
+              },
+              {
+                "id": "remaining",
+                "ac": 0,
+                "an": 674,
+                "ac_hom": 0
+              }
+            ],
+            "ac_hom": 0
           },
           "transcript_consequence": {
             "gene_symbol": "CFTR",
             "transcript_id": "ENST00000003084",
             "canonical": true,
-            "consequence_terms": ["frameshift_variant"],
+            "consequence_terms": [
+              "frameshift_variant"
+            ],
             "lof": "HC",
             "lof_filter": null,
             "lof_flags": null,
