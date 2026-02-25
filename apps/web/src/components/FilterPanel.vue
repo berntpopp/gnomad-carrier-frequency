@@ -363,7 +363,7 @@
                     :model-value="penetrancePercent"
                     :min="0"
                     :max="100"
-                    :step="5"
+                    :step="1"
                     :ticks="smAndDown ? undefined : penetranceTickLabels"
                     :show-ticks="showTickLabels"
                     tick-size="4"

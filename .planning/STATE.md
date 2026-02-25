@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 — Phase 32 complete (frequency accuracy + accessibility fixes)
+**Current focus:** v1.5 — Phase 32 complete + post-audit UI/UX polish & CI fixes
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.5 Core Extraction & CLI
-**Phase:** 32 of 32 (Frequency Accuracy Fixes) — COMPLETE
+**Phase:** 32 of 32 (Frequency Accuracy Fixes) — COMPLETE + post-audit polish
 **Plan:** 32-01 — COMPLETE
-**Status:** gnomAD v4 joint field for accurate AN, AC=0 filtering, WCAG AA labels, ESLint template fixes.
-**Last activity:** 2026-02-25 — Completed 32-01
+**Status:** Post-audit UI/UX polish and CI fixes applied. All 3 CI checks passing.
+**Last activity:** 2026-02-25 — CI fixes, Copilot review fixes, phase docs updated
 
 ### Progress
 
@@ -141,6 +141,9 @@ Recent decisions for v1.5 (continued):
 - hasObservedAlleles() applied before pathogenicity filters — excludes AC=0 variants from carrier frequency calculations (32-01)
 - tsdown dist must be rebuilt (bun run build in core) before CLI typecheck can see new types — CLI resolves @gnomad-cf/core via compiled dist/, not source (32-01)
 - WCAG AA label contrast: text-grey-darken-2 (#616161) on #FAFAFA = 5.93:1 ratio (exceeds 4.5:1 minimum for 12px text) (32-01)
+- Root typecheck script changed from tsc --build to tsdown build for core — tsc --build creates nested dist/types/index.d.ts but exports map expects flat dist/types.d.ts
+- CLI tsdown externalizes zod — runtime resolution from node_modules, prevents bundling error exit code 1
+- Penetrance slider step=1 (not step=5) — gene configs can set arbitrary values like 3% (CFTR-RD)
 
 ### Pending Todos
 
@@ -157,8 +160,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-25
-**Completed:** Phase 32 — gnomAD v4 joint field for accurate AN/AC values, AC=0 variant filtering, WCAG AA label contrast, ESLint template fixes.
-**Status:** 114 plans across 32 phases.
+**Completed:** Post-audit UI/UX polish (clickable stepper, inline tooltips, summary card redesign, bottom nav buttons, conditional Notes column, Settings border) + CI fixes (typecheck, MockInstance type, CLI zod externalize) + Copilot review fixes (penetrance slider step, requirements threshold).
+**Status:** 114 plans across 32 phases. 426 tests passing. PR #17 updated.
 **Resume file:** None
 
 ### Handoff Notes

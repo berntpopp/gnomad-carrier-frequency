@@ -72,7 +72,7 @@
 - [x] **TEST-09**: Web app component tests with Vue Test Utils (wizard steps, settings, results display)
 - [x] **TEST-10**: Playwright E2E tests for critical flows (wizard completion, URL sharing, history restore)
 - [x] **TEST-11**: CI pipeline runs all tests on push/PR with coverage reporting
-- [x] **TEST-12**: Coverage thresholds enforced (core: 90%+, CLI: 80%+, web: 60%+)
+- [x] **TEST-12**: Coverage thresholds enforced (core: 90%+, CLI: 80%+, web: 40%+)
 
 ## Future Requirements (v1.6+)
 

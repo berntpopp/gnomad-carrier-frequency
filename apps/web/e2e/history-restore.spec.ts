@@ -201,15 +201,16 @@ test.describe("History restore", () => {
     await historyEntry.click();
 
     // ── Phase 5: Verify state restored to Step 4 with CFTR results ───────────
-    // Drawer should close after clicking entry
-    await expect(page.getByTestId("history-drawer")).not.toBeVisible({
-      timeout: 5_000,
-    });
-
     // restoreFromHistory() sets currentStep = 4 and re-fetches gene data
     // Use generous timeout (15s) for reactive state propagation through multiple composables
     await expect(page.getByTestId("step-results")).toBeVisible({
       timeout: 15_000,
+    });
+
+    // Drawer should close after clicking entry (check after step-results visible
+    // to allow time for the Vuetify drawer close animation)
+    await expect(page.getByTestId("history-drawer")).not.toBeVisible({
+      timeout: 10_000,
     });
 
     // Results summary card should be visible and contain CFTR
