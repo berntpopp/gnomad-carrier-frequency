@@ -1,14 +1,16 @@
 <template>
   <v-stepper
-    v-model="state.currentStep"
+    :model-value="state.currentStep"
     flat
     :alt-labels="smAndDown"
     class="wizard-stepper"
     data-testid="wizard-stepper"
+    @update:model-value="goToStep($event as WizardStep)"
   >
     <v-stepper-header>
       <v-stepper-item
         :complete="state.currentStep > 1"
+        :editable="state.currentStep > 1"
         :value="1"
         :title="xs ? '' : 'Gene'"
         :subtitle="smAndDown ? undefined : 'Search and select'"
@@ -17,6 +19,7 @@
       <v-divider />
       <v-stepper-item
         :complete="state.currentStep > 2"
+        :editable="state.currentStep > 2"
         :value="2"
         :title="xs ? '' : 'Status'"
         :subtitle="smAndDown ? undefined : 'Carrier or affected'"
@@ -25,6 +28,7 @@
       <v-divider />
       <v-stepper-item
         :complete="state.currentStep > 3"
+        :editable="state.currentStep > 3"
         :value="3"
         :title="xs ? '' : 'Freq'"
         :subtitle="smAndDown ? undefined : 'Select source'"
@@ -120,6 +124,7 @@ import {
   useAppAnnouncer,
   useGeneConfig,
 } from "@/composables";
+import type { WizardStep } from "@gnomad-cf/core/types";
 import StepGene from "./StepGene.vue";
 import StepStatus from "./StepStatus.vue";
 import StepFrequency from "./StepFrequency.vue";
@@ -134,7 +139,7 @@ const { smAndDown, xs } = useDisplay();
 useGeneConfig();
 
 // Wizard state management
-const { state, nextStep, prevStep, resetWizard } = useWizard();
+const { state, nextStep, prevStep, goToStep, resetWizard } = useWizard();
 
 // Carrier frequency calculation
 const {

@@ -3,17 +3,17 @@
     <div class="app-bar-content">
       <v-tooltip
         v-if="!xs"
-        text="Calculate carrier frequency and recurrence risk from gnomAD population data."
+        text="Start new calculation"
         location="bottom"
-        max-width="300"
-        aria-label="Application description"
+        aria-label="Start new calculation"
       >
-        <template #activator="{ props }">
+        <template #activator="{ props: tooltipProps }">
           <v-app-bar-title
-            v-bind="props"
+            v-bind="tooltipProps"
             class="app-logo text-body-1 font-weight-bold"
             @click="emit('reset')"
           >
+            <v-icon size="small" class="mr-1">mdi-home</v-icon>
             gCFCalc
           </v-app-bar-title>
         </template>

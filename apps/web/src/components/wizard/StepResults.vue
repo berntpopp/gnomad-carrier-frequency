@@ -397,8 +397,9 @@
     <!-- Navigation buttons - touch-friendly on mobile -->
     <div class="d-flex justify-space-between mt-6">
       <v-btn
-        variant="text"
+        variant="tonal"
         :min-height="smAndDown ? 44 : undefined"
+        prepend-icon="mdi-arrow-left"
         @click="$emit('back')"
       >
         Back
@@ -407,6 +408,7 @@
         variant="outlined"
         color="primary"
         :min-height="smAndDown ? 44 : undefined"
+        prepend-icon="mdi-refresh"
         @click="$emit('restart')"
       >
         Start Over
