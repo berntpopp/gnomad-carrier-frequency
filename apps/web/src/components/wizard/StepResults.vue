@@ -671,37 +671,52 @@ function openPopulationModal(populationCode: string) {
   showVariantModal.value = true;
 }
 
-// Table headers - use numeric keys for proper sorting
-const headers = ref([
-  { title: "Population", key: "label", sortable: true },
-  {
-    title: "Carrier Freq (%)",
-    key: "carrierFrequency",
-    sortable: true,
-    align: "end" as const,
-  },
-  {
-    title: "Ratio",
-    key: "ratioDenominator",
-    sortable: true,
-    align: "end" as const,
-  },
-  {
-    title: "Prevalence",
-    key: "geneticPrevalence",
-    sortable: true,
-    align: "end" as const,
-  },
-  {
-    title: "Recurrence Risk",
-    key: "recurrenceRiskValue",
-    sortable: true,
-    align: "end" as const,
-  },
-  { title: "AC", key: "alleleCount", sortable: true, align: "end" as const },
-  { title: "AN", key: "alleleNumber", sortable: true, align: "end" as const },
-  { title: "Notes", key: "notes", sortable: true },
-]);
+// Whether any table row has notes content (e.g. founder effect)
+const hasNotes = computed(() =>
+  tableItems.value.some((item) => item.notes.length > 0),
+);
+
+// Table headers - conditionally include Notes column only when data exists
+const headers = computed(() => {
+  const base = [
+    { title: "Population", key: "label", sortable: true },
+    {
+      title: "Carrier Freq (%)",
+      key: "carrierFrequency",
+      sortable: true,
+      align: "end" as const,
+    },
+    {
+      title: "Ratio",
+      key: "ratioDenominator",
+      sortable: true,
+      align: "end" as const,
+    },
+    {
+      title: "Prevalence",
+      key: "geneticPrevalence",
+      sortable: true,
+      align: "end" as const,
+    },
+    {
+      title: "Recurrence Risk",
+      key: "recurrenceRiskValue",
+      sortable: true,
+      align: "end" as const,
+    },
+    { title: "AC", key: "alleleCount", sortable: true, align: "end" as const },
+    {
+      title: "AN",
+      key: "alleleNumber",
+      sortable: true,
+      align: "end" as const,
+    },
+  ];
+  if (hasNotes.value) {
+    base.push({ title: "Notes", key: "notes", sortable: true });
+  }
+  return base;
+});
 
 // Default sort by carrier frequency descending
 const sortBy = ref([{ key: "carrierFrequency", order: "desc" as const }]);
