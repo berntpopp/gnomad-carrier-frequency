@@ -1,12 +1,12 @@
 // Version-aware GraphQL client for gnomAD API
 
-import { createClient } from 'villus';
-import { ref, computed } from 'vue';
+import { createClient } from "villus";
+import { ref, computed } from "vue";
 import {
   getApiEndpoint,
   getGnomadVersion,
   type GnomadVersion,
-} from '@gnomad-cf/core/config';
+} from "@gnomad-cf/core/config";
 
 // Current version state (reactive)
 const currentVersion = ref<GnomadVersion>(getGnomadVersion().version);

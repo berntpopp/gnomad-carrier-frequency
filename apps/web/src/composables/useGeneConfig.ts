@@ -1,11 +1,11 @@
-import { ref, computed } from 'vue';
-import type { Ref } from 'vue';
-import { watch } from 'vue';
-import { loadGeneConfig } from '@gnomad-cf/core/gene-config';
-import type { GeneConfig, ConditionProfile } from '@gnomad-cf/core/gene-config';
-import { useGeneSearch } from './useGeneSearch';
-import { useFilterStore } from '@/stores/useFilterStore';
-import { useCalcStore } from '@/stores/useCalcStore';
+import { ref, computed } from "vue";
+import type { Ref } from "vue";
+import { watch } from "vue";
+import { loadGeneConfig } from "@gnomad-cf/core/gene-config";
+import type { GeneConfig, ConditionProfile } from "@gnomad-cf/core/gene-config";
+import { useGeneSearch } from "./useGeneSearch";
+import { useFilterStore } from "@/stores/useFilterStore";
+import { useCalcStore } from "@/stores/useCalcStore";
 
 // Module-level state — singleton pattern, matches useGeneSearch.
 // Active config is intentionally NOT persisted: it should re-apply from the
@@ -98,7 +98,9 @@ export function useGeneConfig(): UseGeneConfigReturn {
   function selectProfile(profileId: string): void {
     if (activeGeneConfig.value === null) return;
 
-    const profile = activeGeneConfig.value.profiles.find((p) => p.profileId === profileId);
+    const profile = activeGeneConfig.value.profiles.find(
+      (p) => p.profileId === profileId,
+    );
     if (!profile) return;
 
     activeProfile.value = profile;

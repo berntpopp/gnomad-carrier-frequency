@@ -1,17 +1,17 @@
-import { ref, type Ref } from 'vue';
+import { ref, type Ref } from "vue";
 import {
   buildSubmissionsQuery,
   parseSubmissionsResponse,
   type ClinVarSubmission,
   type ClinVarVariantWithSubmissions,
-} from '@gnomad-cf/core/queries';
-import { getReferenceGenome } from '@gnomad-cf/core/config';
+} from "@gnomad-cf/core/queries";
+import { getReferenceGenome } from "@gnomad-cf/core/config";
 
 /** Batch size for fetching submissions (to avoid query size limits) */
 const BATCH_SIZE = 50;
 
 /** API endpoint */
-const GNOMAD_API_URL = 'https://gnomad.broadinstitute.org/api';
+const GNOMAD_API_URL = "https://gnomad.broadinstitute.org/api";
 
 export interface UseClinvarSubmissionsReturn {
   /** Map of variant_id to submissions array */
@@ -45,14 +45,14 @@ export function useClinvarSubmissions(): UseClinvarSubmissionsReturn {
    */
   async function fetchBatch(
     variantIds: string[],
-    referenceGenome: 'GRCh38' | 'GRCh37'
+    referenceGenome: "GRCh38" | "GRCh37",
   ): Promise<Map<string, ClinVarSubmission[]>> {
     const query = buildSubmissionsQuery(variantIds, referenceGenome);
 
     const response = await fetch(GNOMAD_API_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ query }),
     });
@@ -68,7 +68,7 @@ export function useClinvarSubmissions(): UseClinvarSubmissionsReturn {
     }
 
     return parseSubmissionsResponse(
-      json.data as Record<string, ClinVarVariantWithSubmissions | null>
+      json.data as Record<string, ClinVarVariantWithSubmissions | null>,
     );
   }
 
@@ -105,7 +105,9 @@ export function useClinvarSubmissions(): UseClinvarSubmissionsReturn {
       }
     } catch (err) {
       error.value =
-        err instanceof Error ? err.message : 'Failed to fetch ClinVar submissions';
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch ClinVar submissions";
     } finally {
       isLoading.value = false;
     }

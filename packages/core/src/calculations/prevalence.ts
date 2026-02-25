@@ -42,7 +42,7 @@ export function calculateGeneticPrevalence(pathogenicAFs: number[]): number {
  */
 export function calculateBayesianPrevalence(
   geneticPrevalence: number,
-  penetrance: number
+  penetrance: number,
 ): number {
   return geneticPrevalence * penetrance;
 }
@@ -53,13 +53,14 @@ export function calculateBayesianPrevalence(
  * @param prevalence - Prevalence fraction, or null/0 if not detected
  * @returns Object with `ratio` (e.g. "1:1,890") and `percent` (e.g. "0.0529%")
  */
-export function formatPrevalence(
-  prevalence: number | null
-): { ratio: string; percent: string } {
+export function formatPrevalence(prevalence: number | null): {
+  ratio: string;
+  percent: string;
+} {
   if (prevalence === null || prevalence === 0) {
-    return { ratio: 'Not detected', percent: 'Not detected' };
+    return { ratio: "Not detected", percent: "Not detected" };
   }
-  const ratio = `1:${Math.round(1 / prevalence).toLocaleString('en-US')}`;
+  const ratio = `1:${Math.round(1 / prevalence).toLocaleString("en-US")}`;
   const percent = `${(prevalence * 100).toFixed(4)}%`;
   return { ratio, percent };
 }

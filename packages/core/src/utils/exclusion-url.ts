@@ -1,5 +1,5 @@
 // URL compression utilities for excluded variant IDs
-import LZString from 'lz-string';
+import LZString from "lz-string";
 
 /** Maximum compressed exclusion string length for URL safety */
 const MAX_EXCLUSION_URL_LENGTH = 1500; // Conservative limit within 2000 char URL
@@ -15,7 +15,7 @@ export function encodeExclusions(variantIds: string[]): string | null {
   if (variantIds.length === 0) return null;
 
   // Join IDs with comma separator
-  const joined = variantIds.join(',');
+  const joined = variantIds.join(",");
 
   // Compress using URL-safe encoding
   const compressed = LZString.compressToEncodedURIComponent(joined);
@@ -23,7 +23,7 @@ export function encodeExclusions(variantIds: string[]): string | null {
   // Check if result fits in URL
   if (compressed.length > MAX_EXCLUSION_URL_LENGTH) {
     console.warn(
-      `[Exclusion URL] Compressed exclusions (${compressed.length} chars) exceed limit (${MAX_EXCLUSION_URL_LENGTH}). Exclusions will not be included in URL.`
+      `[Exclusion URL] Compressed exclusions (${compressed.length} chars) exceed limit (${MAX_EXCLUSION_URL_LENGTH}). Exclusions will not be included in URL.`,
     );
     return null;
   }
@@ -43,12 +43,12 @@ export function decodeExclusions(compressed: string): string[] {
   try {
     const decompressed = LZString.decompressFromEncodedURIComponent(compressed);
     if (!decompressed) {
-      console.warn('[Exclusion URL] Failed to decompress exclusion data');
+      console.warn("[Exclusion URL] Failed to decompress exclusion data");
       return [];
     }
-    return decompressed.split(',').filter(Boolean);
+    return decompressed.split(",").filter(Boolean);
   } catch (error) {
-    console.warn('[Exclusion URL] Error decoding exclusions:', error);
+    console.warn("[Exclusion URL] Error decoding exclusions:", error);
     return [];
   }
 }
@@ -62,7 +62,7 @@ export function decodeExclusions(compressed: string): string[] {
 export function exclusionsTooLargeForUrl(variantIds: string[]): boolean {
   if (variantIds.length === 0) return false;
 
-  const joined = variantIds.join(',');
+  const joined = variantIds.join(",");
   const compressed = LZString.compressToEncodedURIComponent(joined);
   return compressed.length > MAX_EXCLUSION_URL_LENGTH;
 }

@@ -1,5 +1,10 @@
-import { defineStore } from 'pinia';
-import type { LogLevel, LogEntry, LogSettings, LogStats } from '@gnomad-cf/core/types';
+import { defineStore } from "pinia";
+import type {
+  LogLevel,
+  LogEntry,
+  LogSettings,
+  LogStats,
+} from "@gnomad-cf/core/types";
 
 interface LogStoreState {
   entries: LogEntry[];
@@ -8,7 +13,7 @@ interface LogStoreState {
   settings: LogSettings;
 }
 
-export const useLogStore = defineStore('logs', {
+export const useLogStore = defineStore("logs", {
   state: (): LogStoreState => ({
     entries: [],
     nextId: 1,
@@ -16,8 +21,8 @@ export const useLogStore = defineStore('logs', {
     settings: {
       maxEntries: 500,
       autoClearOnStart: false,
-      defaultFilterLevel: 'INFO',
-      enabledCategories: ['api', 'calculation', 'error', 'user'],
+      defaultFilterLevel: "INFO",
+      enabledCategories: ["api", "calculation", "error", "user"],
     },
   }),
 
@@ -105,7 +110,7 @@ export const useLogStore = defineStore('logs', {
   },
 
   persist: {
-    key: 'carrier-freq-logs',
+    key: "carrier-freq-logs",
     storage: localStorage,
   },
 });

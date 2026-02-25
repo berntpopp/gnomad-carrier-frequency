@@ -1,8 +1,5 @@
 <template>
-  <v-app-bar
-    density="compact"
-    :elevation="2"
-  >
+  <v-app-bar density="compact" :elevation="2">
     <div class="app-bar-content">
       <v-tooltip
         v-if="!xs"
@@ -77,11 +74,7 @@
         </template>
       </v-tooltip>
 
-      <v-tooltip
-        text="Settings"
-        location="bottom"
-        aria-label="Settings"
-      >
+      <v-tooltip text="Settings" location="bottom" aria-label="Settings">
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
@@ -108,10 +101,7 @@
       Back online
 
       <template #actions>
-        <v-btn
-          variant="text"
-          @click="dismissBackOnlineNotification"
-        >
+        <v-btn variant="text" @click="dismissBackOnlineNotification">
           Close
         </v-btn>
       </template>
@@ -120,14 +110,15 @@
 </template>
 
 <script setup lang="ts">
-import { useDisplay } from 'vuetify';
-import { useAppTheme, useNetworkStatus, useWizard } from '@/composables';
-import { useGnomadVersion } from '@/api';
-import OfflineIndicator from '@/components/OfflineIndicator.vue';
+import { useDisplay } from "vuetify";
+import { useAppTheme, useNetworkStatus, useWizard } from "@/composables";
+import { useGnomadVersion } from "@/api";
+import OfflineIndicator from "@/components/OfflineIndicator.vue";
 
 const { xs } = useDisplay();
 const { toggleTheme, tooltipText, themeIcon } = useAppTheme();
-const { showBackOnlineNotification, dismissBackOnlineNotification } = useNetworkStatus();
+const { showBackOnlineNotification, dismissBackOnlineNotification } =
+  useNetworkStatus();
 const { state, goToStep } = useWizard();
 const { version } = useGnomadVersion();
 
@@ -151,7 +142,9 @@ const emit = defineEmits<{
 .app-logo {
   cursor: pointer;
   animation: subtle-pulse 3s ease-in-out infinite;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .app-logo:hover {
@@ -161,7 +154,8 @@ const emit = defineEmits<{
 }
 
 @keyframes subtle-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

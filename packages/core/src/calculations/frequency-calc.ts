@@ -6,13 +6,19 @@ import {
   getPopulationLabel,
   getPopulationCodes,
   type GnomadVersion,
-} from '../config/index.js';
-import type { IndexPatientStatus, PopulationFrequency } from '../types/index.js';
-import type { VariantFrequencyData } from '../types/variant.js';
-import type { CalcConfig } from '../types/calculations.js';
-import { calculateHWECarrierFrequency, calculateSimplifiedCarrierFrequency } from './carrier-frequency.js';
-import { calculateVCR, calculateGCR } from './homozygote-exclusion.js';
-import { calculateGeneticPrevalence } from './prevalence.js';
+} from "../config/index.js";
+import type {
+  IndexPatientStatus,
+  PopulationFrequency,
+} from "../types/index.js";
+import type { VariantFrequencyData } from "../types/variant.js";
+import type { CalcConfig } from "../types/calculations.js";
+import {
+  calculateHWECarrierFrequency,
+  calculateSimplifiedCarrierFrequency,
+} from "./carrier-frequency.js";
+import { calculateVCR, calculateGCR } from "./homozygote-exclusion.js";
+import { calculateGeneticPrevalence } from "./prevalence.js";
 
 // All thresholds from config - NO MAGIC NUMBERS
 const { lowSampleSizeThreshold, founderEffectMultiplier } = config.settings;
@@ -23,7 +29,7 @@ const { lowSampleSizeThreshold, founderEffectMultiplier } = config.settings;
  */
 export function calculateAlleleFrequency(
   ac: number,
-  an: number
+  an: number,
 ): number | null {
   if (an === 0) return null;
   return ac / an;
@@ -45,9 +51,9 @@ export function calculateCarrierFrequency(pathogenicAFs: number[]): number {
  */
 export function calculateRecurrenceRisk(
   carrierFrequency: number,
-  indexStatus: IndexPatientStatus
+  indexStatus: IndexPatientStatus,
 ): number {
-  return indexStatus === 'heterozygous'
+  return indexStatus === "heterozygous"
     ? carrierFrequency / 4
     : carrierFrequency / 2;
 }
@@ -71,7 +77,7 @@ export function calculateRecurrenceRisk(
 export function aggregatePopulationFrequenciesWithConfig(
   variants: VariantFrequencyData[],
   version: GnomadVersion,
-  calcConfig: CalcConfig
+  calcConfig: CalcConfig,
 ): Map<
   string,
   {
@@ -90,51 +96,69 @@ export function aggregatePopulationFrequenciesWithConfig(
     {
       sumAF: number;
       totalAC: number;
-      maxExomeAN: number;
-      maxGenomeAN: number;
+      maxAN: number;
       vcrs: number[]; // Only populated when useHomExclusion=true
     }
   >();
 
   for (const pop of populationCodes) {
-    acc.set(pop, { sumAF: 0, totalAC: 0, maxExomeAN: 0, maxGenomeAN: 0, vcrs: [] });
+    acc.set(pop, { sumAF: 0, totalAC: 0, maxAN: 0, vcrs: [] });
   }
 
   for (const variant of variants) {
-    // Build population lookup maps for this variant
+    // Build population lookup maps — prefer joint data (gnomAD v4)
+    const jointPops = new Map(
+      (variant.joint !== null && variant.joint !== undefined
+        ? variant.joint.populations
+        : []
+      ).map((p) => [p.id, p]),
+    );
+    const hasJoint = jointPops.size > 0;
+
     const exomePops = new Map(
       (variant.exome !== null && variant.exome !== undefined
         ? variant.exome.populations
         : []
-      ).map((p) => [p.id, p])
+      ).map((p) => [p.id, p]),
     );
     const genomePops = new Map(
       (variant.genome !== null && variant.genome !== undefined
         ? variant.genome.populations
         : []
-      ).map((p) => [p.id, p])
+      ).map((p) => [p.id, p]),
     );
 
     for (const popCode of populationCodes) {
-      const exomePop = exomePops.get(popCode);
-      const genomePop = genomePops.get(popCode);
+      let combinedAC: number;
+      let combinedAN: number;
+      let combinedAcHom: number;
 
-      const exomeAC = exomePop !== undefined ? exomePop.ac : 0;
-      const genomeAC = genomePop !== undefined ? genomePop.ac : 0;
-      const exomeAN = exomePop !== undefined ? exomePop.an : 0;
-      const genomeAN = genomePop !== undefined ? genomePop.an : 0;
-      const exomeAcHom = exomePop !== undefined ? exomePop.ac_hom : 0;
-      const genomeAcHom = genomePop !== undefined ? genomePop.ac_hom : 0;
+      const jointPop = hasJoint ? jointPops.get(popCode) : undefined;
+      if (jointPop !== undefined) {
+        // Use joint data — properly combines exome+genome using coverage
+        combinedAC = jointPop.ac;
+        combinedAN = jointPop.an;
+        combinedAcHom = jointPop.homozygote_count;
+      } else {
+        // Fall back to exome + genome sum
+        const exomePop = exomePops.get(popCode);
+        const genomePop = genomePops.get(popCode);
 
-      const combinedAC = exomeAC + genomeAC;
-      const combinedAN = exomeAN + genomeAN;
-      const combinedAcHom = exomeAcHom + genomeAcHom;
+        combinedAC =
+          (exomePop !== undefined ? exomePop.ac : 0) +
+          (genomePop !== undefined ? genomePop.ac : 0);
+        combinedAN =
+          (exomePop !== undefined ? exomePop.an : 0) +
+          (genomePop !== undefined ? genomePop.an : 0);
+        combinedAcHom =
+          (exomePop !== undefined ? exomePop.ac_hom : 0) +
+          (genomePop !== undefined ? genomePop.ac_hom : 0);
+      }
 
       const current = acc.get(popCode)!;
 
       current.totalAC += combinedAC;
-      current.maxExomeAN = Math.max(current.maxExomeAN, exomeAN);
-      current.maxGenomeAN = Math.max(current.maxGenomeAN, genomeAN);
+      current.maxAN = Math.max(current.maxAN, combinedAN);
 
       if (combinedAN > 0) {
         current.sumAF += combinedAC / combinedAN;
@@ -161,7 +185,7 @@ export function aggregatePopulationFrequenciesWithConfig(
   >();
 
   for (const [popCode, data] of acc) {
-    const maxAN = data.maxExomeAN + data.maxGenomeAN;
+    const maxAN = data.maxAN;
 
     // Genetic prevalence always from raw q = sumAF (never from carrier frequency)
     const geneticPrevalence =
@@ -169,7 +193,10 @@ export function aggregatePopulationFrequenciesWithConfig(
 
     let carrierFrequency: number | null = null;
 
-    if (data.sumAF > 0 || (calcConfig.useHomExclusion && data.vcrs.length > 0)) {
+    if (
+      data.sumAF > 0 ||
+      (calcConfig.useHomExclusion && data.vcrs.length > 0)
+    ) {
       if (calcConfig.useHomExclusion) {
         // VCR/GCR path — HWE toggle has no effect
         const gcr = calculateGCR(data.vcrs);
@@ -216,7 +243,7 @@ export function buildPopulationFrequencies(
     }
   >,
   globalCarrierFrequency: number | null,
-  version: GnomadVersion
+  version: GnomadVersion,
 ): PopulationFrequency[] {
   const results: PopulationFrequency[] = [];
 

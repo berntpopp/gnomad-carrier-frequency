@@ -4,10 +4,10 @@
  * Predefined exclusion reasons for quick selection
  */
 export type PredefinedExclusionReason =
-  | 'likely_benign'
-  | 'low_quality'
-  | 'population_specific'
-  | 'other';
+  | "likely_benign"
+  | "low_quality"
+  | "population_specific"
+  | "other";
 
 /**
  * Exclusion reason - either predefined or custom text

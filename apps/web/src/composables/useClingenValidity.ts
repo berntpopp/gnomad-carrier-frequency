@@ -1,13 +1,16 @@
-import { ref, computed, type Ref, type ComputedRef } from 'vue';
-import { useClingenStore } from '@/stores/useClingenStore';
-import type { ClingenEntry, ClingenValidityResult } from '@gnomad-cf/core/types';
+import { ref, computed, type Ref, type ComputedRef } from "vue";
+import { useClingenStore } from "@/stores/useClingenStore";
+import type {
+  ClingenEntry,
+  ClingenValidityResult,
+} from "@gnomad-cf/core/types";
 
 // ClinGen CSV - use local bundled copy to avoid CORS issues on GitHub Pages
 // The file is stored in public/data/ and updated periodically via GitHub Actions
 // Falls back to external URL for development with Vite proxy
 const CLINGEN_CSV_LOCAL = `${import.meta.env.BASE_URL}data/clingen-gene-validity.csv`;
 const CLINGEN_CSV_EXTERNAL =
-  'https://search.clinicalgenome.org/kb/gene-validity/download';
+  "https://search.clinicalgenome.org/kb/gene-validity/download";
 
 export interface UseClingenValidityReturn {
   // State
@@ -31,7 +34,7 @@ export interface UseClingenValidityReturn {
  */
 function parseCSVLine(line: string): string[] {
   const result: string[] = [];
-  let current = '';
+  let current = "";
   let inQuotes = false;
 
   for (let i = 0; i < line.length; i++) {
@@ -39,9 +42,9 @@ function parseCSVLine(line: string): string[] {
 
     if (char === '"') {
       inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
+    } else if (char === "," && !inQuotes) {
       result.push(current);
-      current = '';
+      current = "";
     } else {
       current += char;
     }
@@ -65,7 +68,7 @@ function parseCSVLine(line: string): string[] {
  * CSV columns: GENE SYMBOL, GENE ID (HGNC), DISEASE LABEL, DISEASE ID (MONDO), MOI, SOP, CLASSIFICATION, ONLINE REPORT, CLASSIFICATION DATE, GCEP
  */
 function parseClingenCSV(csvText: string): ClingenEntry[] {
-  const lines = csvText.split('\n');
+  const lines = csvText.split("\n");
 
   // Skip metadata and header rows (first 6 rows), filter empty lines and separator rows
   return lines
@@ -74,15 +77,15 @@ function parseClingenCSV(csvText: string): ClingenEntry[] {
     .map((line) => {
       const values = parseCSVLine(line);
       return {
-        geneSymbol: values[0]?.trim().toUpperCase() ?? '',
-        hgncId: values[1]?.trim() ?? '',
-        diseaseLabel: values[2]?.trim() ?? '',
-        mondoId: values[3]?.trim() ?? '',
-        moi: values[4]?.trim() ?? '',
-        classification: values[6]?.trim() ?? '',
-        expertPanel: values[9]?.trim() ?? '',
-        classificationDate: values[8]?.trim() ?? '',
-        permId: '', // Not in CSV
+        geneSymbol: values[0]?.trim().toUpperCase() ?? "",
+        hgncId: values[1]?.trim() ?? "",
+        diseaseLabel: values[2]?.trim() ?? "",
+        mondoId: values[3]?.trim() ?? "",
+        moi: values[4]?.trim() ?? "",
+        classification: values[6]?.trim() ?? "",
+        expertPanel: values[9]?.trim() ?? "",
+        classificationDate: values[8]?.trim() ?? "",
+        permId: "", // Not in CSV
       };
     })
     .filter((entry) => entry.geneSymbol.length > 0);
@@ -99,7 +102,7 @@ export function useClingenValidity(): UseClingenValidityReturn {
     }
 
     isLoading.value = true;
-    store.setError(''); // Clear previous errors
+    store.setError(""); // Clear previous errors
 
     try {
       // Try local bundled file first (works on GitHub Pages)
@@ -111,11 +114,11 @@ export function useClingenValidity(): UseClingenValidityReturn {
         response = await fetch(CLINGEN_CSV_LOCAL);
         usedUrl = CLINGEN_CSV_LOCAL;
         if (!response.ok) {
-          throw new Error('Local file not available');
+          throw new Error("Local file not available");
         }
       } catch {
         // Fallback to external URL (works in dev with Vite proxy or when CORS is available)
-        console.log('[ClinGen] Local file not available, trying external URL');
+        console.log("[ClinGen] Local file not available, trying external URL");
         response = await fetch(CLINGEN_CSV_EXTERNAL);
         usedUrl = CLINGEN_CSV_EXTERNAL;
       }
@@ -128,15 +131,15 @@ export function useClingenValidity(): UseClingenValidityReturn {
       const entries = parseClingenCSV(csvText);
 
       if (entries.length === 0) {
-        throw new Error('No valid entries parsed from ClinGen CSV');
+        throw new Error("No valid entries parsed from ClinGen CSV");
       }
 
       console.log(`[ClinGen] Loaded ${entries.length} entries from ${usedUrl}`);
       store.setData(entries);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to fetch ClinGen data';
-      console.error('[ClinGen] Fetch error:', message);
+        err instanceof Error ? err.message : "Failed to fetch ClinGen data";
+      console.error("[ClinGen] Fetch error:", message);
       store.setError(message);
     } finally {
       isLoading.value = false;

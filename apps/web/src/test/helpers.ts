@@ -1,12 +1,14 @@
-import { mount, type MountingOptions } from '@vue/test-utils'
-import { createTestingPinia, type TestingOptions } from '@pinia/testing'
-import type { Component } from 'vue'
-import { vi } from 'vitest'
-import { vuetify } from './setup'
+import { mount, type MountingOptions } from "@vue/test-utils";
+import { createTestingPinia, type TestingOptions } from "@pinia/testing";
+import type { Component } from "vue";
+import { vi } from "vitest";
+import { vuetify } from "./setup";
 
-interface MountWithPluginsOptions extends MountingOptions<Record<string, unknown>> {
-  piniaOptions?: TestingOptions
-  storeInitialState?: Record<string, unknown>
+interface MountWithPluginsOptions extends MountingOptions<
+  Record<string, unknown>
+> {
+  piniaOptions?: TestingOptions;
+  storeInitialState?: Record<string, unknown>;
 }
 
 /**
@@ -17,7 +19,7 @@ export function mountWithPlugins(
   component: Component,
   options: MountWithPluginsOptions = {},
 ) {
-  const { piniaOptions, storeInitialState, ...rest } = options
+  const { piniaOptions, storeInitialState, ...rest } = options;
 
   return mount(component, {
     global: {
@@ -32,5 +34,5 @@ export function mountWithPlugins(
       ],
     },
     ...rest,
-  })
+  });
 }

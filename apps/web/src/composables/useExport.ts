@@ -1,15 +1,15 @@
 // Composable for exporting calculation results as JSON or Excel
 
-import * as XLSX from 'xlsx';
-import type { ExportData, LogEntry, LogStats } from '@gnomad-cf/core/types';
-import { generateFilename } from '@/utils/export-utils';
+import * as XLSX from "xlsx";
+import type { ExportData, LogEntry, LogStats } from "@gnomad-cf/core/types";
+import { generateFilename } from "@/utils/export-utils";
 
 /**
  * Download a blob as a file
  */
 function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
   link.download = filename;
   document.body.appendChild(link);
@@ -34,11 +34,11 @@ export function useExport(): UseExportReturn {
   function exportToJson(
     data: ExportData,
     gene: string,
-    population?: string
+    population?: string,
   ): void {
     const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const filename = generateFilename(gene, population) + '.json';
+    const blob = new Blob([json], { type: "application/json" });
+    const filename = generateFilename(gene, population) + ".json";
     downloadBlob(blob, filename);
   }
 
@@ -48,66 +48,66 @@ export function useExport(): UseExportReturn {
   function exportToExcel(
     data: ExportData,
     gene: string,
-    population?: string
+    population?: string,
   ): void {
     const wb = XLSX.utils.book_new();
 
     // Summary sheet (single row)
     const summaryWs = XLSX.utils.json_to_sheet([data.summary]);
-    XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
+    XLSX.utils.book_append_sheet(wb, summaryWs, "Summary");
 
     // Populations sheet
     if (data.populations.length > 0) {
       const populationsWs = XLSX.utils.json_to_sheet(data.populations);
-      XLSX.utils.book_append_sheet(wb, populationsWs, 'Populations');
+      XLSX.utils.book_append_sheet(wb, populationsWs, "Populations");
     }
 
     // Variants sheet
     if (data.variants.length > 0) {
       const variantsWs = XLSX.utils.json_to_sheet(data.variants);
-      XLSX.utils.book_append_sheet(wb, variantsWs, 'Variants');
+      XLSX.utils.book_append_sheet(wb, variantsWs, "Variants");
     }
 
     // Metadata sheet (flatten for readability)
     const metadataRows = [
-      { field: 'Export Date', value: data.metadata.exportDate },
-      { field: 'gnomAD Version', value: data.metadata.gnomadVersion },
-      { field: 'gnomAD Display Name', value: data.metadata.gnomadDisplayName },
-      { field: 'App Version', value: data.metadata.appVersion },
+      { field: "Export Date", value: data.metadata.exportDate },
+      { field: "gnomAD Version", value: data.metadata.gnomadVersion },
+      { field: "gnomAD Display Name", value: data.metadata.gnomadDisplayName },
+      { field: "App Version", value: data.metadata.appVersion },
       {
-        field: 'LoF HC Filter',
+        field: "LoF HC Filter",
         value: String(data.metadata.filtersApplied.lofHcEnabled),
       },
       {
-        field: 'Missense Filter',
+        field: "Missense Filter",
         value: String(data.metadata.filtersApplied.missenseEnabled),
       },
       {
-        field: 'ClinVar Filter',
+        field: "ClinVar Filter",
         value: String(data.metadata.filtersApplied.clinvarEnabled),
       },
       {
-        field: 'ClinVar Star Threshold',
+        field: "ClinVar Star Threshold",
         value: String(data.metadata.filtersApplied.clinvarStarThreshold),
       },
       {
-        field: 'Calc: HWE Formula',
+        field: "Calc: HWE Formula",
         value: String(data.metadata.calcConfig.useHWEFormula),
       },
       {
-        field: 'Calc: Homozygote Exclusion',
+        field: "Calc: Homozygote Exclusion",
         value: String(data.metadata.calcConfig.useHomExclusion),
       },
       {
-        field: 'Calc: Penetrance',
+        field: "Calc: Penetrance",
         value: String(data.metadata.calcConfig.penetrance),
       },
     ];
     const metadataWs = XLSX.utils.json_to_sheet(metadataRows);
-    XLSX.utils.book_append_sheet(wb, metadataWs, 'Metadata');
+    XLSX.utils.book_append_sheet(wb, metadataWs, "Metadata");
 
     // Generate and download file
-    const filename = generateFilename(gene, population) + '.xlsx';
+    const filename = generateFilename(gene, population) + ".xlsx";
     XLSX.writeFile(wb, filename);
   }
 
@@ -121,8 +121,8 @@ export function useExport(): UseExportReturn {
       entries,
     };
     const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const filename = `carrier-freq-logs_${new Date().toISOString().split('T')[0]}.json`;
+    const blob = new Blob([json], { type: "application/json" });
+    const filename = `carrier-freq-logs_${new Date().toISOString().split("T")[0]}.json`;
     downloadBlob(blob, filename);
   }
 

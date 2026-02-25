@@ -8,10 +8,10 @@ import type {
   GnomadVersionConfig,
   AppSettings,
   PopulationConfig,
-} from './types';
+} from "./types";
 
-import gnomadConfig from './gnomad.json';
-import settingsConfig from './settings.json';
+import gnomadConfig from "./gnomad.json";
+import settingsConfig from "./settings.json";
 
 // Type assertion - JSON imports are validated at build time
 const gnomad = gnomadConfig as GnomadConfig;
@@ -37,9 +37,11 @@ export function getPopulationCodes(version?: GnomadVersion): string[] {
 // Helper: Get population label by code
 export function getPopulationLabel(
   code: string,
-  version?: GnomadVersion
+  version?: GnomadVersion,
 ): string {
-  const pop = getGnomadVersion(version).populations.find((p) => p.code === code);
+  const pop = getGnomadVersion(version).populations.find(
+    (p) => p.code === code,
+  );
   return pop?.label ?? code;
 }
 
@@ -50,7 +52,7 @@ export function getPopulations(version?: GnomadVersion): PopulationConfig[] {
 
 // Helper: Build population labels map for a version
 export function getPopulationLabels(
-  version?: GnomadVersion
+  version?: GnomadVersion,
 ): Record<string, string> {
   const pops = getPopulations(version);
   return Object.fromEntries(pops.map((p) => [p.code, p.label]));
@@ -68,8 +70,8 @@ export function getDatasetId(version?: GnomadVersion): string {
 
 // Helper: Get reference genome for a version
 export function getReferenceGenome(
-  version?: GnomadVersion
-): 'GRCh38' | 'GRCh37' {
+  version?: GnomadVersion,
+): "GRCh38" | "GRCh37" {
   return getGnomadVersion(version).referenceGenome;
 }
 
@@ -86,8 +88,8 @@ export type {
   GnomadVersionConfig,
   AppSettings,
   PopulationConfig,
-} from './types';
+} from "./types";
 
 // Re-export exclusion reasons config
-export { EXCLUSION_REASONS } from './exclusion-reasons';
-export type { ExclusionReasonOption } from './exclusion-reasons';
+export { EXCLUSION_REASONS } from "./exclusion-reasons";
+export type { ExclusionReasonOption } from "./exclusion-reasons";

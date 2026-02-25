@@ -30,10 +30,10 @@ export const GENE_DETAILS_QUERY = `
 
 export interface GeneSearchVariables {
   query: string;
-  referenceGenome: 'GRCh37' | 'GRCh38';
+  referenceGenome: "GRCh37" | "GRCh38";
 }
 
 export interface GeneDetailsVariables {
   geneSymbol: string;
-  referenceGenome: 'GRCh37' | 'GRCh38';
+  referenceGenome: "GRCh37" | "GRCh38";
 }

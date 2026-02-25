@@ -1,8 +1,8 @@
 // Export data types for JSON and Excel file generation
 
-import type { FilterConfig } from './filter.js';
-import type { CalcConfig } from './calculations.js';
-import type { GnomadVersion } from '../config/types.js';
+import type { FilterConfig } from "./filter.js";
+import type { CalcConfig } from "./calculations.js";
+import type { GnomadVersion } from "../config/types.js";
 
 /**
  * Metadata included in all exports

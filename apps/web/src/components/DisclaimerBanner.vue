@@ -9,27 +9,19 @@
   >
     <v-card>
       <v-card-title class="d-flex align-center">
-        <v-icon
-          start
-          color="warning"
-        >
-          mdi-alert-circle
-        </v-icon>
+        <v-icon start color="warning"> mdi-alert-circle </v-icon>
         Clinical Disclaimer
       </v-card-title>
 
       <v-card-text>
-        <v-alert
-          type="warning"
-          variant="tonal"
-          class="mb-4"
-        >
+        <v-alert type="warning" variant="tonal" class="mb-4">
           <strong>For Research Use Only</strong>
         </v-alert>
 
         <p class="text-body-1 mb-3">
-          This tool provides carrier frequency estimates based on gnomAD population data.
-          Results are intended for research and educational purposes.
+          This tool provides carrier frequency estimates based on gnomAD
+          population data. Results are intended for research and educational
+          purposes.
         </p>
 
         <p class="text-body-2 mb-3">
@@ -37,17 +29,28 @@
         </p>
 
         <ul class="text-body-2 mb-4">
-          <li>Results should be verified by a clinical laboratory before use in patient care</li>
-          <li>This tool does not replace genetic counseling or clinical judgment</li>
-          <li>Population frequencies may not reflect specific patient ancestry</li>
-          <li>Variant classifications are derived from gnomAD and ClinVar annotations</li>
+          <li>
+            Results should be verified by a clinical laboratory before use in
+            patient care
+          </li>
+          <li>
+            This tool does not replace genetic counseling or clinical judgment
+          </li>
+          <li>
+            Population frequencies may not reflect specific patient ancestry
+          </li>
+          <li>
+            Variant classifications are derived from gnomAD and ClinVar
+            annotations
+          </li>
         </ul>
 
         <v-divider class="mb-4" />
 
         <p class="text-caption text-medium-emphasis">
-          By clicking "I Understand", you acknowledge these limitations and agree to use
-          this tool appropriately within research and educational contexts.
+          By clicking "I Understand", you acknowledge these limitations and
+          agree to use this tool appropriately within research and educational
+          contexts.
         </p>
       </v-card-text>
 
@@ -67,8 +70,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useAppStore } from '@/stores/useAppStore';
+import { computed } from "vue";
+import { useAppStore } from "@/stores/useAppStore";
 
 const appStore = useAppStore();
 

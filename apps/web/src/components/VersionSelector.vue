@@ -21,15 +21,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { getAvailableVersions, getGnomadVersion, type GnomadVersion } from '@gnomad-cf/core/config';
-import { useGnomadVersion } from '@/api';
+import { ref, computed, watch } from "vue";
+import {
+  getAvailableVersions,
+  getGnomadVersion,
+  type GnomadVersion,
+} from "@gnomad-cf/core/config";
+import { useGnomadVersion } from "@/api";
 
 const { version, setVersion } = useGnomadVersion();
 
 // Get all available versions from config
 const versions = computed(() =>
-  getAvailableVersions().map((v) => getGnomadVersion(v))
+  getAvailableVersions().map((v) => getGnomadVersion(v)),
 );
 
 const selectedVersion = ref(version.value);

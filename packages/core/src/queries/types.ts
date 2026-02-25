@@ -23,6 +23,21 @@ export interface GeneVariantExomeGenome {
   populations: GeneVariantPopulation[];
 }
 
+export interface GeneVariantJointPopulation {
+  id: string;
+  ac: number;
+  an: number;
+  homozygote_count: number;
+}
+
+export interface GeneVariantJoint {
+  ac: number;
+  an: number;
+  homozygote_count: number;
+  hemizygote_count: number;
+  populations: GeneVariantJointPopulation[];
+}
+
 export interface GeneVariantTranscript {
   gene_symbol: string;
   transcript_id: string;
@@ -42,6 +57,7 @@ export interface GeneVariant {
   alt: string;
   exome: GeneVariantExomeGenome | null;
   genome: GeneVariantExomeGenome | null;
+  joint: GeneVariantJoint | null;
   transcript_consequence: GeneVariantTranscript | null;
 }
 

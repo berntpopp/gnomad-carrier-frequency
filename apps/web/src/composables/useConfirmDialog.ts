@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref } from "vue";
 
 export interface ConfirmDialogOptions {
   title: string;
@@ -10,7 +10,7 @@ export interface ConfirmDialogOptions {
 
 // Module-level singleton state
 const isVisible = ref(false);
-const options = ref<ConfirmDialogOptions>({ title: '', message: '' });
+const options = ref<ConfirmDialogOptions>({ title: "", message: "" });
 let resolvePromise: ((value: boolean) => void) | null = null;
 
 export function useConfirmDialog() {

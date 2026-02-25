@@ -36,7 +36,9 @@ export function calculateHWECarrierFrequency(pathogenicAFs: number[]): number {
  * @param pathogenicAFs - Array of pathogenic allele frequencies (one per variant)
  * @returns Carrier frequency in range [0, 1]
  */
-export function calculateSimplifiedCarrierFrequency(pathogenicAFs: number[]): number {
+export function calculateSimplifiedCarrierFrequency(
+  pathogenicAFs: number[],
+): number {
   if (pathogenicAFs.length === 0) return 0;
   const sumAF = pathogenicAFs.reduce((sum, af) => sum + af, 0);
   return 2 * sumAF;

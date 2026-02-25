@@ -13,16 +13,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useDisplay } from 'vuetify';
-import LogViewer from '@/components/LogViewer.vue';
+import { computed } from "vue";
+import { useDisplay } from "vuetify";
+import LogViewer from "@/components/LogViewer.vue";
 
 // Responsive breakpoint detection
 const { smAndDown, width: viewportWidth } = useDisplay();
 
 // Use actual viewport width on mobile, fixed width on desktop
 // Vuetify doesn't support percentage width, so we use the actual viewport pixel value
-const drawerWidth = computed(() => smAndDown.value ? viewportWidth.value : 450);
+const drawerWidth = computed(() =>
+  smAndDown.value ? viewportWidth.value : 450,
+);
 
 const modelValue = defineModel<boolean>();
 </script>

@@ -1,11 +1,15 @@
-import { computed, ref, type Ref, type ComputedRef } from 'vue';
-import { useFilterStore } from '@/stores/useFilterStore';
+import { computed, ref, type Ref, type ComputedRef } from "vue";
+import { useFilterStore } from "@/stores/useFilterStore";
 import {
   filterPathogenicVariantsConfigurable,
   getConflictingVariantIds,
-} from '@gnomad-cf/core/filters';
-import type { FilterConfig, GnomadVariant, ClinVarVariant } from '@gnomad-cf/core/types';
-import type { ClinVarSubmission } from '@gnomad-cf/core/queries';
+} from "@gnomad-cf/core/filters";
+import type {
+  FilterConfig,
+  GnomadVariant,
+  ClinVarVariant,
+} from "@gnomad-cf/core/types";
+import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 
 /**
  * Return type for useVariantFilters composable
@@ -44,7 +48,7 @@ export interface UseVariantFiltersReturn {
 export function useVariantFilters(
   variants: Ref<GnomadVariant[]>,
   clinvarVariants: Ref<ClinVarVariant[]>,
-  submissionsMap?: Ref<Map<string, ClinVarSubmission[]>>
+  submissionsMap?: Ref<Map<string, ClinVarSubmission[]>>,
 ): UseVariantFiltersReturn {
   const filterStore = useFilterStore();
 
@@ -55,12 +59,13 @@ export function useVariantFilters(
     clinvarEnabled: filterStore.defaults.clinvarEnabled,
     clinvarStarThreshold: filterStore.defaults.clinvarStarThreshold,
     clinvarIncludeConflicting: filterStore.defaults.clinvarIncludeConflicting,
-    clinvarConflictingThreshold: filterStore.defaults.clinvarConflictingThreshold,
+    clinvarConflictingThreshold:
+      filterStore.defaults.clinvarConflictingThreshold,
   });
 
   // Get list of variant IDs with conflicting classifications
   const conflictingVariantIds = computed(() =>
-    getConflictingVariantIds(clinvarVariants.value)
+    getConflictingVariantIds(clinvarVariants.value),
   );
 
   // Count of conflicting variants
@@ -73,7 +78,7 @@ export function useVariantFilters(
       variants.value,
       clinvarVariants.value,
       filters.value,
-      submissionsMap?.value
+      submissionsMap?.value,
     );
   });
 
@@ -88,7 +93,8 @@ export function useVariantFilters(
       clinvarEnabled: filterStore.defaults.clinvarEnabled,
       clinvarStarThreshold: filterStore.defaults.clinvarStarThreshold,
       clinvarIncludeConflicting: filterStore.defaults.clinvarIncludeConflicting,
-      clinvarConflictingThreshold: filterStore.defaults.clinvarConflictingThreshold,
+      clinvarConflictingThreshold:
+        filterStore.defaults.clinvarConflictingThreshold,
     };
   }
 
@@ -105,8 +111,10 @@ export function useVariantFilters(
       filters.value.missenseEnabled !== defaults.missenseEnabled ||
       filters.value.clinvarEnabled !== defaults.clinvarEnabled ||
       filters.value.clinvarStarThreshold !== defaults.clinvarStarThreshold ||
-      filters.value.clinvarIncludeConflicting !== defaults.clinvarIncludeConflicting ||
-      filters.value.clinvarConflictingThreshold !== defaults.clinvarConflictingThreshold
+      filters.value.clinvarIncludeConflicting !==
+        defaults.clinvarIncludeConflicting ||
+      filters.value.clinvarConflictingThreshold !==
+        defaults.clinvarConflictingThreshold
     );
   });
 

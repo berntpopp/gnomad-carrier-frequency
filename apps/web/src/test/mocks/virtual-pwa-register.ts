@@ -4,14 +4,14 @@
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function registerSW(_options?: {
-  immediate?: boolean
-  onNeedRefresh?: () => void
-  onOfflineReady?: () => void
-  onRegistered?: (registration: ServiceWorkerRegistration | undefined) => void
-  onRegisterError?: (error: unknown) => void
+  immediate?: boolean;
+  onNeedRefresh?: () => void;
+  onOfflineReady?: () => void;
+  onRegistered?: (registration: ServiceWorkerRegistration | undefined) => void;
+  onRegisterError?: (error: unknown) => void;
 }): (reloadPage?: boolean) => Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return async (_reloadPage?: boolean) => {
     // no-op in test environment
-  }
+  };
 }

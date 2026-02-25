@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 /**
  * Disease identifier schema — at least one of omimId or mondoId must be present
@@ -7,18 +7,21 @@ export const DiseaseIdentifierSchema = z
   .object({
     omimId: z
       .string()
-      .regex(/^\d{6}$/, 'OMIM ID must be exactly 6 digits')
+      .regex(/^\d{6}$/, "OMIM ID must be exactly 6 digits")
       .optional(),
     mondoId: z
       .string()
-      .regex(/^MONDO:\d{7}$/, 'MONDO ID must be in format MONDO:XXXXXXX (7 digits)')
+      .regex(
+        /^MONDO:\d{7}$/,
+        "MONDO ID must be in format MONDO:XXXXXXX (7 digits)",
+      )
       .optional(),
-    name: z.string().min(1, 'Disease name is required'),
+    name: z.string().min(1, "Disease name is required"),
   })
   .refine(
     (data) => data.omimId !== undefined || data.mondoId !== undefined,
-    'At least one disease identifier (omimId or mondoId) must be provided',
-  )
+    "At least one disease identifier (omimId or mondoId) must be provided",
+  );
 
 /**
  * Filter configuration overrides — all fields optional, overrides factory defaults
@@ -33,22 +36,24 @@ export const FilterConfigOverrideSchema = z
     clinvarIncludeConflicting: z.boolean().optional(),
     clinvarConflictingThreshold: z.number().int().min(50).max(100).optional(),
   })
-  .optional()
+  .optional();
 
 /**
  * Individual condition/disease profile within a gene config
  */
 export const ConditionProfileSchema = z.object({
-  profileId: z.string().min(1, 'Profile ID is required'),
-  displayName: z.string().min(1, 'Display name is required'),
+  profileId: z.string().min(1, "Profile ID is required"),
+  displayName: z.string().min(1, "Display name is required"),
   isDefault: z.boolean(),
   disease: DiseaseIdentifierSchema,
   penetrance: z.number().min(0).max(1).optional(),
   filterOverrides: FilterConfigOverrideSchema,
   variantExclusions: z.array(z.string()).optional(),
   notes: z.string().optional(),
-  references: z.array(z.string().url('References must be valid URLs')).optional(),
-})
+  references: z
+    .array(z.string().url("References must be valid URLs"))
+    .optional(),
+});
 
 /**
  * Root gene configuration schema
@@ -56,26 +61,25 @@ export const ConditionProfileSchema = z.object({
  */
 export const GeneConfigSchema = z
   .object({
-    schemaVersion: z.literal('1.0'),
+    schemaVersion: z.literal("1.0"),
     geneSymbol: z.string().min(1).max(20),
     displayName: z.string().optional(),
     omimGeneId: z
       .string()
-      .regex(/^\d{6}$/, 'OMIM Gene ID must be exactly 6 digits')
+      .regex(/^\d{6}$/, "OMIM Gene ID must be exactly 6 digits")
       .optional(),
-    inheritance: z.enum(['AR', 'XL', 'AD']).optional(),
-    profiles: z.array(ConditionProfileSchema).min(1, 'At least one profile is required'),
+    inheritance: z.enum(["AR", "XL", "AD"]).optional(),
+    profiles: z
+      .array(ConditionProfileSchema)
+      .min(1, "At least one profile is required"),
   })
-  .refine(
-    (data) => {
-      const defaultProfiles = data.profiles.filter((p) => p.isDefault)
-      return defaultProfiles.length === 1
-    },
-    'Exactly one profile must have isDefault: true',
-  )
+  .refine((data) => {
+    const defaultProfiles = data.profiles.filter((p) => p.isDefault);
+    return defaultProfiles.length === 1;
+  }, "Exactly one profile must have isDefault: true");
 
 // Inferred TypeScript types
-export type GeneConfig = z.infer<typeof GeneConfigSchema>
-export type ConditionProfile = z.infer<typeof ConditionProfileSchema>
-export type DiseaseIdentifier = z.infer<typeof DiseaseIdentifierSchema>
-export type FilterConfigOverride = z.infer<typeof FilterConfigOverrideSchema>
+export type GeneConfig = z.infer<typeof GeneConfigSchema>;
+export type ConditionProfile = z.infer<typeof ConditionProfileSchema>;
+export type DiseaseIdentifier = z.infer<typeof DiseaseIdentifierSchema>;
+export type FilterConfigOverride = z.infer<typeof FilterConfigOverrideSchema>;

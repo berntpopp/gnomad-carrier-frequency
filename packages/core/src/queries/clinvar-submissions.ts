@@ -26,7 +26,7 @@ export interface ClinVarVariantWithSubmissions {
  */
 export function buildSubmissionsQuery(
   variantIds: string[],
-  referenceGenome: 'GRCh38' | 'GRCh37'
+  referenceGenome: "GRCh38" | "GRCh37",
 ): string {
   const variantQueries = variantIds
     .map((id, index) => {
@@ -38,7 +38,7 @@ export function buildSubmissionsQuery(
         }
       }`;
     })
-    .join('\n      ');
+    .join("\n      ");
 
   return `query ClinVarSubmissions {
       ${variantQueries}
@@ -52,7 +52,7 @@ export function buildSubmissionsQuery(
  * @returns Map of variant_id to submissions array
  */
 export function parseSubmissionsResponse(
-  response: Record<string, ClinVarVariantWithSubmissions | null>
+  response: Record<string, ClinVarVariantWithSubmissions | null>,
 ): Map<string, ClinVarSubmission[]> {
   const result = new Map<string, ClinVarSubmission[]>();
 
@@ -70,10 +70,10 @@ export function parseSubmissionsResponse(
  * Case-insensitive matching
  */
 export const PATHOGENIC_CLASSIFICATIONS = [
-  'pathogenic',
-  'likely pathogenic',
-  'pathogenic, low penetrance',
-  'likely pathogenic, low penetrance',
+  "pathogenic",
+  "likely pathogenic",
+  "pathogenic, low penetrance",
+  "likely pathogenic, low penetrance",
 ] as const;
 
 /**
@@ -81,17 +81,17 @@ export const PATHOGENIC_CLASSIFICATIONS = [
  * These don't indicate a clear benign or pathogenic interpretation
  */
 export const EXCLUDED_CLASSIFICATIONS = [
-  'not provided',
-  'other',
-  'risk factor',
-  'drug response',
-  'association',
-  'protective',
-  'affects',
-  'confers sensitivity',
-  'uncertain risk allele',
-  'likely risk allele',
-  'established risk allele',
+  "not provided",
+  "other",
+  "risk factor",
+  "drug response",
+  "association",
+  "protective",
+  "affects",
+  "confers sensitivity",
+  "uncertain risk allele",
+  "likely risk allele",
+  "established risk allele",
 ] as const;
 
 /**
@@ -101,7 +101,7 @@ export const EXCLUDED_CLASSIFICATIONS = [
  * @returns Percentage (0-100) of P/LP submissions, or null if no valid submissions
  */
 export function calculatePathogenicPercentage(
-  submissions: ClinVarSubmission[]
+  submissions: ClinVarSubmission[],
 ): number | null {
   if (!submissions || submissions.length === 0) {
     return null;
@@ -115,7 +115,7 @@ export function calculatePathogenicPercentage(
 
     // Skip excluded classifications
     const isExcluded = EXCLUDED_CLASSIFICATIONS.some((exc) =>
-      sig.includes(exc.toLowerCase())
+      sig.includes(exc.toLowerCase()),
     );
     if (isExcluded) {
       continue;
@@ -125,7 +125,7 @@ export function calculatePathogenicPercentage(
 
     // Check if pathogenic
     const isPathogenic = PATHOGENIC_CLASSIFICATIONS.some((p) =>
-      sig.includes(p.toLowerCase())
+      sig.includes(p.toLowerCase()),
     );
     if (isPathogenic) {
       pathogenicCount++;
@@ -149,7 +149,7 @@ export function calculatePathogenicPercentage(
  */
 export function meetsConflictingThreshold(
   submissions: ClinVarSubmission[],
-  threshold: number
+  threshold: number,
 ): boolean {
   const percentage = calculatePathogenicPercentage(submissions);
   if (percentage === null) {

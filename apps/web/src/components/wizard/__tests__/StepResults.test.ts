@@ -1,14 +1,17 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { ref, computed } from 'vue'
-import { mountWithPlugins } from '@/test/helpers'
-import { useWizard } from '@/composables/useWizard'
-import StepResults from '../StepResults.vue'
-import type { CarrierFrequencyResult, FilterConfig } from '@gnomad-cf/core/types'
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { ref, computed } from "vue";
+import { mountWithPlugins } from "@/test/helpers";
+import { useWizard } from "@/composables/useWizard";
+import StepResults from "../StepResults.vue";
+import type {
+  CarrierFrequencyResult,
+  FilterConfig,
+} from "@gnomad-cf/core/types";
 
 // Vuetify useDisplay requires a display injection that the minimal Vuetify setup does not provide.
 // Mock it to return a stable non-responsive state for unit tests.
-vi.mock('vuetify', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('vuetify')>()
+vi.mock("vuetify", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("vuetify")>();
   return {
     ...actual,
     useDisplay: () => ({
@@ -22,14 +25,14 @@ vi.mock('vuetify', async (importOriginal) => {
       lgAndUp: ref(true),
       width: ref(1280),
       height: ref(800),
-      name: ref('lg'),
+      name: ref("lg"),
       platform: ref({ touch: false, win: false, mac: false, linux: false }),
     }),
-  }
-})
+  };
+});
 
 // Mock composables with side effects (API calls, singletons with complex dependencies)
-vi.mock('@/composables/useExclusionState', () => ({
+vi.mock("@/composables/useExclusionState", () => ({
   useExclusionState: () => ({
     excluded: computed(() => []),
     excludedCount: computed(() => 0),
@@ -46,16 +49,16 @@ vi.mock('@/composables/useExclusionState', () => ({
     resetForGene: vi.fn(),
     setExclusions: vi.fn(),
   }),
-}))
+}));
 
-vi.mock('@/composables/useExport', () => ({
+vi.mock("@/composables/useExport", () => ({
   useExport: () => ({
     exportToJson: vi.fn(),
     exportToExcel: vi.fn(),
   }),
-}))
+}));
 
-vi.mock('@/composables/useAppAnnouncer', () => ({
+vi.mock("@/composables/useAppAnnouncer", () => ({
   useAppAnnouncer: () => ({
     polite: vi.fn(),
     assertive: vi.fn(),
@@ -65,34 +68,34 @@ vi.mock('@/composables/useAppAnnouncer', () => ({
     announceStep: vi.fn(),
     announceGeneSelection: vi.fn(),
   }),
-}))
+}));
 
 // @vueuse/core clipboard composable
-vi.mock('@vueuse/core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@vueuse/core')>()
+vi.mock("@vueuse/core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@vueuse/core")>();
   return {
     ...actual,
     useClipboard: () => ({
       copy: vi.fn(),
       copied: ref(false),
       isSupported: ref(true),
-      text: ref(''),
+      text: ref(""),
     }),
-  }
-})
+  };
+});
 
 // Stub heavy child components — they are tested separately
 const stubComponents = {
   FilterPanel: { template: '<div data-testid="filter-panel-stub" />' },
-  VariantModal: { template: '<div />' },
+  VariantModal: { template: "<div />" },
   TextOutput: { template: '<div data-testid="text-output-stub" />' },
-  ClingenWarning: { template: '<div />' },
-}
+  ClingenWarning: { template: "<div />" },
+};
 
 // Minimal valid CarrierFrequencyResult for seeding tests
 const mockResult: CarrierFrequencyResult = {
-  gene: 'CFTR',
-  version: 'v4',
+  gene: "CFTR",
+  version: "v4",
   globalCarrierFrequency: 0.04,
   globalAlleleCount: 10,
   globalAlleleNumber: 250,
@@ -103,9 +106,9 @@ const mockResult: CarrierFrequencyResult = {
   hasFounderEffect: false,
   geneticPrevalence: 0.0016,
   bayesianPrevalence: 0.0016,
-  formula: 'hwe',
+  formula: "hwe",
   homExclusionActive: false,
-}
+};
 
 const mockFilterConfig: FilterConfig = {
   lofHcEnabled: true,
@@ -114,21 +117,21 @@ const mockFilterConfig: FilterConfig = {
   clinvarStarThreshold: 1,
   clinvarIncludeConflicting: false,
   clinvarConflictingThreshold: 75,
-}
+};
 
-describe('StepResults', () => {
+describe("StepResults", () => {
   beforeEach(() => {
-    const { resetWizard } = useWizard()
-    resetWizard()
-  })
+    const { resetWizard } = useWizard();
+    resetWizard();
+  });
 
-  it('renders the step container', () => {
+  it("renders the step container", () => {
     const wrapper = mountWithPlugins(StepResults, {
       props: {
         result: null,
         globalFrequency: null,
-        indexStatus: 'heterozygous',
-        frequencySource: 'gnomad',
+        indexStatus: "heterozygous",
+        frequencySource: "gnomad",
         literatureFrequency: null,
         literaturePmid: null,
         usingDefault: false,
@@ -142,21 +145,27 @@ describe('StepResults', () => {
       },
       global: { stubs: stubComponents },
       storeInitialState: {
-        'calc-settings': { defaults: { useHWEFormula: true, useHomExclusion: true, penetrance: 1.0 } },
-        'filters': { defaults: mockFilterConfig },
+        "calc-settings": {
+          defaults: {
+            useHWEFormula: true,
+            useHomExclusion: true,
+            penetrance: 1.0,
+          },
+        },
+        filters: { defaults: mockFilterConfig },
       },
-    })
+    });
 
-    expect(wrapper.find('[data-testid="step-results"]').exists()).toBe(true)
-  })
+    expect(wrapper.find('[data-testid="step-results"]').exists()).toBe(true);
+  });
 
-  it('renders summary card when result data is provided', () => {
+  it("renders summary card when result data is provided", () => {
     const wrapper = mountWithPlugins(StepResults, {
       props: {
         result: mockResult,
-        globalFrequency: { percent: '4.00%', ratio: '1:25' },
-        indexStatus: 'heterozygous',
-        frequencySource: 'gnomad',
+        globalFrequency: { percent: "4.00%", ratio: "1:25" },
+        indexStatus: "heterozygous",
+        frequencySource: "gnomad",
         literatureFrequency: null,
         literaturePmid: null,
         usingDefault: false,
@@ -170,21 +179,29 @@ describe('StepResults', () => {
       },
       global: { stubs: stubComponents },
       storeInitialState: {
-        'calc-settings': { defaults: { useHWEFormula: true, useHomExclusion: true, penetrance: 1.0 } },
-        'filters': { defaults: mockFilterConfig },
+        "calc-settings": {
+          defaults: {
+            useHWEFormula: true,
+            useHomExclusion: true,
+            penetrance: 1.0,
+          },
+        },
+        filters: { defaults: mockFilterConfig },
       },
-    })
+    });
 
-    expect(wrapper.find('[data-testid="results-summary-card"]').exists()).toBe(true)
-  })
+    expect(wrapper.find('[data-testid="results-summary-card"]').exists()).toBe(
+      true,
+    );
+  });
 
-  it('does not render summary card when result is null', () => {
+  it("does not render summary card when result is null", () => {
     const wrapper = mountWithPlugins(StepResults, {
       props: {
         result: null,
         globalFrequency: null,
-        indexStatus: 'heterozygous',
-        frequencySource: 'gnomad',
+        indexStatus: "heterozygous",
+        frequencySource: "gnomad",
         literatureFrequency: null,
         literaturePmid: null,
         usingDefault: false,
@@ -198,21 +215,29 @@ describe('StepResults', () => {
       },
       global: { stubs: stubComponents },
       storeInitialState: {
-        'calc-settings': { defaults: { useHWEFormula: true, useHomExclusion: true, penetrance: 1.0 } },
-        'filters': { defaults: mockFilterConfig },
+        "calc-settings": {
+          defaults: {
+            useHWEFormula: true,
+            useHomExclusion: true,
+            penetrance: 1.0,
+          },
+        },
+        filters: { defaults: mockFilterConfig },
       },
-    })
+    });
 
-    expect(wrapper.find('[data-testid="results-summary-card"]').exists()).toBe(false)
-  })
+    expect(wrapper.find('[data-testid="results-summary-card"]').exists()).toBe(
+      false,
+    );
+  });
 
-  it('renders population table when result is provided', () => {
+  it("renders population table when result is provided", () => {
     const wrapper = mountWithPlugins(StepResults, {
       props: {
         result: mockResult,
-        globalFrequency: { percent: '4.00%', ratio: '1:25' },
-        indexStatus: 'heterozygous',
-        frequencySource: 'gnomad',
+        globalFrequency: { percent: "4.00%", ratio: "1:25" },
+        indexStatus: "heterozygous",
+        frequencySource: "gnomad",
         literatureFrequency: null,
         literaturePmid: null,
         usingDefault: false,
@@ -226,22 +251,30 @@ describe('StepResults', () => {
       },
       global: { stubs: stubComponents },
       storeInitialState: {
-        'calc-settings': { defaults: { useHWEFormula: true, useHomExclusion: true, penetrance: 1.0 } },
-        'filters': { defaults: mockFilterConfig },
+        "calc-settings": {
+          defaults: {
+            useHWEFormula: true,
+            useHomExclusion: true,
+            penetrance: 1.0,
+          },
+        },
+        filters: { defaults: mockFilterConfig },
       },
-    })
+    });
 
     // Population table renders when tableItems is non-empty (mockResult has globalCarrierFrequency)
-    expect(wrapper.find('[data-testid="population-table"]').exists()).toBe(true)
-  })
+    expect(wrapper.find('[data-testid="population-table"]').exists()).toBe(
+      true,
+    );
+  });
 
-  it('shows gene name in results heading', () => {
+  it("shows gene name in results heading", () => {
     const wrapper = mountWithPlugins(StepResults, {
       props: {
         result: mockResult,
-        globalFrequency: { percent: '4.00%', ratio: '1:25' },
-        indexStatus: 'heterozygous',
-        frequencySource: 'gnomad',
+        globalFrequency: { percent: "4.00%", ratio: "1:25" },
+        indexStatus: "heterozygous",
+        frequencySource: "gnomad",
         literatureFrequency: null,
         literaturePmid: null,
         usingDefault: false,
@@ -255,11 +288,17 @@ describe('StepResults', () => {
       },
       global: { stubs: stubComponents },
       storeInitialState: {
-        'calc-settings': { defaults: { useHWEFormula: true, useHomExclusion: true, penetrance: 1.0 } },
-        'filters': { defaults: mockFilterConfig },
+        "calc-settings": {
+          defaults: {
+            useHWEFormula: true,
+            useHomExclusion: true,
+            penetrance: 1.0,
+          },
+        },
+        filters: { defaults: mockFilterConfig },
       },
-    })
+    });
 
-    expect(wrapper.text()).toContain('CFTR')
-  })
-})
+    expect(wrapper.text()).toContain("CFTR");
+  });
+});

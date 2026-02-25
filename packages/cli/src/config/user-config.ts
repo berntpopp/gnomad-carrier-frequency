@@ -7,13 +7,16 @@
  * Merge priority (highest wins): CLI flags > user config > factory defaults
  */
 
-import { readFile } from 'node:fs/promises'
-import { homedir } from 'node:os'
-import { join } from 'node:path'
-import { z } from 'zod'
-import type { FilterConfig, CalcConfig } from '@gnomad-cf/core/types'
-import { FACTORY_FILTER_DEFAULTS, FACTORY_CALC_DEFAULTS } from '@gnomad-cf/core/types'
-import type { GnomadVersion } from '@gnomad-cf/core/config'
+import { readFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { join } from "node:path";
+import { z } from "zod";
+import type { FilterConfig, CalcConfig } from "@gnomad-cf/core/types";
+import {
+  FACTORY_FILTER_DEFAULTS,
+  FACTORY_CALC_DEFAULTS,
+} from "@gnomad-cf/core/types";
+import type { GnomadVersion } from "@gnomad-cf/core/config";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -21,17 +24,17 @@ import type { GnomadVersion } from '@gnomad-cf/core/config'
 
 const UserConfigSchema = z
   .object({
-    defaultVersion: z.enum(['v4', 'v3', 'v2']).optional(),
-    defaultFormat: z.enum(['text', 'json', 'tsv']).optional(),
+    defaultVersion: z.enum(["v4", "v3", "v2"]).optional(),
+    defaultFormat: z.enum(["text", "json", "tsv"]).optional(),
     defaultConcurrency: z.number().int().min(1).max(10).optional(),
     defaultPopulation: z.string().optional(),
     hwe: z.boolean().optional(),
     excludeHomozygotes: z.boolean().optional(),
     penetrance: z.number().min(0).max(1).optional(),
   })
-  .strict()
+  .strict();
 
-export type UserConfig = z.infer<typeof UserConfigSchema>
+export type UserConfig = z.infer<typeof UserConfigSchema>;
 
 // ---------------------------------------------------------------------------
 // Loader
@@ -48,39 +51,39 @@ export type UserConfig = z.infer<typeof UserConfigSchema>
  * @returns Validated UserConfig (may be partial / empty)
  */
 export async function loadUserConfig(): Promise<UserConfig> {
-  const configPath = join(homedir(), '.gnomad-cf.json')
+  const configPath = join(homedir(), ".gnomad-cf.json");
 
-  let raw: string
+  let raw: string;
   try {
-    raw = await readFile(configPath, 'utf-8')
+    raw = await readFile(configPath, "utf-8");
   } catch {
     // File not found or not readable — silently return defaults
-    return {}
+    return {};
   }
 
-  let parsed: unknown
+  let parsed: unknown;
   try {
-    parsed = JSON.parse(raw)
+    parsed = JSON.parse(raw);
   } catch {
     process.stderr.write(
-      `[gnomad-cf] Warning: ~/.gnomad-cf.json contains invalid JSON — using defaults\n`
-    )
-    return {}
+      `[gnomad-cf] Warning: ~/.gnomad-cf.json contains invalid JSON — using defaults\n`,
+    );
+    return {};
   }
 
-  const result = UserConfigSchema.safeParse(parsed)
+  const result = UserConfigSchema.safeParse(parsed);
   if (!result.success) {
     process.stderr.write(
       `[gnomad-cf] Warning: ~/.gnomad-cf.json validation failed — using defaults\n` +
         result.error.issues
-          .map((e) => `  ${e.path.join('.')}: ${e.message}`)
-          .join('\n') +
-        '\n'
-    )
-    return {}
+          .map((e) => `  ${e.path.join(".")}: ${e.message}`)
+          .join("\n") +
+        "\n",
+    );
+    return {};
   }
 
-  return result.data
+  return result.data;
 }
 
 // ---------------------------------------------------------------------------
@@ -88,10 +91,10 @@ export async function loadUserConfig(): Promise<UserConfig> {
 // ---------------------------------------------------------------------------
 
 export interface MergedConfig {
-  filterConfig: FilterConfig
-  calcConfig: CalcConfig
-  version: GnomadVersion
-  format: string
+  filterConfig: FilterConfig;
+  calcConfig: CalcConfig;
+  version: GnomadVersion;
+  format: string;
 }
 
 /**
@@ -108,49 +111,49 @@ export interface MergedConfig {
  */
 export function mergeConfig(
   userConfig: UserConfig,
-  cliFlags: Record<string, unknown>
+  cliFlags: Record<string, unknown>,
 ): MergedConfig {
   // --- Filter config ---
-  const filterConfig: FilterConfig = { ...FACTORY_FILTER_DEFAULTS }
+  const filterConfig: FilterConfig = { ...FACTORY_FILTER_DEFAULTS };
   // (user config doesn't currently expose filter toggles — only calcConfig knobs)
 
   // --- Calc config ---
-  const calcConfig: CalcConfig = { ...FACTORY_CALC_DEFAULTS }
+  const calcConfig: CalcConfig = { ...FACTORY_CALC_DEFAULTS };
 
   // Overlay user config values
   if (userConfig.hwe !== undefined) {
-    calcConfig.useHWEFormula = userConfig.hwe
+    calcConfig.useHWEFormula = userConfig.hwe;
   }
   if (userConfig.excludeHomozygotes !== undefined) {
-    calcConfig.useHomExclusion = userConfig.excludeHomozygotes
+    calcConfig.useHomExclusion = userConfig.excludeHomozygotes;
   }
   if (userConfig.penetrance !== undefined) {
-    calcConfig.penetrance = userConfig.penetrance
+    calcConfig.penetrance = userConfig.penetrance;
   }
 
   // Overlay CLI flags (always win)
-  if (typeof cliFlags['hwe'] === 'boolean') {
-    calcConfig.useHWEFormula = cliFlags['hwe']
+  if (typeof cliFlags["hwe"] === "boolean") {
+    calcConfig.useHWEFormula = cliFlags["hwe"];
   }
-  if (typeof cliFlags['excludeHomozygotes'] === 'boolean') {
-    calcConfig.useHomExclusion = cliFlags['excludeHomozygotes']
+  if (typeof cliFlags["excludeHomozygotes"] === "boolean") {
+    calcConfig.useHomExclusion = cliFlags["excludeHomozygotes"];
   }
-  if (typeof cliFlags['penetrance'] === 'number') {
-    calcConfig.penetrance = cliFlags['penetrance']
+  if (typeof cliFlags["penetrance"] === "number") {
+    calcConfig.penetrance = cliFlags["penetrance"];
   }
 
   // --- Version ---
   let version: GnomadVersion =
-    (userConfig.defaultVersion as GnomadVersion | undefined) ?? 'v4'
-  if (typeof cliFlags['version'] === 'string') {
-    version = cliFlags['version'] as GnomadVersion
+    (userConfig.defaultVersion as GnomadVersion | undefined) ?? "v4";
+  if (typeof cliFlags["version"] === "string") {
+    version = cliFlags["version"] as GnomadVersion;
   }
 
   // --- Format ---
-  let format: string = userConfig.defaultFormat ?? 'text'
-  if (typeof cliFlags['format'] === 'string') {
-    format = cliFlags['format']
+  let format: string = userConfig.defaultFormat ?? "text";
+  if (typeof cliFlags["format"] === "string") {
+    format = cliFlags["format"];
   }
 
-  return { filterConfig, calcConfig, version, format }
+  return { filterConfig, calcConfig, version, format };
 }

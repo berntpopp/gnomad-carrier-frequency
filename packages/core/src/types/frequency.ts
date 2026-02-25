@@ -1,12 +1,12 @@
 // Frequency calculation result types
 
-import type { GnomadVersion } from '../config/types.js';
+import type { GnomadVersion } from "../config/types.js";
 
 export type IndexPatientStatus =
-  | 'heterozygous'           // Carrier - one pathogenic allele
-  | 'homozygous'             // Affected - two copies same allele
-  | 'compound_het_confirmed' // Affected - two different alleles, confirmed
-  | 'compound_het_assumed';  // Affected - two different alleles, assumed by phenotype
+  | "heterozygous" // Carrier - one pathogenic allele
+  | "homozygous" // Affected - two copies same allele
+  | "compound_het_confirmed" // Affected - two different alleles, confirmed
+  | "compound_het_assumed"; // Affected - two different alleles, assumed by phenotype
 
 export interface PopulationFrequency {
   code: string; // Dynamic from config, not hardcoded
@@ -38,7 +38,7 @@ export interface CarrierFrequencyResult {
   /** Bayesian prevalence = geneticPrevalence * penetrance */
   bayesianPrevalence: number | null;
   /** Which carrier frequency formula was used to produce globalCarrierFrequency */
-  formula: 'hwe' | 'simplified';
+  formula: "hwe" | "simplified";
   /** Whether VCR/GCR homozygote exclusion was applied */
   homExclusionActive: boolean;
 }

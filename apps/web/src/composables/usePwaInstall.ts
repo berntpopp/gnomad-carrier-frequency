@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from "vue";
 
 /**
  * Composable for managing PWA installation.
@@ -10,14 +10,16 @@ export function usePwaInstall() {
 
   // Check if already installed via display mode
   const checkIfInstalled = (): boolean => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(display-mode: standalone)').matches;
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(display-mode: standalone)").matches;
   };
 
   // Detect iOS devices
   const isIos = computed((): boolean => {
-    if (typeof navigator === 'undefined') return false;
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
+    if (typeof navigator === "undefined") return false;
+    return (
+      /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window)
+    );
   });
 
   // Can install if we have a deferred prompt and not already installed
@@ -54,7 +56,7 @@ export function usePwaInstall() {
     // Clear the deferred prompt regardless of outcome
     deferredPrompt.value = null;
 
-    return outcome === 'accepted';
+    return outcome === "accepted";
   };
 
   onMounted(() => {
@@ -64,30 +66,30 @@ export function usePwaInstall() {
     // Listen for the beforeinstallprompt event
     // Cast to EventListener to satisfy TypeScript (the type is correct via vite-env.d.ts)
     window.addEventListener(
-      'beforeinstallprompt',
-      handleBeforeInstallPrompt as EventListener
+      "beforeinstallprompt",
+      handleBeforeInstallPrompt as EventListener,
     );
 
     // Listen for the appinstalled event
-    window.addEventListener('appinstalled', handleAppInstalled);
+    window.addEventListener("appinstalled", handleAppInstalled);
 
     // Listen for display mode changes (e.g., user installs via browser menu)
-    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    const mediaQuery = window.matchMedia("(display-mode: standalone)");
     const handleDisplayModeChange = (event: MediaQueryListEvent) => {
       if (event.matches) {
         isInstalled.value = true;
         deferredPrompt.value = null;
       }
     };
-    mediaQuery.addEventListener('change', handleDisplayModeChange);
+    mediaQuery.addEventListener("change", handleDisplayModeChange);
   });
 
   onUnmounted(() => {
     window.removeEventListener(
-      'beforeinstallprompt',
-      handleBeforeInstallPrompt as EventListener
+      "beforeinstallprompt",
+      handleBeforeInstallPrompt as EventListener,
     );
-    window.removeEventListener('appinstalled', handleAppInstalled);
+    window.removeEventListener("appinstalled", handleAppInstalled);
   });
 
   return {

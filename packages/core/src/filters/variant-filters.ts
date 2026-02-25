@@ -5,21 +5,21 @@ import type {
   ClinVarVariant,
   GnomadVariant,
   FilterConfig,
-} from '../types/index.js';
-import { FACTORY_FILTER_DEFAULTS } from '../types/index.js';
+} from "../types/index.js";
+import { FACTORY_FILTER_DEFAULTS } from "../types/index.js";
 import {
   meetsConflictingThreshold,
   type ClinVarSubmission,
-} from '../queries/index.js';
+} from "../queries/index.js";
 
 /**
  * Missense-class consequence terms
  * Used when missense filter is enabled
  */
 export const MISSENSE_CONSEQUENCES = [
-  'missense_variant',
-  'inframe_insertion',
-  'inframe_deletion',
+  "missense_variant",
+  "inframe_insertion",
+  "inframe_deletion",
 ] as const;
 
 /**
@@ -27,10 +27,10 @@ export const MISSENSE_CONSEQUENCES = [
  * FILT-01: LoF "HC" (high confidence) from LOFTEE on canonical transcript
  */
 export function isHighConfidenceLoF(
-  consequence: TranscriptConsequence
+  consequence: TranscriptConsequence,
 ): boolean {
   // Only consider canonical transcript
-  return consequence.canonical && consequence.lof === 'HC';
+  return consequence.canonical && consequence.lof === "HC";
 }
 
 /**
@@ -42,7 +42,9 @@ export function isMissenseVariant(consequence: TranscriptConsequence): boolean {
     return false;
   }
   return consequence.consequence_terms.some((term) =>
-    MISSENSE_CONSEQUENCES.includes(term as (typeof MISSENSE_CONSEQUENCES)[number])
+    MISSENSE_CONSEQUENCES.includes(
+      term as (typeof MISSENSE_CONSEQUENCES)[number],
+    ),
   );
 }
 
@@ -54,8 +56,8 @@ export function isMissenseVariant(consequence: TranscriptConsequence): boolean {
 export function isPathogenicClinVar(variant: ClinVarVariant): boolean {
   const sig = variant.clinical_significance.toLowerCase();
   const isPathogenic =
-    (sig.includes('pathogenic') || sig.includes('likely_pathogenic')) &&
-    !sig.includes('conflicting');
+    (sig.includes("pathogenic") || sig.includes("likely_pathogenic")) &&
+    !sig.includes("conflicting");
   const hasReview = variant.gold_stars >= 1;
   return isPathogenic && hasReview;
 }
@@ -67,12 +69,12 @@ export function isPathogenicClinVar(variant: ClinVarVariant): boolean {
  */
 export function isPathogenicClinVarWithThreshold(
   variant: ClinVarVariant,
-  threshold: number
+  threshold: number,
 ): boolean {
   const sig = variant.clinical_significance.toLowerCase();
   const isPathogenic =
-    (sig.includes('pathogenic') || sig.includes('likely_pathogenic')) &&
-    !sig.includes('conflicting');
+    (sig.includes("pathogenic") || sig.includes("likely_pathogenic")) &&
+    !sig.includes("conflicting");
   const hasReview = variant.gold_stars >= threshold;
   return isPathogenic && hasReview;
 }
@@ -83,7 +85,7 @@ export function isPathogenicClinVarWithThreshold(
  */
 export function hasConflictingClassification(variant: ClinVarVariant): boolean {
   const sig = variant.clinical_significance.toLowerCase();
-  return sig.includes('conflicting');
+  return sig.includes("conflicting");
 }
 
 /**
@@ -94,7 +96,7 @@ export function hasConflictingClassification(variant: ClinVarVariant): boolean {
  * @returns Array of variant IDs with conflicting status
  */
 export function getConflictingVariantIds(
-  clinvarVariants: ClinVarVariant[]
+  clinvarVariants: ClinVarVariant[],
 ): string[] {
   return clinvarVariants
     .filter(hasConflictingClassification)
@@ -107,14 +109,14 @@ export function getConflictingVariantIds(
  */
 export function shouldIncludeVariant(
   variant: GnomadVariant,
-  clinvarVariants: ClinVarVariant[]
+  clinvarVariants: ClinVarVariant[],
 ): boolean {
   const hasHCLoF = variant.transcript_consequence
     ? isHighConfidenceLoF(variant.transcript_consequence)
     : false;
 
   const clinvarMatch = clinvarVariants.find(
-    (cv) => cv.variant_id === variant.variant_id
+    (cv) => cv.variant_id === variant.variant_id,
   );
   const hasPathogenicClinVar = clinvarMatch
     ? isPathogenicClinVar(clinvarMatch)
@@ -143,7 +145,7 @@ export function shouldIncludeVariantConfigurable(
   variant: GnomadVariant,
   clinvarVariants: ClinVarVariant[],
   config: FilterConfig,
-  submissionsMap?: Map<string, ClinVarSubmission[]>
+  submissionsMap?: Map<string, ClinVarSubmission[]>,
 ): boolean {
   const consequence = variant.transcript_consequence;
 
@@ -153,7 +155,7 @@ export function shouldIncludeVariantConfigurable(
 
   // Get ClinVar match (computed once)
   const clinvarMatch = clinvarVariants.find(
-    (cv) => cv.variant_id === variant.variant_id
+    (cv) => cv.variant_id === variant.variant_id,
   );
 
   // Check for standard ClinVar P/LP evidence (non-conflicting)
@@ -173,10 +175,11 @@ export function shouldIncludeVariantConfigurable(
     submissionsMap.has(variant.variant_id) &&
     meetsConflictingThreshold(
       submissionsMap.get(variant.variant_id)!,
-      config.clinvarConflictingThreshold
+      config.clinvarConflictingThreshold,
     );
 
-  const hasClinvarEvidence = hasStandardClinvarEvidence || hasConflictingEvidence;
+  const hasClinvarEvidence =
+    hasStandardClinvarEvidence || hasConflictingEvidence;
 
   // 1. LoF HC: Include if filter enabled (independent of ClinVar - LOFTEE is sufficient evidence)
   if (config.lofHcEnabled && isLoFHC) {
@@ -199,13 +202,29 @@ export function shouldIncludeVariantConfigurable(
 }
 
 /**
+ * Check if a variant has any observed alleles globally.
+ * Variants with AC=0 (no observed alleles) are excluded — they contribute
+ * nothing to carrier frequency and may represent failed QC or coverage artifacts.
+ * Prefers joint data (gnomAD v4) when available, falls back to exome+genome sum.
+ */
+export function hasObservedAlleles(variant: GnomadVariant): boolean {
+  if (variant.joint) {
+    return variant.joint.ac > 0;
+  }
+  const ac = (variant.exome?.ac ?? 0) + (variant.genome?.ac ?? 0);
+  return ac > 0;
+}
+
+/**
  * Filter variants to only those qualifying for carrier frequency calculation
  */
 export function filterPathogenicVariants(
   variants: GnomadVariant[],
-  clinvarVariants: ClinVarVariant[]
+  clinvarVariants: ClinVarVariant[],
 ): GnomadVariant[] {
-  return variants.filter((v) => shouldIncludeVariant(v, clinvarVariants));
+  return variants.filter(
+    (v) => hasObservedAlleles(v) && shouldIncludeVariant(v, clinvarVariants),
+  );
 }
 
 /**
@@ -221,9 +240,16 @@ export function filterPathogenicVariantsConfigurable(
   variants: GnomadVariant[],
   clinvarVariants: ClinVarVariant[],
   config: FilterConfig = FACTORY_FILTER_DEFAULTS,
-  submissionsMap?: Map<string, ClinVarSubmission[]>
+  submissionsMap?: Map<string, ClinVarSubmission[]>,
 ): GnomadVariant[] {
-  return variants.filter((v) =>
-    shouldIncludeVariantConfigurable(v, clinvarVariants, config, submissionsMap)
+  return variants.filter(
+    (v) =>
+      hasObservedAlleles(v) &&
+      shouldIncludeVariantConfigurable(
+        v,
+        clinvarVariants,
+        config,
+        submissionsMap,
+      ),
   );
 }

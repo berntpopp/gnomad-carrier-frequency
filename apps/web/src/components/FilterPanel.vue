@@ -1,16 +1,10 @@
 <template>
-  <v-expansion-panels
-    v-model="panel"
-    class="mb-4"
-  >
+  <v-expansion-panels v-model="panel" class="mb-4">
     <v-expansion-panel>
       <v-expansion-panel-title>
         <div class="d-flex align-center flex-wrap ga-2">
           <span class="text-subtitle-2">Filters</span>
-          <FilterChips
-            v-if="!isExpanded"
-            :filters="modelValue"
-          />
+          <FilterChips v-if="!isExpanded" :filters="modelValue" />
           <v-chip
             v-if="configLoading"
             color="info"
@@ -42,7 +36,12 @@
         <v-select
           v-if="configLoaded && availableProfiles.length > 1"
           :model-value="activeProfile?.profileId"
-          :items="availableProfiles.map(p => ({ title: p.displayName, value: p.profileId }))"
+          :items="
+            availableProfiles.map((p) => ({
+              title: p.displayName,
+              value: p.profileId,
+            }))
+          "
           label="Condition profile"
           density="compact"
           variant="outlined"
@@ -52,10 +51,7 @@
         />
 
         <v-row dense>
-          <v-col
-            cols="12"
-            md="6"
-          >
+          <v-col cols="12" md="6">
             <div class="d-flex align-center">
               <v-switch
                 :model-value="modelValue.lofHcEnabled"
@@ -65,10 +61,7 @@
                 hide-details
                 @update:model-value="updateFilter('lofHcEnabled', $event)"
               />
-              <v-tooltip
-                location="top"
-                aria-label="Filter information"
-              >
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -80,19 +73,16 @@
                   </v-icon>
                 </template>
                 <span class="tooltip-text">
-                  <strong>Loss-of-Function High Confidence</strong><br>
-                  Includes predicted loss-of-function variants (nonsense, frameshift,
-                  splice site) that pass gnomAD quality filters. These variants typically
-                  result in no protein product.
+                  <strong>Loss-of-Function High Confidence</strong><br />
+                  Includes predicted loss-of-function variants (nonsense,
+                  frameshift, splice site) that pass gnomAD quality filters.
+                  These variants typically result in no protein product.
                 </span>
               </v-tooltip>
             </div>
           </v-col>
 
-          <v-col
-            cols="12"
-            md="6"
-          >
+          <v-col cols="12" md="6">
             <div class="d-flex align-center">
               <v-switch
                 :model-value="modelValue.missenseEnabled"
@@ -102,10 +92,7 @@
                 hide-details
                 @update:model-value="updateFilter('missenseEnabled', $event)"
               />
-              <v-tooltip
-                location="top"
-                aria-label="Filter information"
-              >
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -117,19 +104,16 @@
                   </v-icon>
                 </template>
                 <span class="tooltip-text">
-                  <strong>Missense Variants</strong><br>
-                  Includes single amino acid substitutions. Not all missense variants
-                  are pathogenic. Enable this if ClinVar P/LP missense variants should
-                  be included in the calculation.
+                  <strong>Missense Variants</strong><br />
+                  Includes single amino acid substitutions. Not all missense
+                  variants are pathogenic. Enable this if ClinVar P/LP missense
+                  variants should be included in the calculation.
                 </span>
               </v-tooltip>
             </div>
           </v-col>
 
-          <v-col
-            cols="12"
-            md="6"
-          >
+          <v-col cols="12" md="6">
             <div class="d-flex align-center">
               <v-switch
                 :model-value="modelValue.clinvarEnabled"
@@ -139,10 +123,7 @@
                 hide-details
                 @update:model-value="updateFilter('clinvarEnabled', $event)"
               />
-              <v-tooltip
-                location="top"
-                aria-label="Filter information"
-              >
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -154,19 +135,16 @@
                   </v-icon>
                 </template>
                 <span class="tooltip-text">
-                  <strong>ClinVar Pathogenic/Likely Pathogenic</strong><br>
-                  Includes variants classified as Pathogenic or Likely Pathogenic
-                  in ClinVar. This captures known disease-causing variants that may
-                  not be predicted as LoF.
+                  <strong>ClinVar Pathogenic/Likely Pathogenic</strong><br />
+                  Includes variants classified as Pathogenic or Likely
+                  Pathogenic in ClinVar. This captures known disease-causing
+                  variants that may not be predicted as LoF.
                 </span>
               </v-tooltip>
             </div>
           </v-col>
 
-          <v-col
-            cols="12"
-            md="6"
-          >
+          <v-col cols="12" md="6">
             <div class="d-flex align-start">
               <v-slider
                 :model-value="modelValue.clinvarStarThreshold"
@@ -182,12 +160,11 @@
                 thumb-label
                 color="success"
                 class="flex-grow-1"
-                @update:model-value="updateFilter('clinvarStarThreshold', $event)"
+                @update:model-value="
+                  updateFilter('clinvarStarThreshold', $event)
+                "
               />
-              <v-tooltip
-                location="top"
-                aria-label="Filter information"
-              >
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -199,13 +176,13 @@
                   </v-icon>
                 </template>
                 <span class="tooltip-text">
-                  <strong>ClinVar Review Stars</strong><br>
+                  <strong>ClinVar Review Stars</strong><br />
                   Minimum number of review stars required. Higher stars indicate
-                  more evidence and expert review.<br>
-                  0: Any assertion<br>
-                  1: Single submitter<br>
-                  2: Multiple submitters with consensus<br>
-                  3: Reviewed by expert panel<br>
+                  more evidence and expert review.<br />
+                  0: Any assertion<br />
+                  1: Single submitter<br />
+                  2: Multiple submitters with consensus<br />
+                  3: Reviewed by expert panel<br />
                   4: Practice guideline
                 </span>
               </v-tooltip>
@@ -223,12 +200,11 @@
                 label="Include conflicting with majority P/LP"
                 :density="smAndDown ? 'default' : 'compact'"
                 hide-details
-                @update:model-value="updateFilter('clinvarIncludeConflicting', $event)"
+                @update:model-value="
+                  updateFilter('clinvarIncludeConflicting', $event)
+                "
               />
-              <v-tooltip
-                location="top"
-                aria-label="Filter information"
-              >
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -240,7 +216,7 @@
                   </v-icon>
                 </template>
                 <span class="tooltip-text">
-                  <strong>Conflicting Classifications</strong><br>
+                  <strong>Conflicting Classifications</strong><br />
                   When enabled, variants marked as "Conflicting interpretations"
                   in ClinVar will be included if the majority of individual
                   submissions classify them as Pathogenic or Likely Pathogenic.
@@ -250,14 +226,14 @@
             </div>
           </v-col>
 
-          <v-col
-            cols="12"
-            md="6"
-          >
+          <v-col cols="12" md="6">
             <div class="d-flex align-start">
               <v-slider
                 :model-value="modelValue.clinvarConflictingThreshold"
-                :disabled="!modelValue.clinvarEnabled || !modelValue.clinvarIncludeConflicting"
+                :disabled="
+                  !modelValue.clinvarEnabled ||
+                  !modelValue.clinvarIncludeConflicting
+                "
                 :min="50"
                 :max="100"
                 :step="5"
@@ -266,12 +242,11 @@
                 thumb-label
                 color="warning"
                 class="flex-grow-1"
-                @update:model-value="updateFilter('clinvarConflictingThreshold', $event)"
+                @update:model-value="
+                  updateFilter('clinvarConflictingThreshold', $event)
+                "
               />
-              <v-tooltip
-                location="top"
-                aria-label="Filter information"
-              >
+              <v-tooltip location="top" aria-label="Filter information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -283,7 +258,7 @@
                   </v-icon>
                 </template>
                 <span class="tooltip-text">
-                  <strong>P/LP Threshold</strong><br>
+                  <strong>P/LP Threshold</strong><br />
                   Minimum percentage of ClinVar submissions that must classify
                   the variant as Pathogenic or Likely Pathogenic for it to be
                   included. Default is 80%.
@@ -294,27 +269,24 @@
 
           <!-- Warning alert for conflicting filter -->
           <v-col
-            v-if="modelValue.clinvarIncludeConflicting && modelValue.clinvarEnabled"
+            v-if="
+              modelValue.clinvarIncludeConflicting && modelValue.clinvarEnabled
+            "
             cols="12"
           >
-            <v-alert
-              type="warning"
-              variant="tonal"
-              density="compact"
-            >
+            <v-alert type="warning" variant="tonal" density="compact">
               <template #prepend>
                 <v-icon>mdi-alert</v-icon>
               </template>
               <div class="text-body-2">
                 <strong>Performance warning:</strong>
-                Fetching individual ClinVar submissions can be slow for genes with many
-                conflicting variants. This may take up to 20 seconds for some genes.
+                Fetching individual ClinVar submissions can be slow for genes
+                with many conflicting variants. This may take up to 20 seconds
+                for some genes.
               </div>
-              <div
-                v-if="conflictingCount > 0"
-                class="text-body-2 mt-1"
-              >
-                Found <strong>{{ conflictingCount }}</strong> variant(s) with conflicting classifications.
+              <div v-if="conflictingCount > 0" class="text-body-2 mt-1">
+                Found <strong>{{ conflictingCount }}</strong> variant(s) with
+                conflicting classifications.
                 <span v-if="isLoadingSubmissions">
                   Loading submissions... {{ submissionsProgress }}%
                 </span>
@@ -323,10 +295,7 @@
           </v-col>
 
           <!-- Calculation settings -->
-          <v-col
-            cols="12"
-            md="6"
-          >
+          <v-col cols="12" md="6">
             <div class="d-flex align-center">
               <v-switch
                 :model-value="calcConfig.useHWEFormula"
@@ -336,10 +305,7 @@
                 hide-details
                 @update:model-value="updateCalcConfig('useHWEFormula', $event)"
               />
-              <v-tooltip
-                location="top"
-                aria-label="Calculation information"
-              >
+              <v-tooltip location="top" aria-label="Calculation information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -351,22 +317,19 @@
                   </v-icon>
                 </template>
                 <span class="tooltip-text">
-                  <strong>Hardy-Weinberg Equilibrium Formula</strong><br>
-                  When enabled (default), carrier frequency is calculated as
-                  2pq where p = 1 - q and q = sum of pathogenic allele frequencies.
-                  This is the standard epidemiological approach.<br><br>
-                  When disabled, the simplified formula 2 * SumAF is used instead.
-                  This underestimates carrier frequency slightly but matches some
-                  published methods.
+                  <strong>Hardy-Weinberg Equilibrium Formula</strong><br />
+                  When enabled (default), carrier frequency is calculated as 2pq
+                  where p = 1 - q and q = sum of pathogenic allele frequencies.
+                  This is the standard epidemiological approach.<br /><br />
+                  When disabled, the simplified formula 2 * SumAF is used
+                  instead. This underestimates carrier frequency slightly but
+                  matches some published methods.
                 </span>
               </v-tooltip>
             </div>
           </v-col>
 
-          <v-col
-            cols="12"
-            md="6"
-          >
+          <v-col cols="12" md="6">
             <div class="d-flex align-center">
               <v-switch
                 :model-value="calcConfig.useHomExclusion"
@@ -374,12 +337,11 @@
                 label="Homozygote Exclusion"
                 :density="smAndDown ? 'default' : 'compact'"
                 hide-details
-                @update:model-value="updateCalcConfig('useHomExclusion', $event)"
+                @update:model-value="
+                  updateCalcConfig('useHomExclusion', $event)
+                "
               />
-              <v-tooltip
-                location="top"
-                aria-label="Calculation information"
-              >
+              <v-tooltip location="top" aria-label="Calculation information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -391,11 +353,11 @@
                   </v-icon>
                 </template>
                 <span class="tooltip-text">
-                  <strong>Homozygote Exclusion (VCR/GCR)</strong><br>
-                  When enabled (default), uses Variant Carrier Rate (VCR) per variant
-                  and Gene Carrier Rate (GCR) aggregation. This accounts for observed
-                  homozygotes in gnomAD data and avoids double-counting compound
-                  heterozygotes.<br><br>
+                  <strong>Homozygote Exclusion (VCR/GCR)</strong><br />
+                  When enabled (default), uses Variant Carrier Rate (VCR) per
+                  variant and Gene Carrier Rate (GCR) aggregation. This accounts
+                  for observed homozygotes in gnomAD data and avoids
+                  double-counting compound heterozygotes.<br /><br />
                   When disabled, carrier frequency is computed directly from the
                   HWE or simplified formula without homozygote correction.
                 </span>
@@ -403,10 +365,7 @@
             </div>
           </v-col>
 
-          <v-col
-            cols="12"
-            md="6"
-          >
+          <v-col cols="12" md="6">
             <div class="d-flex align-start">
               <v-slider
                 :model-value="penetrancePercent"
@@ -420,10 +379,7 @@
                 class="flex-grow-1"
                 @update:model-value="updatePenetrance($event)"
               />
-              <v-tooltip
-                location="top"
-                aria-label="Calculation information"
-              >
+              <v-tooltip location="top" aria-label="Calculation information">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
                     v-bind="tooltipProps"
@@ -435,13 +391,14 @@
                   </v-icon>
                 </template>
                 <span class="tooltip-text">
-                  <strong>Penetrance</strong><br>
+                  <strong>Penetrance</strong><br />
                   The proportion of individuals with the disease genotype who
                   actually express the disease phenotype. Default is 100% (fully
-                  penetrant).<br><br>
-                  Reducing penetrance scales the Bayesian prevalence accordingly.
-                  For example, 80% penetrance means only 80% of genetically affected
-                  individuals are expected to be clinically affected.
+                  penetrant).<br /><br />
+                  Reducing penetrance scales the Bayesian prevalence
+                  accordingly. For example, 80% penetrance means only 80% of
+                  genetically affected individuals are expected to be clinically
+                  affected.
                 </span>
               </v-tooltip>
             </div>
@@ -476,7 +433,11 @@
                   prepend-icon="mdi-flask-outline"
                   :disabled="!selectedGene"
                 >
-                  {{ configLoaded ? 'Suggest Config Update' : 'Suggest Gene Config' }}
+                  {{
+                    configLoaded
+                      ? "Suggest Config Update"
+                      : "Suggest Gene Config"
+                  }}
                 </v-btn>
               </template>
             </GeneConfigSubmitDialog>
@@ -488,15 +449,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useDisplay } from 'vuetify';
-import FilterChips from './FilterChips.vue';
-import GeneConfigSubmitDialog from './GeneConfigSubmitDialog.vue';
-import type { FilterConfig, CalcConfig } from '@gnomad-cf/core/types';
-import { useGeneConfig } from '@/composables/useGeneConfig';
-import { useGeneSearch } from '@/composables/useGeneSearch';
+import { ref, computed } from "vue";
+import { useDisplay } from "vuetify";
+import FilterChips from "./FilterChips.vue";
+import GeneConfigSubmitDialog from "./GeneConfigSubmitDialog.vue";
+import type { FilterConfig, CalcConfig } from "@gnomad-cf/core/types";
+import { useGeneConfig } from "@/composables/useGeneConfig";
+import { useGeneSearch } from "@/composables/useGeneSearch";
 
-const { configLoaded, configLoading, activeProfile, availableProfiles, selectProfile, resetConfig } = useGeneConfig();
+const {
+  configLoaded,
+  configLoading,
+  activeProfile,
+  availableProfiles,
+  selectProfile,
+  resetConfig,
+} = useGeneConfig();
 const { selectedGene } = useGeneSearch();
 
 const props = defineProps<{
@@ -509,8 +477,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'update:modelValue': [value: FilterConfig];
-  'update:calcConfig': [value: CalcConfig];
+  "update:modelValue": [value: FilterConfig];
+  "update:calcConfig": [value: CalcConfig];
   reset: [];
 }>();
 
@@ -523,39 +491,46 @@ const isExpanded = computed(() => panel.value === 0);
 
 // Default values for optional props
 const conflictingCount = computed(() => props.conflictingCount ?? 0);
-const isLoadingSubmissions = computed(() => props.isLoadingSubmissions ?? false);
+const isLoadingSubmissions = computed(
+  () => props.isLoadingSubmissions ?? false,
+);
 const submissionsProgress = computed(() => props.submissionsProgress ?? 0);
 
 // Show tick labels only on desktop to prevent overlap on mobile
-const showTickLabels = computed(() => !smAndDown.value ? 'always' : true);
+const showTickLabels = computed(() => (!smAndDown.value ? "always" : true));
 
 const tickLabels = {
-  0: '0',
-  1: '1',
-  2: '2',
-  3: '3',
-  4: '4',
+  0: "0",
+  1: "1",
+  2: "2",
+  3: "3",
+  4: "4",
 };
 
 // Penetrance displayed as 0-100% integer
-const penetrancePercent = computed(() => Math.round(props.calcConfig.penetrance * 100));
+const penetrancePercent = computed(() =>
+  Math.round(props.calcConfig.penetrance * 100),
+);
 
 function updateFilter<K extends keyof FilterConfig>(
   key: K,
-  value: FilterConfig[K]
+  value: FilterConfig[K],
 ) {
-  emit('update:modelValue', {
+  emit("update:modelValue", {
     ...props.modelValue,
     [key]: value,
   });
 }
 
-function updateCalcConfig<K extends keyof CalcConfig>(key: K, value: CalcConfig[K]) {
-  emit('update:calcConfig', { ...props.calcConfig, [key]: value });
+function updateCalcConfig<K extends keyof CalcConfig>(
+  key: K,
+  value: CalcConfig[K],
+) {
+  emit("update:calcConfig", { ...props.calcConfig, [key]: value });
 }
 
 function updatePenetrance(percentValue: number) {
-  updateCalcConfig('penetrance', percentValue / 100);
+  updateCalcConfig("penetrance", percentValue / 100);
 }
 </script>
 

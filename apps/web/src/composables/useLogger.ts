@@ -1,5 +1,5 @@
-import { useLogStore } from '@/stores/useLogStore';
-import type { LogLevel } from '@gnomad-cf/core/types';
+import { useLogStore } from "@/stores/useLogStore";
+import type { LogLevel } from "@gnomad-cf/core/types";
 
 /**
  * Return type for the useLogger composable
@@ -30,7 +30,7 @@ export interface UseLoggerReturn {
  * logger.error('API request failed', { error: err.message });
  * ```
  */
-export function useLogger(category: string = 'app'): UseLoggerReturn {
+export function useLogger(category: string = "app"): UseLoggerReturn {
   const store = useLogStore();
 
   function log(level: LogLevel, message: string, details?: unknown) {
@@ -39,10 +39,12 @@ export function useLogger(category: string = 'app'): UseLoggerReturn {
 
   return {
     // Convenience level methods
-    debug: (message: string, details?: unknown) => log('DEBUG', message, details),
-    info: (message: string, details?: unknown) => log('INFO', message, details),
-    warn: (message: string, details?: unknown) => log('WARN', message, details),
-    error: (message: string, details?: unknown) => log('ERROR', message, details),
+    debug: (message: string, details?: unknown) =>
+      log("DEBUG", message, details),
+    info: (message: string, details?: unknown) => log("INFO", message, details),
+    warn: (message: string, details?: unknown) => log("WARN", message, details),
+    error: (message: string, details?: unknown) =>
+      log("ERROR", message, details),
 
     // Direct access to store for advanced use
     store,

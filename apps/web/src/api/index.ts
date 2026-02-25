@@ -1,6 +1,2 @@
 // API module exports
-export {
-  createGnomadClient,
-  useGnomadVersion,
-  graphqlClient,
-} from './client';
+export { createGnomadClient, useGnomadVersion, graphqlClient } from "./client";

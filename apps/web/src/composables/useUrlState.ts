@@ -1,8 +1,8 @@
 // URL state synchronization composable
 // Syncs wizard state to URL query parameters for shareable URLs
 
-import { ref, watch, onMounted, nextTick } from 'vue';
-import { useUrlSearchParams } from '@vueuse/core';
+import { ref, watch, onMounted, nextTick } from "vue";
+import { useUrlSearchParams } from "@vueuse/core";
 import {
   parseUrlState,
   encodeFilterFlags,
@@ -11,14 +11,14 @@ import {
   calcMatchesDefaults,
   FACTORY_FILTER_DEFAULTS,
   FACTORY_CALC_DEFAULTS,
-} from '@gnomad-cf/core/types';
-import type { UrlState } from '@gnomad-cf/core/types';
-import { useWizard } from './useWizard';
-import { useFilterStore } from '@/stores/useFilterStore';
-import { useCalcStore } from '@/stores/useCalcStore';
-import { useGeneSearch } from './useGeneSearch';
-import { useExclusionState } from './useExclusionState';
-import { encodeExclusions, decodeExclusions } from '@gnomad-cf/core/utils';
+} from "@gnomad-cf/core/types";
+import type { UrlState } from "@gnomad-cf/core/types";
+import { useWizard } from "./useWizard";
+import { useFilterStore } from "@/stores/useFilterStore";
+import { useCalcStore } from "@/stores/useCalcStore";
+import { useGeneSearch } from "./useGeneSearch";
+import { useExclusionState } from "./useExclusionState";
+import { encodeExclusions, decodeExclusions } from "@gnomad-cf/core/utils";
 
 // Module-level singleton state
 const isInitialized = ref(false);
@@ -46,7 +46,7 @@ export interface UseUrlStateReturn {
 export function useUrlState(): UseUrlStateReturn {
   // Initialize URL params with VueUse
   // Using 'history' mode with replace to avoid creating history entries
-  const params = useUrlSearchParams('history', {
+  const params = useUrlSearchParams("history", {
     write: true,
   });
 
@@ -85,7 +85,7 @@ export function useUrlState(): UseUrlStateReturn {
           if (geneSearch.results.value.length > 0) {
             // Find matching gene (exact match on symbol)
             const matchingGene = geneSearch.results.value.find(
-              (g) => g.symbol.toUpperCase() === urlState.gene?.toUpperCase()
+              (g) => g.symbol.toUpperCase() === urlState.gene?.toUpperCase(),
             );
 
             if (matchingGene) {
@@ -101,7 +101,7 @@ export function useUrlState(): UseUrlStateReturn {
             setTimeout(checkResults, 100);
           } else {
             // Give up after max attempts
-            console.warn('[URL State] Could not find gene:', urlState.gene);
+            console.warn("[URL State] Could not find gene:", urlState.gene);
             resolve();
           }
         };
@@ -119,7 +119,7 @@ export function useUrlState(): UseUrlStateReturn {
       wizardState.frequencySource = urlState.source;
 
       // Restore literature frequency if source is literature
-      if (urlState.source === 'literature') {
+      if (urlState.source === "literature") {
         if (urlState.litFreq !== undefined) {
           wizardState.literatureFrequency = urlState.litFreq;
         }
@@ -141,7 +141,7 @@ export function useUrlState(): UseUrlStateReturn {
 
       // Restore conflicting classifications setting
       if (urlState.conflicting !== undefined) {
-        filterStore.setClinvarIncludeConflicting(urlState.conflicting === '1');
+        filterStore.setClinvarIncludeConflicting(urlState.conflicting === "1");
       }
 
       // Restore conflicting threshold if present
@@ -164,18 +164,18 @@ export function useUrlState(): UseUrlStateReturn {
       }
 
       // Show warning if exclusions were truncated
-      if (urlState.exclWarn === '1') {
+      if (urlState.exclWarn === "1") {
         console.warn(
-          '[URL State] Some exclusions were not included in the shared URL due to length limits'
+          "[URL State] Some exclusions were not included in the shared URL due to length limits",
         );
       }
 
       // Restore calc settings if present in URL
       if (urlState.hweFormula !== undefined) {
-        calcStore.setUseHWEFormula(urlState.hweFormula === '1');
+        calcStore.setUseHWEFormula(urlState.hweFormula === "1");
       }
       if (urlState.homExclusion !== undefined) {
-        calcStore.setUseHomExclusion(urlState.homExclusion === '1');
+        calcStore.setUseHomExclusion(urlState.homExclusion === "1");
       }
       if (urlState.penetrance !== undefined) {
         calcStore.setPenetrance(urlState.penetrance);
@@ -210,14 +210,14 @@ export function useUrlState(): UseUrlStateReturn {
     }
 
     // Index status (only if not default)
-    if (wizardState.indexStatus !== 'heterozygous') {
+    if (wizardState.indexStatus !== "heterozygous") {
       params.status = wizardState.indexStatus;
     } else {
       delete params.status;
     }
 
     // Frequency source (only if not default)
-    if (wizardState.frequencySource !== 'gnomad') {
+    if (wizardState.frequencySource !== "gnomad") {
       params.source = wizardState.frequencySource;
     } else {
       delete params.source;
@@ -225,7 +225,7 @@ export function useUrlState(): UseUrlStateReturn {
 
     // Literature frequency (only if source is literature)
     if (
-      wizardState.frequencySource === 'literature' &&
+      wizardState.frequencySource === "literature" &&
       wizardState.literatureFrequency !== null
     ) {
       params.litFreq = wizardState.literatureFrequency.toString();
@@ -235,7 +235,7 @@ export function useUrlState(): UseUrlStateReturn {
 
     // Literature PMID (only if source is literature)
     if (
-      wizardState.frequencySource === 'literature' &&
+      wizardState.frequencySource === "literature" &&
       wizardState.literaturePmid !== null
     ) {
       params.litPmid = wizardState.literaturePmid;
@@ -249,8 +249,10 @@ export function useUrlState(): UseUrlStateReturn {
       // Check if only the filter flags differ (not star/threshold settings)
       const flagsOnly =
         currentFilters.lofHcEnabled !== FACTORY_FILTER_DEFAULTS.lofHcEnabled ||
-        currentFilters.missenseEnabled !== FACTORY_FILTER_DEFAULTS.missenseEnabled ||
-        currentFilters.clinvarEnabled !== FACTORY_FILTER_DEFAULTS.clinvarEnabled;
+        currentFilters.missenseEnabled !==
+          FACTORY_FILTER_DEFAULTS.missenseEnabled ||
+        currentFilters.clinvarEnabled !==
+          FACTORY_FILTER_DEFAULTS.clinvarEnabled;
 
       if (flagsOnly) {
         params.filters = encodeFilterFlags(currentFilters);
@@ -259,7 +261,10 @@ export function useUrlState(): UseUrlStateReturn {
       }
 
       // ClinVar star threshold (only if different from default)
-      if (currentFilters.clinvarStarThreshold !== FACTORY_FILTER_DEFAULTS.clinvarStarThreshold) {
+      if (
+        currentFilters.clinvarStarThreshold !==
+        FACTORY_FILTER_DEFAULTS.clinvarStarThreshold
+      ) {
         params.clinvarStars = currentFilters.clinvarStarThreshold.toString();
       } else {
         delete params.clinvarStars;
@@ -267,14 +272,15 @@ export function useUrlState(): UseUrlStateReturn {
 
       // Conflicting classifications
       if (currentFilters.clinvarIncludeConflicting) {
-        params.conflicting = '1';
+        params.conflicting = "1";
 
         // Conflicting threshold (only if enabled and different from default)
         if (
           currentFilters.clinvarConflictingThreshold !==
           FACTORY_FILTER_DEFAULTS.clinvarConflictingThreshold
         ) {
-          params.conflictThreshold = currentFilters.clinvarConflictingThreshold.toString();
+          params.conflictThreshold =
+            currentFilters.clinvarConflictingThreshold.toString();
         } else {
           delete params.conflictThreshold;
         }
@@ -299,7 +305,7 @@ export function useUrlState(): UseUrlStateReturn {
       } else {
         // Exclusions too large - set warning flag
         delete params.excl;
-        params.exclWarn = '1';
+        params.exclWarn = "1";
       }
     } else {
       delete params.excl;
@@ -311,14 +317,16 @@ export function useUrlState(): UseUrlStateReturn {
     if (!calcMatchesDefaults(currentCalc)) {
       // HWE formula (only if different from default: true = '1')
       if (currentCalc.useHWEFormula !== FACTORY_CALC_DEFAULTS.useHWEFormula) {
-        params.hweFormula = currentCalc.useHWEFormula ? '1' : '0';
+        params.hweFormula = currentCalc.useHWEFormula ? "1" : "0";
       } else {
         delete params.hweFormula;
       }
 
       // Homozygote exclusion (only if different from default: true = '1')
-      if (currentCalc.useHomExclusion !== FACTORY_CALC_DEFAULTS.useHomExclusion) {
-        params.homExclusion = currentCalc.useHomExclusion ? '1' : '0';
+      if (
+        currentCalc.useHomExclusion !== FACTORY_CALC_DEFAULTS.useHomExclusion
+      ) {
+        params.homExclusion = currentCalc.useHomExclusion ? "1" : "0";
       } else {
         delete params.homExclusion;
       }
@@ -341,19 +349,19 @@ export function useUrlState(): UseUrlStateReturn {
   watch(
     () => wizardState,
     () => updateUrlFromState(),
-    { deep: true }
+    { deep: true },
   );
 
   watch(
     () => filterStore.defaults,
     () => updateUrlFromState(),
-    { deep: true }
+    { deep: true },
   );
 
   watch(
     () => calcStore.defaults,
     () => updateUrlFromState(),
-    { deep: true }
+    { deep: true },
   );
 
   watch(excluded, () => updateUrlFromState(), { deep: true });
@@ -365,10 +373,17 @@ export function useUrlState(): UseUrlStateReturn {
 
     // Check if URL has any state parameters
     const hasUrlState = [
-      'gene', 'step', 'status', 'source', 'filters', 'excl',
-      'hweFormula', 'homExclusion', 'penetrance',
+      "gene",
+      "step",
+      "status",
+      "source",
+      "filters",
+      "excl",
+      "hweFormula",
+      "homExclusion",
+      "penetrance",
     ].some(
-      (k) => params[k] !== undefined && params[k] !== null && params[k] !== ''
+      (k) => params[k] !== undefined && params[k] !== null && params[k] !== "",
     );
 
     if (hasUrlState) {

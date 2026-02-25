@@ -12,11 +12,11 @@
 
 export interface RetryOptions {
   /** Maximum number of retry attempts for transient errors (default: 3) */
-  retries?: number
+  retries?: number;
   /** Initial delay in milliseconds before first retry (default: 1000) */
-  baseDelayMs?: number
+  baseDelayMs?: number;
   /** Maximum delay cap in milliseconds (default: 16000) */
-  maxDelayMs?: number
+  maxDelayMs?: number;
 }
 
 /**
@@ -25,17 +25,17 @@ export interface RetryOptions {
  * Returns null if no status code can be parsed.
  */
 function parseStatusFromError(error: unknown): number | null {
-  if (!(error instanceof Error)) return null
-  const match = error.message.match(/GraphQL request failed: (\d{3})/)
-  if (!match) return null
-  return parseInt(match[1], 10)
+  if (!(error instanceof Error)) return null;
+  const match = error.message.match(/GraphQL request failed: (\d{3})/);
+  if (!match) return null;
+  return parseInt(match[1], 10);
 }
 
 /**
  * Sleep for the given number of milliseconds.
  */
 function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -55,44 +55,50 @@ function sleep(ms: number): Promise<void> {
  */
 export async function withRetry<T>(
   fn: () => Promise<T>,
-  opts: RetryOptions = {}
+  opts: RetryOptions = {},
 ): Promise<T> {
-  const { retries = 3, baseDelayMs = 1000, maxDelayMs = 16000 } = opts
+  const { retries = 3, baseDelayMs = 1000, maxDelayMs = 16000 } = opts;
 
-  let transientAttempt = 0
+  let transientAttempt = 0;
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
-      return await fn()
+      return await fn();
     } catch (error) {
-      const status = parseStatusFromError(error)
+      const status = parseStatusFromError(error);
 
       if (status !== null) {
         // HTTP 429 — rate limited: always retry, don't count against limit
         if (status === 429) {
-          const jitter = Math.random() * 500
-          const delay = Math.min(baseDelayMs * Math.pow(2, transientAttempt) + jitter, maxDelayMs)
-          await sleep(delay)
+          const jitter = Math.random() * 500;
+          const delay = Math.min(
+            baseDelayMs * Math.pow(2, transientAttempt) + jitter,
+            maxDelayMs,
+          );
+          await sleep(delay);
           // Don't increment transientAttempt for 429s
-          continue
+          continue;
         }
 
         // Other 4xx — terminal client errors (bad request, not found, auth)
         if (status >= 400 && status < 500) {
-          throw error
+          throw error;
         }
       }
 
       // 5xx or network error (no status parsed) — transient, retry up to limit
       if (transientAttempt >= retries) {
-        throw error
+        throw error;
       }
 
-      const jitter = Math.random() * 500
-      const delay = Math.min(baseDelayMs * Math.pow(2, transientAttempt) + jitter, maxDelayMs)
-      await sleep(delay)
-      transientAttempt++
+      const jitter = Math.random() * 500;
+      const delay = Math.min(
+        baseDelayMs * Math.pow(2, transientAttempt) + jitter,
+        maxDelayMs,
+      );
+      await sleep(delay);
+      transientAttempt++;
     }
   }
 }

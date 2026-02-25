@@ -49,10 +49,7 @@
 
     <v-stepper-window data-testid="wizard-content">
       <v-stepper-window-item :value="1">
-        <StepGene
-          v-model="state.gene"
-          @complete="onGeneComplete"
-        />
+        <StepGene v-model="state.gene" @complete="onGeneComplete" />
       </v-stepper-window-item>
 
       <v-stepper-window-item :value="2">
@@ -103,33 +100,28 @@
     </v-stepper-window>
 
     <!-- Error state -->
-    <v-alert
-      v-if="hasError"
-      type="error"
-      variant="tonal"
-      class="mt-4"
-    >
+    <v-alert v-if="hasError" type="error" variant="tonal" class="mt-4">
       {{ errorMessage }}
       <template #append>
-        <v-btn
-          variant="text"
-          @click="refetch"
-        >
-          Retry
-        </v-btn>
+        <v-btn variant="text" @click="refetch"> Retry </v-btn>
       </template>
     </v-alert>
   </v-stepper>
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue';
-import { useDisplay } from 'vuetify';
-import { useWizard, useCarrierFrequency, useAppAnnouncer, useGeneConfig } from '@/composables';
-import StepGene from './StepGene.vue';
-import StepStatus from './StepStatus.vue';
-import StepFrequency from './StepFrequency.vue';
-import StepResults from './StepResults.vue';
+import { watch } from "vue";
+import { useDisplay } from "vuetify";
+import {
+  useWizard,
+  useCarrierFrequency,
+  useAppAnnouncer,
+  useGeneConfig,
+} from "@/composables";
+import StepGene from "./StepGene.vue";
+import StepStatus from "./StepStatus.vue";
+import StepFrequency from "./StepFrequency.vue";
+import StepResults from "./StepResults.vue";
 
 // Responsive breakpoint detection for mobile-friendly stepper
 // xs: < 600px (phones), sm: 600-960px (tablets)
@@ -140,12 +132,7 @@ const { smAndDown, xs } = useDisplay();
 useGeneConfig();
 
 // Wizard state management
-const {
-  state,
-  nextStep,
-  prevStep,
-  resetWizard,
-} = useWizard();
+const { state, nextStep, prevStep, resetWizard } = useWizard();
 
 // Carrier frequency calculation
 const {
@@ -177,7 +164,7 @@ const {
 } = useAppAnnouncer();
 
 // Step names for announcements
-const stepNames = ['Gene', 'Status', 'Frequency', 'Results'];
+const stepNames = ["Gene", "Status", "Frequency", "Results"];
 
 // Handle gene selection completion
 function onGeneComplete() {
@@ -193,7 +180,7 @@ watch(
   (newGene) => {
     setGeneSymbol(newGene?.symbol ?? null);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // Announce step changes to screen readers
@@ -208,31 +195,25 @@ watch(
 
       // Announce results when reaching step 4
       if (newStep === 4 && globalFrequency.value !== null) {
-        announceCalculation(globalFrequency.value.ratio, 'global');
+        announceCalculation(globalFrequency.value.ratio, "global");
       }
     }
-  }
+  },
 );
 
 // Announce loading state changes
-watch(
-  isLoading,
-  (loading, wasLoading) => {
-    if (loading && !wasLoading) {
-      announceLoading('variant data');
-    } else if (!loading && wasLoading && !hasError.value) {
-      announceLoading('Variant data', true);
-    }
+watch(isLoading, (loading, wasLoading) => {
+  if (loading && !wasLoading) {
+    announceLoading("variant data");
+  } else if (!loading && wasLoading && !hasError.value) {
+    announceLoading("Variant data", true);
   }
-);
+});
 
 // Announce errors
-watch(
-  hasError,
-  (error) => {
-    if (error && errorMessage.value) {
-      announceError(errorMessage.value);
-    }
+watch(hasError, (error) => {
+  if (error && errorMessage.value) {
+    announceError(errorMessage.value);
   }
-);
+});
 </script>

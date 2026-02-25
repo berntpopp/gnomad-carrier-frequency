@@ -30,6 +30,21 @@ export interface VariantPopulation {
   ac_hom: number;
 }
 
+export interface JointPopulation {
+  id: string;
+  ac: number;
+  an: number;
+  homozygote_count: number;
+}
+
+export interface JointFrequencyData {
+  ac: number;
+  an: number;
+  homozygote_count: number;
+  hemizygote_count: number;
+  populations: JointPopulation[];
+}
+
 export interface VariantFrequencyData {
   exome?: {
     ac: number;
@@ -43,6 +58,7 @@ export interface VariantFrequencyData {
     ac_hom: number;
     populations: VariantPopulation[];
   };
+  joint?: JointFrequencyData;
 }
 
 export interface GnomadVariant {
@@ -50,7 +66,8 @@ export interface GnomadVariant {
   pos: number;
   ref: string;
   alt: string;
-  exome?: VariantFrequencyData['exome'];
-  genome?: VariantFrequencyData['genome'];
+  exome?: VariantFrequencyData["exome"];
+  genome?: VariantFrequencyData["genome"];
+  joint?: VariantFrequencyData["joint"];
   transcript_consequence: TranscriptConsequence | null;
 }

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="d-flex flex-wrap ga-1"
-    data-testid="filter-chips"
-  >
+  <div class="d-flex flex-wrap ga-1" data-testid="filter-chips">
     <v-chip
       v-if="filters.lofHcEnabled"
       color="secondary"
@@ -53,8 +50,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { FilterConfig } from '@gnomad-cf/core/types';
+import { computed } from "vue";
+import type { FilterConfig } from "@gnomad-cf/core/types";
 
 const props = defineProps<{
   filters: FilterConfig;
@@ -70,7 +67,7 @@ const hasActiveFilters = computed(() => {
 
 const starLabel = computed(() => {
   const threshold = props.filters.clinvarStarThreshold;
-  if (threshold === 0) return '';
-  return threshold === 1 ? '>= 1 star' : `>= ${threshold} stars`;
+  if (threshold === 0) return "";
+  return threshold === 1 ? ">= 1 star" : `>= ${threshold} stars`;
 });
 </script>

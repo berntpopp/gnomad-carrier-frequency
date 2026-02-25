@@ -1,6 +1,6 @@
-import { computed, watch } from 'vue';
-import { useDark, useToggle } from '@vueuse/core';
-import { useTheme } from 'vuetify';
+import { computed, watch } from "vue";
+import { useDark, useToggle } from "@vueuse/core";
+import { useTheme } from "vuetify";
 
 /**
  * Composable for managing application theme (light/dark mode).
@@ -12,9 +12,9 @@ export function useAppTheme() {
 
   // VueUse handles localStorage persistence and system preference detection
   const isDark = useDark({
-    storageKey: 'carrier-freq-theme',
-    valueDark: 'dark',
-    valueLight: 'light',
+    storageKey: "carrier-freq-theme",
+    valueDark: "dark",
+    valueLight: "light",
   });
 
   const toggleTheme = useToggle(isDark);
@@ -23,18 +23,18 @@ export function useAppTheme() {
   watch(
     isDark,
     (dark) => {
-      vuetifyTheme.change(dark ? 'dark' : 'light');
+      vuetifyTheme.change(dark ? "dark" : "light");
     },
-    { immediate: true }
+    { immediate: true },
   );
 
   // Computed properties for UI
   const tooltipText = computed(() =>
-    isDark.value ? 'Switch to light mode' : 'Switch to dark mode'
+    isDark.value ? "Switch to light mode" : "Switch to dark mode",
   );
 
   const themeIcon = computed(() =>
-    isDark.value ? 'mdi-weather-sunny' : 'mdi-weather-night'
+    isDark.value ? "mdi-weather-sunny" : "mdi-weather-night",
   );
 
   return {

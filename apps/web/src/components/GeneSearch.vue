@@ -32,9 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
-import { useGeneSearch } from '@/composables';
-import type { GeneSearchResult } from '@gnomad-cf/core/queries';
+import { ref, watch, computed } from "vue";
+import { useGeneSearch } from "@/composables";
+import type { GeneSearchResult } from "@gnomad-cf/core/queries";
 
 defineProps<{
   disabled?: boolean;
@@ -55,7 +55,7 @@ const {
 } = useGeneSearch();
 
 const model = ref<GeneSearchResult | null>(null);
-const searchInput = ref('');
+const searchInput = ref("");
 
 watch(searchInput, (value) => {
   if (value !== selectedGene.value?.symbol) {
@@ -73,21 +73,21 @@ watch(selectedGene, (gene) => {
     searchInput.value = gene.symbol;
   } else {
     model.value = null;
-    searchInput.value = '';
+    searchInput.value = "";
   }
 });
 
 const items = computed(() =>
-  selectedGene.value ? [selectedGene.value] : results.value
+  selectedGene.value ? [selectedGene.value] : results.value,
 );
 
 const onSelect = (gene: GeneSearchResult | null) => {
   if (gene) {
     selectGene(gene);
-    emit('select', gene);
+    emit("select", gene);
   } else {
     clearSelection();
-    emit('select', null);
+    emit("select", null);
   }
 };
 </script>

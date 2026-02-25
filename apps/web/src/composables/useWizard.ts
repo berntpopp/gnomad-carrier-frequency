@@ -1,14 +1,18 @@
 // Wizard state management composable
 
-import { reactive, computed, watch } from 'vue';
-import type { WizardState, WizardStep, FrequencySource } from '@gnomad-cf/core/types';
+import { reactive, computed, watch } from "vue";
+import type {
+  WizardState,
+  WizardStep,
+  FrequencySource,
+} from "@gnomad-cf/core/types";
 
 // Singleton state - shared across all useWizard() calls
 const state = reactive<WizardState>({
   currentStep: 1,
   gene: null,
-  indexStatus: 'heterozygous', // User decision: default to carrier
-  frequencySource: 'gnomad',
+  indexStatus: "heterozygous", // User decision: default to carrier
+  frequencySource: "gnomad",
   literatureFrequency: null,
   literaturePmid: null,
 });
@@ -20,8 +24,8 @@ watch(
   (_newGene, oldGene) => {
     if (oldGene !== null && state.currentStep > 1) {
       state.currentStep = 1;
-      state.indexStatus = 'heterozygous';
-      state.frequencySource = 'gnomad';
+      state.indexStatus = "heterozygous";
+      state.frequencySource = "gnomad";
       state.literatureFrequency = null;
       state.literaturePmid = null;
     }
@@ -41,9 +45,9 @@ export function useWizard() {
 
   const step3Valid = computed(() => {
     switch (state.frequencySource) {
-      case 'gnomad':
+      case "gnomad":
         return true; // Uses calculated value
-      case 'literature':
+      case "literature":
         return (
           state.literatureFrequency !== null &&
           state.literatureFrequency > 0 &&
@@ -51,7 +55,7 @@ export function useWizard() {
           state.literaturePmid !== null &&
           state.literaturePmid.trim().length > 0
         );
-      case 'default':
+      case "default":
         return true; // Uses config value
       default:
         return false;
@@ -105,8 +109,8 @@ export function useWizard() {
   function resetWizard(): void {
     state.currentStep = 1;
     state.gene = null;
-    state.indexStatus = 'heterozygous';
-    state.frequencySource = 'gnomad';
+    state.indexStatus = "heterozygous";
+    state.frequencySource = "gnomad";
     state.literatureFrequency = null;
     state.literaturePmid = null;
   }
@@ -115,7 +119,7 @@ export function useWizard() {
   function setFrequencySource(source: FrequencySource): void {
     state.frequencySource = source;
     // Clear literature values when switching away from literature
-    if (source !== 'literature') {
+    if (source !== "literature") {
       state.literatureFrequency = null;
       state.literaturePmid = null;
     }

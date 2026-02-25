@@ -1,4 +1,4 @@
-import { useAnnouncer } from '@vue-a11y/announcer'
+import { useAnnouncer } from "@vue-a11y/announcer";
 
 /**
  * Application-specific announcer wrapper.
@@ -8,14 +8,16 @@ import { useAnnouncer } from '@vue-a11y/announcer'
  * Uses assertive for urgent messages (errors).
  */
 export function useAppAnnouncer() {
-  const { polite, assertive } = useAnnouncer()
+  const { polite, assertive } = useAnnouncer();
 
   /**
    * Announce calculation results to screen readers.
    * Example: "Carrier frequency calculated: 1 in 25 for European population"
    */
   function announceCalculation(ratio: string, population: string) {
-    polite(`Carrier frequency calculated: ${ratio} for ${population} population`)
+    polite(
+      `Carrier frequency calculated: ${ratio} for ${population} population`,
+    );
   }
 
   /**
@@ -23,7 +25,7 @@ export function useAppAnnouncer() {
    * Example: "Error: Gene BRCA1 not found in gnomAD"
    */
   function announceError(message: string) {
-    assertive(`Error: ${message}`)
+    assertive(`Error: ${message}`);
   }
 
   /**
@@ -32,7 +34,7 @@ export function useAppAnnouncer() {
    * @param done - If true, announces completion instead of start
    */
   function announceLoading(what: string, done = false) {
-    polite(done ? `${what} loaded` : `Loading ${what}...`)
+    polite(done ? `${what} loaded` : `Loading ${what}...`);
   }
 
   /**
@@ -40,7 +42,7 @@ export function useAppAnnouncer() {
    * Example: "Step 2: Select Population"
    */
   function announceStep(stepNumber: number, stepName: string) {
-    polite(`Step ${stepNumber}: ${stepName}`)
+    polite(`Step ${stepNumber}: ${stepName}`);
   }
 
   /**
@@ -48,7 +50,7 @@ export function useAppAnnouncer() {
    * Example: "Selected gene: CFTR"
    */
   function announceGeneSelection(geneSymbol: string) {
-    polite(`Selected gene: ${geneSymbol}`)
+    polite(`Selected gene: ${geneSymbol}`);
   }
 
   return {
@@ -59,7 +61,7 @@ export function useAppAnnouncer() {
     announceLoading,
     announceStep,
     announceGeneSelection,
-  }
+  };
 }
 
-export type UseAppAnnouncerReturn = ReturnType<typeof useAppAnnouncer>
+export type UseAppAnnouncerReturn = ReturnType<typeof useAppAnnouncer>;

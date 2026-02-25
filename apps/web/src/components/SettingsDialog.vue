@@ -6,38 +6,25 @@
     persistent
     aria-label="Settings"
     data-testid="settings-dialog"
-    @update:model-value="(val: boolean) => val ? onDialogOpen() : undefined"
+    @update:model-value="(val: boolean) => (val ? onDialogOpen() : undefined)"
   >
     <v-card ref="dialogCard">
       <v-card-title class="d-flex align-center">
         <span>Settings</span>
         <v-spacer />
-        <v-btn
-          icon
-          variant="text"
-          @click="close"
-        >
+        <v-btn icon variant="text" @click="close">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>
 
       <v-tabs v-model="activeTab">
-        <v-tab
-          value="general"
-          data-testid="settings-tab-general"
-        >
+        <v-tab value="general" data-testid="settings-tab-general">
           General
         </v-tab>
-        <v-tab
-          value="filters"
-          data-testid="settings-tab-filters"
-        >
+        <v-tab value="filters" data-testid="settings-tab-filters">
           Filters
         </v-tab>
-        <v-tab
-          value="templates"
-          data-testid="settings-tab-templates"
-        >
+        <v-tab value="templates" data-testid="settings-tab-templates">
           Templates
         </v-tab>
       </v-tabs>
@@ -46,17 +33,9 @@
         <v-tabs-window v-model="activeTab">
           <v-tabs-window-item value="general">
             <!-- Clinical Disclaimer Section -->
-            <v-card
-              variant="outlined"
-              class="mb-4"
-            >
+            <v-card variant="outlined" class="mb-4">
               <v-card-title class="text-subtitle-1">
-                <v-icon
-                  start
-                  size="small"
-                >
-                  mdi-alert-circle-outline
-                </v-icon>
+                <v-icon start size="small"> mdi-alert-circle-outline </v-icon>
                 Clinical Disclaimer
               </v-card-title>
 
@@ -66,9 +45,7 @@
                     <span v-if="appStore.disclaimerAcknowledged">
                       Acknowledged on {{ appStore.acknowledgedDate }}
                     </span>
-                    <span v-else>
-                      Not yet acknowledged
-                    </span>
+                    <span v-else> Not yet acknowledged </span>
                   </div>
 
                   <v-btn
@@ -84,17 +61,9 @@
             </v-card>
 
             <!-- ClinGen Cache Management Section -->
-            <v-card
-              variant="outlined"
-              class="mb-4"
-            >
+            <v-card variant="outlined" class="mb-4">
               <v-card-title class="text-subtitle-1">
-                <v-icon
-                  start
-                  size="small"
-                >
-                  mdi-database-sync
-                </v-icon>
+                <v-icon start size="small"> mdi-database-sync </v-icon>
                 ClinGen Data Cache
               </v-card-title>
 
@@ -108,11 +77,12 @@
                         size="x-small"
                         class="ml-2"
                       >
-                        {{ clingenExpired ? 'Expired' : 'Valid' }}
+                        {{ clingenExpired ? "Expired" : "Valid" }}
                       </v-chip>
                     </div>
                     <div class="text-caption text-medium-emphasis">
-                      {{ clingenEntryCount }} entries | Last updated: {{ clingenCacheAge }}
+                      {{ clingenEntryCount }} entries | Last updated:
+                      {{ clingenCacheAge }}
                     </div>
                   </div>
 
@@ -122,12 +92,7 @@
                     :loading="clingenLoading"
                     @click="refreshClingenCache"
                   >
-                    <v-icon
-                      start
-                      size="small"
-                    >
-                      mdi-refresh
-                    </v-icon>
+                    <v-icon start size="small"> mdi-refresh </v-icon>
                     Refresh
                   </v-btn>
                 </div>
@@ -150,17 +115,9 @@
             </v-card>
 
             <!-- Logging Configuration Section -->
-            <v-card
-              variant="outlined"
-              class="mb-4"
-            >
+            <v-card variant="outlined" class="mb-4">
               <v-card-title class="text-subtitle-1">
-                <v-icon
-                  start
-                  size="small"
-                >
-                  mdi-console
-                </v-icon>
+                <v-icon start size="small"> mdi-console </v-icon>
                 Application Logging
               </v-card-title>
 
@@ -175,7 +132,8 @@
                   class="mb-2"
                 />
                 <div class="text-caption text-medium-emphasis mb-3">
-                  Maximum number of log entries to keep. Older entries are automatically removed.
+                  Maximum number of log entries to keep. Older entries are
+                  automatically removed.
                 </div>
 
                 <v-switch
@@ -189,7 +147,9 @@
                 <div class="d-flex align-center justify-space-between mt-3">
                   <div class="text-body-2">
                     Current: {{ logStore.stats.totalCount }} entries
-                    <span class="text-medium-emphasis">({{ logStore.stats.memoryEstimate }})</span>
+                    <span class="text-medium-emphasis"
+                      >({{ logStore.stats.memoryEstimate }})</span
+                    >
                   </div>
                   <v-btn
                     variant="text"
@@ -204,17 +164,9 @@
             </v-card>
 
             <!-- History Settings Section -->
-            <v-card
-              variant="outlined"
-              class="mb-4"
-            >
+            <v-card variant="outlined" class="mb-4">
               <v-card-title class="text-subtitle-1">
-                <v-icon
-                  start
-                  size="small"
-                >
-                  mdi-history
-                </v-icon>
+                <v-icon start size="small"> mdi-history </v-icon>
                 Search History
               </v-card-title>
 
@@ -255,7 +207,8 @@
                 </v-slider>
 
                 <div class="text-caption text-medium-emphasis">
-                  Oldest entries are automatically removed when the limit is exceeded.
+                  Oldest entries are automatically removed when the limit is
+                  exceeded.
                 </div>
               </v-card-text>
             </v-card>
@@ -269,22 +222,16 @@
               <v-card>
                 <v-card-title>Clear Search History?</v-card-title>
                 <v-card-text>
-                  This will permanently delete all {{ historyStore.entryCount }} history entries.
-                  This action cannot be undone.
+                  This will permanently delete all
+                  {{ historyStore.entryCount }} history entries. This action
+                  cannot be undone.
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer />
-                  <v-btn
-                    variant="text"
-                    @click="showClearHistoryDialog = false"
-                  >
+                  <v-btn variant="text" @click="showClearHistoryDialog = false">
                     Cancel
                   </v-btn>
-                  <v-btn
-                    color="error"
-                    variant="flat"
-                    @click="clearAllHistory"
-                  >
+                  <v-btn color="error" variant="flat" @click="clearAllHistory">
                     Clear All
                   </v-btn>
                 </v-card-actions>
@@ -292,17 +239,9 @@
             </v-dialog>
 
             <!-- Data Cache Section -->
-            <v-card
-              variant="outlined"
-              class="mb-4"
-            >
+            <v-card variant="outlined" class="mb-4">
               <v-card-title class="text-subtitle-1">
-                <v-icon
-                  start
-                  size="small"
-                >
-                  mdi-cached
-                </v-icon>
+                <v-icon start size="small"> mdi-cached </v-icon>
                 Data Cache
               </v-card-title>
 
@@ -315,12 +254,10 @@
                   v-if="cacheInfo"
                   class="text-caption text-medium-emphasis mb-3"
                 >
-                  Using {{ formatBytes(cacheInfo.usage) }} of {{ formatBytes(cacheInfo.quota) }}
+                  Using {{ formatBytes(cacheInfo.usage) }} of
+                  {{ formatBytes(cacheInfo.quota) }}
                 </div>
-                <div
-                  v-else
-                  class="text-caption text-medium-emphasis mb-3"
-                >
+                <div v-else class="text-caption text-medium-emphasis mb-3">
                   Storage information not available
                 </div>
 
@@ -346,23 +283,16 @@
                 </v-btn>
 
                 <div class="text-caption text-medium-emphasis mt-3">
-                  Clearing cache will remove offline gene data. Fresh data will be fetched on next use.
+                  Clearing cache will remove offline gene data. Fresh data will
+                  be fetched on next use.
                 </div>
               </v-card-text>
             </v-card>
 
             <!-- Install App Section -->
-            <v-card
-              variant="outlined"
-              class="mb-4"
-            >
+            <v-card variant="outlined" class="mb-4">
               <v-card-title class="text-subtitle-1">
-                <v-icon
-                  start
-                  size="small"
-                >
-                  mdi-download
-                </v-icon>
+                <v-icon start size="small"> mdi-download </v-icon>
                 Install App
               </v-card-title>
 
@@ -370,20 +300,20 @@
                 <!-- Already installed -->
                 <template v-if="isInstalled">
                   <div class="d-flex align-center">
-                    <v-icon
-                      color="success"
-                      class="mr-2"
-                    >
+                    <v-icon color="success" class="mr-2">
                       mdi-check-circle
                     </v-icon>
-                    <span class="text-body-2">App is installed and ready to use offline.</span>
+                    <span class="text-body-2"
+                      >App is installed and ready to use offline.</span
+                    >
                   </div>
                 </template>
 
                 <!-- Can install (browser supports) -->
                 <template v-else-if="canInstall">
                   <div class="text-body-2 mb-3">
-                    Install gCFCalc on your device for quick access and offline use.
+                    Install gCFCalc on your device for quick access and offline
+                    use.
                   </div>
                   <v-btn
                     color="primary"
@@ -397,16 +327,9 @@
                 <!-- iOS device -->
                 <template v-else-if="isIos">
                   <div class="d-flex align-start">
-                    <v-icon
-                      color="grey"
-                      class="mr-2 mt-1"
-                    >
-                      mdi-apple
-                    </v-icon>
+                    <v-icon color="grey" class="mr-2 mt-1"> mdi-apple </v-icon>
                     <div>
-                      <div class="text-body-2 mb-2">
-                        To install on iOS:
-                      </div>
+                      <div class="text-body-2 mb-2">To install on iOS:</div>
                       <ol class="text-caption text-medium-emphasis pl-4 mb-0">
                         <li>Tap the Share button</li>
                         <li>Select "Add to Home Screen"</li>
@@ -418,7 +341,8 @@
                 <!-- Not installable -->
                 <template v-else>
                   <div class="text-body-2 text-medium-emphasis">
-                    Install option not available in this browser. Try Chrome, Edge, or Safari on iOS.
+                    Install option not available in this browser. Try Chrome,
+                    Edge, or Safari on iOS.
                   </div>
                 </template>
               </v-card-text>
@@ -426,8 +350,8 @@
           </v-tabs-window-item>
           <v-tabs-window-item value="filters">
             <p class="text-body-2 text-medium-emphasis mb-4">
-              Configure the default filter settings for new calculations.
-              These defaults can be overridden per calculation.
+              Configure the default filter settings for new calculations. These
+              defaults can be overridden per calculation.
             </p>
 
             <v-switch
@@ -494,7 +418,9 @@
               <!-- Editor column -->
               <div class="flex-grow-1">
                 <p class="text-body-2 text-medium-emphasis mb-4">
-                  Customize the clinical text templates. Use {{ formatVariablePlaceholder('variable') }} syntax for dynamic values.
+                  Customize the clinical text templates. Use
+                  {{ formatVariablePlaceholder("variable") }} syntax for dynamic
+                  values.
                 </p>
 
                 <!-- Language selector -->
@@ -505,12 +431,8 @@
                   mandatory
                   class="mb-4"
                 >
-                  <v-btn value="de">
-                    German
-                  </v-btn>
-                  <v-btn value="en">
-                    English
-                  </v-btn>
+                  <v-btn value="de"> German </v-btn>
+                  <v-btn value="en"> English </v-btn>
                 </v-btn-toggle>
 
                 <TemplateEditor ref="templateEditorRef" />
@@ -542,7 +464,7 @@
                     accept=".json"
                     style="display: none"
                     @change="handleImportTemplates"
-                  >
+                  />
 
                   <v-btn
                     variant="outlined"
@@ -551,7 +473,8 @@
                     prepend-icon="mdi-restore"
                     @click="handleResetLanguage"
                   >
-                    Reset {{ templateStore.language === 'de' ? 'German' : 'English' }}
+                    Reset
+                    {{ templateStore.language === "de" ? "German" : "English" }}
                   </v-btn>
                 </div>
               </div>
@@ -567,35 +490,29 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn
-          variant="text"
-          @click="close"
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          color="primary"
-          @click="save"
-        >
-          Save
-        </v-btn>
+        <v-btn variant="text" @click="close"> Cancel </v-btn>
+        <v-btn color="primary" @click="save"> Save </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted, computed } from 'vue';
-import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
-import { useDisplay } from 'vuetify';
-import { useFilterStore } from '@/stores/useFilterStore';
-import { useAppStore } from '@/stores/useAppStore';
-import { useLogStore } from '@/stores/useLogStore';
-import { useTemplateStore } from '@/stores/useTemplateStore';
-import { useHistoryStore } from '@/stores/useHistoryStore';
-import { useClingenValidity, usePwaInstall, useConfirmDialog } from '@/composables';
-import TemplateEditor from '@/components/TemplateEditor.vue';
-import VariablePicker from '@/components/VariablePicker.vue';
+import { ref, nextTick, onMounted, computed } from "vue";
+import { useFocusTrap } from "@vueuse/integrations/useFocusTrap";
+import { useDisplay } from "vuetify";
+import { useFilterStore } from "@/stores/useFilterStore";
+import { useAppStore } from "@/stores/useAppStore";
+import { useLogStore } from "@/stores/useLogStore";
+import { useTemplateStore } from "@/stores/useTemplateStore";
+import { useHistoryStore } from "@/stores/useHistoryStore";
+import {
+  useClingenValidity,
+  usePwaInstall,
+  useConfirmDialog,
+} from "@/composables";
+import TemplateEditor from "@/components/TemplateEditor.vue";
+import VariablePicker from "@/components/VariablePicker.vue";
 
 // Responsive breakpoint detection
 const { smAndDown } = useDisplay();
@@ -603,12 +520,12 @@ const { smAndDown } = useDisplay();
 // Computed dialog max-width (undefined for fullscreen mode)
 const dialogMaxWidth = computed(() => {
   if (smAndDown.value) return undefined;
-  return activeTab.value === 'templates' ? 900 : 600;
+  return activeTab.value === "templates" ? 900 : 600;
 });
 
 const modelValue = defineModel<boolean>();
 
-const activeTab = ref('general');
+const activeTab = ref("general");
 const dialogCard = ref<HTMLElement | null>(null);
 const filterStore = useFilterStore();
 const appStore = useAppStore();
@@ -664,9 +581,9 @@ async function loadCacheInfo(): Promise<void> {
  * Format bytes to human-readable string
  */
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
@@ -680,8 +597,8 @@ async function clearGeneDataCache(): Promise<void> {
 
   try {
     // Delete both API caches
-    const gnomadDeleted = await caches.delete('gnomad-api-cache');
-    const clingenDeleted = await caches.delete('clingen-api-cache');
+    const gnomadDeleted = await caches.delete("gnomad-api-cache");
+    const clingenDeleted = await caches.delete("clingen-api-cache");
 
     if (gnomadDeleted || clingenDeleted) {
       cacheCleared.value = true;
@@ -693,7 +610,7 @@ async function clearGeneDataCache(): Promise<void> {
       }, 3000);
     }
   } catch (error) {
-    console.error('Failed to clear cache:', error);
+    console.error("Failed to clear cache:", error);
   } finally {
     cacheClearing.value = false;
   }
@@ -722,11 +639,11 @@ function clearAllHistory() {
 }
 
 const tickLabels = {
-  0: '0',
-  1: '1',
-  2: '2',
-  3: '3',
-  4: '4',
+  0: "0",
+  1: "1",
+  2: "2",
+  3: "3",
+  4: "4",
 };
 
 const { activate, deactivate } = useFocusTrap(dialogCard, {
@@ -765,11 +682,11 @@ function handleVariableSelect(variableName: string) {
 function handleExportTemplates() {
   const data = templateStore.exportTemplates();
   const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
+  const blob = new Blob([json], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
-  link.download = `templates_${data.language}_${new Date().toISOString().split('T')[0]}.json`;
+  link.download = `templates_${data.language}_${new Date().toISOString().split("T")[0]}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -783,7 +700,7 @@ function handleImportTemplates(event: Event) {
   if (!file) return;
 
   // Reset file input before reading to prevent holding the file input open
-  input.value = '';
+  input.value = "";
 
   const reader = new FileReader();
   reader.onload = async (e) => {
@@ -793,33 +710,33 @@ function handleImportTemplates(event: Event) {
       // Validate structure without applying yet
       if (
         !data ||
-        typeof data !== 'object' ||
+        typeof data !== "object" ||
         !data.version ||
         !data.language ||
         !data.customSections ||
         !data.enabledSections
       ) {
         await ask({
-          title: 'Import Error',
-          message: 'Invalid template file format.',
-          confirmText: 'OK',
-          cancelText: '',
+          title: "Import Error",
+          message: "Invalid template file format.",
+          confirmText: "OK",
+          cancelText: "",
         });
         return;
       }
 
       // Build summary for confirmation
-      const langName = data.language === 'de' ? 'German' : 'English';
-      const sectionCount = Object.values(data.enabledSections as Record<string, string[]>)
-        .flat()
-        .length;
+      const langName = data.language === "de" ? "German" : "English";
+      const sectionCount = Object.values(
+        data.enabledSections as Record<string, string[]>,
+      ).flat().length;
 
       const confirmed = await ask({
-        title: 'Import Templates',
+        title: "Import Templates",
         message: `Import ${langName} templates with ${sectionCount} enabled sections?`,
-        confirmText: 'Import',
-        cancelText: 'Cancel',
-        confirmColor: 'primary',
+        confirmText: "Import",
+        cancelText: "Cancel",
+        confirmColor: "primary",
       });
 
       if (confirmed) {
@@ -827,10 +744,10 @@ function handleImportTemplates(event: Event) {
       }
     } catch {
       await ask({
-        title: 'Import Error',
-        message: 'Failed to parse template file.',
-        confirmText: 'OK',
-        cancelText: '',
+        title: "Import Error",
+        message: "Failed to parse template file.",
+        confirmText: "OK",
+        cancelText: "",
       });
     }
   };
@@ -839,13 +756,13 @@ function handleImportTemplates(event: Event) {
 
 // Reset templates for current language
 async function handleResetLanguage() {
-  const langName = templateStore.language === 'de' ? 'German' : 'English';
+  const langName = templateStore.language === "de" ? "German" : "English";
   const confirmed = await ask({
-    title: 'Reset Templates',
+    title: "Reset Templates",
     message: `This will reset all ${langName} templates to defaults. This cannot be undone.`,
-    confirmText: 'Yes, reset',
-    cancelText: 'Keep current',
-    confirmColor: 'error',
+    confirmText: "Yes, reset",
+    cancelText: "Keep current",
+    confirmColor: "error",
   });
   if (confirmed) {
     templateStore.resetLanguageTemplates(templateStore.language);

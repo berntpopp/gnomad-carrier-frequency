@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { ref, computed } from 'vue'
-import { mountWithPlugins } from '@/test/helpers'
-import { useWizard } from '@/composables/useWizard'
-import WizardStepper from '../WizardStepper.vue'
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { ref, computed } from "vue";
+import { mountWithPlugins } from "@/test/helpers";
+import { useWizard } from "@/composables/useWizard";
+import WizardStepper from "../WizardStepper.vue";
 
 // Vuetify useDisplay requires the display injection — mock it for the test env
-vi.mock('vuetify', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('vuetify')>()
+vi.mock("vuetify", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("vuetify")>();
   return {
     ...actual,
     useDisplay: () => ({
@@ -20,14 +20,14 @@ vi.mock('vuetify', async (importOriginal) => {
       lgAndUp: ref(true),
       width: ref(1280),
       height: ref(800),
-      name: ref('lg'),
+      name: ref("lg"),
       platform: ref({ touch: false, win: false, mac: false, linux: false }),
     }),
-  }
-})
+  };
+});
 
 // Mock useCarrierFrequency — singleton with complex villus/store dependencies
-vi.mock('@/composables/useCarrierFrequency', () => ({
+vi.mock("@/composables/useCarrierFrequency", () => ({
   useCarrierFrequency: () => ({
     geneSymbol: ref(null),
     setGeneSymbol: vi.fn(),
@@ -58,16 +58,16 @@ vi.mock('@/composables/useCarrierFrequency', () => ({
     isLoadingSubmissions: ref(false),
     submissionsProgress: ref(0),
     submissionsError: ref(null),
-    currentVersion: ref('v4'),
+    currentVersion: ref("v4"),
     excludedCount: ref(0),
     totalPathogenicCount: ref(0),
     calculateRisk: vi.fn(),
     refetch: vi.fn(),
   }),
-}))
+}));
 
 // Mock useGeneConfig — uses useGeneSearch (villus) internally
-vi.mock('@/composables/useGeneConfig', () => ({
+vi.mock("@/composables/useGeneConfig", () => ({
   useGeneConfig: () => ({
     activeGeneConfig: ref(null),
     activeProfile: ref(null),
@@ -76,10 +76,10 @@ vi.mock('@/composables/useGeneConfig', () => ({
     selectProfile: vi.fn(),
     resetConfig: vi.fn(),
   }),
-}))
+}));
 
 // Mock useAppAnnouncer — uses @vue-a11y/announcer which needs app-level plugin
-vi.mock('@/composables/useAppAnnouncer', () => ({
+vi.mock("@/composables/useAppAnnouncer", () => ({
   useAppAnnouncer: () => ({
     polite: vi.fn(),
     assertive: vi.fn(),
@@ -89,12 +89,12 @@ vi.mock('@/composables/useAppAnnouncer', () => ({
     announceStep: vi.fn(),
     announceGeneSelection: vi.fn(),
   }),
-}))
+}));
 
 // Mock useGeneSearch so WizardStepper's indirect dependency doesn't cause villus errors
-vi.mock('@/composables/useGeneSearch', () => ({
+vi.mock("@/composables/useGeneSearch", () => ({
   useGeneSearch: () => ({
-    searchTerm: ref(''),
+    searchTerm: ref(""),
     setSearchTerm: vi.fn(),
     results: ref([]),
     isLoading: ref(false),
@@ -107,16 +107,16 @@ vi.mock('@/composables/useGeneSearch', () => ({
     constraintLoading: ref(false),
     prefillGene: vi.fn(),
   }),
-}))
+}));
 
-vi.mock('@/api', () => ({
+vi.mock("@/api", () => ({
   useGnomadVersion: () => ({
-    version: ref('v4'),
+    version: ref("v4"),
   }),
   graphqlClient: {
     executeQuery: vi.fn().mockResolvedValue({ data: null, error: null }),
   },
-}))
+}));
 
 // Stub individual step components — WizardStepper orchestrates them;
 // they are tested individually in their own test files.
@@ -125,47 +125,47 @@ const stubComponents = {
   StepStatus: { template: '<div data-testid="step-status-stub" />' },
   StepFrequency: { template: '<div data-testid="step-frequency-stub" />' },
   StepResults: { template: '<div data-testid="step-results-stub" />' },
-}
+};
 
-describe('WizardStepper', () => {
+describe("WizardStepper", () => {
   beforeEach(() => {
-    const { resetWizard } = useWizard()
-    resetWizard()
-  })
+    const { resetWizard } = useWizard();
+    resetWizard();
+  });
 
-  it('renders the wizard stepper container', () => {
+  it("renders the wizard stepper container", () => {
     const wrapper = mountWithPlugins(WizardStepper, {
       global: { stubs: stubComponents },
-    })
+    });
 
-    expect(wrapper.find('[data-testid="wizard-stepper"]').exists()).toBe(true)
-  })
+    expect(wrapper.find('[data-testid="wizard-stepper"]').exists()).toBe(true);
+  });
 
-  it('renders all 4 step header items', () => {
+  it("renders all 4 step header items", () => {
     const wrapper = mountWithPlugins(WizardStepper, {
       global: { stubs: stubComponents },
-    })
+    });
 
-    expect(wrapper.find('[data-testid="wizard-step-1"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="wizard-step-2"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="wizard-step-3"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="wizard-step-4"]').exists()).toBe(true)
-  })
+    expect(wrapper.find('[data-testid="wizard-step-1"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="wizard-step-2"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="wizard-step-3"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="wizard-step-4"]').exists()).toBe(true);
+  });
 
-  it('renders the wizard content area', () => {
+  it("renders the wizard content area", () => {
     const wrapper = mountWithPlugins(WizardStepper, {
       global: { stubs: stubComponents },
-    })
+    });
 
-    expect(wrapper.find('[data-testid="wizard-content"]').exists()).toBe(true)
-  })
+    expect(wrapper.find('[data-testid="wizard-content"]').exists()).toBe(true);
+  });
 
-  it('starts on step 1 (Gene selection)', () => {
+  it("starts on step 1 (Gene selection)", () => {
     const wrapper = mountWithPlugins(WizardStepper, {
       global: { stubs: stubComponents },
-    })
+    });
 
     // Step 1 stub should be rendered (WizardStepper uses v-model on currentStep)
-    expect(wrapper.find('[data-testid="step-gene-stub"]').exists()).toBe(true)
-  })
-})
+    expect(wrapper.find('[data-testid="step-gene-stub"]').exists()).toBe(true);
+  });
+});

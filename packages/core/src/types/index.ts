@@ -3,22 +3,20 @@ export type {
   TranscriptConsequence,
   ClinVarVariant,
   VariantPopulation,
+  JointPopulation,
+  JointFrequencyData,
   VariantFrequencyData,
   GnomadVariant,
-} from './variant';
+} from "./variant";
 
 export type {
   IndexPatientStatus,
   PopulationFrequency,
   CarrierFrequencyResult,
   RecurrenceRiskResult,
-} from './frequency';
+} from "./frequency";
 
-export type {
-  WizardStep,
-  FrequencySource,
-  WizardState,
-} from './wizard';
+export type { WizardStep, FrequencySource, WizardState } from "./wizard";
 
 export type {
   Perspective,
@@ -28,29 +26,29 @@ export type {
   PerspectiveConfig,
   TemplateConfig,
   TemplateContext,
-} from './text';
+} from "./text";
 
-export type { FilterConfig, FilterDefaults } from './filter';
-export { FACTORY_FILTER_DEFAULTS } from './filter';
+export type { FilterConfig, FilterDefaults } from "./filter";
+export { FACTORY_FILTER_DEFAULTS } from "./filter";
 
-export type { DisplayVariant, PopulationVariantFrequency } from './display';
+export type { DisplayVariant, PopulationVariantFrequency } from "./display";
 
 export type {
   ClingenEntry,
   ClingenCacheState,
   ClingenValidityResult,
-} from './clingen';
-export { CLINGEN_CACHE_EXPIRY_MS } from './clingen';
+} from "./clingen";
+export { CLINGEN_CACHE_EXPIRY_MS } from "./clingen";
 
 export type {
   GeneConstraint,
   ConstraintInterpretation,
   PliInterpretation,
   LoeufInterpretation,
-} from './constraint';
-export { getLoeufInterpretation, getPliInterpretation } from './constraint';
+} from "./constraint";
+export { getLoeufInterpretation, getPliInterpretation } from "./constraint";
 
-export type { LogLevel, LogEntry, LogSettings, LogStats } from './log';
+export type { LogLevel, LogEntry, LogSettings, LogStats } from "./log";
 
 export type {
   ExportMetadata,
@@ -58,9 +56,9 @@ export type {
   ExportPopulation,
   ExportVariant,
   ExportData,
-} from './export';
+} from "./export";
 
-export type { UrlState } from './url-state';
+export type { UrlState } from "./url-state";
 export {
   UrlStateSchema,
   parseUrlState,
@@ -68,19 +66,19 @@ export {
   decodeFilterFlags,
   filtersMatchDefaults,
   calcMatchesDefaults,
-} from './url-state';
+} from "./url-state";
 
 export type {
   PredefinedExclusionReason,
   ExclusionReason,
   ExclusionState,
-} from './exclusion';
+} from "./exclusion";
 
 export type {
   HistoryEntry,
   HistorySettings,
   HistoryStoreState,
-} from './history';
+} from "./history";
 
-export type { CalcConfig, CalcResult } from './calculations';
-export { FACTORY_CALC_DEFAULTS } from './calculations';
+export type { CalcConfig, CalcResult } from "./calculations";
+export { FACTORY_CALC_DEFAULTS } from "./calculations";

@@ -1,9 +1,9 @@
-import { watch, toRaw } from 'vue';
-import { watchDebounced } from '@vueuse/core';
-import { useHistoryStore } from '@/stores/useHistoryStore';
-import { useWizard } from './useWizard';
-import { useCarrierFrequency } from './useCarrierFrequency';
-import { useExclusionState } from './useExclusionState';
+import { watch, toRaw } from "vue";
+import { watchDebounced } from "@vueuse/core";
+import { useHistoryStore } from "@/stores/useHistoryStore";
+import { useWizard } from "./useWizard";
+import { useCarrierFrequency } from "./useCarrierFrequency";
+import { useExclusionState } from "./useExclusionState";
 
 // Track if already initialized (singleton pattern)
 let isInitialized = false;
@@ -45,7 +45,7 @@ export function useHistoryAutoSave() {
           lastSavedGene = null;
           currentEntryId = null;
         }
-      }
+      },
     );
 
     // Also watch for result changes when on step 4
@@ -60,7 +60,7 @@ export function useHistoryAutoSave() {
         ) {
           saveCurrentCalculation();
         }
-      }
+      },
     );
 
     // Watch for filter config changes when on step 4 - update existing entry
@@ -72,7 +72,7 @@ export function useHistoryAutoSave() {
           updateCurrentEntry();
         }
       },
-      { debounce: 500, deep: true }
+      { debounce: 500, deep: true },
     );
 
     // Watch for exclusion changes when on step 4 - update existing entry
@@ -84,30 +84,36 @@ export function useHistoryAutoSave() {
           updateCurrentEntry();
         }
       },
-      { debounce: 500 }
+      { debounce: 500 },
     );
   }
 
   function saveCurrentCalculation() {
     // Must have valid gene and result
     if (!wizardState.gene || !result.value) {
-      console.log('[HistoryAutoSave] Skip: no gene or result', { gene: wizardState.gene, result: result.value });
+      console.log("[HistoryAutoSave] Skip: no gene or result", {
+        gene: wizardState.gene,
+        result: result.value,
+      });
       return;
     }
 
     // Must have valid carrier frequency
     if (result.value.globalCarrierFrequency === null) {
-      console.log('[HistoryAutoSave] Skip: globalCarrierFrequency is null');
+      console.log("[HistoryAutoSave] Skip: globalCarrierFrequency is null");
       return;
     }
 
     // Skip if we already saved this gene in current session
     if (lastSavedGene === wizardState.gene.symbol) {
-      console.log('[HistoryAutoSave] Skip: already saved', lastSavedGene);
+      console.log("[HistoryAutoSave] Skip: already saved", lastSavedGene);
       return;
     }
 
-    console.log('[HistoryAutoSave] Attempting save for', wizardState.gene.symbol);
+    console.log(
+      "[HistoryAutoSave] Attempting save for",
+      wizardState.gene.symbol,
+    );
 
     // Check for duplicate (same gene within 30 seconds)
     const mostRecent = historyStore.mostRecent;
@@ -145,7 +151,7 @@ export function useHistoryAutoSave() {
 
     // Track the entry ID for subsequent updates
     currentEntryId = historyStore.mostRecent?.id ?? null;
-    console.log('[HistoryAutoSave] Saved entry', currentEntryId);
+    console.log("[HistoryAutoSave] Saved entry", currentEntryId);
   }
 
   /**
@@ -162,7 +168,11 @@ export function useHistoryAutoSave() {
       return;
     }
 
-    console.log('[HistoryAutoSave] Updating entry', currentEntryId, 'with filter/exclusion changes');
+    console.log(
+      "[HistoryAutoSave] Updating entry",
+      currentEntryId,
+      "with filter/exclusion changes",
+    );
 
     historyStore.updateEntry(currentEntryId, {
       filterConfig: { ...toRaw(filterConfig.value) },

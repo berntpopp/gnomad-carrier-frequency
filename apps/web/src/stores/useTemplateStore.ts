@@ -1,14 +1,19 @@
-import { defineStore } from 'pinia';
-import type { Perspective, GenderStyle, PatientSex, TemplateConfig } from '@gnomad-cf/core/types';
-import defaultDe from '@gnomad-cf/core/config/templates/de.json';
-import defaultEn from '@gnomad-cf/core/config/templates/en.json';
+import { defineStore } from "pinia";
+import type {
+  Perspective,
+  GenderStyle,
+  PatientSex,
+  TemplateConfig,
+} from "@gnomad-cf/core/types";
+import defaultDe from "@gnomad-cf/core/config/templates/de.json";
+import defaultEn from "@gnomad-cf/core/config/templates/en.json";
 
 // Type assertion for imported JSON
 const templateDe = defaultDe as TemplateConfig;
 const templateEn = defaultEn as TemplateConfig;
 
 interface TemplateStoreState {
-  language: 'de' | 'en';
+  language: "de" | "en";
   genderStyle: GenderStyle;
   patientSex: PatientSex;
   enabledSections: Record<Perspective, string[]>; // Which sections are enabled per perspective
@@ -20,66 +25,91 @@ interface TemplateStoreState {
  */
 export interface TemplateExport {
   version: string;
-  language: 'de' | 'en';
+  language: "de" | "en";
   exportDate: string;
   customSections: Record<string, string>;
   enabledSections: Record<Perspective, string[]>;
 }
 
-export const useTemplateStore = defineStore('templates', {
+export const useTemplateStore = defineStore("templates", {
   state: (): TemplateStoreState => ({
     language: detectBrowserLanguage(),
-    genderStyle: '*',
-    patientSex: 'male',
+    genderStyle: "*",
+    patientSex: "male",
     enabledSections: {
-      affected: ['geneIntro', 'inheritance', 'carrierFrequency', 'recurrenceRisk', 'recommendation'],
-      carrier: ['geneIntro', 'inheritance', 'carrierFrequency', 'recurrenceRisk', 'recommendation'],
-      familyMember: ['geneIntro', 'inheritance', 'carrierFrequency', 'recurrenceRisk', 'recommendation'],
+      affected: [
+        "geneIntro",
+        "inheritance",
+        "carrierFrequency",
+        "recurrenceRisk",
+        "recommendation",
+      ],
+      carrier: [
+        "geneIntro",
+        "inheritance",
+        "carrierFrequency",
+        "recurrenceRisk",
+        "recommendation",
+      ],
+      familyMember: [
+        "geneIntro",
+        "inheritance",
+        "carrierFrequency",
+        "recurrenceRisk",
+        "recommendation",
+      ],
     },
     customSections: {},
   }),
 
   getters: {
     defaultTemplates: (state): TemplateConfig => {
-      return state.language === 'de' ? templateDe : templateEn;
+      return state.language === "de" ? templateDe : templateEn;
     },
 
     genderSuffix: (state): string => {
       switch (state.genderStyle) {
-        case '*': return '*innen';
-        case ':': return ':innen';
-        case '/': return '/-innen';
-        case 'traditional': return 'innen';
-        default: return '*innen';
+        case "*":
+          return "*innen";
+        case ":":
+          return ":innen";
+        case "/":
+          return "/-innen";
+        case "traditional":
+          return "innen";
+        default:
+          return "*innen";
       }
     },
 
-    patientForms: (state): { nominative: string; genitive: string; dative: string } => {
+    patientForms: (
+      state,
+    ): { nominative: string; genitive: string; dative: string } => {
       switch (state.patientSex) {
-        case 'male':
+        case "male":
           return {
-            nominative: 'der Patient',
-            genitive: 'des Patienten',
-            dative: 'dem Patienten',
+            nominative: "der Patient",
+            genitive: "des Patienten",
+            dative: "dem Patienten",
           };
-        case 'female':
+        case "female":
           return {
-            nominative: 'die Patientin',
-            genitive: 'der Patientin',
-            dative: 'der Patientin',
+            nominative: "die Patientin",
+            genitive: "der Patientin",
+            dative: "der Patientin",
           };
-        case 'neutral':
+        case "neutral":
           return {
-            nominative: 'der/die Patient*in',
-            genitive: 'des/der Patient*in',
-            dative: 'dem/der Patient*in',
+            nominative: "der/die Patient*in",
+            genitive: "des/der Patient*in",
+            dative: "dem/der Patient*in",
           };
       }
     },
   },
 
   actions: {
-    setLanguage(lang: 'de' | 'en') {
+    setLanguage(lang: "de" | "en") {
       this.language = lang;
     },
 
@@ -101,7 +131,11 @@ export const useTemplateStore = defineStore('templates', {
       }
     },
 
-    setSectionEnabled(perspective: Perspective, sectionId: string, enabled: boolean) {
+    setSectionEnabled(
+      perspective: Perspective,
+      sectionId: string,
+      enabled: boolean,
+    ) {
       const sections = this.enabledSections[perspective];
       const index = sections.indexOf(sectionId);
       if (enabled && index === -1) {
@@ -128,7 +162,7 @@ export const useTemplateStore = defineStore('templates', {
      */
     exportTemplates(): TemplateExport {
       return {
-        version: '1.0',
+        version: "1.0",
         language: this.language,
         exportDate: new Date().toISOString(),
         customSections: { ...this.customSections },
@@ -142,21 +176,35 @@ export const useTemplateStore = defineStore('templates', {
      */
     importTemplates(data: unknown): boolean {
       // Validate structure
-      if (!data || typeof data !== 'object') return false;
+      if (!data || typeof data !== "object") return false;
       const exported = data as TemplateExport;
 
       if (!exported.version || !exported.language) return false;
-      if (!exported.customSections || typeof exported.customSections !== 'object') return false;
-      if (!exported.enabledSections || typeof exported.enabledSections !== 'object') return false;
+      if (
+        !exported.customSections ||
+        typeof exported.customSections !== "object"
+      )
+        return false;
+      if (
+        !exported.enabledSections ||
+        typeof exported.enabledSections !== "object"
+      )
+        return false;
 
       // Apply customizations
       this.language = exported.language;
       this.customSections = { ...exported.customSections };
 
       // Merge enabled sections (preserve structure for all perspectives)
-      for (const perspective of ['affected', 'carrier', 'familyMember'] as Perspective[]) {
+      for (const perspective of [
+        "affected",
+        "carrier",
+        "familyMember",
+      ] as Perspective[]) {
         if (exported.enabledSections[perspective]) {
-          this.enabledSections[perspective] = [...exported.enabledSections[perspective]];
+          this.enabledSections[perspective] = [
+            ...exported.enabledSections[perspective],
+          ];
         }
       }
 
@@ -167,7 +215,7 @@ export const useTemplateStore = defineStore('templates', {
      * Reset customizations for a specific language
      * Only clears customSections when user is on that language
      */
-    resetLanguageTemplates(lang: 'de' | 'en') {
+    resetLanguageTemplates(lang: "de" | "en") {
       // Custom sections are keyed by perspective.sectionId
       // They apply regardless of language, but user expects per-language reset
       // Since templates are language-specific in the JSON files, we clear all customizations
@@ -186,7 +234,10 @@ export const useTemplateStore = defineStore('templates', {
       if (this.customSections[key]) {
         return this.customSections[key];
       }
-      return this.defaultTemplates.perspectives[perspective]?.sections[sectionId]?.template ?? '';
+      return (
+        this.defaultTemplates.perspectives[perspective]?.sections[sectionId]
+          ?.template ?? ""
+      );
     },
 
     /**
@@ -199,12 +250,12 @@ export const useTemplateStore = defineStore('templates', {
   },
 
   persist: {
-    key: 'carrier-freq-templates',
+    key: "carrier-freq-templates",
     storage: localStorage,
   },
 });
 
-function detectBrowserLanguage(): 'de' | 'en' {
-  const browserLang = navigator.language.split('-')[0];
-  return browserLang === 'de' ? 'de' : 'en';
+function detectBrowserLanguage(): "de" | "en" {
+  const browserLang = navigator.language.split("-")[0];
+  return browserLang === "de" ? "de" : "en";
 }

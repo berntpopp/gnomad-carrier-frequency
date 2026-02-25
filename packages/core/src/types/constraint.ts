@@ -16,10 +16,10 @@ export interface GeneConstraint {
  * Interpretation of constraint score
  */
 export type ConstraintInterpretation =
-  | 'constrained'
-  | 'intermediate'
-  | 'tolerant'
-  | 'unknown';
+  | "constrained"
+  | "intermediate"
+  | "tolerant"
+  | "unknown";
 
 /**
  * pLI interpretation result
@@ -44,24 +44,24 @@ export interface LoeufInterpretation {
  */
 export function getLoeufInterpretation(
   loeuf: number | null,
-  gnomadVersion: string
+  gnomadVersion: string,
 ): LoeufInterpretation {
   if (loeuf === null) {
-    return { level: 'unknown', label: 'N/A', color: 'grey' };
+    return { level: "unknown", label: "N/A", color: "grey" };
   }
 
   // v4 has higher thresholds due to larger sample size
-  const isV4 = gnomadVersion.startsWith('4');
+  const isV4 = gnomadVersion.startsWith("4");
   const constrainedThreshold = isV4 ? 0.6 : 0.35;
   const tolerantThreshold = isV4 ? 1.5 : 1.0;
 
   if (loeuf < constrainedThreshold) {
-    return { level: 'constrained', label: 'LoF intolerant', color: 'error' };
+    return { level: "constrained", label: "LoF intolerant", color: "error" };
   }
   if (loeuf > tolerantThreshold) {
-    return { level: 'tolerant', label: 'LoF tolerant', color: 'success' };
+    return { level: "tolerant", label: "LoF tolerant", color: "success" };
   }
-  return { level: 'intermediate', label: 'Intermediate', color: 'warning' };
+  return { level: "intermediate", label: "Intermediate", color: "warning" };
 }
 
 /**
@@ -69,13 +69,13 @@ export function getLoeufInterpretation(
  */
 export function getPliInterpretation(pLI: number | null): PliInterpretation {
   if (pLI === null) {
-    return { label: 'N/A', color: 'grey' };
+    return { label: "N/A", color: "grey" };
   }
   if (pLI >= 0.9) {
-    return { label: 'LoF intolerant (>=0.9)', color: 'error' };
+    return { label: "LoF intolerant (>=0.9)", color: "error" };
   }
   if (pLI <= 0.1) {
-    return { label: 'LoF tolerant (<=0.1)', color: 'success' };
+    return { label: "LoF tolerant (<=0.1)", color: "success" };
   }
-  return { label: 'Intermediate', color: 'warning' };
+  return { label: "Intermediate", color: "warning" };
 }

@@ -1,7 +1,7 @@
 /**
  * Log level enumeration for categorizing log entry severity
  */
-export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
+export type LogLevel = "DEBUG" | "INFO" | "WARN" | "ERROR";
 
 /**
  * Individual log entry with timestamp and optional structured details

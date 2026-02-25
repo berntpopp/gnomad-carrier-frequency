@@ -1,12 +1,7 @@
 <template>
-  <div
-    class="history-panel"
-    data-testid="history-panel"
-  >
+  <div class="history-panel" data-testid="history-panel">
     <div class="d-flex align-center mb-4">
-      <h2 class="text-h6">
-        Search History
-      </h2>
+      <h2 class="text-h6">Search History</h2>
       <v-spacer />
       <v-btn
         icon
@@ -24,24 +19,16 @@
       v-if="historyStore.isEmpty"
       class="text-center py-8 text-medium-emphasis"
     >
-      <v-icon
-        size="48"
-        class="mb-2"
-      >
-        mdi-history
-      </v-icon>
-      <p class="text-body-2">
-        No search history yet
-      </p>
-      <p class="text-caption">
-        Completed calculations will appear here
-      </p>
+      <v-icon size="48" class="mb-2"> mdi-history </v-icon>
+      <p class="text-body-2">No search history yet</p>
+      <p class="text-caption">Completed calculations will appear here</p>
     </div>
 
     <!-- History list grouped by date -->
     <template v-else>
       <div class="text-body-2 text-medium-emphasis mb-2">
-        {{ historyStore.entryCount }} {{ historyStore.entryCount === 1 ? 'entry' : 'entries' }}
+        {{ historyStore.entryCount }}
+        {{ historyStore.entryCount === 1 ? "entry" : "entries" }}
       </div>
 
       <div
@@ -55,10 +42,7 @@
         </div>
 
         <!-- Entries for this date -->
-        <v-list
-          density="compact"
-          class="history-list"
-        >
+        <v-list density="compact" class="history-list">
           <v-list-item
             v-for="entry in group.entries"
             :key="entry.id"
@@ -67,12 +51,7 @@
             @click="emit('restore', entry.id)"
           >
             <template #prepend>
-              <v-icon
-                color="secondary"
-                size="small"
-              >
-                mdi-dna
-              </v-icon>
+              <v-icon color="secondary" size="small"> mdi-dna </v-icon>
             </template>
 
             <v-list-item-title class="font-weight-medium">
@@ -99,9 +78,7 @@
                 aria-label="Delete history entry"
                 @click.stop="handleDelete(entry.id)"
               >
-                <v-icon size="small">
-                  mdi-delete-outline
-                </v-icon>
+                <v-icon size="small"> mdi-delete-outline </v-icon>
               </v-btn>
             </template>
           </v-list-item>
@@ -112,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { useHistoryStore } from '@/stores/useHistoryStore';
+import { useHistoryStore } from "@/stores/useHistoryStore";
 
 const historyStore = useHistoryStore();
 
@@ -125,9 +102,9 @@ const emit = defineEmits<{
  * Format timestamp to time string (e.g., "2:30 PM")
  */
 function formatTime(timestamp: number): string {
-  return new Date(timestamp).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
+  return new Date(timestamp).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
   });
 }
 
@@ -135,7 +112,7 @@ function formatTime(timestamp: number): string {
  * Format carrier frequency as ratio (e.g., "1:25")
  */
 function formatFrequency(freq: number): string {
-  if (freq <= 0) return 'N/A';
+  if (freq <= 0) return "N/A";
   return `1:${Math.round(1 / freq)}`;
 }
 

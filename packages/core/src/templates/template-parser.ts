@@ -1,10 +1,10 @@
-import { TEMPLATE_VARIABLES } from '../config/template-variables.js';
+import { TEMPLATE_VARIABLES } from "../config/template-variables.js";
 
 /**
  * Segment of a parsed template
  */
 export interface TemplateSegment {
-  type: 'text' | 'variable';
+  type: "text" | "variable";
   content: string; // For text: the text, for variable: the variable name (without braces)
   raw?: string; // For variable: the raw {{variable}} string
 }
@@ -31,14 +31,14 @@ export function parseTemplate(template: string): TemplateSegment[] {
     // Text before variable
     if (match.index > lastIndex) {
       segments.push({
-        type: 'text',
+        type: "text",
         content: template.slice(lastIndex, match.index),
       });
     }
 
     // Variable
     segments.push({
-      type: 'variable',
+      type: "variable",
       content: match[2]!, // Variable name without braces (guaranteed by regex)
       raw: match[1], // Full {{variable}} string
     });
@@ -49,7 +49,7 @@ export function parseTemplate(template: string): TemplateSegment[] {
   // Remaining text after last variable
   if (lastIndex < template.length) {
     segments.push({
-      type: 'text',
+      type: "text",
       content: template.slice(lastIndex),
     });
   }
@@ -62,8 +62,10 @@ export function parseTemplate(template: string): TemplateSegment[] {
  */
 export function segmentsToTemplate(segments: TemplateSegment[]): string {
   return segments
-    .map((seg) => (seg.type === 'variable' ? `{{${seg.content}}}` : seg.content))
-    .join('');
+    .map((seg) =>
+      seg.type === "variable" ? `{{${seg.content}}}` : seg.content,
+    )
+    .join("");
 }
 
 /**

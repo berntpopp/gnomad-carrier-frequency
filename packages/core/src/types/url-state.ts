@@ -1,9 +1,9 @@
 // URL state types and Zod validation schemas for shareable URLs
-import { z } from 'zod';
-import type { FilterConfig } from './filter';
-import { FACTORY_FILTER_DEFAULTS } from './filter';
-import type { CalcConfig } from './calculations';
-import { FACTORY_CALC_DEFAULTS } from './calculations';
+import { z } from "zod";
+import type { FilterConfig } from "./filter";
+import { FACTORY_FILTER_DEFAULTS } from "./filter";
+import type { CalcConfig } from "./calculations";
+import { FACTORY_CALC_DEFAULTS } from "./calculations";
 
 /**
  * Zod schema for URL state parameters
@@ -17,10 +17,16 @@ export const UrlStateSchema = z.object({
   step: z.coerce.number().int().min(1).max(4).optional().default(1),
 
   /** Index patient status */
-  status: z.enum(['heterozygous', 'homozygous']).optional().default('heterozygous'),
+  status: z
+    .enum(["heterozygous", "homozygous"])
+    .optional()
+    .default("heterozygous"),
 
   /** Frequency source */
-  source: z.enum(['gnomad', 'literature', 'default']).optional().default('gnomad'),
+  source: z
+    .enum(["gnomad", "literature", "default"])
+    .optional()
+    .default("gnomad"),
 
   /** Literature frequency value (only when source=literature) */
   litFreq: z.coerce.number().min(0).max(1).optional(),
@@ -38,7 +44,7 @@ export const UrlStateSchema = z.object({
   clinvarStars: z.coerce.number().int().min(0).max(4).optional(),
 
   /** Include conflicting classifications (0=no, 1=yes) */
-  conflicting: z.enum(['0', '1']).optional(),
+  conflicting: z.enum(["0", "1"]).optional(),
 
   /** Conflicting classification threshold percentage (50-100) */
   conflictThreshold: z.coerce.number().int().min(50).max(100).optional(),
@@ -47,13 +53,13 @@ export const UrlStateSchema = z.object({
   excl: z.string().optional(),
 
   /** Warning flag if exclusions were truncated from URL (1=truncated) */
-  exclWarn: z.enum(['0', '1']).optional(),
+  exclWarn: z.enum(["0", "1"]).optional(),
 
   /** HWE formula: '0'=simplified 2*SumAF, '1'=HWE 2pq (default) */
-  hweFormula: z.enum(['0', '1']).optional(),
+  hweFormula: z.enum(["0", "1"]).optional(),
 
   /** Homozygote exclusion: '0'=off, '1'=on/VCR-GCR (default) */
-  homExclusion: z.enum(['0', '1']).optional(),
+  homExclusion: z.enum(["0", "1"]).optional(),
 
   /** Penetrance fraction 0.0-1.0 (default 1.0) */
   penetrance: z.coerce.number().min(0).max(1).optional(),
@@ -75,7 +81,10 @@ export function parseUrlState(params: Record<string, unknown>): UrlState {
   const result = UrlStateSchema.safeParse(params);
 
   if (!result.success) {
-    console.warn('[URL State] Validation failed, using defaults:', result.error.format());
+    console.warn(
+      "[URL State] Validation failed, using defaults:",
+      result.error.format(),
+    );
     return UrlStateSchema.parse({});
   }
 
@@ -93,14 +102,18 @@ export function parseUrlState(params: Record<string, unknown>): UrlState {
  */
 export function encodeFilterFlags(config: FilterConfig): string {
   // Check if all filters are disabled
-  if (!config.lofHcEnabled && !config.missenseEnabled && !config.clinvarEnabled) {
-    return 'none';
+  if (
+    !config.lofHcEnabled &&
+    !config.missenseEnabled &&
+    !config.clinvarEnabled
+  ) {
+    return "none";
   }
 
-  let flags = '';
-  if (config.lofHcEnabled) flags += 'l';
-  if (config.missenseEnabled) flags += 'm';
-  if (config.clinvarEnabled) flags += 'c';
+  let flags = "";
+  if (config.lofHcEnabled) flags += "l";
+  if (config.missenseEnabled) flags += "m";
+  if (config.clinvarEnabled) flags += "c";
 
   return flags;
 }
@@ -112,7 +125,7 @@ export function encodeFilterFlags(config: FilterConfig): string {
  * @returns Partial FilterConfig with decoded flags
  */
 export function decodeFilterFlags(flags: string): Partial<FilterConfig> {
-  if (flags === 'none') {
+  if (flags === "none") {
     return {
       lofHcEnabled: false,
       missenseEnabled: false,
@@ -121,9 +134,9 @@ export function decodeFilterFlags(flags: string): Partial<FilterConfig> {
   }
 
   return {
-    lofHcEnabled: flags.includes('l'),
-    missenseEnabled: flags.includes('m'),
-    clinvarEnabled: flags.includes('c'),
+    lofHcEnabled: flags.includes("l"),
+    missenseEnabled: flags.includes("m"),
+    clinvarEnabled: flags.includes("c"),
   };
 }
 
@@ -139,9 +152,12 @@ export function filtersMatchDefaults(config: FilterConfig): boolean {
     config.lofHcEnabled === FACTORY_FILTER_DEFAULTS.lofHcEnabled &&
     config.missenseEnabled === FACTORY_FILTER_DEFAULTS.missenseEnabled &&
     config.clinvarEnabled === FACTORY_FILTER_DEFAULTS.clinvarEnabled &&
-    config.clinvarStarThreshold === FACTORY_FILTER_DEFAULTS.clinvarStarThreshold &&
-    config.clinvarIncludeConflicting === FACTORY_FILTER_DEFAULTS.clinvarIncludeConflicting &&
-    config.clinvarConflictingThreshold === FACTORY_FILTER_DEFAULTS.clinvarConflictingThreshold
+    config.clinvarStarThreshold ===
+      FACTORY_FILTER_DEFAULTS.clinvarStarThreshold &&
+    config.clinvarIncludeConflicting ===
+      FACTORY_FILTER_DEFAULTS.clinvarIncludeConflicting &&
+    config.clinvarConflictingThreshold ===
+      FACTORY_FILTER_DEFAULTS.clinvarConflictingThreshold
   );
 }
 

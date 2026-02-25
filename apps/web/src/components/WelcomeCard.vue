@@ -9,13 +9,13 @@
   >
     <v-card-text>
       <p class="text-body-1 mb-3">
-        This tool calculates carrier frequencies for autosomal recessive conditions using gnomAD
-        population data, and generates clinical documentation text ready to paste into patient
-        letters.
+        This tool calculates carrier frequencies for autosomal recessive
+        conditions using gnomAD population data, and generates clinical
+        documentation text ready to paste into patient letters.
       </p>
       <p class="text-body-2 text-medium-emphasis mb-4">
-        Search for any gene symbol above, or use the quick-start below to see the tool in action
-        with CFTR (cystic fibrosis).
+        Search for any gene symbol above, or use the quick-start below to see
+        the tool in action with CFTR (cystic fibrosis).
       </p>
       <v-btn
         color="primary"
@@ -30,10 +30,10 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue';
-import { useAppStore } from '@/stores/useAppStore';
-import { useGeneSearch } from '@/composables';
-import { useWizard } from '@/composables';
+import { watch } from "vue";
+import { useAppStore } from "@/stores/useAppStore";
+import { useGeneSearch } from "@/composables";
+import { useWizard } from "@/composables";
 
 const appStore = useAppStore();
 const { prefillGene } = useGeneSearch();
@@ -51,6 +51,6 @@ watch(
 
 const onQuickStart = () => {
   appStore.dismissOnboarding();
-  prefillGene('CFTR');
+  prefillGene("CFTR");
 };
 </script>

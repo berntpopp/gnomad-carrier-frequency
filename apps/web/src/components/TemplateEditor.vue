@@ -38,14 +38,8 @@
       </div>
 
       <!-- Preview with highlighted variables -->
-      <div
-        class="template-preview pa-3 rounded border"
-        @click="focusTextarea"
-      >
-        <template
-          v-for="(segment, idx) in parsedTemplate"
-          :key="idx"
-        >
+      <div class="template-preview pa-3 rounded border" @click="focusTextarea">
+        <template v-for="(segment, idx) in parsedTemplate" :key="idx">
           <span v-if="segment.type === 'text'">{{ segment.content }}</span>
           <v-chip
             v-else
@@ -88,18 +82,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { useTemplateStore } from '@/stores/useTemplateStore';
-import { parseTemplate } from '@gnomad-cf/core/templates';
-import type { Perspective } from '@gnomad-cf/core/types';
+import { ref, computed, watch } from "vue";
+import { useTemplateStore } from "@/stores/useTemplateStore";
+import { parseTemplate } from "@gnomad-cf/core/templates";
+import type { Perspective } from "@gnomad-cf/core/types";
 
 const templateStore = useTemplateStore();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const textareaRef = ref<any>(null);
 
 // Selection state
-const selectedPerspective = ref<Perspective>('affected');
-const selectedSection = ref('geneIntro');
+const selectedPerspective = ref<Perspective>("affected");
+const selectedSection = ref("geneIntro");
 
 // Format variable for display (avoids template literal with braces in Vue template)
 function formatVariable(name: string): string {
@@ -130,8 +124,11 @@ const sectionItems = computed(() => {
 // Reset section selection when perspective changes
 watch(selectedPerspective, () => {
   const items = sectionItems.value;
-  if (items.length > 0 && !items.find((i) => i.value === selectedSection.value)) {
-    selectedSection.value = items[0]?.value ?? '';
+  if (
+    items.length > 0 &&
+    !items.find((i) => i.value === selectedSection.value)
+  ) {
+    selectedSection.value = items[0]?.value ?? "";
   }
 });
 
@@ -140,7 +137,7 @@ const templateText = computed({
   get: () =>
     templateStore.getEffectiveTemplate(
       selectedPerspective.value,
-      selectedSection.value
+      selectedSection.value,
     ),
   set: (value: string) => {
     const key = `${selectedPerspective.value}.${selectedSection.value}`;
@@ -155,7 +152,10 @@ const templateText = computed({
 
 // Check if current section has customization
 const hasCustomization = computed(() =>
-  templateStore.hasCustomization(selectedPerspective.value, selectedSection.value)
+  templateStore.hasCustomization(
+    selectedPerspective.value,
+    selectedSection.value,
+  ),
 );
 
 // Parse template for highlighting
@@ -167,7 +167,7 @@ function getDefaultTemplate(): string {
   return (
     templates.perspectives[selectedPerspective.value]?.sections[
       selectedSection.value
-    ]?.template ?? ''
+    ]?.template ?? ""
   );
 }
 
@@ -180,13 +180,15 @@ function resetSection() {
 // Focus textarea when preview clicked
 function focusTextarea() {
   // VTextarea exposes input via $el query
-  const textarea = textareaRef.value?.$el?.querySelector('textarea');
+  const textarea = textareaRef.value?.$el?.querySelector("textarea");
   textarea?.focus();
 }
 
 // Public method for variable insertion
 function insertVariable(variableName: string) {
-  const textarea = textareaRef.value?.$el?.querySelector('textarea') as HTMLTextAreaElement | null;
+  const textarea = textareaRef.value?.$el?.querySelector(
+    "textarea",
+  ) as HTMLTextAreaElement | null;
   const currentText = templateText.value;
   const insertion = `{{${variableName}}}`;
 
@@ -199,7 +201,8 @@ function insertVariable(variableName: string) {
   const start = textarea.selectionStart ?? currentText.length;
   const end = textarea.selectionEnd ?? start;
 
-  templateText.value = currentText.slice(0, start) + insertion + currentText.slice(end);
+  templateText.value =
+    currentText.slice(0, start) + insertion + currentText.slice(end);
 
   // Restore cursor position after insertion
   requestAnimationFrame(() => {

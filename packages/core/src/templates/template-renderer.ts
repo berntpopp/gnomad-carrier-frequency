@@ -1,4 +1,4 @@
-import type { TemplateContext } from '../types/index.js';
+import type { TemplateContext } from "../types/index.js";
 
 /**
  * Renders a template string by replacing {{variable}} placeholders with context values.
@@ -18,13 +18,13 @@ import type { TemplateContext } from '../types/index.js';
  */
 export function renderTemplate(
   template: string,
-  context: Partial<TemplateContext>
+  context: Partial<TemplateContext>,
 ): string {
   return template.replace(/\{\{(\w+)\}\}/g, (_match, key) => {
     const value = context[key as keyof TemplateContext];
     if (value === undefined || value === null) {
       console.warn(`Template variable "${key}" is undefined`);
-      return '';
+      return "";
     }
     return String(value);
   });

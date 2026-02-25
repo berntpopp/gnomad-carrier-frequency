@@ -42,7 +42,11 @@
             :model-value="!isExcluded(item.variant_id)"
             density="compact"
             hide-details
-            :aria-label="isExcluded(item.variant_id) ? 'Include variant' : 'Exclude variant'"
+            :aria-label="
+              isExcluded(item.variant_id)
+                ? 'Include variant'
+                : 'Exclude variant'
+            "
             @update:model-value="() => toggleVariant(item.variant_id)"
           />
         </template>
@@ -55,14 +59,15 @@
             rel="noopener noreferrer"
             :class="[
               'text-primary text-decoration-none',
-              { 'text-decoration-line-through text-medium-emphasis': isExcluded(item.variant_id) }
+              {
+                'text-decoration-line-through text-medium-emphasis': isExcluded(
+                  item.variant_id,
+                ),
+              },
             ]"
           >
             {{ item.variant_id }}
-            <v-icon
-              size="x-small"
-              class="ml-1"
-            >mdi-open-in-new</v-icon>
+            <v-icon size="x-small" class="ml-1">mdi-open-in-new</v-icon>
           </a>
         </template>
 
@@ -73,12 +78,16 @@
 
         <!-- Allele frequency column - scientific notation for small values -->
         <template #[`item.alleleFrequency`]="{ item }">
-          <span class="text-mono">{{ formatFrequency(item.alleleFrequency) }}</span>
+          <span class="text-mono">{{
+            formatFrequency(item.alleleFrequency)
+          }}</span>
         </template>
 
         <!-- Carrier frequency column - 2 × AF -->
         <template #[`item.carrierFrequency`]="{ item }">
-          <span class="text-mono">{{ formatCarrierFreq(item.alleleFrequency) }}</span>
+          <span class="text-mono">{{
+            formatCarrierFreq(item.alleleFrequency)
+          }}</span>
         </template>
 
         <!-- Ratio column - 1:X format based on carrier frequency -->
@@ -100,17 +109,9 @@
             link
           >
             {{ formatClinvarStatus(item.clinvarStatus) }}
-            <v-icon
-              end
-              size="x-small"
-            >
-              mdi-open-in-new
-            </v-icon>
+            <v-icon end size="x-small"> mdi-open-in-new </v-icon>
           </v-chip>
-          <span
-            v-else
-            class="text-medium-emphasis"
-          >-</span>
+          <span v-else class="text-medium-emphasis">-</span>
         </template>
 
         <!-- Gold stars column - star icons -->
@@ -128,10 +129,7 @@
               size="x-small"
             />
           </div>
-          <span
-            v-else
-            class="text-medium-emphasis"
-          >-</span>
+          <span v-else class="text-medium-emphasis">-</span>
         </template>
 
         <!-- HGVS-c column - truncate if long -->
@@ -144,10 +142,7 @@
           >
             {{ item.hgvsc }}
           </span>
-          <span
-            v-else
-            class="text-medium-emphasis"
-          >-</span>
+          <span v-else class="text-medium-emphasis">-</span>
         </template>
 
         <!-- HGVS-p column - truncate if long -->
@@ -160,10 +155,7 @@
           >
             {{ item.hgvsp }}
           </span>
-          <span
-            v-else
-            class="text-medium-emphasis"
-          >-</span>
+          <span v-else class="text-medium-emphasis">-</span>
         </template>
 
         <!-- Expanded row - additional details -->
@@ -172,52 +164,45 @@
             <td :colspan="columns.length">
               <div class="pa-3">
                 <v-row dense>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="3"
-                  >
-                    <div class="text-caption font-weight-bold text-grey-darken-2">
+                  <v-col cols="12" sm="6" md="3">
+                    <div
+                      class="text-caption font-weight-bold text-grey-darken-2"
+                    >
                       Transcript
                     </div>
                     <div class="text-body-2">
-                      {{ item.transcriptId || '-' }}
+                      {{ item.transcriptId || "-" }}
                     </div>
                   </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="3"
-                  >
-                    <div class="text-caption font-weight-bold text-grey-darken-2">
+                  <v-col cols="12" sm="6" md="3">
+                    <div
+                      class="text-caption font-weight-bold text-grey-darken-2"
+                    >
                       Position
                     </div>
                     <div class="text-body-2">
                       {{ item.pos.toLocaleString() }}
                     </div>
                   </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="3"
-                  >
-                    <div class="text-caption font-weight-bold text-grey-darken-2">
+                  <v-col cols="12" sm="6" md="3">
+                    <div
+                      class="text-caption font-weight-bold text-grey-darken-2"
+                    >
                       Ref / Alt
                     </div>
                     <div class="text-body-2 text-mono">
                       {{ item.ref }} / {{ item.alt }}
                     </div>
                   </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="3"
-                  >
-                    <div class="text-caption font-weight-bold text-grey-darken-2">
+                  <v-col cols="12" sm="6" md="3">
+                    <div
+                      class="text-caption font-weight-bold text-grey-darken-2"
+                    >
                       Allele Count / Number
                     </div>
                     <div class="text-body-2">
-                      {{ item.alleleCount.toLocaleString() }} / {{ item.alleleNumber.toLocaleString() }}
+                      {{ item.alleleCount.toLocaleString() }} /
+                      {{ item.alleleNumber.toLocaleString() }}
                     </div>
                   </v-col>
                 </v-row>
@@ -230,12 +215,7 @@
                     size="small"
                     variant="tonal"
                   >
-                    <v-icon
-                      start
-                      size="x-small"
-                    >
-                      mdi-alert-circle
-                    </v-icon>
+                    <v-icon start size="x-small"> mdi-alert-circle </v-icon>
                     LoF HC
                   </v-chip>
                   <v-chip
@@ -260,12 +240,7 @@
                     size="small"
                     variant="tonal"
                   >
-                    <v-icon
-                      start
-                      size="x-small"
-                    >
-                      mdi-alert
-                    </v-icon>
+                    <v-icon start size="x-small"> mdi-alert </v-icon>
                     ClinVar P/LP
                   </v-chip>
                 </div>
@@ -291,11 +266,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import type { DisplayVariant } from '@gnomad-cf/core/types';
-import { getClinvarColor, formatAlleleFrequency } from '@gnomad-cf/core/filters';
-import { getDatasetId, getReferenceGenome } from '@gnomad-cf/core/config';
-import { useExclusionState } from '@/composables';
+import { ref, computed } from "vue";
+import type { DisplayVariant } from "@gnomad-cf/core/types";
+import {
+  getClinvarColor,
+  formatAlleleFrequency,
+} from "@gnomad-cf/core/filters";
+import { getDatasetId, getReferenceGenome } from "@gnomad-cf/core/config";
+import { useExclusionState } from "@/composables";
 
 const props = defineProps<{
   /** Variants to display in the table */
@@ -307,24 +285,24 @@ const props = defineProps<{
 }>();
 
 // Get exclusion state composable
-const {
-  excludeAll,
-  includeVariant,
-  toggleVariant,
-  isExcluded,
-} = useExclusionState();
+const { excludeAll, includeVariant, toggleVariant, isExcluded } =
+  useExclusionState();
 
 // All variants are included (none excluded)
 const allIncluded = computed(() => {
   if (!props.variants.length) return true;
-  return props.variants.every(v => !isExcluded(v.variant_id));
+  return props.variants.every((v) => !isExcluded(v.variant_id));
 });
 
 // Some but not all variants are excluded
 const someExcluded = computed(() => {
   if (!props.variants.length) return false;
-  const excludedInTable = props.variants.filter(v => isExcluded(v.variant_id));
-  return excludedInTable.length > 0 && excludedInTable.length < props.variants.length;
+  const excludedInTable = props.variants.filter((v) =>
+    isExcluded(v.variant_id),
+  );
+  return (
+    excludedInTable.length > 0 && excludedInTable.length < props.variants.length
+  );
 });
 
 // Handle header checkbox toggle
@@ -336,34 +314,49 @@ function handleHeaderToggle(include: boolean) {
     }
   } else {
     // Exclude all variants in this table
-    excludeAll(props.variants.map(v => v.variant_id));
+    excludeAll(props.variants.map((v) => v.variant_id));
   }
 }
 
 // Row class for excluded variant styling
 function getRowClass(item: DisplayVariant): string {
-  return isExcluded(item.variant_id) ? 'excluded-row' : '';
+  return isExcluded(item.variant_id) ? "excluded-row" : "";
 }
 
 // Table headers with sorting configuration
 const headers = ref([
-  { title: '', key: 'include', sortable: false, width: '48px' },
-  { title: 'Variant ID', key: 'variant_id', sortable: true },
-  { title: 'Consequence', key: 'consequence', sortable: true },
-  { title: 'Allele Freq', key: 'alleleFrequency', sortable: true, align: 'end' as const },
-  { title: 'Carrier Freq', key: 'carrierFrequency', sortable: true, align: 'end' as const },
-  { title: 'Ratio', key: 'ratio', sortable: true, align: 'end' as const },
-  { title: 'ClinVar', key: 'clinvarStatus', sortable: true },
-  { title: 'Stars', key: 'goldStars', sortable: true, align: 'center' as const },
-  { title: 'HGVS-c', key: 'hgvsc', sortable: false },
-  { title: 'HGVS-p', key: 'hgvsp', sortable: false },
+  { title: "", key: "include", sortable: false, width: "48px" },
+  { title: "Variant ID", key: "variant_id", sortable: true },
+  { title: "Consequence", key: "consequence", sortable: true },
+  {
+    title: "Allele Freq",
+    key: "alleleFrequency",
+    sortable: true,
+    align: "end" as const,
+  },
+  {
+    title: "Carrier Freq",
+    key: "carrierFrequency",
+    sortable: true,
+    align: "end" as const,
+  },
+  { title: "Ratio", key: "ratio", sortable: true, align: "end" as const },
+  { title: "ClinVar", key: "clinvarStatus", sortable: true },
+  {
+    title: "Stars",
+    key: "goldStars",
+    sortable: true,
+    align: "center" as const,
+  },
+  { title: "HGVS-c", key: "hgvsc", sortable: false },
+  { title: "HGVS-p", key: "hgvsp", sortable: false },
 ]);
 
 // Default sort by allele frequency descending
-const sortBy = ref([{ key: 'alleleFrequency', order: 'desc' as const }]);
+const sortBy = ref([{ key: "alleleFrequency", order: "desc" as const }]);
 
 // Search filter
-const search = ref('');
+const search = ref("");
 
 // Build gnomAD variant URL
 function getGnomadUrl(variantId: string): string {
@@ -372,18 +365,21 @@ function getGnomadUrl(variantId: string): string {
 }
 
 // Build ClinVar URL - uses variation ID if available, otherwise falls back to position search
-function getClinvarUrl(clinvarVariationId: string | null, variantId: string): string {
+function getClinvarUrl(
+  clinvarVariationId: string | null,
+  variantId: string,
+): string {
   // Use direct variation link if ID is available
   if (clinvarVariationId) {
     return `https://www.ncbi.nlm.nih.gov/clinvar/variation/${clinvarVariationId}/`;
   }
   // Fallback to position-based search with correct assembly
-  const parts = variantId.split('-');
+  const parts = variantId.split("-");
   if (parts.length >= 2) {
     const chr = parts[0];
     const pos = parts[1];
     const refGenome = getReferenceGenome();
-    const chrposField = refGenome === 'GRCh38' ? 'chrpos38' : 'chrpos37';
+    const chrposField = refGenome === "GRCh38" ? "chrpos38" : "chrpos37";
     return `https://www.ncbi.nlm.nih.gov/clinvar/?term=${chr}[chr]+AND+${pos}[${chrposField}]`;
   }
   return `https://www.ncbi.nlm.nih.gov/clinvar/?term=${encodeURIComponent(variantId)}`;
@@ -396,7 +392,7 @@ function formatFrequency(freq: number | null): string {
 
 // Format carrier frequency (2 × AF) - same decimal format as allele frequency
 function formatCarrierFreq(alleleFreq: number | null): string {
-  if (alleleFreq === null || alleleFreq === 0) return '-';
+  if (alleleFreq === null || alleleFreq === 0) return "-";
   const carrierFreq = 2 * alleleFreq;
   // Use same format as allele frequency (decimal, scientific for small values)
   return formatAlleleFrequency(carrierFreq);
@@ -404,7 +400,7 @@ function formatCarrierFreq(alleleFreq: number | null): string {
 
 // Format ratio as "1:X" based on carrier frequency (2 × allele frequency)
 function formatRatio(alleleFreq: number | null): string {
-  if (alleleFreq === null || alleleFreq === 0) return '-';
+  if (alleleFreq === null || alleleFreq === 0) return "-";
   const carrierFreq = 2 * alleleFreq;
   const denominator = Math.round(1 / carrierFreq);
   return `1:${denominator.toLocaleString()}`;
@@ -413,27 +409,27 @@ function formatRatio(alleleFreq: number | null): string {
 // Format ClinVar status for display (shorten long strings)
 function formatClinvarStatus(status: string): string {
   const lower = status.toLowerCase();
-  if (lower.includes('pathogenic') && lower.includes('likely')) {
-    return 'Likely P';
+  if (lower.includes("pathogenic") && lower.includes("likely")) {
+    return "Likely P";
   }
-  if (lower.includes('pathogenic')) {
-    return 'Pathogenic';
+  if (lower.includes("pathogenic")) {
+    return "Pathogenic";
   }
-  if (lower.includes('uncertain') || lower.includes('vus')) {
-    return 'VUS';
+  if (lower.includes("uncertain") || lower.includes("vus")) {
+    return "VUS";
   }
-  if (lower.includes('benign') && lower.includes('likely')) {
-    return 'Likely B';
+  if (lower.includes("benign") && lower.includes("likely")) {
+    return "Likely B";
   }
-  if (lower.includes('benign')) {
-    return 'Benign';
+  if (lower.includes("benign")) {
+    return "Benign";
   }
-  if (lower.includes('conflicting')) {
-    return 'Conflicting';
+  if (lower.includes("conflicting")) {
+    return "Conflicting";
   }
   // Truncate very long strings
   if (status.length > 15) {
-    return status.substring(0, 12) + '...';
+    return status.substring(0, 12) + "...";
   }
   return status;
 }
@@ -472,13 +468,13 @@ function formatClinvarStatus(status: string): string {
 /* Add shadow to indicate scrollable content */
 :deep(.variant-table) th:nth-child(2)::after,
 :deep(.variant-table) td:nth-child(2)::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: -8px;
   bottom: 0;
   width: 8px;
-  background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.1), transparent);
   pointer-events: none;
 }
 

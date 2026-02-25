@@ -1,10 +1,10 @@
 // Wizard state management types
 
-import type { IndexPatientStatus } from './frequency';
-import type { GeneSearchResult } from '../queries/types.js';
+import type { IndexPatientStatus } from "./frequency";
+import type { GeneSearchResult } from "../queries/types.js";
 
 export type WizardStep = 1 | 2 | 3 | 4;
-export type FrequencySource = 'gnomad' | 'literature' | 'default';
+export type FrequencySource = "gnomad" | "literature" | "default";
 
 export interface WizardState {
   currentStep: WizardStep;

@@ -5,13 +5,13 @@ import type {
   ClinVarVariant,
   DisplayVariant,
   PopulationVariantFrequency,
-} from '../types/index.js';
-import { getPopulationLabel } from '../config/index.js';
+} from "../types/index.js";
+import { getPopulationLabel } from "../config/index.js";
 import {
   isHighConfidenceLoF,
   isMissenseVariant,
   isPathogenicClinVar,
-} from './variant-filters.js';
+} from "./variant-filters.js";
 
 /**
  * Transform a single gnomAD variant to display format
@@ -25,7 +25,7 @@ import {
 export function toDisplayVariant(
   variant: GnomadVariant,
   clinvarVariants: ClinVarVariant[],
-  populationCode?: string | null
+  populationCode?: string | null,
 ): DisplayVariant {
   // Extract transcript consequence fields
   const tc = variant.transcript_consequence;
@@ -40,37 +40,40 @@ export function toDisplayVariant(
   let alleleFrequency: number | null;
 
   if (populationCode) {
-    // Get population-specific counts
-    const exomePop = variant.exome?.populations?.find(
-      (p) => p.id === populationCode
-    );
-    const genomePop = variant.genome?.populations?.find(
-      (p) => p.id === populationCode
+    // Get population-specific counts — prefer joint data (gnomAD v4)
+    const jointPop = variant.joint?.populations?.find(
+      (p) => p.id === populationCode,
     );
 
-    const popExomeAc = exomePop?.ac ?? 0;
-    const popGenomeAc = genomePop?.ac ?? 0;
-    const popExomeAn = exomePop?.an ?? 0;
-    const popGenomeAn = genomePop?.an ?? 0;
-
-    totalAc = popExomeAc + popGenomeAc;
-    totalAn = popExomeAn + popGenomeAn;
+    if (jointPop) {
+      totalAc = jointPop.ac;
+      totalAn = jointPop.an;
+    } else {
+      const exomePop = variant.exome?.populations?.find(
+        (p) => p.id === populationCode,
+      );
+      const genomePop = variant.genome?.populations?.find(
+        (p) => p.id === populationCode,
+      );
+      totalAc = (exomePop?.ac ?? 0) + (genomePop?.ac ?? 0);
+      totalAn = (exomePop?.an ?? 0) + (genomePop?.an ?? 0);
+    }
     alleleFrequency = totalAn > 0 ? totalAc / totalAn : null;
   } else {
-    // Use global counts
-    const exomeAc = variant.exome?.ac ?? 0;
-    const genomeAc = variant.genome?.ac ?? 0;
-    const exomeAn = variant.exome?.an ?? 0;
-    const genomeAn = variant.genome?.an ?? 0;
-
-    totalAc = exomeAc + genomeAc;
-    totalAn = exomeAn + genomeAn;
+    // Use global counts — prefer joint data (gnomAD v4)
+    if (variant.joint) {
+      totalAc = variant.joint.ac;
+      totalAn = variant.joint.an;
+    } else {
+      totalAc = (variant.exome?.ac ?? 0) + (variant.genome?.ac ?? 0);
+      totalAn = (variant.exome?.an ?? 0) + (variant.genome?.an ?? 0);
+    }
     alleleFrequency = totalAn > 0 ? totalAc / totalAn : null;
   }
 
   // Find matching ClinVar variant
   const clinvarMatch = clinvarVariants.find(
-    (cv) => cv.variant_id === variant.variant_id
+    (cv) => cv.variant_id === variant.variant_id,
   );
 
   // Set ClinVar status, variation ID, and stars
@@ -80,7 +83,9 @@ export function toDisplayVariant(
 
   // Compute boolean flags
   const isLoF = tc ? isHighConfidenceLoF(tc) : false;
-  const isClinvarPathogenic = clinvarMatch ? isPathogenicClinVar(clinvarMatch) : false;
+  const isClinvarPathogenic = clinvarMatch
+    ? isPathogenicClinVar(clinvarMatch)
+    : false;
   const isMissense = tc ? isMissenseVariant(tc) : false;
 
   return {
@@ -116,9 +121,11 @@ export function toDisplayVariant(
 export function toDisplayVariants(
   variants: GnomadVariant[],
   clinvarVariants: ClinVarVariant[],
-  populationCode?: string | null
+  populationCode?: string | null,
 ): DisplayVariant[] {
-  return variants.map((v) => toDisplayVariant(v, clinvarVariants, populationCode));
+  return variants.map((v) =>
+    toDisplayVariant(v, clinvarVariants, populationCode),
+  );
 }
 
 /**
@@ -130,22 +137,32 @@ export function toDisplayVariants(
  */
 export function getPopulationVariants(
   variants: GnomadVariant[],
-  populationCode: string
+  populationCode: string,
 ): PopulationVariantFrequency[] {
   const results: PopulationVariantFrequency[] = [];
 
   for (const variant of variants) {
-    // Find population data in exome or genome
-    const exomePop = variant.exome?.populations?.find(
-      (p) => p.id === populationCode
-    );
-    const genomePop = variant.genome?.populations?.find(
-      (p) => p.id === populationCode
+    let ac: number;
+    let an: number;
+
+    // Prefer joint data (gnomAD v4)
+    const jointPop = variant.joint?.populations?.find(
+      (p) => p.id === populationCode,
     );
 
-    // Combine exome and genome for this population
-    const ac = (exomePop?.ac ?? 0) + (genomePop?.ac ?? 0);
-    const an = Math.max(exomePop?.an ?? 0, genomePop?.an ?? 0);
+    if (jointPop) {
+      ac = jointPop.ac;
+      an = jointPop.an;
+    } else {
+      const exomePop = variant.exome?.populations?.find(
+        (p) => p.id === populationCode,
+      );
+      const genomePop = variant.genome?.populations?.find(
+        (p) => p.id === populationCode,
+      );
+      ac = (exomePop?.ac ?? 0) + (genomePop?.ac ?? 0);
+      an = (exomePop?.an ?? 0) + (genomePop?.an ?? 0);
+    }
 
     // Only include if there's data for this population
     if (an > 0) {
@@ -172,11 +189,11 @@ export function getPopulationVariants(
  */
 export function getConsequenceLabel(consequenceTerms: string[]): string {
   if (!consequenceTerms || consequenceTerms.length === 0) {
-    return 'Unknown';
+    return "Unknown";
   }
   // Return first term, replacing underscores with spaces
   const firstTerm = consequenceTerms[0];
-  return firstTerm ? firstTerm.replace(/_/g, ' ') : 'Unknown';
+  return firstTerm ? firstTerm.replace(/_/g, " ") : "Unknown";
 }
 
 /**
@@ -186,22 +203,25 @@ export function getConsequenceLabel(consequenceTerms: string[]): string {
  * @returns Vuetify color name
  */
 export function getClinvarColor(status: string | null): string {
-  if (!status) return 'default';
+  if (!status) return "default";
 
   const lower = status.toLowerCase();
-  if (lower.includes('pathogenic') && !lower.includes('likely')) {
-    return 'error';
+  if (lower.includes("pathogenic") && !lower.includes("likely")) {
+    return "error";
   }
-  if (lower.includes('likely_pathogenic') || lower.includes('likely pathogenic')) {
-    return 'warning';
+  if (
+    lower.includes("likely_pathogenic") ||
+    lower.includes("likely pathogenic")
+  ) {
+    return "warning";
   }
-  if (lower.includes('uncertain') || lower.includes('vus')) {
-    return 'grey';
+  if (lower.includes("uncertain") || lower.includes("vus")) {
+    return "grey";
   }
-  if (lower.includes('benign')) {
-    return 'success';
+  if (lower.includes("benign")) {
+    return "success";
   }
-  return 'default';
+  return "default";
 }
 
 /**
@@ -212,8 +232,8 @@ export function getClinvarColor(status: string | null): string {
  * @returns Formatted string
  */
 export function formatAlleleFrequency(freq: number | null): string {
-  if (freq === null) return '-';
-  if (freq === 0) return '0';
+  if (freq === null) return "-";
+  if (freq === 0) return "0";
   if (freq < 0.0001) {
     return freq.toExponential(2);
   }
@@ -230,16 +250,21 @@ export function formatAlleleFrequency(freq: number | null): string {
  */
 export function filterVariantsByPopulation(
   variants: GnomadVariant[],
-  populationCode: string
+  populationCode: string,
 ): GnomadVariant[] {
   return variants.filter((variant) => {
+    // Prefer joint data (gnomAD v4)
+    const jointPop = variant.joint?.populations?.find(
+      (p) => p.id === populationCode,
+    );
+    if (jointPop) return jointPop.ac > 0;
+
     const exomePop = variant.exome?.populations?.find(
-      (p) => p.id === populationCode
+      (p) => p.id === populationCode,
     );
     const genomePop = variant.genome?.populations?.find(
-      (p) => p.id === populationCode
+      (p) => p.id === populationCode,
     );
-
     const ac = (exomePop?.ac ?? 0) + (genomePop?.ac ?? 0);
     return ac > 0;
   });

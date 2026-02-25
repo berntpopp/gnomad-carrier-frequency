@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
-import type { HistoryEntry, HistoryStoreState } from '@gnomad-cf/core/types';
+import { defineStore } from "pinia";
+import type { HistoryEntry, HistoryStoreState } from "@gnomad-cf/core/types";
 
-export const useHistoryStore = defineStore('history', {
+export const useHistoryStore = defineStore("history", {
   state: (): HistoryStoreState => ({
     entries: [],
     settings: {
@@ -32,14 +32,16 @@ export const useHistoryStore = defineStore('history', {
     /**
      * Group entries by calendar date for timeline display
      */
-    groupedByDate: (state): Array<{ date: string; entries: HistoryEntry[] }> => {
+    groupedByDate: (
+      state,
+    ): Array<{ date: string; entries: HistoryEntry[] }> => {
       const groups = new Map<string, HistoryEntry[]>();
 
       for (const entry of state.entries) {
-        const dateKey = new Date(entry.timestamp).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
+        const dateKey = new Date(entry.timestamp).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
 
         if (!groups.has(dateKey)) {
@@ -60,7 +62,7 @@ export const useHistoryStore = defineStore('history', {
      * Add a new history entry with ring buffer management.
      * Entry is prepended (newest first).
      */
-    addEntry(entry: Omit<HistoryEntry, 'id' | 'timestamp'>) {
+    addEntry(entry: Omit<HistoryEntry, "id" | "timestamp">) {
       const newEntry: HistoryEntry = {
         ...entry,
         id: crypto.randomUUID(),
@@ -79,7 +81,7 @@ export const useHistoryStore = defineStore('history', {
      * Delete a single entry by ID
      */
     deleteEntry(id: string) {
-      const index = this.entries.findIndex(e => e.id === id);
+      const index = this.entries.findIndex((e) => e.id === id);
       if (index > -1) {
         this.entries.splice(index, 1);
       }
@@ -109,15 +111,18 @@ export const useHistoryStore = defineStore('history', {
      * Find entry by ID
      */
     getEntry(id: string): HistoryEntry | undefined {
-      return this.entries.find(e => e.id === id);
+      return this.entries.find((e) => e.id === id);
     },
 
     /**
      * Update an existing entry by ID (preserves timestamp and id)
      * Used to update filter/exclusion changes without creating a new entry
      */
-    updateEntry(id: string, updates: Partial<Omit<HistoryEntry, 'id' | 'timestamp'>>) {
-      const index = this.entries.findIndex(e => e.id === id);
+    updateEntry(
+      id: string,
+      updates: Partial<Omit<HistoryEntry, "id" | "timestamp">>,
+    ) {
+      const index = this.entries.findIndex((e) => e.id === id);
       if (index > -1) {
         const existing = this.entries[index]!;
         this.entries[index] = {
@@ -132,7 +137,7 @@ export const useHistoryStore = defineStore('history', {
   },
 
   persist: {
-    key: 'carrier-freq-history',
+    key: "carrier-freq-history",
     storage: localStorage,
   },
 });

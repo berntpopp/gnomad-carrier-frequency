@@ -1,2 +1,2 @@
-export * from './variant-filters.js'
-export * from './variant-display.js'
+export * from "./variant-filters.js";
+export * from "./variant-display.js";

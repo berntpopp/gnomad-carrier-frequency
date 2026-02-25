@@ -1,12 +1,12 @@
-import { defineStore } from 'pinia';
-import { FACTORY_CALC_DEFAULTS } from '@gnomad-cf/core/types';
-import type { CalcConfig } from '@gnomad-cf/core/types';
+import { defineStore } from "pinia";
+import { FACTORY_CALC_DEFAULTS } from "@gnomad-cf/core/types";
+import type { CalcConfig } from "@gnomad-cf/core/types";
 
 interface CalcStoreState {
   defaults: CalcConfig;
 }
 
-export const useCalcStore = defineStore('calc-settings', {
+export const useCalcStore = defineStore("calc-settings", {
   state: (): CalcStoreState => ({
     defaults: { ...FACTORY_CALC_DEFAULTS },
   }),
@@ -49,7 +49,7 @@ export const useCalcStore = defineStore('calc-settings', {
   },
 
   persist: {
-    key: 'carrier-freq-calc',
+    key: "carrier-freq-calc",
     storage: localStorage,
   },
 });

@@ -1,10 +1,10 @@
-import { ref } from 'vue';
-import { useHistoryStore } from '@/stores/useHistoryStore';
-import { useHistoryAutoSave } from './useHistoryAutoSave';
-import { useWizard } from './useWizard';
-import { useCarrierFrequency } from './useCarrierFrequency';
-import { useExclusionState } from './useExclusionState';
-import { useGeneSearch } from './useGeneSearch';
+import { ref } from "vue";
+import { useHistoryStore } from "@/stores/useHistoryStore";
+import { useHistoryAutoSave } from "./useHistoryAutoSave";
+import { useWizard } from "./useWizard";
+import { useCarrierFrequency } from "./useCarrierFrequency";
+import { useExclusionState } from "./useExclusionState";
+import { useGeneSearch } from "./useGeneSearch";
 
 /**
  * Composable for restoring calculation state from history entries.
@@ -36,7 +36,7 @@ export function useHistoryRestore() {
   async function restoreFromHistory(entryId: string): Promise<boolean> {
     const entry = historyStore.getEntry(entryId);
     if (!entry) {
-      console.warn('History entry not found:', entryId);
+      console.warn("History entry not found:", entryId);
       return false;
     }
 
@@ -88,7 +88,7 @@ export function useHistoryRestore() {
 
       return true;
     } catch (error) {
-      console.error('Failed to restore from history:', error);
+      console.error("Failed to restore from history:", error);
       return false;
     } finally {
       isRestoring.value = false;

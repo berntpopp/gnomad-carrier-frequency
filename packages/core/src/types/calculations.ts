@@ -34,7 +34,7 @@ export interface CalcResult {
   /** Bayesian prevalence = geneticPrevalence * penetrance */
   bayesianPrevalence: number;
   /** Which carrier frequency formula was used */
-  formula: 'hwe' | 'simplified';
+  formula: "hwe" | "simplified";
   /** Whether homozygote exclusion (VCR/GCR) was applied */
   homExclusion: boolean;
 }

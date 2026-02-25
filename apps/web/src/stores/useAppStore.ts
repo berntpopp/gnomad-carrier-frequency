@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 
 interface AppStoreState {
   disclaimerAcknowledged: boolean;
@@ -6,7 +6,7 @@ interface AppStoreState {
   onboardingDismissed: boolean;
 }
 
-export const useAppStore = defineStore('app', {
+export const useAppStore = defineStore("app", {
   state: (): AppStoreState => ({
     disclaimerAcknowledged: false,
     disclaimerAcknowledgedAt: null,
@@ -35,7 +35,10 @@ export const useAppStore = defineStore('app', {
      * Ensures first-time users get guided entry after accepting the disclaimer.
      */
     shouldShowOnboarding: (state): boolean => {
-      return state.disclaimerAcknowledged === true && state.onboardingDismissed === false;
+      return (
+        state.disclaimerAcknowledged === true &&
+        state.onboardingDismissed === false
+      );
     },
   },
 
@@ -66,7 +69,7 @@ export const useAppStore = defineStore('app', {
   },
 
   persist: {
-    key: 'carrier-freq-app',
+    key: "carrier-freq-app",
     storage: localStorage,
   },
 });

@@ -1,11 +1,9 @@
 <template>
-  <v-card
-    class="mt-4"
-    variant="outlined"
-    data-testid="text-output"
-  >
+  <v-card class="mt-4" variant="outlined" data-testid="text-output">
     <!-- Header row - stacks vertically on mobile -->
-    <v-card-title class="d-flex flex-column flex-sm-row align-start align-sm-center ga-2 pb-0">
+    <v-card-title
+      class="d-flex flex-column flex-sm-row align-start align-sm-center ga-2 pb-0"
+    >
       <span>{{ labels.title }}</span>
       <v-spacer class="d-none d-sm-flex" />
 
@@ -18,18 +16,8 @@
           density="compact"
           variant="outlined"
         >
-          <v-btn
-            value="de"
-            size="small"
-          >
-            DE
-          </v-btn>
-          <v-btn
-            value="en"
-            size="small"
-          >
-            EN
-          </v-btn>
+          <v-btn value="de" size="small"> DE </v-btn>
+          <v-btn value="en" size="small"> EN </v-btn>
         </v-btn-toggle>
 
         <!-- Gender style selector (German only) -->
@@ -100,10 +88,7 @@
         <div class="text-body-2 text-medium-emphasis mb-2">
           {{ labels.sections }}
         </div>
-        <div
-          class="d-flex flex-wrap ga-2"
-          data-testid="text-section-chips"
-        >
+        <div class="d-flex flex-wrap ga-2" data-testid="text-section-chips">
           <v-chip
             v-for="section in availableSections"
             :key="section.id"
@@ -119,15 +104,13 @@
       </div>
 
       <!-- Text preview -->
-      <v-card
-        variant="tonal"
-        class="mb-4"
-      >
+      <v-card variant="tonal" class="mb-4">
         <v-card-text data-testid="text-content">
           <pre
             class="text-body-2"
-            style="white-space: pre-wrap; font-family: inherit; margin: 0;"
-          >{{ generatedText || labels.noText }}</pre>
+            style="white-space: pre-wrap; font-family: inherit; margin: 0"
+            >{{ generatedText || labels.noText }}</pre
+          >
         </v-card-text>
       </v-card>
 
@@ -147,10 +130,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useClipboard } from '@vueuse/core';
-import { useDisplay } from 'vuetify';
-import { useTextGenerator } from '@/composables';
+import { ref, computed } from "vue";
+import { useClipboard } from "@vueuse/core";
+import { useDisplay } from "vuetify";
+import { useTextGenerator } from "@/composables";
 import type {
   Perspective,
   GenderStyle,
@@ -158,7 +141,7 @@ import type {
   FrequencySource,
   IndexPatientStatus,
   CarrierFrequencyResult,
-} from '@gnomad-cf/core/types';
+} from "@gnomad-cf/core/types";
 
 // Responsive breakpoint detection
 const { smAndDown } = useDisplay();
@@ -172,7 +155,7 @@ const props = defineProps<{
   usingDefault: boolean;
 }>();
 
-const selectedPerspective = ref<Perspective>('affected');
+const selectedPerspective = ref<Perspective>("affected");
 
 // Pass props as getter function to composable
 const {
@@ -197,7 +180,7 @@ const {
 // Two-way binding models for Vuetify components
 const languageModel = computed({
   get: () => language.value,
-  set: (val: 'de' | 'en') => setLanguage(val),
+  set: (val: "de" | "en") => setLanguage(val),
 });
 
 const genderStyleModel = computed({
@@ -212,17 +195,17 @@ const patientSexModel = computed({
 
 // Gender style options for select
 const genderStyleOptions = computed(() => [
-  { value: '*', title: labels.value.genderStyles['*'] },
-  { value: ':', title: labels.value.genderStyles[':'] },
-  { value: '/', title: labels.value.genderStyles['/'] },
-  { value: 'traditional', title: labels.value.genderStyles.traditional },
+  { value: "*", title: labels.value.genderStyles["*"] },
+  { value: ":", title: labels.value.genderStyles[":"] },
+  { value: "/", title: labels.value.genderStyles["/"] },
+  { value: "traditional", title: labels.value.genderStyles.traditional },
 ]);
 
 // Patient sex options for select
 const patientSexOptions = computed(() => [
-  { value: 'male', title: labels.value.patientSexOptions.male },
-  { value: 'female', title: labels.value.patientSexOptions.female },
-  { value: 'neutral', title: labels.value.patientSexOptions.neutral },
+  { value: "male", title: labels.value.patientSexOptions.male },
+  { value: "female", title: labels.value.patientSexOptions.female },
+  { value: "neutral", title: labels.value.patientSexOptions.neutral },
 ]);
 
 // Clipboard
@@ -235,61 +218,64 @@ const { copy, copied } = useClipboard({
 const generatedText = computed(() => generateText(selectedPerspective.value));
 
 // Available sections for current perspective
-const availableSections = computed(() => getSections(selectedPerspective.value));
+const availableSections = computed(() =>
+  getSections(selectedPerspective.value),
+);
 
 // UI labels based on language
 const labels = computed(() =>
-  language.value === 'de'
+  language.value === "de"
     ? {
-        title: 'Klinischer Text',
-        perspective: 'Perspektive',
-        sections: 'Abschnitte',
-        copy: 'Text kopieren',
-        copied: 'Kopiert!',
-        noText: 'Kein Text generiert. Bitte mindestens einen Abschnitt aktivieren.',
-        patientSex: 'Patient*in',
+        title: "Klinischer Text",
+        perspective: "Perspektive",
+        sections: "Abschnitte",
+        copy: "Text kopieren",
+        copied: "Kopiert!",
+        noText:
+          "Kein Text generiert. Bitte mindestens einen Abschnitt aktivieren.",
+        patientSex: "Patient*in",
         perspectives: {
-          affected: 'Betroffener Patient',
-          carrier: 'Anlageträger/in',
-          familyMember: 'Familienmitglied',
+          affected: "Betroffener Patient",
+          carrier: "Anlageträger/in",
+          familyMember: "Familienmitglied",
         },
         genderStyles: {
-          '*': 'Genderstern (*)',
-          ':': 'Doppelpunkt (:)',
-          '/': 'Schrägstrich (/)',
-          traditional: 'Traditionell',
+          "*": "Genderstern (*)",
+          ":": "Doppelpunkt (:)",
+          "/": "Schrägstrich (/)",
+          traditional: "Traditionell",
         },
         patientSexOptions: {
-          male: 'Männlich (der Patient)',
-          female: 'Weiblich (die Patientin)',
-          neutral: 'Neutral (der/die Patient*in)',
+          male: "Männlich (der Patient)",
+          female: "Weiblich (die Patientin)",
+          neutral: "Neutral (der/die Patient*in)",
         },
       }
     : {
-        title: 'Clinical Text',
-        perspective: 'Perspective',
-        sections: 'Sections',
-        copy: 'Copy text',
-        copied: 'Copied!',
-        noText: 'No text generated. Please enable at least one section.',
-        patientSex: 'Patient Sex',
+        title: "Clinical Text",
+        perspective: "Perspective",
+        sections: "Sections",
+        copy: "Copy text",
+        copied: "Copied!",
+        noText: "No text generated. Please enable at least one section.",
+        patientSex: "Patient Sex",
         perspectives: {
-          affected: 'Affected Patient',
-          carrier: 'Carrier',
-          familyMember: 'Family Member',
+          affected: "Affected Patient",
+          carrier: "Carrier",
+          familyMember: "Family Member",
         },
         genderStyles: {
-          '*': 'Asterisk (*)',
-          ':': 'Colon (:)',
-          '/': 'Slash (/)',
-          traditional: 'Traditional',
+          "*": "Asterisk (*)",
+          ":": "Colon (:)",
+          "/": "Slash (/)",
+          traditional: "Traditional",
         },
         patientSexOptions: {
-          male: 'Male',
-          female: 'Female',
-          neutral: 'Neutral',
+          male: "Male",
+          female: "Female",
+          neutral: "Neutral",
         },
-      }
+      },
 );
 </script>
 

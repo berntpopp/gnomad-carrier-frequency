@@ -1,5 +1,5 @@
 // Predefined exclusion reason options for UI dropdowns
-import type { PredefinedExclusionReason } from '../types/exclusion.js';
+import type { PredefinedExclusionReason } from "../types/exclusion.js";
 
 export interface ExclusionReasonOption {
   value: PredefinedExclusionReason;
@@ -13,23 +13,23 @@ export interface ExclusionReasonOption {
  */
 export const EXCLUSION_REASONS: ExclusionReasonOption[] = [
   {
-    value: 'likely_benign',
-    label: 'Likely benign',
-    description: 'Variant appears benign based on clinical evidence',
+    value: "likely_benign",
+    label: "Likely benign",
+    description: "Variant appears benign based on clinical evidence",
   },
   {
-    value: 'low_quality',
-    label: 'Low quality',
-    description: 'Sequencing quality concerns for this variant',
+    value: "low_quality",
+    label: "Low quality",
+    description: "Sequencing quality concerns for this variant",
   },
   {
-    value: 'population_specific',
-    label: 'Population-specific',
-    description: 'Variant frequency specific to certain populations',
+    value: "population_specific",
+    label: "Population-specific",
+    description: "Variant frequency specific to certain populations",
   },
   {
-    value: 'other',
-    label: 'Other',
-    description: 'Custom reason (specify below)',
+    value: "other",
+    label: "Other",
+    description: "Custom reason (specify below)",
   },
 ];

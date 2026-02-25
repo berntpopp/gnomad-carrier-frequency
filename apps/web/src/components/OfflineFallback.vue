@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { useNetworkStatus } from '@/composables';
+import { useNetworkStatus } from "@/composables";
 
 const { isOnline } = useNetworkStatus();
 </script>

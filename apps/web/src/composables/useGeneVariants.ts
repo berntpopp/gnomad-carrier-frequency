@@ -1,16 +1,20 @@
-import { computed, type Ref } from 'vue';
-import { useQuery } from 'villus';
-import { GENE_VARIANTS_QUERY } from '@gnomad-cf/core/queries';
+import { computed, type Ref } from "vue";
+import { useQuery } from "villus";
+import { GENE_VARIANTS_QUERY } from "@gnomad-cf/core/queries";
 import type {
   GeneVariantsResponse,
   GeneVariant,
   GeneClinvarVariant,
-} from '@gnomad-cf/core/queries';
-import { getDatasetId, getReferenceGenome, type GnomadVersion } from '@gnomad-cf/core/config';
-import { useGnomadVersion } from '@/api';
+} from "@gnomad-cf/core/queries";
+import {
+  getDatasetId,
+  getReferenceGenome,
+  type GnomadVersion,
+} from "@gnomad-cf/core/config";
+import { useGnomadVersion } from "@/api";
 
 export interface UseGeneVariantsReturn {
-  gene: Ref<GeneVariantsResponse['gene']>;
+  gene: Ref<GeneVariantsResponse["gene"]>;
   variants: Ref<GeneVariant[]>;
   clinvarVariants: Ref<GeneClinvarVariant[]>;
   isLoading: Ref<boolean>;
@@ -22,13 +26,13 @@ export interface UseGeneVariantsReturn {
 }
 
 export function useGeneVariants(
-  geneSymbol: Ref<string | null>
+  geneSymbol: Ref<string | null>,
 ): UseGeneVariantsReturn {
   const { version } = useGnomadVersion();
 
   // Variables use dataset and referenceGenome from config
   const variables = computed(() => ({
-    geneSymbol: geneSymbol.value?.toUpperCase() ?? '',
+    geneSymbol: geneSymbol.value?.toUpperCase() ?? "",
     dataset: getDatasetId(version.value), // From config: 'gnomad_r4', etc.
     referenceGenome: getReferenceGenome(version.value), // From config: 'GRCh38', etc.
   }));
@@ -37,7 +41,7 @@ export function useGeneVariants(
     query: GENE_VARIANTS_QUERY,
     variables,
     skip: () => !geneSymbol.value,
-    cachePolicy: 'cache-first',
+    cachePolicy: "cache-first",
   });
 
   const gene = computed(() => data.value?.gene ?? null);
@@ -48,21 +52,24 @@ export function useGeneVariants(
   const hasError = computed(
     () =>
       !!error.value ||
-      (geneSymbol.value !== null && data.value !== undefined && gene.value === null && !isFetching.value)
+      (geneSymbol.value !== null &&
+        data.value !== undefined &&
+        gene.value === null &&
+        !isFetching.value),
   );
 
   const errorMessage = computed(() => {
     if (error.value) {
       const msg = error.value.message;
       // GENE-03: Invalid gene shows clear error message
-      if (msg.includes('not found') || msg.includes('does not exist')) {
+      if (msg.includes("not found") || msg.includes("does not exist")) {
         return `Gene "${geneSymbol.value}" not found in gnomAD. Please check the gene symbol.`;
       }
       // API-02: Handle API errors gracefully
-      if (msg.includes('timeout') || msg.includes('network')) {
-        return 'Network error. Please check your connection and try again.';
+      if (msg.includes("timeout") || msg.includes("network")) {
+        return "Network error. Please check your connection and try again.";
       }
-      return 'Failed to load variant data. Please try again.';
+      return "Failed to load variant data. Please try again.";
     }
     // Gene exists in search but has no data
     if (data.value !== undefined && gene.value === null && geneSymbol.value) {

@@ -1,12 +1,12 @@
-import { defineStore } from 'pinia';
-import type { FilterConfig, FilterDefaults } from '@gnomad-cf/core/types';
-import { FACTORY_FILTER_DEFAULTS } from '@gnomad-cf/core/types';
+import { defineStore } from "pinia";
+import type { FilterConfig, FilterDefaults } from "@gnomad-cf/core/types";
+import { FACTORY_FILTER_DEFAULTS } from "@gnomad-cf/core/types";
 
 interface FilterStoreState {
   defaults: FilterDefaults;
 }
 
-export const useFilterStore = defineStore('filters', {
+export const useFilterStore = defineStore("filters", {
   state: (): FilterStoreState => ({
     defaults: { ...FACTORY_FILTER_DEFAULTS },
   }),
@@ -20,30 +20,32 @@ export const useFilterStore = defineStore('filters', {
       const parts: string[] = [];
 
       if (state.defaults.lofHcEnabled) {
-        parts.push('LoF HC');
+        parts.push("LoF HC");
       }
 
       if (state.defaults.missenseEnabled) {
-        parts.push('Missense');
+        parts.push("Missense");
       }
 
       if (state.defaults.clinvarEnabled) {
         const starText =
           state.defaults.clinvarStarThreshold === 1
-            ? '1 star'
+            ? "1 star"
             : `${state.defaults.clinvarStarThreshold} stars`;
         parts.push(`ClinVar >= ${starText}`);
 
         if (state.defaults.clinvarIncludeConflicting) {
-          parts.push(`Conflicting >= ${state.defaults.clinvarConflictingThreshold}% P/LP`);
+          parts.push(
+            `Conflicting >= ${state.defaults.clinvarConflictingThreshold}% P/LP`,
+          );
         }
       }
 
       if (parts.length === 0) {
-        return 'No filters active';
+        return "No filters active";
       }
 
-      return parts.join(', ');
+      return parts.join(", ");
     },
   },
 
@@ -110,7 +112,7 @@ export const useFilterStore = defineStore('filters', {
   },
 
   persist: {
-    key: 'carrier-freq-filters',
+    key: "carrier-freq-filters",
     storage: localStorage,
   },
 });

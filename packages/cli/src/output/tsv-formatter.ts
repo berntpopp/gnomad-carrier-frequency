@@ -1,5 +1,8 @@
-import { formatCarrierFrequency, formatPrevalence } from '@gnomad-cf/core/calculations'
-import type { QueryResult } from '../types.js'
+import {
+  formatCarrierFrequency,
+  formatPrevalence,
+} from "@gnomad-cf/core/calculations";
+import type { QueryResult } from "../types.js";
 
 /**
  * Escape a field value for TSV output.
@@ -10,33 +13,36 @@ import type { QueryResult } from '../types.js'
  * - Replace newlines with a space
  * - Replace tab characters with a space
  */
-function escapeTsv(value: string | number | boolean | null | undefined): string {
+function escapeTsv(
+  value: string | number | boolean | null | undefined,
+): string {
   if (value === null || value === undefined) {
-    return '""'
+    return '""';
   }
   const str = String(value)
-    .replace(/\n/g, ' ')   // newlines → space
-    .replace(/\t/g, ' ')   // tabs → space
-    .replace(/"/g, '""')   // internal quotes → doubled quotes
-  return `"${str}"`
+    .replace(/\n/g, " ") // newlines → space
+    .replace(/\t/g, " ") // tabs → space
+    .replace(/"/g, '""'); // internal quotes → doubled quotes
+  return `"${str}"`;
 }
 
 /** TSV header columns for main table */
 const MAIN_HEADER =
-  'gene\tpopulation\tpopulation_code\tcarrier_frequency\tcarrier_freq_ratio\t' +
-  'genetic_prevalence\tbayesian_prevalence\tallele_count\tallele_number\tsum_af\t' +
-  'founder_effect\tlow_sample_size'
+  "gene\tpopulation\tpopulation_code\tcarrier_frequency\tcarrier_freq_ratio\t" +
+  "genetic_prevalence\tbayesian_prevalence\tallele_count\tallele_number\tsum_af\t" +
+  "founder_effect\tlow_sample_size";
 
 /** TSV header columns for variant table */
-const VARIANT_HEADER = 'variant_id\tgene\tconsequence\tallele_frequency\tclinvar\tac_hom'
+const VARIANT_HEADER =
+  "variant_id\tgene\tconsequence\tallele_frequency\tclinvar\tac_hom";
 
 /**
  * Compute sum_af from allele count/number.
  * Returns 0 if allele number is 0.
  */
 function computeSumAF(alleleCount: number, alleleNumber: number): number {
-  if (alleleNumber === 0) return 0
-  return alleleCount / alleleNumber
+  if (alleleNumber === 0) return 0;
+  return alleleCount / alleleNumber;
 }
 
 /**
@@ -44,20 +50,19 @@ function computeSumAF(alleleCount: number, alleleNumber: number): number {
  * The global row uses population='Global', population_code='global'.
  */
 function resultToRows(result: QueryResult): string[] {
-  const rows: string[] = []
+  const rows: string[] = [];
 
-  const { ratio: cfRatioGlobal, percent: cfPercentGlobal } = formatCarrierFrequency(
-    result.globalCarrierFrequency
-  )
-  const { ratio: gpGlobal } = formatPrevalence(result.geneticPrevalence)
-  const { ratio: bpGlobal } = formatPrevalence(result.bayesianPrevalence)
+  const { ratio: cfRatioGlobal, percent: cfPercentGlobal } =
+    formatCarrierFrequency(result.globalCarrierFrequency);
+  const { ratio: gpGlobal } = formatPrevalence(result.geneticPrevalence);
+  const { ratio: bpGlobal } = formatPrevalence(result.bayesianPrevalence);
 
   // Global row
   rows.push(
     [
       escapeTsv(result.gene),
-      escapeTsv('Global'),
-      escapeTsv('global'),
+      escapeTsv("Global"),
+      escapeTsv("global"),
       escapeTsv(cfPercentGlobal),
       escapeTsv(cfRatioGlobal),
       escapeTsv(gpGlobal),
@@ -67,19 +72,23 @@ function resultToRows(result: QueryResult): string[] {
       escapeTsv(result.globalSumAF.toPrecision(5)),
       escapeTsv(false),
       escapeTsv(false),
-    ].join('\t')
-  )
+    ].join("\t"),
+  );
 
   // Per-population rows
   for (const pop of result.populations) {
-    if (pop.carrierFrequency === null) continue
+    if (pop.carrierFrequency === null) continue;
 
-    const { ratio: cfRatio, percent: cfPercent } = formatCarrierFrequency(pop.carrierFrequency)
-    const { ratio: gpRatio } = formatPrevalence(pop.geneticPrevalence)
+    const { ratio: cfRatio, percent: cfPercent } = formatCarrierFrequency(
+      pop.carrierFrequency,
+    );
+    const { ratio: gpRatio } = formatPrevalence(pop.geneticPrevalence);
     const bayesianPrevalence =
-      pop.geneticPrevalence !== null ? pop.geneticPrevalence * result.penetrance : null
-    const { ratio: bpRatio } = formatPrevalence(bayesianPrevalence)
-    const sumAF = computeSumAF(pop.alleleCount, pop.alleleNumber)
+      pop.geneticPrevalence !== null
+        ? pop.geneticPrevalence * result.penetrance
+        : null;
+    const { ratio: bpRatio } = formatPrevalence(bayesianPrevalence);
+    const sumAF = computeSumAF(pop.alleleCount, pop.alleleNumber);
 
     rows.push(
       [
@@ -95,11 +104,11 @@ function resultToRows(result: QueryResult): string[] {
         escapeTsv(sumAF.toPrecision(5)),
         escapeTsv(pop.isFounderEffect),
         escapeTsv(pop.isLowSampleSize),
-      ].join('\t')
-    )
+      ].join("\t"),
+    );
   }
 
-  return rows
+  return rows;
 }
 
 /**
@@ -121,21 +130,21 @@ function resultToRows(result: QueryResult): string[] {
  */
 export function formatTsv(
   results: QueryResult | QueryResult[],
-  opts?: { includeVariants?: boolean }
+  opts?: { includeVariants?: boolean },
 ): string {
-  const resultArray = Array.isArray(results) ? results : [results]
+  const resultArray = Array.isArray(results) ? results : [results];
 
-  const lines: string[] = [MAIN_HEADER]
+  const lines: string[] = [MAIN_HEADER];
 
   for (const result of resultArray) {
-    lines.push(...resultToRows(result))
+    lines.push(...resultToRows(result));
   }
 
   if (opts?.includeVariants) {
-    const variantLines: string[] = ['', '# Variants', VARIANT_HEADER]
+    const variantLines: string[] = ["", "# Variants", VARIANT_HEADER];
 
     for (const result of resultArray) {
-      if (!result.variants || result.variants.length === 0) continue
+      if (!result.variants || result.variants.length === 0) continue;
 
       for (const v of result.variants) {
         variantLines.push(
@@ -144,15 +153,15 @@ export function formatTsv(
             escapeTsv(result.gene),
             escapeTsv(v.consequence),
             escapeTsv(v.alleleFrequency.toPrecision(5)),
-            escapeTsv(v.clinvarSignificance ?? 'N/A'),
+            escapeTsv(v.clinvarSignificance ?? "N/A"),
             escapeTsv(v.ac_hom),
-          ].join('\t')
-        )
+          ].join("\t"),
+        );
       }
     }
 
-    lines.push(...variantLines)
+    lines.push(...variantLines);
   }
 
-  return lines.join('\n')
+  return lines.join("\n");
 }

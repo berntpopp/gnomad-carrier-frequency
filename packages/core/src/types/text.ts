@@ -3,7 +3,7 @@
 /**
  * Perspective for text generation - determines phrasing and focus
  */
-export type Perspective = 'affected' | 'carrier' | 'familyMember';
+export type Perspective = "affected" | "carrier" | "familyMember";
 
 /**
  * Gender-inclusive language style for German text
@@ -12,7 +12,7 @@ export type Perspective = 'affected' | 'carrier' | 'familyMember';
  * - '/': Anlageträger/-innen
  * - 'traditional': Anlageträgerinnen und Anlageträger
  */
-export type GenderStyle = '*' | ':' | '/' | 'traditional';
+export type GenderStyle = "*" | ":" | "/" | "traditional";
 
 /**
  * Patient biological sex for German grammatical gender agreement
@@ -20,7 +20,7 @@ export type GenderStyle = '*' | ':' | '/' | 'traditional';
  * - 'female': die Patientin / der Patientin / der Patientin
  * - 'neutral': der/die Patient*in / des/der Patient*in / dem/der Patient*in
  */
-export type PatientSex = 'male' | 'female' | 'neutral';
+export type PatientSex = "male" | "female" | "neutral";
 
 /**
  * A single text section within a perspective
@@ -43,7 +43,7 @@ export interface PerspectiveConfig {
  * Full template configuration for a language
  */
 export interface TemplateConfig {
-  language: 'de' | 'en';
+  language: "de" | "en";
   perspectives: Record<Perspective, PerspectiveConfig>;
 }
 
@@ -71,7 +71,11 @@ export interface TemplateContext {
   source: string;
 
   /** Index patient status - expanded for status-specific text */
-  indexStatus: 'heterozygous' | 'homozygous' | 'compound_het_confirmed' | 'compound_het_assumed';
+  indexStatus:
+    | "heterozygous"
+    | "homozygous"
+    | "compound_het_confirmed"
+    | "compound_het_assumed";
 
   /** Status-specific intro text (built by text generator) */
   statusIntro: string;

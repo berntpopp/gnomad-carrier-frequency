@@ -6,17 +6,9 @@
     data-testid="gene-constraint-card"
   >
     <v-card-title class="text-subtitle-1 d-flex align-center">
-      <v-icon
-        start
-        size="small"
-      >
-        mdi-dna
-      </v-icon>
+      <v-icon start size="small"> mdi-dna </v-icon>
       Gene Constraint
-      <v-tooltip
-        location="top"
-        aria-label="Gene constraint information"
-      >
+      <v-tooltip location="top" aria-label="Gene constraint information">
         <template #activator="{ props: tooltipProps }">
           <v-icon
             v-bind="tooltipProps"
@@ -36,18 +28,13 @@
     </v-card-title>
 
     <v-card-text>
-      <v-skeleton-loader
-        v-if="loading"
-        type="text, text"
-      />
+      <v-skeleton-loader v-if="loading" type="text, text" />
 
       <template v-else-if="constraint">
         <div class="d-flex flex-wrap ga-4">
           <!-- LOEUF (primary metric) -->
           <div class="constraint-metric">
-            <div class="text-caption text-medium-emphasis">
-              LOEUF
-            </div>
+            <div class="text-caption text-medium-emphasis">LOEUF</div>
             <div class="d-flex align-center">
               <v-chip
                 :color="loeufInterpretation.color"
@@ -57,7 +44,7 @@
                 {{
                   constraint.loeuf !== null
                     ? constraint.loeuf.toFixed(2)
-                    : 'N/A'
+                    : "N/A"
                 }}
               </v-chip>
               <span class="text-caption ml-2">{{
@@ -68,9 +55,7 @@
 
           <!-- pLI (secondary metric) -->
           <div class="constraint-metric">
-            <div class="text-caption text-medium-emphasis">
-              pLI
-            </div>
+            <div class="text-caption text-medium-emphasis">pLI</div>
             <div class="d-flex align-center">
               <v-chip
                 :color="pliInterpretation.color"
@@ -78,21 +63,18 @@
                 variant="tonal"
               >
                 {{
-                  constraint.pLI !== null ? constraint.pLI.toFixed(2) : 'N/A'
+                  constraint.pLI !== null ? constraint.pLI.toFixed(2) : "N/A"
                 }}
               </v-chip>
-              <span class="text-caption ml-2">{{ pliInterpretation.label }}</span>
+              <span class="text-caption ml-2">{{
+                pliInterpretation.label
+              }}</span>
             </div>
           </div>
 
           <!-- O/E Ratio -->
-          <div
-            v-if="constraint.oeLof !== null"
-            class="constraint-metric"
-          >
-            <div class="text-caption text-medium-emphasis">
-              O/E LoF
-            </div>
+          <div v-if="constraint.oeLof !== null" class="constraint-metric">
+            <div class="text-caption text-medium-emphasis">O/E LoF</div>
             <div class="text-body-2">
               {{ constraint.oeLof.toFixed(2) }}
               <span
@@ -110,9 +92,7 @@
             v-if="constraint.obsLof !== null && constraint.expLof !== null"
             class="constraint-metric"
           >
-            <div class="text-caption text-medium-emphasis">
-              LoF Variants
-            </div>
+            <div class="text-caption text-medium-emphasis">LoF Variants</div>
             <div class="text-body-2">
               {{ constraint.obsLof }} observed /
               {{ constraint.expLof?.toFixed(1) }} expected
@@ -130,12 +110,7 @@
         >
           <template #title>
             <div class="d-flex align-center">
-              <v-icon
-                start
-                size="small"
-              >
-                mdi-signal-off
-              </v-icon>
+              <v-icon start size="small"> mdi-signal-off </v-icon>
               Low Exome Coverage
             </div>
           </template>
@@ -160,15 +135,12 @@
           class="mt-3"
         >
           <div class="text-caption">
-            Quality flags: {{ nonCoverageFlags.join(', ') }}
+            Quality flags: {{ nonCoverageFlags.join(", ") }}
           </div>
         </v-alert>
       </template>
 
-      <div
-        v-else
-        class="text-medium-emphasis text-body-2"
-      >
+      <div v-else class="text-medium-emphasis text-body-2">
         No constraint data available for this gene.
       </div>
     </v-card-text>
@@ -176,9 +148,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { GeneConstraint } from '@gnomad-cf/core/types';
-import { getLoeufInterpretation, getPliInterpretation } from '@gnomad-cf/core/types';
+import { computed } from "vue";
+import type { GeneConstraint } from "@gnomad-cf/core/types";
+import {
+  getLoeufInterpretation,
+  getPliInterpretation,
+} from "@gnomad-cf/core/types";
 
 const props = defineProps<{
   constraint: GeneConstraint | null;
@@ -187,11 +162,14 @@ const props = defineProps<{
 }>();
 
 const loeufInterpretation = computed(() =>
-  getLoeufInterpretation(props.constraint?.loeuf ?? null, props.gnomadVersion ?? '4.1')
+  getLoeufInterpretation(
+    props.constraint?.loeuf ?? null,
+    props.gnomadVersion ?? "4.1",
+  ),
 );
 
 const pliInterpretation = computed(() =>
-  getPliInterpretation(props.constraint?.pLI ?? null)
+  getPliInterpretation(props.constraint?.pLI ?? null),
 );
 
 // Check for coverage-related flags
@@ -200,10 +178,11 @@ const hasLowCoverage = computed(() => {
   if (!flags || flags.length === 0) return false;
 
   // gnomAD flags include: 'lof_too_many', 'no_lof_constraint', 'low_coverage', etc.
-  return flags.some(flag =>
-    flag.toLowerCase().includes('coverage') ||
-    flag.toLowerCase().includes('no_constraint') ||
-    flag.toLowerCase().includes('no_lof')
+  return flags.some(
+    (flag) =>
+      flag.toLowerCase().includes("coverage") ||
+      flag.toLowerCase().includes("no_constraint") ||
+      flag.toLowerCase().includes("no_lof"),
   );
 });
 
@@ -212,10 +191,11 @@ const nonCoverageFlags = computed(() => {
   const flags = props.constraint?.flags;
   if (!flags || flags.length === 0) return [];
 
-  return flags.filter(flag =>
-    !flag.toLowerCase().includes('coverage') &&
-    !flag.toLowerCase().includes('no_constraint') &&
-    !flag.toLowerCase().includes('no_lof')
+  return flags.filter(
+    (flag) =>
+      !flag.toLowerCase().includes("coverage") &&
+      !flag.toLowerCase().includes("no_constraint") &&
+      !flag.toLowerCase().includes("no_lof"),
   );
 });
 </script>

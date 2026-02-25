@@ -54,9 +54,7 @@
           size="small"
           @click="includeAll"
         >
-          <v-icon start>
-            mdi-refresh
-          </v-icon>
+          <v-icon start> mdi-refresh </v-icon>
           Clear exclusions
         </v-btn>
 
@@ -70,13 +68,9 @@
               size="small"
               :disabled="variants.length === 0"
             >
-              <v-icon start>
-                mdi-download
-              </v-icon>
+              <v-icon start> mdi-download </v-icon>
               Export
-              <v-icon end>
-                mdi-chevron-down
-              </v-icon>
+              <v-icon end> mdi-chevron-down </v-icon>
             </v-btn>
           </template>
           <v-list density="compact">
@@ -109,13 +103,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useDisplay } from 'vuetify';
-import * as XLSX from 'xlsx';
-import VariantTable from './VariantTable.vue';
-import type { DisplayVariant } from '@gnomad-cf/core/types';
-import { buildExportVariants, generateFilename } from '@/utils/export-utils';
-import { useExclusionState } from '@/composables';
+import { computed } from "vue";
+import { useDisplay } from "vuetify";
+import * as XLSX from "xlsx";
+import VariantTable from "./VariantTable.vue";
+import type { DisplayVariant } from "@gnomad-cf/core/types";
+import { buildExportVariants, generateFilename } from "@/utils/export-utils";
+import { useExclusionState } from "@/composables";
 
 const props = defineProps<{
   /** v-model for dialog visibility */
@@ -133,7 +127,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'update:modelValue': [value: boolean];
+  "update:modelValue": [value: boolean];
 }>();
 
 // Get exclusion state composable
@@ -144,7 +138,8 @@ const excludedSet = computed(() => new Set(excluded.value));
 
 // Count of excluded variants in current modal view
 const excludedInModal = computed(() => {
-  return props.variants.filter(v => excluded.value.includes(v.variant_id)).length;
+  return props.variants.filter((v) => excluded.value.includes(v.variant_id))
+    .length;
 });
 
 // Responsive breakpoint detection
@@ -153,8 +148,8 @@ const { smAndDown, lgAndUp } = useDisplay();
 // Responsive dialog sizing
 const isSmallScreen = computed(() => smAndDown.value);
 const dialogWidth = computed(() => {
-  if (lgAndUp.value) return '90%';
-  return '95%';
+  if (lgAndUp.value) return "90%";
+  return "95%";
 });
 
 // Dynamic modal title
@@ -162,7 +157,7 @@ const modalTitle = computed(() => {
   if (props.populationLabel) {
     return `Variants for ${props.populationLabel}`;
   }
-  return 'All Contributing Variants';
+  return "All Contributing Variants";
 });
 
 /**
@@ -170,7 +165,7 @@ const modalTitle = computed(() => {
  */
 function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
   link.download = filename;
   document.body.appendChild(link);
@@ -182,20 +177,20 @@ function downloadBlob(blob: Blob, filename: string): void {
 /**
  * Export variants handler for JSON or Excel format
  */
-function handleVariantExport(format: 'json' | 'xlsx') {
+function handleVariantExport(format: "json" | "xlsx") {
   if (!props.variants.length) return;
 
   // Build export variants with exclusion data
   const exportVariants = buildExportVariants(
     props.variants,
     excludedSet.value,
-    reasons
+    reasons,
   );
-  const gene = props.gene || 'variants';
+  const gene = props.gene || "variants";
   const population = props.populationCode || undefined;
-  const filename = generateFilename(gene, population) + '_variants';
+  const filename = generateFilename(gene, population) + "_variants";
 
-  if (format === 'json') {
+  if (format === "json") {
     const data = {
       variants: exportVariants,
       populationCode: props.populationCode,
@@ -205,14 +200,14 @@ function handleVariantExport(format: 'json' | 'xlsx') {
       excludedCount: exportVariants.filter((v) => v.excluded).length,
     };
     const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    downloadBlob(blob, filename + '.json');
+    const blob = new Blob([json], { type: "application/json" });
+    downloadBlob(blob, filename + ".json");
   } else {
     // Excel export with single Variants sheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(exportVariants);
-    XLSX.utils.book_append_sheet(wb, ws, 'Variants');
-    XLSX.writeFile(wb, filename + '.xlsx');
+    XLSX.utils.book_append_sheet(wb, ws, "Variants");
+    XLSX.writeFile(wb, filename + ".xlsx");
   }
 }
 </script>

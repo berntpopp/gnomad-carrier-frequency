@@ -32,6 +32,18 @@ export const GENE_VARIANTS_QUERY = `
             ac_hom
           }
         }
+        joint {
+          ac
+          an
+          homozygote_count
+          hemizygote_count
+          populations {
+            id
+            ac
+            an
+            homozygote_count
+          }
+        }
         transcript_consequence {
           gene_symbol
           transcript_id
@@ -61,5 +73,5 @@ export const GENE_VARIANTS_QUERY = `
 export interface GeneVariantsVariables {
   geneSymbol: string;
   dataset: string; // From config: 'gnomad_r4', 'gnomad_r3', 'gnomad_r2_1'
-  referenceGenome: 'GRCh37' | 'GRCh38';
+  referenceGenome: "GRCh37" | "GRCh38";
 }

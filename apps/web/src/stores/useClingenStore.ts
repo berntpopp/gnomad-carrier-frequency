@@ -1,12 +1,12 @@
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 import type {
   ClingenCacheState,
   ClingenEntry,
   ClingenValidityResult,
-} from '@gnomad-cf/core/types';
-import { CLINGEN_CACHE_EXPIRY_MS } from '@gnomad-cf/core/types';
+} from "@gnomad-cf/core/types";
+import { CLINGEN_CACHE_EXPIRY_MS } from "@gnomad-cf/core/types";
 
-export const useClingenStore = defineStore('clingen', {
+export const useClingenStore = defineStore("clingen", {
   state: (): ClingenCacheState => ({
     data: null,
     lastFetched: null,
@@ -33,12 +33,12 @@ export const useClingenStore = defineStore('clingen', {
      * Get human-readable cache age
      */
     cacheAge: (state): string => {
-      if (!state.lastFetched) return 'Never fetched';
+      if (!state.lastFetched) return "Never fetched";
       const days = Math.floor(
-        (Date.now() - state.lastFetched) / (24 * 60 * 60 * 1000)
+        (Date.now() - state.lastFetched) / (24 * 60 * 60 * 1000),
       );
-      if (days === 0) return 'Today';
-      if (days === 1) return '1 day ago';
+      if (days === 0) return "Today";
+      if (days === 1) return "1 day ago";
       return `${days} days ago`;
     },
 
@@ -91,13 +91,13 @@ export const useClingenStore = defineStore('clingen', {
 
       const normalizedSymbol = geneSymbol.toUpperCase().trim();
       const entries = this.data.filter(
-        (e) => e.geneSymbol.toUpperCase() === normalizedSymbol
+        (e) => e.geneSymbol.toUpperCase() === normalizedSymbol,
       );
 
       // Check for AR inheritance patterns
       const arEntries = entries.filter((e) => {
         const moi = e.moi.toLowerCase();
-        return moi.includes('recessive') || moi === 'ar';
+        return moi.includes("recessive") || moi === "ar";
       });
 
       return {
@@ -110,7 +110,7 @@ export const useClingenStore = defineStore('clingen', {
   },
 
   persist: {
-    key: 'clingen-cache',
+    key: "clingen-cache",
     storage: localStorage,
   },
 });

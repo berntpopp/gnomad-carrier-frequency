@@ -1,5 +1,5 @@
-import { ref, watch } from 'vue';
-import { useOnline } from '@vueuse/core';
+import { ref, watch } from "vue";
+import { useOnline } from "@vueuse/core";
 
 /**
  * Composable for monitoring network connectivity status.
@@ -13,20 +13,24 @@ export function useNetworkStatus() {
   let wasOffline = false;
 
   // Watch for online state changes
-  watch(isOnline, (online) => {
-    if (online && wasOffline) {
-      // Connection restored - show notification
-      showBackOnlineNotification.value = true;
+  watch(
+    isOnline,
+    (online) => {
+      if (online && wasOffline) {
+        // Connection restored - show notification
+        showBackOnlineNotification.value = true;
 
-      // Auto-hide after 3 seconds
-      setTimeout(() => {
-        showBackOnlineNotification.value = false;
-      }, 3000);
-    }
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+          showBackOnlineNotification.value = false;
+        }, 3000);
+      }
 
-    // Update previous state
-    wasOffline = !online;
-  }, { immediate: true });
+      // Update previous state
+      wasOffline = !online;
+    },
+    { immediate: true },
+  );
 
   // Manual dismiss function
   const dismissBackOnlineNotification = (): void => {

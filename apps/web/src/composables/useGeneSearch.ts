@@ -1,15 +1,15 @@
-import { computed, ref, watch, type Ref } from 'vue';
-import { useQuery } from 'villus';
-import { useDebounceFn } from '@vueuse/core';
-import { GENE_SEARCH_QUERY, GENE_DETAILS_QUERY } from '@gnomad-cf/core/queries';
+import { computed, ref, watch, type Ref } from "vue";
+import { useQuery } from "villus";
+import { useDebounceFn } from "@vueuse/core";
+import { GENE_SEARCH_QUERY, GENE_DETAILS_QUERY } from "@gnomad-cf/core/queries";
 import type {
   GeneSearchResponse,
   GeneSearchResult,
   GeneDetailsResponse,
-} from '@gnomad-cf/core/queries';
-import { config, getReferenceGenome } from '@gnomad-cf/core/config';
-import { useGnomadVersion, graphqlClient } from '@/api';
-import type { GeneConstraint } from '@gnomad-cf/core/types';
+} from "@gnomad-cf/core/queries";
+import { config, getReferenceGenome } from "@gnomad-cf/core/config";
+import { useGnomadVersion, graphqlClient } from "@/api";
+import type { GeneConstraint } from "@gnomad-cf/core/types";
 
 // Get settings from config - NO HARDCODED VALUES
 const { debounceMs, minSearchChars, maxAutocompleteResults } = config.settings;
@@ -19,8 +19,8 @@ const sharedGeneConstraint = ref<GeneConstraint | null>(null);
 const sharedConstraintLoading = ref(false);
 
 // Promoted to module-level so all callers share the same reactive state
-const searchTerm = ref('');
-const debouncedTerm = ref('');
+const searchTerm = ref("");
+const debouncedTerm = ref("");
 const selectedGene = ref<GeneSearchResult | null>(null);
 
 export interface UseGeneSearchReturn {
@@ -53,7 +53,11 @@ export function useGeneSearch(): UseGeneSearchReturn {
     // Clear selection when user types a different gene name.
     // Don't clear on empty string — v-autocomplete resets its search model
     // during stepper transitions, which would incorrectly deselect the gene.
-    if (selectedGene.value && term.length > 0 && term.toUpperCase() !== selectedGene.value.symbol) {
+    if (
+      selectedGene.value &&
+      term.length > 0 &&
+      term.toUpperCase() !== selectedGene.value.symbol
+    ) {
       selectedGene.value = null;
     }
     setSearchTerm(term);
@@ -75,7 +79,7 @@ export function useGeneSearch(): UseGeneSearchReturn {
 
   // Limit results from config
   const results = computed(() =>
-    (data.value?.gene_search ?? []).slice(0, maxAutocompleteResults)
+    (data.value?.gene_search ?? []).slice(0, maxAutocompleteResults),
   );
 
   // Fetch constraint data for a selected gene
@@ -120,7 +124,7 @@ export function useGeneSearch(): UseGeneSearchReturn {
   const selectGene = (gene: GeneSearchResult) => {
     selectedGene.value = gene;
     searchTerm.value = gene.symbol;
-    debouncedTerm.value = ''; // Stop searching
+    debouncedTerm.value = ""; // Stop searching
 
     // Fetch constraint data when gene is selected
     fetchConstraint(gene.symbol);
@@ -128,8 +132,8 @@ export function useGeneSearch(): UseGeneSearchReturn {
 
   const clearSelection = () => {
     selectedGene.value = null;
-    searchTerm.value = '';
-    debouncedTerm.value = '';
+    searchTerm.value = "";
+    debouncedTerm.value = "";
     sharedGeneConstraint.value = null;
   };
 

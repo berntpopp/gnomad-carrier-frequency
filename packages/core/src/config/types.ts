@@ -1,5 +1,5 @@
 // gnomAD version identifiers
-export type GnomadVersion = 'v4' | 'v3' | 'v2';
+export type GnomadVersion = "v4" | "v3" | "v2";
 
 // Population code varies by version
 export interface PopulationConfig {
@@ -14,7 +14,7 @@ export interface GnomadVersionConfig {
   displayName: string;
   apiEndpoint: string;
   datasetId: string;
-  referenceGenome: 'GRCh38' | 'GRCh37';
+  referenceGenome: "GRCh38" | "GRCh37";
   populations: PopulationConfig[];
   notes?: string;
 }

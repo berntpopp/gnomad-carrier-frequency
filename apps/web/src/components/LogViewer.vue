@@ -2,9 +2,7 @@
   <div class="log-viewer">
     <!-- Header with actions -->
     <div class="d-flex align-center justify-space-between mb-3">
-      <h3 class="text-h6">
-        Application Logs
-      </h3>
+      <h3 class="text-h6">Application Logs</h3>
       <v-btn
         icon
         variant="text"
@@ -17,19 +15,12 @@
     </div>
 
     <!-- Statistics -->
-    <v-card
-      variant="tonal"
-      density="compact"
-      class="mb-3 pa-2"
-    >
+    <v-card variant="tonal" density="compact" class="mb-3 pa-2">
       <div class="d-flex flex-wrap ga-4 text-body-2">
         <span>
           <strong>{{ stats.totalCount }}</strong> entries
         </span>
-        <span
-          v-if="stats.droppedCount > 0"
-          class="text-warning"
-        >
+        <span v-if="stats.droppedCount > 0" class="text-warning">
           <strong>{{ stats.droppedCount }}</strong> dropped
         </span>
         <span class="text-medium-emphasis">
@@ -76,10 +67,7 @@
     </div>
 
     <!-- Log entries -->
-    <v-list
-      density="compact"
-      class="log-list rounded border"
-    >
+    <v-list density="compact" class="log-list rounded border">
       <template v-if="filteredEntries.length > 0">
         <v-list-item
           v-for="entry in filteredEntries"
@@ -112,7 +100,9 @@
             v-if="expandedIds.has(entry.id) && entry.details"
             class="mt-2 pa-2 rounded bg-grey-darken-4"
           >
-            <pre class="text-caption text-wrap">{{ formatDetails(entry.details) }}</pre>
+            <pre class="text-caption text-wrap">{{
+              formatDetails(entry.details)
+            }}</pre>
           </div>
         </v-list-item>
       </template>
@@ -149,10 +139,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useLogStore } from '@/stores/useLogStore';
-import { useExport, useConfirmDialog } from '@/composables';
-import type { LogLevel, LogEntry } from '@gnomad-cf/core/types';
+import { ref, computed } from "vue";
+import { useLogStore } from "@/stores/useLogStore";
+import { useExport, useConfirmDialog } from "@/composables";
+import type { LogLevel, LogEntry } from "@gnomad-cf/core/types";
 
 const emit = defineEmits<{
   close: [];
@@ -163,17 +153,17 @@ const { exportLogsToJson } = useExport();
 const { ask } = useConfirmDialog();
 
 // Filter state
-const searchQuery = ref('');
-const levels: LogLevel[] = ['DEBUG', 'INFO', 'WARN', 'ERROR'];
-const enabledLevels = ref<LogLevel[]>(['INFO', 'WARN', 'ERROR']);
+const searchQuery = ref("");
+const levels: LogLevel[] = ["DEBUG", "INFO", "WARN", "ERROR"];
+const enabledLevels = ref<LogLevel[]>(["INFO", "WARN", "ERROR"]);
 const expandedIds = ref(new Set<number>());
 
 // Level colors
 const levelColors: Record<LogLevel, string> = {
-  DEBUG: 'grey',
-  INFO: 'info',
-  WARN: 'warning',
-  ERROR: 'error',
+  DEBUG: "grey",
+  INFO: "info",
+  WARN: "warning",
+  ERROR: "error",
 };
 
 // Stats from store
@@ -193,7 +183,7 @@ const filteredEntries = computed((): LogEntry[] => {
       (e) =>
         e.message.toLowerCase().includes(query) ||
         e.category.toLowerCase().includes(query) ||
-        (e.details && JSON.stringify(e.details).toLowerCase().includes(query))
+        (e.details && JSON.stringify(e.details).toLowerCase().includes(query)),
     );
   }
 
@@ -212,10 +202,10 @@ function toggleExpanded(id: number) {
 
 // Format timestamp
 function formatTimestamp(ts: number): string {
-  return new Date(ts).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+  return new Date(ts).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
     hour12: false,
   });
 }
@@ -233,11 +223,11 @@ function handleDownload() {
 // Clear all logs
 async function handleClear() {
   const confirmed = await ask({
-    title: 'Clear Logs',
-    message: 'Clear all application logs? This cannot be undone.',
-    confirmText: 'Clear logs',
-    cancelText: 'Cancel',
-    confirmColor: 'error',
+    title: "Clear Logs",
+    message: "Clear all application logs? This cannot be undone.",
+    confirmText: "Clear logs",
+    cancelText: "Cancel",
+    confirmColor: "error",
   });
   if (confirmed) {
     logStore.clearAll();

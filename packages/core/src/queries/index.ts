@@ -1,8 +1,8 @@
 // GraphQL queries module exports
 
 // Queries
-export { GENE_SEARCH_QUERY, GENE_DETAILS_QUERY } from './gene-search';
-export { GENE_VARIANTS_QUERY } from './gene-variants';
+export { GENE_SEARCH_QUERY, GENE_DETAILS_QUERY } from "./gene-search";
+export { GENE_VARIANTS_QUERY } from "./gene-variants";
 
 // ClinVar submissions (for conflicting classification resolution)
 export {
@@ -12,15 +12,15 @@ export {
   meetsConflictingThreshold,
   PATHOGENIC_CLASSIFICATIONS,
   EXCLUDED_CLASSIFICATIONS,
-} from './clinvar-submissions';
+} from "./clinvar-submissions";
 export type {
   ClinVarSubmission,
   ClinVarVariantWithSubmissions,
-} from './clinvar-submissions';
+} from "./clinvar-submissions";
 
 // Variable types
-export type { GeneSearchVariables } from './gene-search';
-export type { GeneVariantsVariables } from './gene-variants';
+export type { GeneSearchVariables } from "./gene-search";
+export type { GeneVariantsVariables } from "./gene-variants";
 
 // Response types
 export type {
@@ -36,4 +36,4 @@ export type {
   GnomadConstraint,
   GeneDetailsResult,
   GeneDetailsResponse,
-} from './types';
+} from "./types";

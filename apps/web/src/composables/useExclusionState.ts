@@ -1,6 +1,6 @@
 // Singleton composable for variant exclusion state management
-import { reactive, computed, type ComputedRef } from 'vue';
-import type { ExclusionState, ExclusionReason } from '@gnomad-cf/core/types';
+import { reactive, computed, type ComputedRef } from "vue";
+import type { ExclusionState, ExclusionReason } from "@gnomad-cf/core/types";
 
 // Module-level singleton state - shared across all useExclusionState() calls
 const state = reactive<ExclusionState>({
@@ -39,7 +39,10 @@ export interface UseExclusionStateReturn {
   /** Reset exclusions when gene changes */
   resetForGene: (geneSymbol: string) => void;
   /** Set exclusions from external source (e.g., URL state) */
-  setExclusions: (variantIds: string[], reasons?: Map<string, ExclusionReason>) => void;
+  setExclusions: (
+    variantIds: string[],
+    reasons?: Map<string, ExclusionReason>,
+  ) => void;
 }
 
 /**
@@ -123,7 +126,10 @@ export function useExclusionState(): UseExclusionStateReturn {
     }
   }
 
-  function setExclusions(variantIds: string[], reasons?: Map<string, ExclusionReason>): void {
+  function setExclusions(
+    variantIds: string[],
+    reasons?: Map<string, ExclusionReason>,
+  ): void {
     state.excluded.clear();
     state.reasons.clear();
     for (const id of variantIds) {

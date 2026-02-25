@@ -3,9 +3,7 @@
     <!-- Welcome onboarding card - visible to first-time users only -->
     <WelcomeCard />
 
-    <h2 class="text-h6 mb-4">
-      Select Gene
-    </h2>
+    <h2 class="text-h6 mb-4">Select Gene</h2>
     <p class="text-body-2 text-medium-emphasis mb-4">
       Search for a gene symbol to calculate carrier frequency.
     </p>
@@ -13,10 +11,7 @@
     <!-- Offline fallback message -->
     <OfflineFallback />
 
-    <div
-      class="mb-4"
-      style="max-width: 300px"
-    >
+    <div class="mb-4" style="max-width: 300px">
       <VersionSelector />
     </div>
 
@@ -51,16 +46,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue';
-import GeneSearch from '@/components/GeneSearch.vue';
-import WelcomeCard from '@/components/WelcomeCard.vue';
-import VersionSelector from '@/components/VersionSelector.vue';
-import GeneConstraintCard from '@/components/GeneConstraintCard.vue';
-import ClingenWarning from '@/components/ClingenWarning.vue';
-import OfflineFallback from '@/components/OfflineFallback.vue';
-import type { GeneSearchResult } from '@gnomad-cf/core/queries';
-import { useGeneSearch, useNetworkStatus, useExclusionState } from '@/composables';
-import { useGnomadVersion } from '@/api';
+import { computed, watch } from "vue";
+import GeneSearch from "@/components/GeneSearch.vue";
+import WelcomeCard from "@/components/WelcomeCard.vue";
+import VersionSelector from "@/components/VersionSelector.vue";
+import GeneConstraintCard from "@/components/GeneConstraintCard.vue";
+import ClingenWarning from "@/components/ClingenWarning.vue";
+import OfflineFallback from "@/components/OfflineFallback.vue";
+import type { GeneSearchResult } from "@gnomad-cf/core/queries";
+import {
+  useGeneSearch,
+  useNetworkStatus,
+  useExclusionState,
+} from "@/composables";
+import { useGnomadVersion } from "@/api";
 
 const { isOnline } = useNetworkStatus();
 
@@ -69,7 +68,7 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'update:modelValue': [gene: GeneSearchResult | null];
+  "update:modelValue": [gene: GeneSearchResult | null];
   complete: [];
 }>();
 
@@ -87,6 +86,6 @@ watch(selectedGene, (gene) => {
   if (gene !== null) {
     resetForGene(gene.symbol);
   }
-  emit('update:modelValue', gene);
+  emit("update:modelValue", gene);
 });
 </script>

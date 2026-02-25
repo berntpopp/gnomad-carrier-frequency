@@ -1,7 +1,7 @@
-import type { GnomadVersion } from '../config/types.js';
-import type { IndexPatientStatus } from './frequency';
-import type { FrequencySource } from './wizard';
-import type { FilterConfig } from './filter';
+import type { GnomadVersion } from "../config/types.js";
+import type { IndexPatientStatus } from "./frequency";
+import type { FrequencySource } from "./wizard";
+import type { FilterConfig } from "./filter";
 
 /**
  * Represents a saved calculation in history.

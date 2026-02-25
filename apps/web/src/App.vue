@@ -1,9 +1,6 @@
 <template>
   <v-app>
-    <a
-      href="#main-content"
-      class="skip-link"
-    >Skip to main content</a>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <VueAnnouncer class="sr-only" />
     <DisclaimerBanner />
     <AppBar
@@ -12,16 +9,12 @@
       @reset="handleReset"
     />
 
-    <v-main
-      id="main-content"
-      tabindex="-1"
-    >
+    <v-main id="main-content" tabindex="-1">
       <v-container max-width="900">
-        <h1 class="text-h4 mb-2">
-          gnomAD Carrier Frequency Calculator
-        </h1>
+        <h1 class="text-h4 mb-2">gnomAD Carrier Frequency Calculator</h1>
         <p class="text-body-2 text-medium-emphasis mb-6">
-          Calculate carrier frequency and recurrence risk from gnomAD population data.
+          Calculate carrier frequency and recurrence risk from gnomAD population
+          data.
         </p>
 
         <!-- Show loading state while restoring from URL -->
@@ -35,9 +28,7 @@
             size="48"
             class="mb-4"
           />
-          <div class="text-h6 mb-2">
-            Loading shared calculation
-          </div>
+          <div class="text-h6 mb-2">Loading shared calculation</div>
           <div class="text-body-2 text-medium-emphasis">
             Restoring parameters from URL...
           </div>
@@ -52,10 +43,7 @@
 
     <SettingsDialog v-model="showSettings" />
     <LogViewerPanel v-model="showLogViewer" />
-    <HistoryDrawer
-      v-model="showHistory"
-      @restore="handleHistoryRestore"
-    />
+    <HistoryDrawer v-model="showHistory" @restore="handleHistoryRestore" />
     <ConfirmDialog />
 
     <!-- PWA Update Notification -->
@@ -68,19 +56,8 @@
       A new version is available
 
       <template #actions>
-        <v-btn
-          variant="text"
-          @click="dismissUpdate"
-        >
-          Later
-        </v-btn>
-        <v-btn
-          color="white"
-          variant="tonal"
-          @click="updateApp"
-        >
-          Update
-        </v-btn>
+        <v-btn variant="text" @click="dismissUpdate"> Later </v-btn>
+        <v-btn color="white" variant="tonal" @click="updateApp"> Update </v-btn>
       </template>
     </v-snackbar>
 
@@ -94,29 +71,30 @@
       App ready for offline use
 
       <template #actions>
-        <v-btn
-          variant="text"
-          @click="showOfflineReady = false"
-        >
-          Close
-        </v-btn>
+        <v-btn variant="text" @click="showOfflineReady = false"> Close </v-btn>
       </template>
     </v-snackbar>
   </v-app>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import AppBar from '@/components/AppBar.vue';
-import AppFooter from '@/components/AppFooter.vue';
-import DisclaimerBanner from '@/components/DisclaimerBanner.vue';
-import SettingsDialog from '@/components/SettingsDialog.vue';
-import LogViewerPanel from '@/components/LogViewerPanel.vue';
-import HistoryDrawer from '@/components/HistoryDrawer.vue';
-import WizardStepper from '@/components/wizard/WizardStepper.vue';
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import { useLogStore } from '@/stores/useLogStore';
-import { useWizard, useUrlState, usePwaUpdate, useHistoryAutoSave, useHistoryRestore } from '@/composables';
+import { ref, onMounted, watch } from "vue";
+import AppBar from "@/components/AppBar.vue";
+import AppFooter from "@/components/AppFooter.vue";
+import DisclaimerBanner from "@/components/DisclaimerBanner.vue";
+import SettingsDialog from "@/components/SettingsDialog.vue";
+import LogViewerPanel from "@/components/LogViewerPanel.vue";
+import HistoryDrawer from "@/components/HistoryDrawer.vue";
+import WizardStepper from "@/components/wizard/WizardStepper.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { useLogStore } from "@/stores/useLogStore";
+import {
+  useWizard,
+  useUrlState,
+  usePwaUpdate,
+  useHistoryAutoSave,
+  useHistoryRestore,
+} from "@/composables";
 
 const showSettings = ref(false);
 const showLogViewer = ref(false);
@@ -156,7 +134,7 @@ async function handleHistoryRestore(id: string) {
   const success = await restoreFromHistory(id);
   if (!success) {
     // Entry may have been deleted or corrupted - silent fail is acceptable
-    console.warn('Failed to restore history entry:', id);
+    console.warn("Failed to restore history entry:", id);
   }
 }
 
