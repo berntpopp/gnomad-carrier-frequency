@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels v-model="panel" class="mb-6">
+  <v-expansion-panels v-model="panel" flat class="mb-6 settings-panel rounded">
     <v-expansion-panel>
       <v-expansion-panel-title>
         <div class="d-flex align-center flex-wrap ga-2">
@@ -529,5 +529,9 @@ function updatePenetrance(percentValue: number) {
 .tooltip-text {
   max-width: 280px;
   display: inline-block;
+}
+
+.settings-panel {
+  border: thin solid currentColor;
 }
 </style>
