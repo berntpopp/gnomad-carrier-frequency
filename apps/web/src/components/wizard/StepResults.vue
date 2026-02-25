@@ -14,8 +14,17 @@
       <template #prepend>
         <v-icon>mdi-filter-remove</v-icon>
       </template>
-      {{ excludedCount }} variant(s) manually excluded from calculation. Open
-      the variant table to review or restore excluded variants.
+      {{ excludedCount }} variant(s) manually excluded from calculation.
+      <template #append>
+        <v-btn
+          variant="text"
+          size="small"
+          prepend-icon="mdi-table"
+          @click="openAllVariantsModal"
+        >
+          Open variant table
+        </v-btn>
+      </template>
     </v-alert>
 
     <!-- Summary card -->
@@ -53,6 +62,29 @@
       </v-card-title>
 
       <v-card-text class="pt-4">
+        <!-- All-excluded warning -->
+        <v-alert
+          v-if="filteredCount === 0 && excludedCount > 0"
+          type="warning"
+          variant="tonal"
+          density="compact"
+          class="mb-4"
+        >
+          All {{ excludedCount }} qualifying variant(s) have been manually
+          excluded. Carrier frequency cannot be calculated. Open the variant
+          table to restore variants.
+          <template #append>
+            <v-btn
+              variant="text"
+              size="small"
+              prepend-icon="mdi-table"
+              @click="openAllVariantsModal"
+            >
+              Open variant table
+            </v-btn>
+          </template>
+        </v-alert>
+
         <!-- Primary metrics grid -->
         <v-row dense>
           <!-- Carrier Frequency — hero stat -->
@@ -72,10 +104,10 @@
                 </span>
               </v-tooltip>
               <div class="stat-value text-h5">
-                {{ globalFrequency?.ratio }}
+                {{ globalFrequency?.ratio ?? "-" }}
               </div>
               <div class="stat-detail">
-                {{ globalFrequency?.percent }}
+                {{ globalFrequency?.percent ?? "No variants included" }}
               </div>
             </div>
           </v-col>
@@ -102,10 +134,10 @@
                 </span>
               </v-tooltip>
               <div class="stat-value">
-                {{ recurrenceRisk?.ratio }}
+                {{ recurrenceRisk?.ratio ?? "-" }}
               </div>
               <div class="stat-detail">
-                {{ recurrenceRisk?.percent }}
+                {{ recurrenceRisk?.percent ?? "-" }}
               </div>
             </div>
           </v-col>
@@ -172,7 +204,10 @@
         </v-row>
 
         <!-- Range across populations -->
-        <div class="text-body-2 text-medium-emphasis mt-3">
+        <div
+          v-if="result.minFrequency !== null"
+          class="text-body-2 text-medium-emphasis mt-3"
+        >
           Range across populations:
           {{ formatRatio(result.minFrequency) }}
           to

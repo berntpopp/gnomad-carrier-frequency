@@ -248,9 +248,11 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     () => pathogenicVariants.value.length,
   );
 
-  // Check if using default (no qualifying variants) - threshold from config
+  // Check if using default (no qualifying variants from filters) - threshold from config
+  // Uses totalPathogenicCount (before manual exclusions) so that manually excluding
+  // all variants yields zero, not the fallback default frequency.
   const usingDefault = computed(
-    () => hasData.value && pathogenicVariants.value.length === 0,
+    () => hasData.value && totalPathogenicCount.value === 0,
   );
 
   // Aggregate population frequencies using CalcConfig
@@ -485,8 +487,11 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   });
 
   // Build full result object
+  // Result is non-null whenever we have a gene and fetched data, even if all
+  // variants were manually excluded (carrier frequency will be 0 in that case).
+  // This keeps the summary card, population table, and variant table accessible.
   const result = computed((): CarrierFrequencyResult | null => {
-    if (!geneSymbol.value || globalCarrierFrequency.value === null) return null;
+    if (!geneSymbol.value || !hasData.value) return null;
 
     const freqs = populations.value
       .map((p) => p.carrierFrequency)
