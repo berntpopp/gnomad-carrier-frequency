@@ -58,6 +58,7 @@ vi.mock("@/composables/useCarrierFrequency", () => ({
     isLoadingSubmissions: ref(false),
     submissionsProgress: ref(0),
     submissionsError: ref(null),
+    retryFailedSubmissions: vi.fn(),
     currentVersion: ref("v4"),
     excludedCount: ref(0),
     totalPathogenicCount: ref(0),

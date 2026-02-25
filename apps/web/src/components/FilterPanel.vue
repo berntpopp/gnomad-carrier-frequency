@@ -267,26 +267,72 @@
             </div>
           </v-col>
 
-          <!-- Warning alert for conflicting filter -->
+          <!-- Conflicting submissions status -->
           <v-col
             v-if="
               modelValue.clinvarIncludeConflicting && modelValue.clinvarEnabled
             "
             cols="12"
           >
-            <v-alert type="warning" variant="tonal" density="compact">
+            <!-- Error state -->
+            <v-alert
+              v-if="submissionsError"
+              type="error"
+              variant="tonal"
+              density="compact"
+            >
               <div class="text-body-2">
-                <strong>Performance warning:</strong>
-                Fetching individual ClinVar submissions can be slow for genes
-                with many conflicting variants. This may take up to 20 seconds
-                for some genes.
+                <strong>Submissions fetch failed:</strong>
+                {{ submissionsError }}
               </div>
-              <div v-if="conflictingCount > 0" class="text-body-2 mt-1">
-                Found <strong>{{ conflictingCount }}</strong> variant(s) with
-                conflicting classifications.
-                <span v-if="isLoadingSubmissions">
-                  Loading submissions... {{ submissionsProgress }}%
-                </span>
+              <template #append>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  prepend-icon="mdi-refresh"
+                  @click="emit('retrySubmissions')"
+                >
+                  Retry
+                </v-btn>
+              </template>
+            </v-alert>
+
+            <!-- Loading state -->
+            <v-alert
+              v-else-if="isLoadingSubmissions"
+              type="info"
+              variant="tonal"
+              density="compact"
+            >
+              <div class="text-body-2">
+                Fetching submissions for
+                <strong>{{ conflictingCount }}</strong> conflicting
+                variant(s)...
+              </div>
+              <v-progress-linear
+                :model-value="submissionsProgress"
+                color="info"
+                height="6"
+                rounded
+                class="mt-2"
+              />
+              <div class="text-caption text-medium-emphasis mt-1">
+                {{ submissionsProgress }}% complete
+              </div>
+            </v-alert>
+
+            <!-- Success / idle state -->
+            <v-alert
+              v-else-if="conflictingCount > 0"
+              type="success"
+              variant="tonal"
+              density="compact"
+            >
+              <div class="text-body-2">
+                Resolved <strong>{{ conflictingCount }}</strong> conflicting
+                variant(s). Variants with &ge;{{
+                  modelValue.clinvarConflictingThreshold
+                }}% P/LP submissions are included.
               </div>
             </v-alert>
           </v-col>
@@ -471,11 +517,13 @@ const props = defineProps<{
   conflictingCount?: number;
   isLoadingSubmissions?: boolean;
   submissionsProgress?: number;
+  submissionsError?: string | null;
 }>();
 
 const emit = defineEmits<{
   "update:modelValue": [value: FilterConfig];
   "update:calcConfig": [value: CalcConfig];
+  retrySubmissions: [];
   reset: [];
 }>();
 
@@ -492,6 +540,7 @@ const isLoadingSubmissions = computed(
   () => props.isLoadingSubmissions ?? false,
 );
 const submissionsProgress = computed(() => props.submissionsProgress ?? 0);
+const submissionsError = computed(() => props.submissionsError ?? null);
 
 // Show tick labels only on desktop to prevent overlap on mobile
 const showTickLabels = computed(() => (!smAndDown.value ? "always" : true));

@@ -92,6 +92,8 @@
           :conflicting-variant-ids="conflictingVariantIds"
           :is-loading-submissions="isLoadingSubmissions"
           :submissions-progress="submissionsProgress"
+          :submissions-error="submissionsError"
+          @retry-submissions="retryFailedSubmissions"
           @update:filter-config="setFilterConfig"
           @back="prevStep"
           @restart="resetWizard"
@@ -152,6 +154,8 @@ const {
   conflictingVariantIds,
   isLoadingSubmissions,
   submissionsProgress,
+  submissionsError,
+  retryFailedSubmissions,
 } = useCarrierFrequency();
 
 // Screen reader announcements

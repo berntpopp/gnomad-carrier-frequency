@@ -164,13 +164,16 @@ export function shouldIncludeVariantConfigurable(
     clinvarMatch !== undefined &&
     isPathogenicClinVarWithThreshold(clinvarMatch, config.clinvarStarThreshold);
 
-  // Check for conflicting classification that meets threshold
+  // Check for conflicting classification that meets threshold.
+  // Note: gold_stars threshold is intentionally NOT applied here — conflicting
+  // variants inherently have lower review status (typically 1 star) because
+  // submitters disagree. Quality is ensured by the submission-level P/LP
+  // percentage threshold instead.
   const hasConflictingEvidence =
     config.clinvarEnabled &&
     config.clinvarIncludeConflicting &&
     clinvarMatch !== undefined &&
     hasConflictingClassification(clinvarMatch) &&
-    clinvarMatch.gold_stars >= config.clinvarStarThreshold &&
     submissionsMap !== undefined &&
     submissionsMap.has(variant.variant_id) &&
     meetsConflictingThreshold(

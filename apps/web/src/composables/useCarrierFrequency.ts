@@ -72,6 +72,7 @@ export interface UseCarrierFrequencyReturn {
   isLoadingSubmissions: Ref<boolean>;
   submissionsProgress: Ref<number>;
   submissionsError: Ref<string | null>;
+  retryFailedSubmissions: () => Promise<void>;
 
   // Version
   currentVersion: Ref<GnomadVersion>;
@@ -145,6 +146,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     error: submissionsError,
     progress: submissionsProgress,
     fetchSubmissions,
+    retryFailed,
     clearSubmissions,
   } = useClinvarSubmissions();
 
@@ -546,6 +548,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     isLoadingSubmissions,
     submissionsProgress,
     submissionsError,
+    retryFailedSubmissions: retryFailed,
     currentVersion,
     excludedCount,
     totalPathogenicCount,

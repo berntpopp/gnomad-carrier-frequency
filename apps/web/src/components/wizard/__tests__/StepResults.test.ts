@@ -161,6 +161,7 @@ describe("StepResults", () => {
         conflictingVariantIds: [],
         isLoadingSubmissions: false,
         submissionsProgress: 0,
+        submissionsError: null,
       },
       global: { stubs: stubComponents },
       storeInitialState: {
@@ -195,6 +196,7 @@ describe("StepResults", () => {
         conflictingVariantIds: [],
         isLoadingSubmissions: false,
         submissionsProgress: 0,
+        submissionsError: null,
       },
       global: { stubs: stubComponents },
       storeInitialState: {
@@ -231,6 +233,7 @@ describe("StepResults", () => {
         conflictingVariantIds: [],
         isLoadingSubmissions: false,
         submissionsProgress: 0,
+        submissionsError: null,
       },
       global: { stubs: stubComponents },
       storeInitialState: {
@@ -267,6 +270,7 @@ describe("StepResults", () => {
         conflictingVariantIds: [],
         isLoadingSubmissions: false,
         submissionsProgress: 0,
+        submissionsError: null,
       },
       global: { stubs: stubComponents },
       storeInitialState: {
@@ -304,6 +308,7 @@ describe("StepResults", () => {
         conflictingVariantIds: [],
         isLoadingSubmissions: false,
         submissionsProgress: 0,
+        submissionsError: null,
       },
       global: { stubs: stubComponents },
       storeInitialState: {

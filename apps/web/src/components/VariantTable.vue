@@ -108,6 +108,13 @@
             variant="tonal"
             link
           >
+            <v-icon
+              v-if="isConflicting(item.clinvarStatus)"
+              start
+              size="x-small"
+            >
+              mdi-alert
+            </v-icon>
             {{ formatClinvarStatus(item.clinvarStatus) }}
             <v-icon end size="x-small"> mdi-open-in-new </v-icon>
           </v-chip>
@@ -242,6 +249,15 @@
                   >
                     <v-icon start size="x-small"> mdi-alert </v-icon>
                     ClinVar P/LP
+                  </v-chip>
+                  <v-chip
+                    v-if="isConflicting(item.clinvarStatus)"
+                    color="deep-orange"
+                    size="small"
+                    variant="tonal"
+                  >
+                    <v-icon start size="x-small"> mdi-alert </v-icon>
+                    Conflicting (majority P/LP)
                   </v-chip>
                 </div>
               </div>
@@ -404,6 +420,12 @@ function formatRatio(alleleFreq: number | null): string {
   const carrierFreq = 2 * alleleFreq;
   const denominator = Math.round(1 / carrierFreq);
   return `1:${denominator.toLocaleString()}`;
+}
+
+// Check if ClinVar status is conflicting
+function isConflicting(status: string | null): boolean {
+  if (!status) return false;
+  return status.toLowerCase().includes("conflicting");
 }
 
 // Format ClinVar status for display (shorten long strings)

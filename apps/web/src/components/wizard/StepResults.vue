@@ -199,6 +199,8 @@
       :conflicting-count="props.conflictingVariantIds.length"
       :is-loading-submissions="props.isLoadingSubmissions"
       :submissions-progress="props.submissionsProgress"
+      :submissions-error="props.submissionsError"
+      @retry-submissions="emit('retrySubmissions')"
       @update:calc-config="calcStore.setDefaults($event)"
       @reset="resetFilters"
     />
@@ -455,11 +457,13 @@ const props = defineProps<{
   conflictingVariantIds: string[];
   isLoadingSubmissions: boolean;
   submissionsProgress: number;
+  submissionsError: string | null;
 }>();
 
 const emit = defineEmits<{
   back: [];
   restart: [];
+  retrySubmissions: [];
   "update:filterConfig": [config: FilterConfig];
 }>();
 

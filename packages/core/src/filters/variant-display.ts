@@ -206,6 +206,10 @@ export function getClinvarColor(status: string | null): string {
   if (!status) return "default";
 
   const lower = status.toLowerCase();
+  // Check conflicting BEFORE pathogenic (since "conflicting" text contains "pathogenic")
+  if (lower.includes("conflicting")) {
+    return "deep-orange";
+  }
   if (lower.includes("pathogenic") && !lower.includes("likely")) {
     return "error";
   }
