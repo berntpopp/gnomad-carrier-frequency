@@ -258,10 +258,10 @@
         <v-spacer />
 
         <v-btn
-          variant="text"
+          variant="flat"
           color="primary"
           size="small"
-          prepend-icon="mdi-table"
+          prepend-icon="mdi-table-eye"
           @click="openAllVariantsModal"
         >
           View all variants ({{ filteredCount }})
