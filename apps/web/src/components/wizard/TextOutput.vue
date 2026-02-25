@@ -7,19 +7,8 @@
       <span>{{ labels.title }}</span>
       <v-spacer class="d-none d-sm-flex" />
 
-      <!-- Controls container - wraps on mobile -->
+      <!-- Controls container - German settings left, language toggle rightmost to avoid layout shift -->
       <div class="d-flex flex-wrap align-center ga-2">
-        <!-- Language toggle -->
-        <v-btn-toggle
-          v-model="languageModel"
-          mandatory
-          density="compact"
-          variant="outlined"
-        >
-          <v-btn value="de" size="small"> DE </v-btn>
-          <v-btn value="en" size="small"> EN </v-btn>
-        </v-btn-toggle>
-
         <!-- Gender style selector (German only) -->
         <v-select
           v-if="language === 'de'"
@@ -42,6 +31,17 @@
           hide-details
           style="max-width: 200px"
         />
+
+        <!-- Language toggle (rightmost) -->
+        <v-btn-toggle
+          v-model="languageModel"
+          mandatory
+          density="compact"
+          variant="outlined"
+        >
+          <v-btn value="de" size="small"> DE </v-btn>
+          <v-btn value="en" size="small"> EN </v-btn>
+        </v-btn-toggle>
       </div>
     </v-card-title>
 
@@ -103,8 +103,24 @@
         </div>
       </div>
 
-      <!-- Text preview -->
-      <v-card variant="tonal" class="mb-4">
+      <!-- Text preview with inline copy button -->
+      <v-card variant="tonal" class="text-preview-card">
+        <v-tooltip location="top">
+          <template #activator="{ props: tooltipProps }">
+            <v-btn
+              v-bind="tooltipProps"
+              :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
+              :color="copied ? 'success' : undefined"
+              variant="text"
+              size="small"
+              density="compact"
+              class="copy-btn"
+              :disabled="!generatedText"
+              @click="copy(generatedText)"
+            />
+          </template>
+          {{ copied ? labels.copied : labels.copy }}
+        </v-tooltip>
         <v-card-text data-testid="text-content">
           <pre
             class="text-body-2"
@@ -113,18 +129,6 @@
           >
         </v-card-text>
       </v-card>
-
-      <!-- Copy button - touch-friendly on mobile -->
-      <v-btn
-        :color="copied ? 'success' : 'primary'"
-        :prepend-icon="copied ? 'mdi-check' : 'mdi-content-copy'"
-        :disabled="!generatedText"
-        :min-height="smAndDown ? 44 : undefined"
-        variant="elevated"
-        @click="copy(generatedText)"
-      >
-        {{ copied ? labels.copied : labels.copy }}
-      </v-btn>
     </v-card-text>
   </v-card>
 </template>
@@ -283,5 +287,23 @@ const labels = computed(() =>
 /* Touch-friendly chip minimum height for mobile */
 .touch-chip {
   min-height: 36px;
+}
+
+/* Inline copy button positioned inside text preview */
+.text-preview-card {
+  position: relative;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  z-index: 1;
+}
+
+.copy-btn:hover {
+  opacity: 1;
 }
 </style>

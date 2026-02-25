@@ -47,7 +47,7 @@ describe("FilterPanel", () => {
     expect(wrapper.exists()).toBe(true);
   });
 
-  it('renders the "Filters" label in the panel title', () => {
+  it('renders the "Settings" label in the panel title', () => {
     const wrapper = mountWithPlugins(FilterPanel, {
       props: {
         modelValue: defaultFilter,
@@ -55,7 +55,7 @@ describe("FilterPanel", () => {
         variantCount: 0,
       },
     });
-    expect(wrapper.text()).toContain("Filters");
+    expect(wrapper.text()).toContain("Settings");
   });
 
   it("renders filter section tooltip descriptions", () => {

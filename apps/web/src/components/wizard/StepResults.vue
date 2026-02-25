@@ -1,7 +1,5 @@
 <template>
   <div data-testid="step-results">
-    <h2 class="text-h6 mb-4">Results</h2>
-
     <!-- ClinGen validation reminder in results -->
     <ClingenWarning v-if="result" :gene-symbol="result.gene" class="mb-4" />
 
@@ -21,7 +19,12 @@
     </v-alert>
 
     <!-- Summary card -->
-    <v-card v-if="result" class="mb-4" data-testid="results-summary-card">
+    <v-card
+      v-if="result"
+      variant="outlined"
+      class="mb-6"
+      data-testid="results-summary-card"
+    >
       <v-card-title
         class="d-flex align-center justify-space-between flex-wrap pb-0"
       >
@@ -168,9 +171,17 @@
           </v-col>
         </v-row>
 
+        <!-- Range across populations -->
+        <div class="text-body-2 text-medium-emphasis mt-3">
+          Range across populations:
+          {{ formatRatio(result.minFrequency) }}
+          to
+          {{ formatRatio(result.maxFrequency) }}
+        </div>
+
         <!-- Supporting info -->
         <div
-          class="text-caption text-medium-emphasis mt-3 d-flex align-center flex-wrap"
+          class="text-caption text-medium-emphasis mt-1 d-flex align-center flex-wrap"
         >
           Based on {{ filteredCount }} qualifying variant(s)
           <span v-if="excludedCount > 0" class="ml-1 text-warning">
@@ -178,19 +189,19 @@
           </span>
         </div>
       </v-card-text>
-
-      <!-- Filter Panel -->
-      <FilterPanel
-        v-model="filters"
-        :calc-config="calcStore.defaults"
-        :variant-count="filteredCount"
-        :conflicting-count="props.conflictingVariantIds.length"
-        :is-loading-submissions="props.isLoadingSubmissions"
-        :submissions-progress="props.submissionsProgress"
-        @update:calc-config="calcStore.setDefaults($event)"
-        @reset="resetFilters"
-      />
     </v-card>
+
+    <!-- Settings panel -->
+    <FilterPanel
+      v-model="filters"
+      :calc-config="calcStore.defaults"
+      :variant-count="filteredCount"
+      :conflicting-count="props.conflictingVariantIds.length"
+      :is-loading-submissions="props.isLoadingSubmissions"
+      :submissions-progress="props.submissionsProgress"
+      @update:calc-config="calcStore.setDefaults($event)"
+      @reset="resetFilters"
+    />
 
     <!-- Founder effect alert -->
     <v-alert
@@ -202,147 +213,139 @@
       Founder effect detected: Some populations show elevated carrier frequency
     </v-alert>
 
-    <!-- Sortable data table -->
-    <div class="table-scroll-wrapper">
-      <v-data-table
-        v-if="tableItems.length"
-        :items="tableItems"
-        :headers="headers"
-        :sort-by="sortBy"
-        density="compact"
-        items-per-page="-1"
-        class="elevation-1 results-table"
-        data-testid="population-table"
-      >
-        <template #item="{ item }">
-          <tr
-            :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
-            @click="!item.isGlobal && openPopulationModal(item.code)"
-          >
-            <td>
-              <div class="d-flex align-center">
-                {{ item.label }}
-                <v-icon
-                  v-if="!item.isGlobal"
-                  class="ml-1 population-chevron"
-                  size="x-small"
-                  color="grey"
-                >
-                  mdi-chevron-right
-                </v-icon>
-              </div>
-            </td>
-            <td class="text-right">
-              {{ formatPercent(item.carrierFrequency) }}
-            </td>
-            <td class="text-right">
-              {{ formatRatio(item.carrierFrequency) }}
-            </td>
-            <td class="text-right">
-              {{ formatPrevalenceRatio(item.geneticPrevalence) }}
-            </td>
-            <td class="text-right">
-              {{ item.recurrenceRisk }}
-            </td>
-            <td class="text-right">
-              {{ item.alleleCount }}
-            </td>
-            <td class="text-right">
-              {{ item.alleleNumber?.toLocaleString() ?? "-" }}
-            </td>
-            <td>
-              <v-chip v-if="item.notes" color="info" size="x-small">
-                <v-icon start size="x-small"> mdi-star </v-icon>
-                {{ item.notes }}
-              </v-chip>
-            </td>
-          </tr>
-        </template>
+    <!-- Population data section -->
+    <v-card v-if="tableItems.length" variant="outlined" class="mb-6">
+      <!-- Table toolbar -->
+      <div class="d-flex align-center flex-wrap ga-2 px-4 py-3">
+        <span class="text-subtitle-2">Population Frequencies</span>
+        <v-spacer />
 
-        <template #bottom />
-      </v-data-table>
-    </div>
+        <v-btn
+          variant="text"
+          color="primary"
+          size="small"
+          prepend-icon="mdi-table"
+          @click="openAllVariantsModal"
+        >
+          View all variants ({{ filteredCount }})
+        </v-btn>
 
-    <!-- View all variants, export, and share buttons - touch-friendly on mobile -->
-    <div
-      v-if="filteredCount > 0"
-      class="d-flex align-center flex-wrap gap-2 mt-3"
-    >
-      <v-btn
-        variant="text"
-        color="primary"
-        prepend-icon="mdi-table"
-        :min-height="smAndDown ? 44 : undefined"
-        @click="openAllVariantsModal"
-      >
-        View all variants ({{ filteredCount }})
-      </v-btn>
+        <!-- Export dropdown -->
+        <v-menu>
+          <template #activator="{ props: menuProps }">
+            <v-btn
+              v-bind="menuProps"
+              variant="outlined"
+              size="small"
+              prepend-icon="mdi-download"
+            >
+              Export
+              <v-icon end size="x-small">mdi-chevron-down</v-icon>
+            </v-btn>
+          </template>
+          <v-list density="compact">
+            <v-list-item
+              prepend-icon="mdi-code-json"
+              @click="handleExport('json')"
+            >
+              <v-list-item-title>Export as JSON</v-list-item-title>
+            </v-list-item>
+            <v-list-item
+              prepend-icon="mdi-file-excel"
+              @click="handleExport('xlsx')"
+            >
+              <v-list-item-title>Export as Excel</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
 
-      <!-- Export dropdown -->
-      <v-menu>
-        <template #activator="{ props: menuProps }">
-          <v-btn
-            v-bind="menuProps"
-            variant="outlined"
-            color="secondary"
-            prepend-icon="mdi-download"
-            :min-height="smAndDown ? 44 : undefined"
-          >
-            Export
-            <v-icon end> mdi-chevron-down </v-icon>
-          </v-btn>
-        </template>
-        <v-list :density="smAndDown ? 'default' : 'compact'">
-          <v-list-item
-            prepend-icon="mdi-code-json"
-            :min-height="smAndDown ? 44 : undefined"
-            @click="handleExport('json')"
-          >
-            <v-list-item-title>Export as JSON</v-list-item-title>
-          </v-list-item>
-          <v-list-item
-            prepend-icon="mdi-file-excel"
-            :min-height="smAndDown ? 44 : undefined"
-            @click="handleExport('xlsx')"
-          >
-            <v-list-item-title>Export as Excel</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+        <!-- Copy link button -->
+        <v-tooltip location="top">
+          <template #activator="{ props: tooltipProps }">
+            <v-btn
+              v-bind="tooltipProps"
+              variant="outlined"
+              size="small"
+              :color="copied ? 'success' : undefined"
+              :prepend-icon="copied ? 'mdi-check' : 'mdi-link'"
+              :disabled="!clipboardSupported"
+              aria-label="Copy shareable link to clipboard"
+              @click="copyShareLink"
+            >
+              {{ copied ? "Copied!" : "Copy link" }}
+            </v-btn>
+          </template>
+          <span class="tooltip-text">
+            Copy a shareable link with your current gene, filters, and settings.
+          </span>
+        </v-tooltip>
+      </div>
 
-      <!-- Copy link button -->
-      <v-tooltip location="top" aria-label="Information">
-        <template #activator="{ props: tooltipProps }">
-          <v-btn
-            v-bind="tooltipProps"
-            variant="outlined"
-            :color="copied ? 'success' : 'primary'"
-            :prepend-icon="copied ? 'mdi-check' : 'mdi-link'"
-            :disabled="!clipboardSupported"
-            :min-height="smAndDown ? 44 : undefined"
-            aria-label="Copy shareable link to clipboard"
-            @click="copyShareLink"
-          >
-            {{ copied ? "Link copied!" : "Copy link" }}
-          </v-btn>
-        </template>
-        <span class="tooltip-text">
-          Copy a shareable link with your current gene, filters, and settings.
-          Recipients can open this link to see the same calculation.
-        </span>
-      </v-tooltip>
-    </div>
+      <v-divider />
 
-    <!-- Range info -->
-    <div v-if="result" class="text-body-2 mt-4 text-medium-emphasis">
-      Range across populations:
-      {{ formatRatio(result.minFrequency) }}
-      to
-      {{ formatRatio(result.maxFrequency) }}
-    </div>
+      <!-- Sortable data table -->
+      <div class="table-scroll-wrapper">
+        <v-data-table
+          :items="tableItems"
+          :headers="headers"
+          :sort-by="sortBy"
+          density="compact"
+          items-per-page="-1"
+          class="results-table"
+          data-testid="population-table"
+        >
+          <template #item="{ item }">
+            <tr
+              :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
+              @click="!item.isGlobal && openPopulationModal(item.code)"
+            >
+              <td>
+                <div class="d-flex align-center">
+                  {{ item.label }}
+                  <v-icon
+                    v-if="!item.isGlobal"
+                    class="ml-1 population-chevron"
+                    size="x-small"
+                    color="grey"
+                  >
+                    mdi-chevron-right
+                  </v-icon>
+                </div>
+              </td>
+              <td class="text-right">
+                {{ formatPercent(item.carrierFrequency) }}
+              </td>
+              <td class="text-right">
+                {{ formatRatio(item.carrierFrequency) }}
+              </td>
+              <td class="text-right">
+                {{ formatPrevalenceRatio(item.geneticPrevalence) }}
+              </td>
+              <td class="text-right">
+                {{ item.recurrenceRisk }}
+              </td>
+              <td class="text-right">
+                {{ item.alleleCount }}
+              </td>
+              <td class="text-right">
+                {{ item.alleleNumber?.toLocaleString() ?? "-" }}
+              </td>
+              <td>
+                <v-chip v-if="item.notes" color="info" size="x-small">
+                  <v-icon start size="x-small">mdi-star</v-icon>
+                  {{ item.notes }}
+                </v-chip>
+              </td>
+            </tr>
+          </template>
+
+          <template #bottom />
+        </v-data-table>
+      </div>
+    </v-card>
 
     <!-- Text output section -->
-    <v-divider class="my-6" />
+    <v-divider class="mb-6" />
 
     <TextOutput
       v-if="result"
@@ -827,16 +830,6 @@ function formatPrevalenceRatio(prevalence: number | null): string {
 .table-scroll-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  position: relative;
-  margin: 0 -16px; /* Extend to card edges on mobile */
-  padding: 0 16px;
-}
-
-@media (min-width: 960px) {
-  .table-scroll-wrapper {
-    margin: 0;
-    padding: 0;
-  }
 }
 
 /* Freeze Population column (first column) */

@@ -10,8 +10,12 @@ export default defineConfig({
   plugins: [
     vue(),
     checker({
-      // Enable vue-tsc for TypeScript checking
-      vueTsc: true,
+      // Enable vue-tsc for TypeScript checking — point to app tsconfig
+      // so watch mode only checks src/ files, not Vuetify .vue SFCs in
+      // node_modules (skipLibCheck only covers .d.ts, not .vue files).
+      vueTsc: {
+        tsconfigPath: 'tsconfig.app.json',
+      },
       // Enable ESLint checking
       eslint: {
         lintCommand: 'eslint "./src/**/*.{ts,vue}"',

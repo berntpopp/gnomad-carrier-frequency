@@ -1,9 +1,9 @@
 <template>
-  <v-expansion-panels v-model="panel" class="mb-4">
+  <v-expansion-panels v-model="panel" class="mb-6">
     <v-expansion-panel>
       <v-expansion-panel-title>
         <div class="d-flex align-center flex-wrap ga-2">
-          <span class="text-subtitle-2">Filters</span>
+          <span class="text-subtitle-2">Settings</span>
           <FilterChips v-if="!isExpanded" :filters="modelValue" />
           <v-chip
             v-if="configLoading"
