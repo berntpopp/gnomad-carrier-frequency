@@ -18,4 +18,5 @@ export default defineConfig({
   exports: true,
   clean: true,
   platform: 'neutral',
+  external: ['node:fs/promises', 'node:path', 'node:url'],
 })
