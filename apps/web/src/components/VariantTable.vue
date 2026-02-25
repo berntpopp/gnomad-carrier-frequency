@@ -177,7 +177,7 @@
                     sm="6"
                     md="3"
                   >
-                    <div class="text-caption text-medium-emphasis">
+                    <div class="text-caption font-weight-bold text-grey-darken-2">
                       Transcript
                     </div>
                     <div class="text-body-2">
@@ -189,7 +189,7 @@
                     sm="6"
                     md="3"
                   >
-                    <div class="text-caption text-medium-emphasis">
+                    <div class="text-caption font-weight-bold text-grey-darken-2">
                       Position
                     </div>
                     <div class="text-body-2">
@@ -201,7 +201,7 @@
                     sm="6"
                     md="3"
                   >
-                    <div class="text-caption text-medium-emphasis">
+                    <div class="text-caption font-weight-bold text-grey-darken-2">
                       Ref / Alt
                     </div>
                     <div class="text-body-2 text-mono">
@@ -213,7 +213,7 @@
                     sm="6"
                     md="3"
                   >
-                    <div class="text-caption text-medium-emphasis">
+                    <div class="text-caption font-weight-bold text-grey-darken-2">
                       Allele Count / Number
                     </div>
                     <div class="text-body-2">
