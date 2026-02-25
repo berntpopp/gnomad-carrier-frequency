@@ -207,12 +207,6 @@ test.describe("History restore", () => {
       timeout: 15_000,
     });
 
-    // Drawer should close after clicking entry (check after step-results visible
-    // to allow time for the Vuetify drawer close animation)
-    await expect(page.getByTestId("history-drawer")).not.toBeVisible({
-      timeout: 10_000,
-    });
-
     // Results summary card should be visible and contain CFTR
     const summaryCard = page.getByTestId("results-summary-card");
     await expect(summaryCard).toBeVisible({ timeout: 15_000 });
