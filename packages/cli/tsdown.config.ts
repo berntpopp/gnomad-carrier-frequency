@@ -6,6 +6,7 @@ export default defineConfig({
   dts: false,
   clean: true,
   platform: 'node',
+  external: ['zod'],
   banner: {
     js: '#!/usr/bin/env node',
   },

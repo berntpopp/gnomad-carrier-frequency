@@ -1,4 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  type MockInstance,
+} from "vitest";
 import { useClinvarSubmissions } from "../useClinvarSubmissions";
 
 // Mock getReferenceGenome — always return GRCh38
@@ -70,7 +78,7 @@ async function runWithTimers<T>(fn: () => Promise<T>): Promise<T> {
 // ---------------------------------------------------------------------------
 
 describe("useClinvarSubmissions", () => {
-  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  let fetchSpy: MockInstance;
 
   beforeEach(() => {
     fetchSpy = vi.spyOn(globalThis, "fetch");
