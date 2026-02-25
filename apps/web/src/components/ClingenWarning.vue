@@ -46,12 +46,6 @@
       class="mb-4"
     >
       <template #title>
-        <v-icon
-          start
-          size="small"
-        >
-          mdi-check-circle
-        </v-icon>
         ClinGen AR Validated
       </template>
       <template #text>
@@ -86,12 +80,6 @@
       class="mb-4"
     >
       <template #title>
-        <v-icon
-          start
-          size="small"
-        >
-          mdi-alert
-        </v-icon>
         No AR Association in ClinGen
       </template>
       <template #text>
@@ -137,12 +125,6 @@
       class="mb-4"
     >
       <template #title>
-        <v-icon
-          start
-          size="small"
-        >
-          mdi-information
-        </v-icon>
         Gene Not in ClinGen
       </template>
       <template #text>

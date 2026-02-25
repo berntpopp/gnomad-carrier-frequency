@@ -318,9 +318,6 @@
               variant="tonal"
               density="compact"
             >
-              <template #prepend>
-                <v-icon>mdi-alert</v-icon>
-              </template>
               <div class="text-body-2">
                 <strong>Performance warning:</strong>
                 Fetching individual ClinVar submissions can be slow for genes

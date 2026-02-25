@@ -130,16 +130,11 @@
           density="compact"
           class="mt-3"
         >
+          <template #prepend>
+            <v-icon>mdi-signal-off</v-icon>
+          </template>
           <template #title>
-            <div class="d-flex align-center">
-              <v-icon
-                start
-                size="small"
-              >
-                mdi-signal-off
-              </v-icon>
-              Low Exome Coverage
-            </div>
+            Low Exome Coverage
           </template>
           <template #text>
             <div class="text-body-2">
