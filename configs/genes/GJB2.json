@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0",
+  "geneSymbol": "GJB2",
+  "displayName": "Gap Junction Protein Beta 2 (Connexin 26)",
+  "omimGeneId": "121011",
+  "inheritance": "AR",
+  "profiles": [
+    {
+      "profileId": "dfnb1",
+      "displayName": "DFNB1 Nonsyndromic Hearing Loss",
+      "isDefault": true,
+      "disease": {
+        "omimId": "220290",
+        "mondoId": "MONDO:0011612",
+        "name": "Autosomal recessive nonsyndromic hearing loss 1A"
+      },
+      "penetrance": 1.0,
+      "filterOverrides": {
+        "lofHcEnabled": true,
+        "missenseEnabled": true,
+        "clinvarEnabled": true,
+        "clinvarStarThreshold": 1
+      },
+      "notes": "GJB2 (Connexin 26) is the most common cause of hereditary hearing loss, accounting for approximately 50% of autosomal recessive nonsyndromic hearing loss in many populations. GJB2 carrier frequency varies considerably across populations: ~1/33 in European populations, ~1/17 in Ashkenazi Jewish populations (35delG founder variant), and variable rates in Asian populations. Variants are fully penetrant when two pathogenic alleles are present. The 35delG (c.35delG) variant is the most common pathogenic variant in European populations.",
+      "references": [
+        "https://pubmed.ncbi.nlm.nih.gov/9285799/",
+        "https://pubmed.ncbi.nlm.nih.gov/11524700/",
+        "https://pubmed.ncbi.nlm.nih.gov/14694050/",
+        "https://pubmed.ncbi.nlm.nih.gov/20301588/"
+      ]
+    }
+  ]
+}

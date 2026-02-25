@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Gene Config Contributing Guide
+    url: https://github.com/berntpopp/gnomad-carrier-frequency/blob/main/configs/CONTRIBUTING.md
+    about: Full documentation for creating and submitting gene configuration files
   - name: Questions & Discussions
     url: https://github.com/berntpopp/gnomad-carrier-frequency/discussions
     about: Ask questions about usage, clinical workflows, or carrier frequency interpretation

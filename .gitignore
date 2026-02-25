@@ -8,11 +8,14 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Dependencies
-node_modules
+node_modules/
 
 # Build output
-dist
-dist-ssr
+dist/
+dist-ssr/
+
+# TypeScript build cache
+*.tsbuildinfo
 
 # Vite
 .vite
@@ -29,8 +32,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# TypeScript
-*.tsbuildinfo
+# Package manager lockfiles (use bun.lock text format)
+bun.lockb
+package-lock.json
 
 # Environment
 .env
@@ -41,5 +45,5 @@ dist-ssr
 .playwright-mcp/
 
 # VitePress
-docs/.vitepress/cache
-docs/.vitepress/dist
+apps/web/docs/.vitepress/cache
+apps/web/docs/.vitepress/dist

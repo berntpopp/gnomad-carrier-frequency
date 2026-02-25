@@ -1,0 +1,32 @@
+{
+  "name": "@gnomad-cf/core",
+  "version": "1.5.0",
+  "type": "module",
+  "private": true,
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.3.5",
+    "lz-string": "^1.5.0"
+  },
+  "devDependencies": {
+    "tsdown": "0.20.3",
+    "typescript": "~5.9.3"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./calculations": "./dist/calculations.js",
+    "./client": "./dist/client.js",
+    "./config": "./dist/config.js",
+    "./filters": "./dist/filters.js",
+    "./gene-config": "./dist/gene-config.js",
+    "./queries": "./dist/queries.js",
+    "./templates": "./dist/templates.js",
+    "./types": "./dist/types.js",
+    "./utils": "./dist/utils.js",
+    "./package.json": "./package.json"
+  }
+}

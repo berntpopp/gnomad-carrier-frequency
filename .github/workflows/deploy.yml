@@ -34,14 +34,17 @@ jobs:
       - name: Type Check
         run: bun run typecheck
 
-      - name: Build app
-        run: bun run build
+      - name: Build core
+        run: bun run --filter @gnomad-cf/core build
+
+      - name: Build web app
+        run: bun run --filter gnomad-cf-web build
 
       - name: Build docs
-        run: bun run docs:build
+        run: bun run --filter gnomad-cf-web docs:build
 
       - name: Merge docs into artifact
-        run: cp -r docs/.vitepress/dist dist/docs
+        run: cp -r apps/web/docs/.vitepress/dist apps/web/dist/docs
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -49,7 +52,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: './dist'
+          path: './apps/web/dist'
 
       - name: Deploy to GitHub Pages
         id: deployment
