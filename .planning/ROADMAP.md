@@ -7,7 +7,7 @@
 - **v1.2 Sharing** - Phases 11-15 (shipped 2026-01-20)
 - **v1.3 Documentation Site** - Phases 16-20 (shipped 2026-02-23)
 - **v1.4 Discoverability & Polish** - Phases 21-24 (shipped 2026-02-23)
-- **v1.5 Core Extraction & CLI** - Phases 25-31 (in progress)
+- **v1.5 Core Extraction & CLI** - Phases 25-32 (in progress)
 
 ## Phases
 
@@ -198,9 +198,26 @@ Plans:
 
 ---
 
+#### Phase 32: Frequency Accuracy Fixes
+
+**Goal**: Carrier frequency calculations match the gnomAD website by using the v4 joint field for accurate AN/AC values, AC=0 variants are excluded from calculations, and the variant table meets WCAG AA accessibility standards.
+**Depends on**: Phase 26, Phase 27, Phase 29
+**Requirements**: (bug fix — no new requirements)
+**Success Criteria** (what must be TRUE):
+  1. AN values displayed for variants match the gnomAD website when joint data is available (site-level coverage-aware combination, not naive exome+genome sum)
+  2. Variants with AC=0 globally are excluded from carrier frequency calculations (hasObservedAlleles filter)
+  3. Variant table expanded row labels meet WCAG AA 4.5:1 contrast ratio minimum
+  4. Zero ESLint warnings across all Vue templates
+**Plans**: 1 plan
+
+Plans:
+- [x] 32-01-PLAN.md — Joint field support, AC=0 filtering, WCAG AA labels, ESLint template fixes
+
+---
+
 ## Progress
 
-**Execution Order:** 25 → 26 → 27 → 28 → 29 → 30 → 31
+**Execution Order:** 25 → 26 → 27 → 28 → 29 → 30 → 31 → 32
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -216,9 +233,10 @@ Plans:
 | 29. Test Suite Completion & Web App Validation | v1.5 | 7/7 | Complete | 2026-02-24 |
 | 30. CLI Integration Fixes | v1.5 | 1/1 | Complete | 2026-02-24 |
 | 31. Runtime Gene Config Loading & Submission Modal | v1.5 | 1/1 | Complete | 2026-02-25 |
+| 32. Frequency Accuracy Fixes | v1.5 | 1/1 | Complete | 2026-02-25 |
 
-**Total:** 113 plans complete across 31 phases in 6 milestones.
+**Total:** 114 plans complete across 32 phases in 6 milestones.
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-25 (Phase 31 complete: 1/1 plans, runtime gene config loading + submission modal)*
+*Last updated: 2026-02-25 (Phase 32 complete: joint field, AC=0 filtering, WCAG AA labels, ESLint fixes)*

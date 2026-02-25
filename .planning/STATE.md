@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.5 COMPLETE — All milestone audit gaps closed
+**Current focus:** v1.5 — Phase 32 complete (frequency accuracy + accessibility fixes)
 
 ---
 
 ## Current Position
 
-**Milestone:** v1.5 Core Extraction & CLI — COMPLETE
-**Phase:** 30 of 30 (CLI Integration Fixes) — COMPLETE
-**Plan:** 30-01 — COMPLETE
-**Status:** All v1.5 audit gaps closed. FilterConfig field names fixed, CLI typecheck added, prevalence delegated to core, filter-effect test added.
-**Last activity:** 2026-02-24 — Completed 30-01-PLAN.md
+**Milestone:** v1.5 Core Extraction & CLI
+**Phase:** 32 of 32 (Frequency Accuracy Fixes) — COMPLETE
+**Plan:** 32-01 — COMPLETE
+**Status:** gnomAD v4 joint field for accurate AN, AC=0 filtering, WCAG AA labels, ESLint template fixes.
+**Last activity:** 2026-02-25 — Completed 32-01
 
 ### Progress
 
@@ -27,18 +27,18 @@ v1.1 Release-Ready: [##########] 100% - SHIPPED 2026-01-19
 v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
-v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-24 (Phase 30 audit gaps closed)
+v1.5 Core & CLI:    [##########] 100% - Phase 32 complete 2026-02-25
 ```
 
-**Overall:** 112 plans complete across 30 phases in 6 milestones.
+**Overall:** 114 plans complete across 32 phases in 6 milestones.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 112
-- v1.5 plans completed: 24
+- Total plans completed: 114
+- v1.5 plans completed: 26
 
 ---
 
@@ -135,6 +135,12 @@ Recent decisions for v1.5 (continued):
 - ZodError.errors is deprecated in Zod v3 — use .issues instead (30-01)
 - GeneVariant.exome is null | GeneVariantExomeGenome; normalize with v.exome ?? undefined before passing to functions expecting GnomadVariant[] (30-01)
 - clack prompt validate callback receives string | undefined — always guard with !v || before calling string methods (30-01)
+- gnomAD v4 joint field preferred over naive exome+genome sum — site-level coverage-aware combination matches gnomAD website AN values (32-01)
+- joint is optional on all variant interfaces — absent for v2/v3, all code falls back to exome+genome sum (32-01)
+- joint uses homozygote_count (not ac_hom) — different field naming from exome/genome in gnomAD API (32-01)
+- hasObservedAlleles() applied before pathogenicity filters — excludes AC=0 variants from carrier frequency calculations (32-01)
+- tsdown dist must be rebuilt (bun run build in core) before CLI typecheck can see new types — CLI resolves @gnomad-cf/core via compiled dist/, not source (32-01)
+- WCAG AA label contrast: text-grey-darken-2 (#616161) on #FAFAFA = 5.93:1 ratio (exceeds 4.5:1 minimum for 12px text) (32-01)
 
 ### Pending Todos
 
@@ -150,9 +156,9 @@ None.
 
 ### Last Session
 
-**Date:** 2026-02-24
-**Completed:** Plan 30-01 — CLI FilterConfig field names fixed, CLI added to root typecheck, prevalence delegated to core, filter-effect integration test added. All v1.5 milestone audit gaps closed.
-**Status:** v1.5 FULLY COMPLETE. 112 plans across 30 phases. All audit gaps closed.
+**Date:** 2026-02-25
+**Completed:** Phase 32 — gnomAD v4 joint field for accurate AN/AC values, AC=0 variant filtering, WCAG AA label contrast, ESLint template fixes.
+**Status:** 114 plans across 32 phases.
 **Resume file:** None
 
 ### Handoff Notes
@@ -221,3 +227,5 @@ Docs: https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 *30-01 complete: 2026-02-24*
 *Phase 30 complete: 2026-02-24*
 *v1.5 milestone audit gaps closed: 2026-02-24*
+*Phase 31 complete: 2026-02-25*
+*Phase 32 complete: 2026-02-25 (joint field, AC=0 filter, WCAG AA, ESLint)*
