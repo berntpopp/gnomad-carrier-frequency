@@ -1,5 +1,8 @@
 <template>
-  <v-app-bar density="compact" :elevation="2">
+  <v-app-bar
+    density="compact"
+    :elevation="2"
+  >
     <div class="app-bar-content">
       <v-tooltip
         v-if="!xs"
@@ -74,7 +77,11 @@
         </template>
       </v-tooltip>
 
-      <v-tooltip text="Settings" location="bottom" aria-label="Settings">
+      <v-tooltip
+        text="Settings"
+        location="bottom"
+        aria-label="Settings"
+      >
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
@@ -101,7 +108,10 @@
       Back online
 
       <template #actions>
-        <v-btn variant="text" @click="dismissBackOnlineNotification">
+        <v-btn
+          variant="text"
+          @click="dismissBackOnlineNotification"
+        >
           Close
         </v-btn>
       </template>

@@ -54,7 +54,9 @@
           size="small"
           @click="includeAll"
         >
-          <v-icon start> mdi-refresh </v-icon>
+          <v-icon start>
+            mdi-refresh
+          </v-icon>
           Clear exclusions
         </v-btn>
 
@@ -68,9 +70,13 @@
               size="small"
               :disabled="variants.length === 0"
             >
-              <v-icon start> mdi-download </v-icon>
+              <v-icon start>
+                mdi-download
+              </v-icon>
               Export
-              <v-icon end> mdi-chevron-down </v-icon>
+              <v-icon end>
+                mdi-chevron-down
+              </v-icon>
             </v-btn>
           </template>
           <v-list density="compact">

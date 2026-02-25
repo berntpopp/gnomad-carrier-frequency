@@ -67,7 +67,10 @@
             ]"
           >
             {{ item.variant_id }}
-            <v-icon size="x-small" class="ml-1">mdi-open-in-new</v-icon>
+            <v-icon
+              size="x-small"
+              class="ml-1"
+            >mdi-open-in-new</v-icon>
           </a>
         </template>
 
@@ -109,9 +112,17 @@
             link
           >
             {{ formatClinvarStatus(item.clinvarStatus) }}
-            <v-icon end size="x-small"> mdi-open-in-new </v-icon>
+            <v-icon
+              end
+              size="x-small"
+            >
+              mdi-open-in-new
+            </v-icon>
           </v-chip>
-          <span v-else class="text-medium-emphasis">-</span>
+          <span
+            v-else
+            class="text-medium-emphasis"
+          >-</span>
         </template>
 
         <!-- Gold stars column - star icons -->
@@ -129,7 +140,10 @@
               size="x-small"
             />
           </div>
-          <span v-else class="text-medium-emphasis">-</span>
+          <span
+            v-else
+            class="text-medium-emphasis"
+          >-</span>
         </template>
 
         <!-- HGVS-c column - truncate if long -->
@@ -142,7 +156,10 @@
           >
             {{ item.hgvsc }}
           </span>
-          <span v-else class="text-medium-emphasis">-</span>
+          <span
+            v-else
+            class="text-medium-emphasis"
+          >-</span>
         </template>
 
         <!-- HGVS-p column - truncate if long -->
@@ -155,7 +172,10 @@
           >
             {{ item.hgvsp }}
           </span>
-          <span v-else class="text-medium-emphasis">-</span>
+          <span
+            v-else
+            class="text-medium-emphasis"
+          >-</span>
         </template>
 
         <!-- Expanded row - additional details -->
@@ -164,7 +184,11 @@
             <td :colspan="columns.length">
               <div class="pa-3">
                 <v-row dense>
-                  <v-col cols="12" sm="6" md="3">
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="3"
+                  >
                     <div
                       class="text-caption font-weight-bold text-grey-darken-2"
                     >
@@ -174,7 +198,11 @@
                       {{ item.transcriptId || "-" }}
                     </div>
                   </v-col>
-                  <v-col cols="12" sm="6" md="3">
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="3"
+                  >
                     <div
                       class="text-caption font-weight-bold text-grey-darken-2"
                     >
@@ -184,7 +212,11 @@
                       {{ item.pos.toLocaleString() }}
                     </div>
                   </v-col>
-                  <v-col cols="12" sm="6" md="3">
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="3"
+                  >
                     <div
                       class="text-caption font-weight-bold text-grey-darken-2"
                     >
@@ -194,7 +226,11 @@
                       {{ item.ref }} / {{ item.alt }}
                     </div>
                   </v-col>
-                  <v-col cols="12" sm="6" md="3">
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="3"
+                  >
                     <div
                       class="text-caption font-weight-bold text-grey-darken-2"
                     >
@@ -215,7 +251,12 @@
                     size="small"
                     variant="tonal"
                   >
-                    <v-icon start size="x-small"> mdi-alert-circle </v-icon>
+                    <v-icon
+                      start
+                      size="x-small"
+                    >
+                      mdi-alert-circle
+                    </v-icon>
                     LoF HC
                   </v-chip>
                   <v-chip
@@ -240,7 +281,12 @@
                     size="small"
                     variant="tonal"
                   >
-                    <v-icon start size="x-small"> mdi-alert </v-icon>
+                    <v-icon
+                      start
+                      size="x-small"
+                    >
+                      mdi-alert
+                    </v-icon>
                     ClinVar P/LP
                   </v-chip>
                 </div>

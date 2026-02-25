@@ -1,5 +1,9 @@
 <template>
-  <v-card class="mt-4" variant="outlined" data-testid="text-output">
+  <v-card
+    class="mt-4"
+    variant="outlined"
+    data-testid="text-output"
+  >
     <!-- Header row - stacks vertically on mobile -->
     <v-card-title
       class="d-flex flex-column flex-sm-row align-start align-sm-center ga-2 pb-0"
@@ -16,8 +20,18 @@
           density="compact"
           variant="outlined"
         >
-          <v-btn value="de" size="small"> DE </v-btn>
-          <v-btn value="en" size="small"> EN </v-btn>
+          <v-btn
+            value="de"
+            size="small"
+          >
+            DE
+          </v-btn>
+          <v-btn
+            value="en"
+            size="small"
+          >
+            EN
+          </v-btn>
         </v-btn-toggle>
 
         <!-- Gender style selector (German only) -->
@@ -88,7 +102,10 @@
         <div class="text-body-2 text-medium-emphasis mb-2">
           {{ labels.sections }}
         </div>
-        <div class="d-flex flex-wrap ga-2" data-testid="text-section-chips">
+        <div
+          class="d-flex flex-wrap ga-2"
+          data-testid="text-section-chips"
+        >
           <v-chip
             v-for="section in availableSections"
             :key="section.id"
@@ -104,13 +121,15 @@
       </div>
 
       <!-- Text preview -->
-      <v-card variant="tonal" class="mb-4">
+      <v-card
+        variant="tonal"
+        class="mb-4"
+      >
         <v-card-text data-testid="text-content">
           <pre
             class="text-body-2"
             style="white-space: pre-wrap; font-family: inherit; margin: 0"
-            >{{ generatedText || labels.noText }}</pre
-          >
+          >{{ generatedText || labels.noText }}</pre>
         </v-card-text>
       </v-card>
 

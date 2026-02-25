@@ -23,7 +23,12 @@
               rel="noopener noreferrer"
               aria-label="Source code on GitHub"
             >
-              <v-icon size="small" start> mdi-github </v-icon>
+              <v-icon
+                size="small"
+                start
+              >
+                mdi-github
+              </v-icon>
               <span class="d-none d-sm-inline">GitHub</span>
             </v-btn>
           </template>
@@ -55,7 +60,12 @@
               rel="noopener noreferrer"
               aria-label="Open documentation"
             >
-              <v-icon size="small" start> mdi-book-open-outline </v-icon>
+              <v-icon
+                size="small"
+                start
+              >
+                mdi-book-open-outline
+              </v-icon>
               <span class="d-none d-sm-inline">Docs</span>
             </v-btn>
           </template>
@@ -75,7 +85,12 @@
               aria-label="View clinical disclaimer"
               @click="reopenDisclaimer"
             >
-              <v-icon size="small" start> mdi-alert-circle-outline </v-icon>
+              <v-icon
+                size="small"
+                start
+              >
+                mdi-alert-circle-outline
+              </v-icon>
               <span class="d-none d-sm-inline">Disclaimer</span>
             </v-btn>
           </template>
@@ -99,7 +114,12 @@
                   size="small"
                   aria-label="View data sources"
                 >
-                  <v-icon size="small" start> mdi-database </v-icon>
+                  <v-icon
+                    size="small"
+                    start
+                  >
+                    mdi-database
+                  </v-icon>
                   <span class="d-none d-sm-inline">Data</span>
                 </v-btn>
               </template>
@@ -122,7 +142,12 @@
                   size="small"
                   aria-label="View calculation methodology"
                 >
-                  <v-icon size="small" start> mdi-function-variant </v-icon>
+                  <v-icon
+                    size="small"
+                    start
+                  >
+                    mdi-function-variant
+                  </v-icon>
                   <span class="d-none d-sm-inline">Method</span>
                 </v-btn>
               </template>
@@ -145,7 +170,12 @@
                   size="small"
                   aria-label="View frequently asked questions"
                 >
-                  <v-icon size="small" start> mdi-help-circle-outline </v-icon>
+                  <v-icon
+                    size="small"
+                    start
+                  >
+                    mdi-help-circle-outline
+                  </v-icon>
                   <span class="d-none d-sm-inline">FAQ</span>
                 </v-btn>
               </template>
@@ -168,7 +198,12 @@
                   size="small"
                   aria-label="About this application"
                 >
-                  <v-icon size="small" start> mdi-information-outline </v-icon>
+                  <v-icon
+                    size="small"
+                    start
+                  >
+                    mdi-information-outline
+                  </v-icon>
                   <span class="d-none d-sm-inline">About</span>
                 </v-btn>
               </template>
@@ -190,7 +225,12 @@
               aria-label="View application logs"
               @click="emit('openLogViewer')"
             >
-              <v-icon size="small" start> mdi-console </v-icon>
+              <v-icon
+                size="small"
+                start
+              >
+                mdi-console
+              </v-icon>
               <span class="d-none d-sm-inline">Logs</span>
             </v-btn>
           </template>
@@ -198,7 +238,10 @@
       </div>
 
       <!-- Mobile menu button (visible only on xs screens) -->
-      <v-menu location="top" class="d-sm-none">
+      <v-menu
+        location="top"
+        class="d-sm-none"
+      >
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
@@ -208,7 +251,9 @@
             aria-label="More options"
             class="d-sm-none"
           >
-            <v-icon size="small"> mdi-dots-horizontal </v-icon>
+            <v-icon size="small">
+              mdi-dots-horizontal
+            </v-icon>
           </v-btn>
         </template>
         <v-list density="compact">

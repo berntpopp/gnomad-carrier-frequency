@@ -1,15 +1,28 @@
 <template>
-  <v-dialog v-model="dialog" max-width="500" aria-label="Data Sources">
+  <v-dialog
+    v-model="dialog"
+    max-width="500"
+    aria-label="Data Sources"
+  >
     <template #activator="{ props }">
-      <slot name="activator" :props="props" />
+      <slot
+        name="activator"
+        :props="props"
+      />
     </template>
 
     <v-card>
       <v-card-title class="d-flex align-center">
-        <v-icon start> mdi-database </v-icon>
+        <v-icon start>
+          mdi-database
+        </v-icon>
         Data Sources
         <v-spacer />
-        <v-btn icon variant="text" @click="dialog = false">
+        <v-btn
+          icon
+          variant="text"
+          @click="dialog = false"
+        >
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>
@@ -22,9 +35,17 @@
         </p>
 
         <!-- gnomAD -->
-        <v-card variant="outlined" class="mb-3">
+        <v-card
+          variant="outlined"
+          class="mb-3"
+        >
           <v-card-title class="text-subtitle-1">
-            <v-icon start size="small"> mdi-database </v-icon>
+            <v-icon
+              start
+              size="small"
+            >
+              mdi-database
+            </v-icon>
             gnomAD
           </v-card-title>
           <v-card-text>
@@ -32,7 +53,11 @@
               Genome Aggregation Database - Population allele frequencies
             </div>
             <div class="d-flex align-center gap-2">
-              <v-chip size="small" color="secondary" variant="tonal">
+              <v-chip
+                size="small"
+                color="secondary"
+                variant="tonal"
+              >
                 Selected: {{ gnomadVersion }}
               </v-chip>
             </div>
@@ -48,15 +73,28 @@
               rel="noopener noreferrer"
             >
               Visit gnomAD
-              <v-icon end size="small"> mdi-open-in-new </v-icon>
+              <v-icon
+                end
+                size="small"
+              >
+                mdi-open-in-new
+              </v-icon>
             </v-btn>
           </v-card-text>
         </v-card>
 
         <!-- ClinVar (from gnomAD) -->
-        <v-card variant="outlined" class="mb-3">
+        <v-card
+          variant="outlined"
+          class="mb-3"
+        >
           <v-card-title class="text-subtitle-1">
-            <v-icon start size="small"> mdi-medical-bag </v-icon>
+            <v-icon
+              start
+              size="small"
+            >
+              mdi-medical-bag
+            </v-icon>
             ClinVar
           </v-card-title>
           <v-card-text>
@@ -77,19 +115,34 @@
               rel="noopener noreferrer"
             >
               Visit ClinVar
-              <v-icon end size="small"> mdi-open-in-new </v-icon>
+              <v-icon
+                end
+                size="small"
+              >
+                mdi-open-in-new
+              </v-icon>
             </v-btn>
           </v-card-text>
         </v-card>
 
         <!-- ClinGen -->
-        <v-card variant="outlined" class="mb-3">
+        <v-card
+          variant="outlined"
+          class="mb-3"
+        >
           <v-card-title class="text-subtitle-1">
-            <v-icon start size="small"> mdi-check-decagram </v-icon>
+            <v-icon
+              start
+              size="small"
+            >
+              mdi-check-decagram
+            </v-icon>
             ClinGen
           </v-card-title>
           <v-card-text>
-            <div class="text-body-2 mb-2">Gene-Disease Validity curations</div>
+            <div class="text-body-2 mb-2">
+              Gene-Disease Validity curations
+            </div>
             <div class="d-flex align-center gap-2">
               <v-chip
                 size="small"
@@ -98,7 +151,10 @@
               >
                 Cache: {{ clingenCacheAge }}
               </v-chip>
-              <v-chip size="small" variant="outlined">
+              <v-chip
+                size="small"
+                variant="outlined"
+              >
                 {{ clingenEntryCount }} entries
               </v-chip>
             </div>
@@ -114,12 +170,21 @@
               rel="noopener noreferrer"
             >
               Visit ClinGen
-              <v-icon end size="small"> mdi-open-in-new </v-icon>
+              <v-icon
+                end
+                size="small"
+              >
+                mdi-open-in-new
+              </v-icon>
             </v-btn>
           </v-card-text>
         </v-card>
 
-        <v-alert type="info" variant="tonal" density="compact">
+        <v-alert
+          type="info"
+          variant="tonal"
+          density="compact"
+        >
           <div class="text-caption">
             All data is queried in real-time from these sources. No patient data
             is stored or transmitted.
@@ -131,7 +196,12 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text" @click="dialog = false"> Close </v-btn>
+        <v-btn
+          variant="text"
+          @click="dialog = false"
+        >
+          Close
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

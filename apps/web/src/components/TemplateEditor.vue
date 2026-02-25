@@ -38,8 +38,14 @@
       </div>
 
       <!-- Preview with highlighted variables -->
-      <div class="template-preview pa-3 rounded border" @click="focusTextarea">
-        <template v-for="(segment, idx) in parsedTemplate" :key="idx">
+      <div
+        class="template-preview pa-3 rounded border"
+        @click="focusTextarea"
+      >
+        <template
+          v-for="(segment, idx) in parsedTemplate"
+          :key="idx"
+        >
           <span v-if="segment.type === 'text'">{{ segment.content }}</span>
           <v-chip
             v-else

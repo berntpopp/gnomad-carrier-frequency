@@ -10,7 +10,11 @@
       <v-card-text>{{ options.message }}</v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn v-if="options.cancelText !== ''" variant="text" @click="cancel">
+        <v-btn
+          v-if="options.cancelText !== ''"
+          variant="text"
+          @click="cancel"
+        >
           {{ options.cancelText || "Cancel" }}
         </v-btn>
         <v-btn

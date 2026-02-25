@@ -1,9 +1,15 @@
 <template>
   <div data-testid="step-results">
-    <h2 class="text-h6 mb-4">Results</h2>
+    <h2 class="text-h6 mb-4">
+      Results
+    </h2>
 
     <!-- ClinGen validation reminder in results -->
-    <ClingenWarning v-if="result" :gene-symbol="result.gene" class="mb-4" />
+    <ClingenWarning
+      v-if="result"
+      :gene-symbol="result.gene"
+      class="mb-4"
+    />
 
     <!-- Exclusion alert - shows when variants have been manually excluded -->
     <v-alert
@@ -21,10 +27,18 @@
     </v-alert>
 
     <!-- Summary card -->
-    <v-card v-if="result" class="mb-4" data-testid="results-summary-card">
+    <v-card
+      v-if="result"
+      class="mb-4"
+      data-testid="results-summary-card"
+    >
       <v-card-title class="d-flex align-center flex-wrap">
         {{ result.gene }} - Carrier Frequency Results
-        <v-chip :color="sourceChipColor" size="small" class="ml-2">
+        <v-chip
+          :color="sourceChipColor"
+          size="small"
+          class="ml-2"
+        >
           {{ sourceAttribution }}
         </v-chip>
         <v-chip
@@ -44,7 +58,10 @@
           <span class="text-body-2 text-medium-emphasis">
             ({{ globalFrequency?.percent }})
           </span>
-          <v-tooltip location="top" aria-label="Information">
+          <v-tooltip
+            location="top"
+            aria-label="Information"
+          >
             <template #activator="{ props: tooltipProps }">
               <v-icon
                 v-bind="tooltipProps"
@@ -56,7 +73,7 @@
               </v-icon>
             </template>
             <span class="tooltip-text">
-              <strong>Carrier Frequency (2pq)</strong><br />
+              <strong>Carrier Frequency (2pq)</strong><br>
               The proportion of individuals who carry one copy of a pathogenic
               variant. Carriers are typically unaffected but can pass the
               variant to offspring. Calculated as approximately 2 times the sum
@@ -69,10 +86,11 @@
             indexStatus === "heterozygous" ? "carrier" : "affected"
           }}):
           <strong class="ml-1">{{ recurrenceRisk?.ratio }}</strong>
-          <span class="text-medium-emphasis ml-1"
-            >({{ recurrenceRisk?.percent }})</span
+          <span class="text-medium-emphasis ml-1">({{ recurrenceRisk?.percent }})</span>
+          <v-tooltip
+            location="top"
+            aria-label="Information"
           >
-          <v-tooltip location="top" aria-label="Information">
             <template #activator="{ props: tooltipProps }">
               <v-icon
                 v-bind="tooltipProps"
@@ -84,9 +102,9 @@
               </v-icon>
             </template>
             <span class="tooltip-text">
-              <strong>Recurrence Risk</strong><br />
+              <strong>Recurrence Risk</strong><br>
               For a carrier index patient: risk that offspring inherits both a
-              parental variant and a population variant (carrier freq / 4).<br />
+              parental variant and a population variant (carrier freq / 4).<br>
               For an affected index patient: risk that offspring is affected
               (carrier freq / 2).
             </span>
@@ -97,10 +115,16 @@
         >
           Based on {{ filteredCount }} qualifying variant(s)
           <!-- Exclusion note when variants have been excluded -->
-          <span v-if="excludedCount > 0" class="ml-1 text-warning">
+          <span
+            v-if="excludedCount > 0"
+            class="ml-1 text-warning"
+          >
             ({{ excludedCount }} manually excluded)
           </span>
-          <v-tooltip location="top" aria-label="Information">
+          <v-tooltip
+            location="top"
+            aria-label="Information"
+          >
             <template #activator="{ props: tooltipProps }">
               <v-icon
                 v-bind="tooltipProps"
@@ -112,7 +136,7 @@
               </v-icon>
             </template>
             <span class="tooltip-text">
-              <strong>Contributing Variants</strong><br />
+              <strong>Contributing Variants</strong><br>
               The number of pathogenic variants included in this calculation.
               Click "View all variants" below to see details including variant
               IDs, consequences, and individual allele frequencies.
@@ -127,10 +151,11 @@
         >
           Genetic Prevalence:
           <strong class="ml-1">{{ geneticPrevalenceFormatted.ratio }}</strong>
-          <span class="text-medium-emphasis ml-1"
-            >({{ geneticPrevalenceFormatted.percent }})</span
+          <span class="text-medium-emphasis ml-1">({{ geneticPrevalenceFormatted.percent }})</span>
+          <v-tooltip
+            location="top"
+            aria-label="Information"
           >
-          <v-tooltip location="top" aria-label="Information">
             <template #activator="{ props: tooltipProps }">
               <v-icon
                 v-bind="tooltipProps"
@@ -142,7 +167,7 @@
               </v-icon>
             </template>
             <span class="tooltip-text">
-              <strong>Genetic Prevalence (q&sup2;)</strong><br />
+              <strong>Genetic Prevalence (q&sup2;)</strong><br>
               The expected frequency of affected individuals in the population
               under Hardy-Weinberg Equilibrium. Calculated as q&sup2; where q is
               the sum of pathogenic allele frequencies. This is the theoretical
@@ -162,10 +187,11 @@
             Math.round(calcStore.defaults.penetrance * 100)
           }}% penetrance):
           <strong class="ml-1">{{ bayesianPrevalenceFormatted.ratio }}</strong>
-          <span class="text-medium-emphasis ml-1"
-            >({{ bayesianPrevalenceFormatted.percent }})</span
+          <span class="text-medium-emphasis ml-1">({{ bayesianPrevalenceFormatted.percent }})</span>
+          <v-tooltip
+            location="top"
+            aria-label="Information"
           >
-          <v-tooltip location="top" aria-label="Information">
             <template #activator="{ props: tooltipProps }">
               <v-icon
                 v-bind="tooltipProps"
@@ -177,7 +203,7 @@
               </v-icon>
             </template>
             <span class="tooltip-text">
-              <strong>Bayesian Prevalence</strong><br />
+              <strong>Bayesian Prevalence</strong><br>
               Genetic prevalence adjusted for incomplete penetrance. Calculated
               as genetic prevalence &times; penetrance fraction. For example,
               with 80% penetrance, only 80% of genetically affected individuals
@@ -259,8 +285,17 @@
               {{ item.alleleNumber?.toLocaleString() ?? "-" }}
             </td>
             <td>
-              <v-chip v-if="item.notes" color="info" size="x-small">
-                <v-icon start size="x-small"> mdi-star </v-icon>
+              <v-chip
+                v-if="item.notes"
+                color="info"
+                size="x-small"
+              >
+                <v-icon
+                  start
+                  size="x-small"
+                >
+                  mdi-star
+                </v-icon>
                 {{ item.notes }}
               </v-chip>
             </td>
@@ -297,7 +332,9 @@
             :min-height="smAndDown ? 44 : undefined"
           >
             Export
-            <v-icon end> mdi-chevron-down </v-icon>
+            <v-icon end>
+              mdi-chevron-down
+            </v-icon>
           </v-btn>
         </template>
         <v-list :density="smAndDown ? 'default' : 'compact'">
@@ -319,7 +356,10 @@
       </v-menu>
 
       <!-- Copy link button -->
-      <v-tooltip location="top" aria-label="Information">
+      <v-tooltip
+        location="top"
+        aria-label="Information"
+      >
         <template #activator="{ props: tooltipProps }">
           <v-btn
             v-bind="tooltipProps"
@@ -342,7 +382,10 @@
     </div>
 
     <!-- Range info -->
-    <div v-if="result" class="text-body-2 mt-4 text-medium-emphasis">
+    <div
+      v-if="result"
+      class="text-body-2 mt-4 text-medium-emphasis"
+    >
       Range across populations:
       {{ formatRatio(result.minFrequency) }}
       to

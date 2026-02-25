@@ -8,7 +8,10 @@
     data-testid="history-drawer"
   >
     <div class="pa-4">
-      <HistoryPanel @close="modelValue = false" @restore="handleRestore" />
+      <HistoryPanel
+        @close="modelValue = false"
+        @restore="handleRestore"
+      />
     </div>
   </v-navigation-drawer>
 </template>

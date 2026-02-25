@@ -1,5 +1,8 @@
 <template>
-  <div v-if="geneSymbol" data-testid="clingen-warning">
+  <div
+    v-if="geneSymbol"
+    data-testid="clingen-warning"
+  >
     <!-- Loading state -->
     <v-alert
       v-if="isLoading"
@@ -9,7 +12,11 @@
       class="mb-4"
     >
       <template #prepend>
-        <v-progress-circular indeterminate size="20" width="2" />
+        <v-progress-circular
+          indeterminate
+          size="20"
+          width="2"
+        />
       </template>
       Checking ClinGen gene-disease validity...
     </v-alert>
@@ -22,7 +29,9 @@
       density="compact"
       class="mb-4"
     >
-      <template #title> ClinGen Data Unavailable </template>
+      <template #title>
+        ClinGen Data Unavailable
+      </template>
       <template #text>
         Unable to verify gene-disease validity. {{ error }}
       </template>
@@ -37,7 +46,12 @@
       class="mb-4"
     >
       <template #title>
-        <v-icon start size="small"> mdi-check-circle </v-icon>
+        <v-icon
+          start
+          size="small"
+        >
+          mdi-check-circle
+        </v-icon>
         ClinGen AR Validated
       </template>
       <template #text>
@@ -46,9 +60,16 @@
           gene-disease association(s):
         </div>
         <ul class="mt-1 mb-0">
-          <li v-for="entry in validity.arEntries" :key="entry.mondoId">
+          <li
+            v-for="entry in validity.arEntries"
+            :key="entry.mondoId"
+          >
             {{ entry.diseaseLabel }}
-            <v-chip size="x-small" variant="outlined" class="ml-1">
+            <v-chip
+              size="x-small"
+              variant="outlined"
+              class="ml-1"
+            >
               {{ entry.classification }}
             </v-chip>
           </li>
@@ -65,7 +86,12 @@
       class="mb-4"
     >
       <template #title>
-        <v-icon start size="small"> mdi-alert </v-icon>
+        <v-icon
+          start
+          size="small"
+        >
+          mdi-alert
+        </v-icon>
         No AR Association in ClinGen
       </template>
       <template #text>
@@ -73,12 +99,22 @@
           <strong>{{ geneSymbol }}</strong> is in ClinGen but has no validated
           autosomal recessive associations.
         </div>
-        <div v-if="validity.entries.length > 0" class="mt-1">
+        <div
+          v-if="validity.entries.length > 0"
+          class="mt-1"
+        >
           Found associations:
           <ul class="mt-1 mb-0">
-            <li v-for="entry in validity.entries" :key="entry.mondoId">
+            <li
+              v-for="entry in validity.entries"
+              :key="entry.mondoId"
+            >
               {{ entry.diseaseLabel }} ({{ entry.moi }})
-              <v-chip size="x-small" variant="outlined" class="ml-1">
+              <v-chip
+                size="x-small"
+                variant="outlined"
+                class="ml-1"
+              >
                 {{ entry.classification }}
               </v-chip>
             </li>
@@ -101,7 +137,12 @@
       class="mb-4"
     >
       <template #title>
-        <v-icon start size="small"> mdi-information </v-icon>
+        <v-icon
+          start
+          size="small"
+        >
+          mdi-information
+        </v-icon>
         Gene Not in ClinGen
       </template>
       <template #text>

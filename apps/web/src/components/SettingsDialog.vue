@@ -12,19 +12,32 @@
       <v-card-title class="d-flex align-center">
         <span>Settings</span>
         <v-spacer />
-        <v-btn icon variant="text" @click="close">
+        <v-btn
+          icon
+          variant="text"
+          @click="close"
+        >
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>
 
       <v-tabs v-model="activeTab">
-        <v-tab value="general" data-testid="settings-tab-general">
+        <v-tab
+          value="general"
+          data-testid="settings-tab-general"
+        >
           General
         </v-tab>
-        <v-tab value="filters" data-testid="settings-tab-filters">
+        <v-tab
+          value="filters"
+          data-testid="settings-tab-filters"
+        >
           Filters
         </v-tab>
-        <v-tab value="templates" data-testid="settings-tab-templates">
+        <v-tab
+          value="templates"
+          data-testid="settings-tab-templates"
+        >
           Templates
         </v-tab>
       </v-tabs>
@@ -33,9 +46,17 @@
         <v-tabs-window v-model="activeTab">
           <v-tabs-window-item value="general">
             <!-- Clinical Disclaimer Section -->
-            <v-card variant="outlined" class="mb-4">
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
               <v-card-title class="text-subtitle-1">
-                <v-icon start size="small"> mdi-alert-circle-outline </v-icon>
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-alert-circle-outline
+                </v-icon>
                 Clinical Disclaimer
               </v-card-title>
 
@@ -61,9 +82,17 @@
             </v-card>
 
             <!-- ClinGen Cache Management Section -->
-            <v-card variant="outlined" class="mb-4">
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
               <v-card-title class="text-subtitle-1">
-                <v-icon start size="small"> mdi-database-sync </v-icon>
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-database-sync
+                </v-icon>
                 ClinGen Data Cache
               </v-card-title>
 
@@ -92,7 +121,12 @@
                     :loading="clingenLoading"
                     @click="refreshClingenCache"
                   >
-                    <v-icon start size="small"> mdi-refresh </v-icon>
+                    <v-icon
+                      start
+                      size="small"
+                    >
+                      mdi-refresh
+                    </v-icon>
                     Refresh
                   </v-btn>
                 </div>
@@ -115,9 +149,17 @@
             </v-card>
 
             <!-- Logging Configuration Section -->
-            <v-card variant="outlined" class="mb-4">
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
               <v-card-title class="text-subtitle-1">
-                <v-icon start size="small"> mdi-console </v-icon>
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-console
+                </v-icon>
                 Application Logging
               </v-card-title>
 
@@ -147,9 +189,7 @@
                 <div class="d-flex align-center justify-space-between mt-3">
                   <div class="text-body-2">
                     Current: {{ logStore.stats.totalCount }} entries
-                    <span class="text-medium-emphasis"
-                      >({{ logStore.stats.memoryEstimate }})</span
-                    >
+                    <span class="text-medium-emphasis">({{ logStore.stats.memoryEstimate }})</span>
                   </div>
                   <v-btn
                     variant="text"
@@ -164,9 +204,17 @@
             </v-card>
 
             <!-- History Settings Section -->
-            <v-card variant="outlined" class="mb-4">
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
               <v-card-title class="text-subtitle-1">
-                <v-icon start size="small"> mdi-history </v-icon>
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-history
+                </v-icon>
                 Search History
               </v-card-title>
 
@@ -228,10 +276,17 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer />
-                  <v-btn variant="text" @click="showClearHistoryDialog = false">
+                  <v-btn
+                    variant="text"
+                    @click="showClearHistoryDialog = false"
+                  >
                     Cancel
                   </v-btn>
-                  <v-btn color="error" variant="flat" @click="clearAllHistory">
+                  <v-btn
+                    color="error"
+                    variant="flat"
+                    @click="clearAllHistory"
+                  >
                     Clear All
                   </v-btn>
                 </v-card-actions>
@@ -239,9 +294,17 @@
             </v-dialog>
 
             <!-- Data Cache Section -->
-            <v-card variant="outlined" class="mb-4">
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
               <v-card-title class="text-subtitle-1">
-                <v-icon start size="small"> mdi-cached </v-icon>
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-cached
+                </v-icon>
                 Data Cache
               </v-card-title>
 
@@ -257,7 +320,10 @@
                   Using {{ formatBytes(cacheInfo.usage) }} of
                   {{ formatBytes(cacheInfo.quota) }}
                 </div>
-                <div v-else class="text-caption text-medium-emphasis mb-3">
+                <div
+                  v-else
+                  class="text-caption text-medium-emphasis mb-3"
+                >
                   Storage information not available
                 </div>
 
@@ -290,9 +356,17 @@
             </v-card>
 
             <!-- Install App Section -->
-            <v-card variant="outlined" class="mb-4">
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
               <v-card-title class="text-subtitle-1">
-                <v-icon start size="small"> mdi-download </v-icon>
+                <v-icon
+                  start
+                  size="small"
+                >
+                  mdi-download
+                </v-icon>
                 Install App
               </v-card-title>
 
@@ -300,12 +374,13 @@
                 <!-- Already installed -->
                 <template v-if="isInstalled">
                   <div class="d-flex align-center">
-                    <v-icon color="success" class="mr-2">
+                    <v-icon
+                      color="success"
+                      class="mr-2"
+                    >
                       mdi-check-circle
                     </v-icon>
-                    <span class="text-body-2"
-                      >App is installed and ready to use offline.</span
-                    >
+                    <span class="text-body-2">App is installed and ready to use offline.</span>
                   </div>
                 </template>
 
@@ -327,9 +402,16 @@
                 <!-- iOS device -->
                 <template v-else-if="isIos">
                   <div class="d-flex align-start">
-                    <v-icon color="grey" class="mr-2 mt-1"> mdi-apple </v-icon>
+                    <v-icon
+                      color="grey"
+                      class="mr-2 mt-1"
+                    >
+                      mdi-apple
+                    </v-icon>
                     <div>
-                      <div class="text-body-2 mb-2">To install on iOS:</div>
+                      <div class="text-body-2 mb-2">
+                        To install on iOS:
+                      </div>
                       <ol class="text-caption text-medium-emphasis pl-4 mb-0">
                         <li>Tap the Share button</li>
                         <li>Select "Add to Home Screen"</li>
@@ -431,8 +513,12 @@
                   mandatory
                   class="mb-4"
                 >
-                  <v-btn value="de"> German </v-btn>
-                  <v-btn value="en"> English </v-btn>
+                  <v-btn value="de">
+                    German
+                  </v-btn>
+                  <v-btn value="en">
+                    English
+                  </v-btn>
                 </v-btn-toggle>
 
                 <TemplateEditor ref="templateEditorRef" />
@@ -464,7 +550,7 @@
                     accept=".json"
                     style="display: none"
                     @change="handleImportTemplates"
-                  />
+                  >
 
                   <v-btn
                     variant="outlined"
@@ -490,8 +576,18 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text" @click="close"> Cancel </v-btn>
-        <v-btn color="primary" @click="save"> Save </v-btn>
+        <v-btn
+          variant="text"
+          @click="close"
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          color="primary"
+          @click="save"
+        >
+          Save
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

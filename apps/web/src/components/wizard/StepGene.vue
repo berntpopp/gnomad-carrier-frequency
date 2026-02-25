@@ -3,7 +3,9 @@
     <!-- Welcome onboarding card - visible to first-time users only -->
     <WelcomeCard />
 
-    <h2 class="text-h6 mb-4">Select Gene</h2>
+    <h2 class="text-h6 mb-4">
+      Select Gene
+    </h2>
     <p class="text-body-2 text-medium-emphasis mb-4">
       Search for a gene symbol to calculate carrier frequency.
     </p>
@@ -11,7 +13,10 @@
     <!-- Offline fallback message -->
     <OfflineFallback />
 
-    <div class="mb-4" style="max-width: 300px">
+    <div
+      class="mb-4"
+      style="max-width: 300px"
+    >
       <VersionSelector />
     </div>
 
