@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="d-flex flex-wrap ga-1"
-    data-testid="filter-chips"
-  >
+  <div class="d-flex flex-wrap ga-1" data-testid="filter-chips">
     <v-chip
       v-if="filters.lofHcEnabled"
       color="secondary"

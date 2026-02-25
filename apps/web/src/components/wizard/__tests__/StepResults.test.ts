@@ -70,6 +70,25 @@ vi.mock("@/composables/useAppAnnouncer", () => ({
   }),
 }));
 
+// Mock useGeneSearch (uses villus useQuery which requires a client provider)
+vi.mock("@/composables/useGeneSearch", () => ({
+  useGeneSearch: () => ({
+    searchTerm: ref(""),
+    setSearchTerm: vi.fn(),
+    results: computed(() => []),
+    isLoading: ref(false),
+    error: computed(() => null),
+    selectedGene: ref(null),
+    selectGene: vi.fn(),
+    clearSelection: vi.fn(),
+    isValidGene: computed(() => false),
+    geneConstraint: ref(null),
+    constraintLoading: ref(false),
+    canonicalTranscript: ref(null),
+    prefillGene: vi.fn(),
+  }),
+}));
+
 // @vueuse/core clipboard composable
 vi.mock("@vueuse/core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@vueuse/core")>();

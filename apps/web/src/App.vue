@@ -1,9 +1,6 @@
 <template>
   <v-app>
-    <a
-      href="#main-content"
-      class="skip-link"
-    >Skip to main content</a>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <VueAnnouncer class="sr-only" />
     <DisclaimerBanner />
     <AppBar
@@ -12,14 +9,9 @@
       @reset="handleReset"
     />
 
-    <v-main
-      id="main-content"
-      tabindex="-1"
-    >
+    <v-main id="main-content" tabindex="-1">
       <v-container max-width="900">
-        <h1 class="text-h4 mb-2">
-          gnomAD Carrier Frequency Calculator
-        </h1>
+        <h1 class="text-h4 mb-2">gnomAD Carrier Frequency Calculator</h1>
         <p class="text-body-2 text-medium-emphasis mb-6">
           Calculate carrier frequency and recurrence risk from gnomAD population
           data.
@@ -36,9 +28,7 @@
             size="48"
             class="mb-4"
           />
-          <div class="text-h6 mb-2">
-            Loading shared calculation
-          </div>
+          <div class="text-h6 mb-2">Loading shared calculation</div>
           <div class="text-body-2 text-medium-emphasis">
             Restoring parameters from URL...
           </div>
@@ -53,10 +43,7 @@
 
     <SettingsDialog v-model="showSettings" />
     <LogViewerPanel v-model="showLogViewer" />
-    <HistoryDrawer
-      v-model="showHistory"
-      @restore="handleHistoryRestore"
-    />
+    <HistoryDrawer v-model="showHistory" @restore="handleHistoryRestore" />
     <ConfirmDialog />
 
     <!-- PWA Update Notification -->
@@ -69,19 +56,8 @@
       A new version is available
 
       <template #actions>
-        <v-btn
-          variant="text"
-          @click="dismissUpdate"
-        >
-          Later
-        </v-btn>
-        <v-btn
-          color="white"
-          variant="tonal"
-          @click="updateApp"
-        >
-          Update
-        </v-btn>
+        <v-btn variant="text" @click="dismissUpdate"> Later </v-btn>
+        <v-btn color="white" variant="tonal" @click="updateApp"> Update </v-btn>
       </template>
     </v-snackbar>
 
@@ -95,12 +71,7 @@
       App ready for offline use
 
       <template #actions>
-        <v-btn
-          variant="text"
-          @click="showOfflineReady = false"
-        >
-          Close
-        </v-btn>
+        <v-btn variant="text" @click="showOfflineReady = false"> Close </v-btn>
       </template>
     </v-snackbar>
   </v-app>

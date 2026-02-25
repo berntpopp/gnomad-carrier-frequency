@@ -9,21 +9,12 @@
   >
     <v-card>
       <v-card-title class="d-flex align-center">
-        <v-icon
-          start
-          color="warning"
-        >
-          mdi-alert-circle
-        </v-icon>
+        <v-icon start color="warning"> mdi-alert-circle </v-icon>
         Clinical Disclaimer
       </v-card-title>
 
       <v-card-text>
-        <v-alert
-          type="warning"
-          variant="tonal"
-          class="mb-4"
-        >
+        <v-alert type="warning" variant="tonal" class="mb-4">
           <strong>For Research Use Only</strong>
         </v-alert>
 

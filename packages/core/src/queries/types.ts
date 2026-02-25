@@ -95,9 +95,18 @@ export interface GnomadConstraint {
   flags: string[] | null;
 }
 
+export interface ManeSelectTranscript {
+  ensembl_id: string;
+  ensembl_version: string;
+  refseq_id: string;
+  refseq_version: string;
+}
+
 export interface GeneDetailsResult {
   gene_id: string;
   symbol: string;
+  canonical_transcript_id: string | null;
+  mane_select_transcript: ManeSelectTranscript | null;
   gnomad_constraint: GnomadConstraint | null;
 }
 

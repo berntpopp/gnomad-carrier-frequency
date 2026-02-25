@@ -14,6 +14,13 @@ export const GENE_DETAILS_QUERY = `
     gene(gene_symbol: $geneSymbol, reference_genome: $referenceGenome) {
       gene_id
       symbol
+      canonical_transcript_id
+      mane_select_transcript {
+        ensembl_id
+        ensembl_version
+        refseq_id
+        refseq_version
+      }
       gnomad_constraint {
         exp_lof
         obs_lof

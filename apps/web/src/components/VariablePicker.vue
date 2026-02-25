@@ -1,29 +1,15 @@
 <template>
-  <v-card
-    variant="outlined"
-    class="variable-picker"
-  >
-    <v-card-title class="text-subtitle-2 py-2">
-      Insert Variable
-    </v-card-title>
+  <v-card variant="outlined" class="variable-picker">
+    <v-card-title class="text-subtitle-2 py-2"> Insert Variable </v-card-title>
 
     <v-card-text class="pa-2">
-      <v-expansion-panels
-        variant="accordion"
-        density="compact"
-      >
-        <v-expansion-panel
-          v-for="category in categories"
-          :key="category.id"
-        >
+      <v-expansion-panels variant="accordion" density="compact">
+        <v-expansion-panel v-for="category in categories" :key="category.id">
           <v-expansion-panel-title class="text-body-2">
             {{ category.label }}
           </v-expansion-panel-title>
           <v-expansion-panel-text>
-            <v-list
-              density="compact"
-              class="pa-0"
-            >
+            <v-list density="compact" class="pa-0">
               <v-list-item
                 v-for="variable in category.variables"
                 :key="variable.name"

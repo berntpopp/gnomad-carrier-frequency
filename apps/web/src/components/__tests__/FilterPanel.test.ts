@@ -119,7 +119,7 @@ describe("FilterPanel", () => {
 
     const emitted = wrapper.emitted("update:modelValue");
     expect(emitted).toBeTruthy();
-    expect(emitted![0][0]).toMatchObject({ missenseEnabled: false });
+    expect(emitted![0]![0]).toMatchObject({ missenseEnabled: false });
   });
 
   it("emits update:calcConfig when calc setting changes", async () => {
@@ -139,7 +139,7 @@ describe("FilterPanel", () => {
 
     const emitted = wrapper.emitted("update:calcConfig");
     expect(emitted).toBeTruthy();
-    expect(emitted![0][0]).toMatchObject({ useHWEFormula: false });
+    expect(emitted![0]![0]).toMatchObject({ useHWEFormula: false });
   });
 
   it("emits reset event", async () => {

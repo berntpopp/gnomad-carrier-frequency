@@ -7,7 +7,7 @@ import type { HistoryEntry } from "@gnomad-cf/core/types";
 function makeEntry(symbol = "CFTR"): Omit<HistoryEntry, "id" | "timestamp"> {
   return {
     gene: { ensembl_id: "ENSG00000001626", symbol },
-    indexStatus: "affected",
+    indexStatus: "homozygous",
     frequencySource: "gnomad",
     literatureFrequency: null,
     literaturePmid: null,
@@ -23,7 +23,7 @@ function makeEntry(symbol = "CFTR"): Omit<HistoryEntry, "id" | "timestamp"> {
     results: {
       globalCarrierFrequency: 0.04,
       qualifyingVariantCount: 3,
-      gnomadVersion: "v4.1",
+      gnomadVersion: "v4",
     },
   };
 }

@@ -49,10 +49,7 @@
 
     <v-stepper-window data-testid="wizard-content">
       <v-stepper-window-item :value="1">
-        <StepGene
-          v-model="state.gene"
-          @complete="onGeneComplete"
-        />
+        <StepGene v-model="state.gene" @complete="onGeneComplete" />
       </v-stepper-window-item>
 
       <v-stepper-window-item :value="2">
@@ -103,20 +100,10 @@
     </v-stepper-window>
 
     <!-- Error state -->
-    <v-alert
-      v-if="hasError"
-      type="error"
-      variant="tonal"
-      class="mt-4"
-    >
+    <v-alert v-if="hasError" type="error" variant="tonal" class="mt-4">
       {{ errorMessage }}
       <template #append>
-        <v-btn
-          variant="text"
-          @click="refetch"
-        >
-          Retry
-        </v-btn>
+        <v-btn variant="text" @click="refetch"> Retry </v-btn>
       </template>
     </v-alert>
   </v-stepper>

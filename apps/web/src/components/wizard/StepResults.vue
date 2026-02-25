@@ -1,15 +1,9 @@
 <template>
   <div data-testid="step-results">
-    <h2 class="text-h6 mb-4">
-      Results
-    </h2>
+    <h2 class="text-h6 mb-4">Results</h2>
 
     <!-- ClinGen validation reminder in results -->
-    <ClingenWarning
-      v-if="result"
-      :gene-symbol="result.gene"
-      class="mb-4"
-    />
+    <ClingenWarning v-if="result" :gene-symbol="result.gene" class="mb-4" />
 
     <!-- Exclusion alert - shows when variants have been manually excluded -->
     <v-alert
@@ -27,189 +21,161 @@
     </v-alert>
 
     <!-- Summary card -->
-    <v-card
-      v-if="result"
-      class="mb-4"
-      data-testid="results-summary-card"
-    >
-      <v-card-title class="d-flex align-center flex-wrap">
-        {{ result.gene }} - Carrier Frequency Results
-        <v-chip
-          :color="sourceChipColor"
-          size="small"
-          class="ml-2"
-        >
-          {{ sourceAttribution }}
-        </v-chip>
-        <v-chip
-          v-if="!calcStore.defaults.useHWEFormula"
-          color="warning"
-          size="small"
-          class="ml-2"
-          prepend-icon="mdi-alert"
-        >
-          Simplified formula
-        </v-chip>
+    <v-card v-if="result" class="mb-4" data-testid="results-summary-card">
+      <v-card-title
+        class="d-flex align-center justify-space-between flex-wrap pb-0"
+      >
+        <span class="text-h6">
+          <em>{{ result.gene }}</em>
+          <span
+            v-if="canonicalTranscript"
+            class="text-body-2 text-medium-emphasis font-weight-regular"
+          >
+            ({{ canonicalTranscript }})
+          </span>
+        </span>
+        <div class="d-flex align-center ga-2">
+          <v-chip :color="sourceChipColor" size="small">
+            {{ sourceAttribution }}
+          </v-chip>
+          <v-chip
+            v-if="!calcStore.defaults.useHWEFormula"
+            color="warning"
+            size="small"
+            prepend-icon="mdi-alert"
+          >
+            Simplified formula
+          </v-chip>
+        </div>
       </v-card-title>
 
-      <v-card-text>
-        <div class="text-h5 d-flex align-center flex-wrap">
-          Global: {{ globalFrequency?.ratio }}
-          <span class="text-body-2 text-medium-emphasis">
-            ({{ globalFrequency?.percent }})
-          </span>
-          <v-tooltip
-            location="top"
-            aria-label="Information"
+      <v-card-text class="pt-4">
+        <!-- Primary metrics grid -->
+        <v-row dense>
+          <!-- Carrier Frequency — hero stat -->
+          <v-col cols="12" sm="4">
+            <div class="stat-cell">
+              <v-tooltip location="top">
+                <template #activator="{ props: tooltipProps }">
+                  <div v-bind="tooltipProps" class="stat-label">
+                    Carrier Frequency
+                  </div>
+                </template>
+                <span class="tooltip-text">
+                  <strong>Carrier Frequency (2pq)</strong><br />
+                  Proportion of individuals carrying one copy of a pathogenic
+                  variant. Calculated as ~2 &times; sum of pathogenic allele
+                  frequencies.
+                </span>
+              </v-tooltip>
+              <div class="stat-value text-h5">
+                {{ globalFrequency?.ratio }}
+              </div>
+              <div class="stat-detail">
+                {{ globalFrequency?.percent }}
+              </div>
+            </div>
+          </v-col>
+
+          <!-- Recurrence Risk -->
+          <v-col cols="6" sm="4">
+            <div class="stat-cell">
+              <v-tooltip location="top">
+                <template #activator="{ props: tooltipProps }">
+                  <div v-bind="tooltipProps" class="stat-label">
+                    Recurrence Risk
+                    <span class="text-lowercase"
+                      >({{
+                        indexStatus === "heterozygous" ? "carrier" : "affected"
+                      }})</span
+                    >
+                  </div>
+                </template>
+                <span class="tooltip-text">
+                  <strong>Recurrence Risk</strong><br />
+                  Carrier: risk offspring inherits both a parental and a
+                  population variant (freq / 4).<br />
+                  Affected: risk offspring is affected (freq / 2).
+                </span>
+              </v-tooltip>
+              <div class="stat-value">
+                {{ recurrenceRisk?.ratio }}
+              </div>
+              <div class="stat-detail">
+                {{ recurrenceRisk?.percent }}
+              </div>
+            </div>
+          </v-col>
+
+          <!-- Genetic Prevalence -->
+          <v-col v-if="geneticPrevalenceFormatted" cols="6" sm="4">
+            <div class="stat-cell">
+              <v-tooltip location="top">
+                <template #activator="{ props: tooltipProps }">
+                  <div v-bind="tooltipProps" class="stat-label">
+                    Genetic Prevalence
+                  </div>
+                </template>
+                <span class="tooltip-text">
+                  <strong>Genetic Prevalence (q&sup2;)</strong><br />
+                  Expected frequency of affected individuals under
+                  Hardy-Weinberg Equilibrium. This is the theoretical disease
+                  frequency before accounting for penetrance.
+                </span>
+              </v-tooltip>
+              <div class="stat-value">
+                {{ geneticPrevalenceFormatted.ratio }}
+              </div>
+              <div class="stat-detail">
+                {{ geneticPrevalenceFormatted.percent }}
+              </div>
+            </div>
+          </v-col>
+
+          <!-- Bayesian Prevalence (only when penetrance < 100%) -->
+          <v-col
+            v-if="
+              bayesianPrevalenceFormatted && calcStore.defaults.penetrance < 1
+            "
+            cols="6"
+            sm="4"
           >
-            <template #activator="{ props: tooltipProps }">
-              <v-icon
-                v-bind="tooltipProps"
-                size="x-small"
-                class="ml-1"
-                aria-label="Carrier frequency information"
-              >
-                mdi-information-outline
-              </v-icon>
-            </template>
-            <span class="tooltip-text">
-              <strong>Carrier Frequency (2pq)</strong><br>
-              The proportion of individuals who carry one copy of a pathogenic
-              variant. Carriers are typically unaffected but can pass the
-              variant to offspring. Calculated as approximately 2 times the sum
-              of pathogenic allele frequencies.
-            </span>
-          </v-tooltip>
-        </div>
-        <div class="text-body-1 mt-2 d-flex align-center flex-wrap">
-          Recurrence Risk ({{
-            indexStatus === "heterozygous" ? "carrier" : "affected"
-          }}):
-          <strong class="ml-1">{{ recurrenceRisk?.ratio }}</strong>
-          <span class="text-medium-emphasis ml-1">({{ recurrenceRisk?.percent }})</span>
-          <v-tooltip
-            location="top"
-            aria-label="Information"
-          >
-            <template #activator="{ props: tooltipProps }">
-              <v-icon
-                v-bind="tooltipProps"
-                size="x-small"
-                class="ml-1"
-                aria-label="Recurrence risk information"
-              >
-                mdi-information-outline
-              </v-icon>
-            </template>
-            <span class="tooltip-text">
-              <strong>Recurrence Risk</strong><br>
-              For a carrier index patient: risk that offspring inherits both a
-              parental variant and a population variant (carrier freq / 4).<br>
-              For an affected index patient: risk that offspring is affected
-              (carrier freq / 2).
-            </span>
-          </v-tooltip>
-        </div>
+            <div class="stat-cell">
+              <v-tooltip location="top">
+                <template #activator="{ props: tooltipProps }">
+                  <div v-bind="tooltipProps" class="stat-label">
+                    Bayesian Prevalence
+                    <span class="text-lowercase"
+                      >({{
+                        Math.round(calcStore.defaults.penetrance * 100)
+                      }}%)</span
+                    >
+                  </div>
+                </template>
+                <span class="tooltip-text">
+                  <strong>Bayesian Prevalence</strong><br />
+                  Genetic prevalence adjusted for incomplete penetrance
+                  (prevalence &times; penetrance).
+                </span>
+              </v-tooltip>
+              <div class="stat-value">
+                {{ bayesianPrevalenceFormatted.ratio }}
+              </div>
+              <div class="stat-detail">
+                {{ bayesianPrevalenceFormatted.percent }}
+              </div>
+            </div>
+          </v-col>
+        </v-row>
+
+        <!-- Supporting info -->
         <div
-          class="text-body-2 mt-2 text-medium-emphasis d-flex align-center flex-wrap"
+          class="text-caption text-medium-emphasis mt-3 d-flex align-center flex-wrap"
         >
           Based on {{ filteredCount }} qualifying variant(s)
-          <!-- Exclusion note when variants have been excluded -->
-          <span
-            v-if="excludedCount > 0"
-            class="ml-1 text-warning"
-          >
+          <span v-if="excludedCount > 0" class="ml-1 text-warning">
             ({{ excludedCount }} manually excluded)
           </span>
-          <v-tooltip
-            location="top"
-            aria-label="Information"
-          >
-            <template #activator="{ props: tooltipProps }">
-              <v-icon
-                v-bind="tooltipProps"
-                size="x-small"
-                class="ml-1"
-                aria-label="Contributing variants information"
-              >
-                mdi-information-outline
-              </v-icon>
-            </template>
-            <span class="tooltip-text">
-              <strong>Contributing Variants</strong><br>
-              The number of pathogenic variants included in this calculation.
-              Click "View all variants" below to see details including variant
-              IDs, consequences, and individual allele frequencies.
-            </span>
-          </v-tooltip>
-        </div>
-
-        <!-- Genetic prevalence -->
-        <div
-          v-if="geneticPrevalenceFormatted"
-          class="text-body-2 mt-2 d-flex align-center flex-wrap"
-        >
-          Genetic Prevalence:
-          <strong class="ml-1">{{ geneticPrevalenceFormatted.ratio }}</strong>
-          <span class="text-medium-emphasis ml-1">({{ geneticPrevalenceFormatted.percent }})</span>
-          <v-tooltip
-            location="top"
-            aria-label="Information"
-          >
-            <template #activator="{ props: tooltipProps }">
-              <v-icon
-                v-bind="tooltipProps"
-                size="x-small"
-                class="ml-1"
-                aria-label="Genetic prevalence information"
-              >
-                mdi-information-outline
-              </v-icon>
-            </template>
-            <span class="tooltip-text">
-              <strong>Genetic Prevalence (q&sup2;)</strong><br>
-              The expected frequency of affected individuals in the population
-              under Hardy-Weinberg Equilibrium. Calculated as q&sup2; where q is
-              the sum of pathogenic allele frequencies. This is the theoretical
-              disease frequency before accounting for penetrance.
-            </span>
-          </v-tooltip>
-        </div>
-
-        <!-- Bayesian prevalence (only when penetrance < 100%) -->
-        <div
-          v-if="
-            bayesianPrevalenceFormatted && calcStore.defaults.penetrance < 1
-          "
-          class="text-body-2 mt-1 d-flex align-center flex-wrap"
-        >
-          Bayesian Prevalence ({{
-            Math.round(calcStore.defaults.penetrance * 100)
-          }}% penetrance):
-          <strong class="ml-1">{{ bayesianPrevalenceFormatted.ratio }}</strong>
-          <span class="text-medium-emphasis ml-1">({{ bayesianPrevalenceFormatted.percent }})</span>
-          <v-tooltip
-            location="top"
-            aria-label="Information"
-          >
-            <template #activator="{ props: tooltipProps }">
-              <v-icon
-                v-bind="tooltipProps"
-                size="x-small"
-                class="ml-1"
-                aria-label="Bayesian prevalence information"
-              >
-                mdi-information-outline
-              </v-icon>
-            </template>
-            <span class="tooltip-text">
-              <strong>Bayesian Prevalence</strong><br>
-              Genetic prevalence adjusted for incomplete penetrance. Calculated
-              as genetic prevalence &times; penetrance fraction. For example,
-              with 80% penetrance, only 80% of genetically affected individuals
-              are expected to be clinically affected.
-            </span>
-          </v-tooltip>
         </div>
       </v-card-text>
 
@@ -285,17 +251,8 @@
               {{ item.alleleNumber?.toLocaleString() ?? "-" }}
             </td>
             <td>
-              <v-chip
-                v-if="item.notes"
-                color="info"
-                size="x-small"
-              >
-                <v-icon
-                  start
-                  size="x-small"
-                >
-                  mdi-star
-                </v-icon>
+              <v-chip v-if="item.notes" color="info" size="x-small">
+                <v-icon start size="x-small"> mdi-star </v-icon>
                 {{ item.notes }}
               </v-chip>
             </td>
@@ -332,9 +289,7 @@
             :min-height="smAndDown ? 44 : undefined"
           >
             Export
-            <v-icon end>
-              mdi-chevron-down
-            </v-icon>
+            <v-icon end> mdi-chevron-down </v-icon>
           </v-btn>
         </template>
         <v-list :density="smAndDown ? 'default' : 'compact'">
@@ -356,10 +311,7 @@
       </v-menu>
 
       <!-- Copy link button -->
-      <v-tooltip
-        location="top"
-        aria-label="Information"
-      >
+      <v-tooltip location="top" aria-label="Information">
         <template #activator="{ props: tooltipProps }">
           <v-btn
             v-bind="tooltipProps"
@@ -382,10 +334,7 @@
     </div>
 
     <!-- Range info -->
-    <div
-      v-if="result"
-      class="text-body-2 mt-4 text-medium-emphasis"
-    >
+    <div v-if="result" class="text-body-2 mt-4 text-medium-emphasis">
       Range across populations:
       {{ formatRatio(result.minFrequency) }}
       to
@@ -460,6 +409,7 @@ import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useCalcStore } from "@/stores/useCalcStore";
 import { useExport, useAppAnnouncer, useExclusionState } from "@/composables";
+import { useGeneSearch } from "@/composables/useGeneSearch";
 import { filterPathogenicVariantsConfigurable } from "@gnomad-cf/core/filters";
 import {
   toDisplayVariants,
@@ -527,6 +477,9 @@ const bayesianPrevalenceFormatted = computed(() => {
   if (bp === null) return null;
   return formatPrevalence(bp);
 });
+
+// Get canonical transcript from gene details (fetched at gene selection time)
+const { canonicalTranscript } = useGeneSearch();
 
 // Get exclusion state (singleton) for displaying excluded count and export data
 const { excludedCount, excluded, reasons } = useExclusionState();
@@ -938,5 +891,36 @@ function formatPrevalenceRatio(prevalence: number | null): string {
 .tooltip-text {
   max-width: 280px;
   display: inline-block;
+}
+
+/* Stat cell layout */
+.stat-cell {
+  padding: 8px 0;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  cursor: help;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: rgba(var(--v-theme-on-surface), 0.87);
+}
+
+.stat-value.text-h5 {
+  font-size: 1.5rem !important;
+}
+
+.stat-detail {
+  font-size: 0.8125rem;
+  color: rgba(var(--v-theme-on-surface), 0.5);
 }
 </style>

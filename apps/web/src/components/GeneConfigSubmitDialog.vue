@@ -1,24 +1,12 @@
 <template>
-  <v-dialog
-    v-model="dialogOpen"
-    max-width="560"
-    scrollable
-  >
+  <v-dialog v-model="dialogOpen" max-width="560" scrollable>
     <template #activator="{ props: activatorProps }">
-      <slot
-        name="activator"
-        :props="activatorProps"
-      />
+      <slot name="activator" :props="activatorProps" />
     </template>
 
     <v-card>
       <v-card-title class="d-flex align-center">
-        <v-icon
-          class="mr-2"
-          color="primary"
-        >
-          mdi-flask-outline
-        </v-icon>
+        <v-icon class="mr-2" color="primary"> mdi-flask-outline </v-icon>
         {{ isUpdate ? "Suggest Config Update" : "Suggest Gene Config" }}
       </v-card-title>
 
@@ -109,12 +97,7 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn
-          variant="text"
-          @click="dialogOpen = false"
-        >
-          Cancel
-        </v-btn>
+        <v-btn variant="text" @click="dialogOpen = false"> Cancel </v-btn>
         <v-btn
           color="primary"
           variant="flat"

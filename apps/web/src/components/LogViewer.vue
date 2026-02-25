@@ -2,9 +2,7 @@
   <div class="log-viewer">
     <!-- Header with actions -->
     <div class="d-flex align-center justify-space-between mb-3">
-      <h3 class="text-h6">
-        Application Logs
-      </h3>
+      <h3 class="text-h6">Application Logs</h3>
       <v-btn
         icon
         variant="text"
@@ -17,19 +15,12 @@
     </div>
 
     <!-- Statistics -->
-    <v-card
-      variant="tonal"
-      density="compact"
-      class="mb-3 pa-2"
-    >
+    <v-card variant="tonal" density="compact" class="mb-3 pa-2">
       <div class="d-flex flex-wrap ga-4 text-body-2">
         <span>
           <strong>{{ stats.totalCount }}</strong> entries
         </span>
-        <span
-          v-if="stats.droppedCount > 0"
-          class="text-warning"
-        >
+        <span v-if="stats.droppedCount > 0" class="text-warning">
           <strong>{{ stats.droppedCount }}</strong> dropped
         </span>
         <span class="text-medium-emphasis">
@@ -76,10 +67,7 @@
     </div>
 
     <!-- Log entries -->
-    <v-list
-      density="compact"
-      class="log-list rounded border"
-    >
+    <v-list density="compact" class="log-list rounded border">
       <template v-if="filteredEntries.length > 0">
         <v-list-item
           v-for="entry in filteredEntries"

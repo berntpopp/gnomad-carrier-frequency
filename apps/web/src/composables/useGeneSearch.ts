@@ -17,6 +17,7 @@ const { debounceMs, minSearchChars, maxAutocompleteResults } = config.settings;
 // Module-level state for singleton pattern - shared across all consumers
 const sharedGeneConstraint = ref<GeneConstraint | null>(null);
 const sharedConstraintLoading = ref(false);
+const sharedCanonicalTranscript = ref<string | null>(null);
 
 // Promoted to module-level so all callers share the same reactive state
 const searchTerm = ref("");
@@ -35,6 +36,7 @@ export interface UseGeneSearchReturn {
   isValidGene: Ref<boolean>;
   geneConstraint: Ref<GeneConstraint | null>;
   constraintLoading: Ref<boolean>;
+  canonicalTranscript: Ref<string | null>;
   prefillGene: (symbol: string) => Promise<GeneSearchResult>;
 }
 
@@ -86,6 +88,7 @@ export function useGeneSearch(): UseGeneSearchReturn {
   const fetchConstraint = async (symbol: string) => {
     sharedConstraintLoading.value = true;
     sharedGeneConstraint.value = null;
+    sharedCanonicalTranscript.value = null;
 
     try {
       const { data: constraintData, error: queryError } =
@@ -101,18 +104,25 @@ export function useGeneSearch(): UseGeneSearchReturn {
         return;
       }
 
-      if (constraintData?.gene?.gnomad_constraint) {
-        const c = constraintData.gene.gnomad_constraint;
-        sharedGeneConstraint.value = {
-          pLI: c.pLI,
-          loeuf: c.oe_lof_upper,
-          oeLof: c.oe_lof,
-          oeLofLower: c.oe_lof_lower,
-          expLof: c.exp_lof,
-          obsLof: c.obs_lof,
-          lofZ: c.lof_z,
-          flags: c.flags,
-        };
+      if (constraintData?.gene) {
+        // Store canonical transcript (prefer MANE select, fall back to canonical)
+        sharedCanonicalTranscript.value =
+          constraintData.gene.mane_select_transcript?.ensembl_id ??
+          constraintData.gene.canonical_transcript_id;
+
+        if (constraintData.gene.gnomad_constraint) {
+          const c = constraintData.gene.gnomad_constraint;
+          sharedGeneConstraint.value = {
+            pLI: c.pLI,
+            loeuf: c.oe_lof_upper,
+            oeLof: c.oe_lof,
+            oeLofLower: c.oe_lof_lower,
+            expLof: c.exp_lof,
+            obsLof: c.obs_lof,
+            lofZ: c.lof_z,
+            flags: c.flags,
+          };
+        }
       }
     } catch {
       // Silently handle error
@@ -135,6 +145,7 @@ export function useGeneSearch(): UseGeneSearchReturn {
     searchTerm.value = "";
     debouncedTerm.value = "";
     sharedGeneConstraint.value = null;
+    sharedCanonicalTranscript.value = null;
   };
 
   const isValidGene = computed(() => selectedGene.value !== null);
@@ -191,6 +202,7 @@ export function useGeneSearch(): UseGeneSearchReturn {
     isValidGene,
     geneConstraint: sharedGeneConstraint,
     constraintLoading: sharedConstraintLoading,
+    canonicalTranscript: sharedCanonicalTranscript,
     prefillGene,
   };
 }

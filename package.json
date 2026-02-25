@@ -21,7 +21,9 @@
     "docs:build": "bun run --filter gnomad-cf-web docs:build",
     "docs:preview": "bun run --filter gnomad-cf-web docs:preview",
     "og:generate": "npx tsx scripts/generate-og-image.ts",
-    "ci": "bun run lint && bun run typecheck && bun run build && bun run docs:build"
+    "format:check": "prettier --check \"apps/web/src/**/*.{ts,vue}\" \"packages/core/src/**/*.ts\" \"packages/cli/src/**/*.ts\"",
+    "format:fix": "prettier --write \"apps/web/src/**/*.{ts,vue}\" \"packages/core/src/**/*.ts\" \"packages/cli/src/**/*.ts\"",
+    "ci": "bun run lint && bun run format:check && bun run typecheck && bun run build && bun run docs:build"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

@@ -6,17 +6,9 @@
     data-testid="gene-constraint-card"
   >
     <v-card-title class="text-subtitle-1 d-flex align-center">
-      <v-icon
-        start
-        size="small"
-      >
-        mdi-dna
-      </v-icon>
+      <v-icon start size="small"> mdi-dna </v-icon>
       Gene Constraint
-      <v-tooltip
-        location="top"
-        aria-label="Gene constraint information"
-      >
+      <v-tooltip location="top" aria-label="Gene constraint information">
         <template #activator="{ props: tooltipProps }">
           <v-icon
             v-bind="tooltipProps"
@@ -36,18 +28,13 @@
     </v-card-title>
 
     <v-card-text>
-      <v-skeleton-loader
-        v-if="loading"
-        type="text, text"
-      />
+      <v-skeleton-loader v-if="loading" type="text, text" />
 
       <template v-else-if="constraint">
         <div class="d-flex flex-wrap ga-4">
           <!-- LOEUF (primary metric) -->
           <div class="constraint-metric">
-            <div class="text-caption text-medium-emphasis">
-              LOEUF
-            </div>
+            <div class="text-caption text-medium-emphasis">LOEUF</div>
             <div class="d-flex align-center">
               <v-chip
                 :color="loeufInterpretation.color"
@@ -68,9 +55,7 @@
 
           <!-- pLI (secondary metric) -->
           <div class="constraint-metric">
-            <div class="text-caption text-medium-emphasis">
-              pLI
-            </div>
+            <div class="text-caption text-medium-emphasis">pLI</div>
             <div class="d-flex align-center">
               <v-chip
                 :color="pliInterpretation.color"
@@ -88,13 +73,8 @@
           </div>
 
           <!-- O/E Ratio -->
-          <div
-            v-if="constraint.oeLof !== null"
-            class="constraint-metric"
-          >
-            <div class="text-caption text-medium-emphasis">
-              O/E LoF
-            </div>
+          <div v-if="constraint.oeLof !== null" class="constraint-metric">
+            <div class="text-caption text-medium-emphasis">O/E LoF</div>
             <div class="text-body-2">
               {{ constraint.oeLof.toFixed(2) }}
               <span
@@ -112,9 +92,7 @@
             v-if="constraint.obsLof !== null && constraint.expLof !== null"
             class="constraint-metric"
           >
-            <div class="text-caption text-medium-emphasis">
-              LoF Variants
-            </div>
+            <div class="text-caption text-medium-emphasis">LoF Variants</div>
             <div class="text-body-2">
               {{ constraint.obsLof }} observed /
               {{ constraint.expLof?.toFixed(1) }} expected
@@ -133,9 +111,7 @@
           <template #prepend>
             <v-icon>mdi-signal-off</v-icon>
           </template>
-          <template #title>
-            Low Exome Coverage
-          </template>
+          <template #title> Low Exome Coverage </template>
           <template #text>
             <div class="text-body-2">
               This gene has regions with low sequencing coverage in gnomAD.
@@ -162,10 +138,7 @@
         </v-alert>
       </template>
 
-      <div
-        v-else
-        class="text-medium-emphasis text-body-2"
-      >
+      <div v-else class="text-medium-emphasis text-body-2">
         No constraint data available for this gene.
       </div>
     </v-card-text>
