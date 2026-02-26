@@ -1,224 +1,251 @@
 # Project Research Summary
 
-**Project:** gnomAD Carrier Frequency Calculator — v1.5 Core Extraction & CLI
-**Domain:** TypeScript monorepo extraction, CLI tooling, bioinformatics calculation accuracy
-**Researched:** 2026-02-23
+**Project:** gnomAD Carrier Frequency Calculator -- v1.6 Analysis & Export Milestone
+**Domain:** Clinical genomics SPA (carrier frequency calculation, data export, external data integration)
+**Researched:** 2026-02-26
 **Confidence:** HIGH
 
 ## Executive Summary
 
-The v1.5 milestone converts an existing Vue 3 SPA into a bun workspaces monorepo with three packages: `packages/core` (pure TypeScript calculation engine), `packages/cli` (CLI consumer), and `apps/web` (the existing web app). The central insight from direct codebase analysis is that the extraction seam is already clean: every utility in `src/utils/` and `src/api/queries/` has zero Vue imports. The composables are thin reactive wrappers over pure functions. This means the bulk of the extraction is mechanical import-path rewriting, not logic refactoring. The deployed GitHub Pages app must not break — and it will not, because `apps/web` source is structurally unchanged; only its import paths update from `@/utils/...` to `@gnomad-cf/core`.
+The v1.6 milestone adds seven features to an existing Vue 3 + Vuetify 3 monorepo: variant quality flags (#12), ClinVar vs pLoF source breakdown (#11), scientific notation and per-100k display (#10), TSV export (#9), Orphanet prevalence integration (#6), gnomAD v2 subcontinental populations (#5), and a population bar chart (#2). Research confirms that **all seven features can be implemented with zero new production dependencies**. The existing stack (Vue 3, Vuetify 3, Vite 7, Zod, native fetch) covers every requirement. Charts should use inline SVG (not Chart.js), Orphanet data should come via live API calls (CORS is confirmed working), scientific notation uses native `Intl.NumberFormat`, and TSV is trivial string concatenation. Estimated total bundle increase is approximately 5-8 KB.
 
-The recommended approach is: set up bun workspaces first, move pure utilities to `packages/core`, update web app imports to `@gnomad-cf/core`, then build the CLI as a pure consumer of core. Calculation improvements (HWE 2pq, homozygote exclusion, genetic prevalence q²) should be implemented directly in core during extraction and validated against published reference values before any further work. The full test suite is built on top of the stabilized core package — testing pure functions first, then composable wrappers, then CLI integration, then Playwright E2E.
+The recommended approach is a four-phase build order driven by dependency analysis: start with foundational formatters and low-risk exports (TSV, scientific notation, source breakdown, quality flags), then add the bar chart visualization, then integrate Orphanet as an external data source, and finally tackle subcontinental populations as the broadest-scope change. This ordering ensures each phase builds on stable foundations and isolates risk. The most complex features (Orphanet, subcontinental populations) come last so their integration challenges do not block simpler, high-value deliverables.
 
-The primary risk is violation of the extraction boundary: accidentally pulling Vue reactivity, villus, or Pinia into the core package. Pitfalls research identifies six specific patterns that cause this — singleton composables, `@/` alias persistence, villus `useQuery` calls, Pinia `localStorage` dependency, TypeScript `as Type` assertions on JSON, and bun `--filter` install misdirection. All six are preventable with conventions established before any code moves. The secondary risk is the GitHub Pages deploy breaking due to lockfile staleness or changed artifact path in `deploy.yml`. Both are mitigated by updating the workflow as the first task of the monorepo setup phase.
+The top risks are: (1) source breakdown double-counting variants that qualify via both LoF HC and ClinVar P/LP -- mitigated by implementing classification as a separate function from the existing filter pipeline; (2) URL state schema changes breaking existing shared bookmarks -- mitigated by requiring `.optional().default()` on all new Zod parameters; and (3) subcontinental population data being v2.1.1-only with no v4 availability -- mitigated by designing the feature as version-gated from the start. Orphanet CORS was confirmed working via live testing, resolving a key uncertainty.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack for v1.5 builds entirely on existing tooling with targeted additions. Bun 1.3.9 (already in use) provides native workspace support via `--filter` and `workspace:*` protocol — no Turborepo or Nx needed for a three-package monorepo. `tsdown` v0.20.x becomes the library bundler for `packages/core` and `packages/cli`; it is the actively-maintained successor to the abandoned `tsup`, built on Rolldown by the same team behind Vite. Vitest 4.0.18 becomes the unified test runner across all packages using the `projects` configuration. Commander v14.0.3 (TypeScript types included) handles the CLI framework; `@clack/prompts` v1.0.1 provides interactive terminal UX for batch mode.
+**Zero new production dependencies.** The existing monorepo stack handles all v1.6 requirements. This is exceptional for a seven-feature milestone.
 
-**Core technologies:**
-- **bun workspaces (native):** monorepo orchestration — no additional tooling for 3 packages; `--filter` covers all use cases; `workspace:*` links packages via symlinks
-- **tsdown v0.20.x:** library bundler for core and cli — tsup successor, Rolldown-based, same config API, ESM-only output sufficient for bun and Vite consumers
-- **Vitest 4.0.18:** unified test runner — `projects` config discovers all packages from root; `node` environment for core/cli; `jsdom` for web
-- **commander v14.0.3:** CLI framework — most-adopted Node CLI library, built-in TypeScript types, works identically under bun runtime
-- **@clack/prompts v1.0.1:** interactive terminal prompts — ESM-first, lightweight, fresher than inquirer; for batch mode interactive flow
-- **Zod v4.3.5 (existing):** gene config schema validation — already installed; provides both TypeScript types and runtime validation; no AJV needed
-- **js-yaml v4.1.0:** YAML gene config parsing — lightweight, standard; enables human-readable community config files
-- **@vue/test-utils v2.4.6:** Vue component testing — official library, Vitest-native integration
+**Core technologies (all existing):**
+- **Native `fetch` + Zod**: Orphanet REST API integration -- CORS confirmed working, no proxy needed, Zod provides runtime response validation
+- **Native `Intl.NumberFormat`**: Scientific notation display -- `formatToParts()` with `notation: 'scientific'` produces publication-quality output with locale awareness
+- **Inline SVG Vue components**: Population bar chart -- zero bundle cost, full Vuetify theme integration, complete accessibility control
+- **Native `Blob` + `URL.createObjectURL`**: TSV export -- matches existing JSON/Excel export pattern, requires only UTF-8 BOM prefix for Excel compatibility
+- **Existing gnomAD GraphQL client**: Subcontinental population queries -- v2.1.1 already returns subcontinental codes in population arrays
 
-See `.planning/research/STACK.md` for the full version matrix, alternatives analysis, and installation commands.
+**What NOT to add:**
+- Chart.js / vue-chartjs (~65 KB) -- overkill for 8 horizontal bars; inline SVG is approximately 50 lines of Vue template
+- Apache ECharts (~270 KB) -- completely disproportionate
+- D3.js (~90 KB) -- low-level abstraction not justified for simple bar charts
+- papaparse, file-saver, numbro -- native APIs cover all needs
+
+**Details:** [STACK-v1.6.md](./STACK-v1.6.md)
 
 ### Expected Features
 
-The v1.5 milestone has a clearly defined MVP verified against peer-reviewed literature (Guo et al. 2022 npj Genomic Medicine, Kandolin et al. 2024 AJMG, Genetics in Medicine 2024). The existing `2 × Σ(AF)` formula is a valid approximation for rare alleles but diverges meaningfully from the clinically-correct formula for common variants like CFTR ΔF508 (2% overestimate at q≈0.02). Published pipelines use homozygote exclusion (VCR = (AC - 2×Hom) / (AN/2)) and inclusion-exclusion for multi-variant genes (GCR = 1 - Π(1 - VCRᵢ)). These are table-stakes corrections for a clinical-grade tool.
-
 **Must have (table stakes):**
-- **HWE 2pq carrier frequency** — published gnomAD pipelines use 2pq, not 2q; 2% accuracy improvement for common variants like CFTR
-- **Homozygote exclusion** — VCR formula per variant, inclusion-exclusion GCR per gene; verified against npj Genomic Medicine 2022 pipeline
-- **Genetic prevalence q²** — GeniE (Broad/gnomAD, 2024) uses this as primary output; expected by clinical users
-- **Monorepo restructure** — bun workspaces with `packages/core`, `packages/cli`, `apps/web`; prerequisite for CLI and test suite
-- **CLI: single gene mode** — `gnomad-cf CFTR --population nfe --format json`; table stakes for any bioinformatics tool
-- **CLI: batch mode** — `gnomad-cf --batch genes.json`; primary use case for research users processing gene panels
-- **Gene config schema + 3-5 initial configs** — CFTR, SMN1, HEXA, PAH; validates schema design against real clinical use
-- **Core unit tests** — reference values from CFTR/SMN1/HEXA literature; no test suite currently exists
+- BA1 (AF >= 5%) and BS1 (AF > 1%) warning chips on variants -- ACMG thresholds, prevents clinical errors
+- Source badges visible in main variant table row (not just expanded view) -- LoF-only, ClinVar-only, Both
+- Summary counts by source above variant count -- standard in published methodology
+- TSV export for variants, populations, and summary -- GeniE parity, bioinformatics standard format
+- Scientific notation for small prevalence values -- prevents misleading "0.00%" displays
+- Per-100,000 prevalence display -- Orphanet comparison format, epidemiology standard
+- Orphanet prevalence as side-by-side comparison value -- GeniE parity feature
+- Subcontinental population display for v2 (eas: 3, nfe: 6 subgroups) -- hierarchical expandable rows
+- Horizontal bar chart of population carrier frequencies with founder effect highlighting
 
-**Should have (competitive):**
-- **Homozygote count pathogenicity filter** — Hom >= 10 threshold flags likely non-pathogenic variants; differentiator vs. GeniE
-- **Bayesian prevalence (penetrance-adjusted)** — q² × penetrance for partial-penetrance conditions (HCM genes, CFTR mild alleles)
-- **At-risk couple frequency** — CF² display; standard in carrier screening reports, absent from GeniE
-- **Vue component tests** — frequency display, variant table; needed for post-extraction regression confidence
-- **Playwright E2E** — wizard completion flow; validates web app is unchanged after monorepo restructure
+**Should have (differentiators):**
+- Auto-exclude BA1 variants with prominent override warning
+- AF contribution breakdown by source (what % of total comes from LoF vs ClinVar)
+- Source column in TSV/Excel export
+- Log scale toggle on bar chart
+- Prevalence discrepancy alert (calculated vs Orphanet > 10x difference)
+- LOFTEE `lof_flags` display on HC variants (~14% carry flags)
 
-**Defer to v1.6+:**
-- X-linked recessive calculation (different formula, different clinical interpretation, different scope)
-- npm registry publishing (premature; GitHub-based consumption sufficient during active development)
-- PDF export, interactive TUI, VCF file upload, Bayesian residual risk for negative carrier test
+**Defer to post-v1.6:**
+- ClinVar-only / LoF-only carrier frequency toggle (sensitivity analysis)
+- World map / geographic visualization (misleading for genetic ancestry)
+- Population-specific variant TSV with per-population AF columns
+- Full Orphanet disease profile (age of onset, clinical features)
+- Aggregate quality score badge (requires scoring rubric definition)
+- Downloadable chart as PNG/SVG (revisit if requested)
 
-See `.planning/research/FEATURES.md` for the full competitor analysis, reference values table, and build-order dependency graph.
+**Details:** [FEATURES-v1.6.md](./FEATURES-v1.6.md)
 
 ### Architecture Approach
 
-The monorepo architecture is justified by a clean extraction boundary confirmed through direct source-code analysis. Every file in `src/utils/` (`frequency-calc.ts`, `variant-filters.ts`, `template-renderer.ts`, `template-parser.ts`) and `src/api/queries/` has zero Vue imports. Every composable is a thin Vue reactive wrapper over these pure functions. The extraction is therefore import-path rewriting, not refactoring. The `packages/core` barrel exports all public types and functions; the web app replaces `@/utils/...`, `@/types/...`, and `@/config/...` with `@gnomad-cf/core`; the CLI calls core functions imperatively with plain `fetch` replacing villus. The deployed artifact (`apps/web/dist`) is unchanged except its import source.
+The architecture follows the established core/web boundary. All new pure logic (quality assessment, source classification, scientific notation formatting, Orphanet client, subpopulation config) goes in `@gnomad-cf/core`. All Vue-specific code (composables, components, Pinia stores) stays in `apps/web`. The critical pattern is **extend, do not replace**: every feature integrates by adding optional fields to existing types and creating new parallel functions rather than modifying the tested calculation pipeline. The aggregation function `aggregatePopulationFrequenciesWithConfig()` remains untouched; source breakdown and subpopulation calculations run as separate computations on the same input data.
 
 **Major components:**
-1. **`packages/core`** — pure TypeScript; `calculations/`, `filters/`, `text/`, `api/` (plain fetch), `config/`, `types/`; zero Vue/Pinia/villus; built with tsdown; tested with Vitest in `node` environment
-2. **`apps/web`** — Vue 3 + Vuetify + Pinia; composables become thin wrappers importing from `@gnomad-cf/core`; all `.vue` files, Pinia stores, and villus client are entirely unchanged
-3. **`packages/cli`** — commander + @clack/prompts; calls core functions imperatively; accepts gene symbols, outputs JSON/TSV/text to stdout; no Vue dependency whatsoever
-4. **`packages/core/src/api/gnomad-fetch.ts`** — new file only: plain `fetch` wrapper for gene variants and search, modeling the existing `useClinvarSubmissions.ts` pattern which already uses native fetch (zero villus dependency)
+1. **`@gnomad-cf/core/orphanet`** (NEW subpath) -- OrphanetClient using native fetch, Zod-validated response types, `lookupPrevalence(geneSymbol)` chaining gene-to-disease-to-prevalence API calls
+2. **`core/filters/variant-quality.ts`** (NEW) -- Pure `assessVariantQuality()` function deriving quality flags from existing `GnomadVariant` data (no new API fields needed for AF thresholds)
+3. **`core/calculations/source-breakdown.ts`** (NEW) -- `calculateSourceBreakdown()` classifying variants into non-overlapping source categories and summing AF contributions
+4. **`core/calculations/formatters.ts`** (EXTEND) -- `formatScientific()` and `formatFrequencyAs()` adding scientific notation and per-100k display alongside existing percent/ratio formatters
+5. **`web/components/PopulationChart.vue`** (NEW) -- Inline SVG bar chart consuming existing `PopulationFrequency[]` data
+6. **`web/components/OrphanetCard.vue`** (NEW) -- Disease and prevalence display with graceful degradation
 
-See `.planning/research/ARCHITECTURE.md` for the complete 25-file migration plan with exact destination paths, import changes, and a 10-step implementation order.
+**Key architecture decisions:**
+- Orphanet client in core (CLI reusable), reactive caching wrapper in web
+- Subpopulation aggregation as a SEPARATE function from main aggregation (safety)
+- TSV serializer in web only (display concern, like existing XLSX export)
+- Quality flags are informational annotations, NOT filter criteria in v1.6
+- New `PopulationConfig.subpopulations?: PopulationConfig[]` is optional and backward-compatible
+
+**Details:** [ARCHITECTURE.md](./ARCHITECTURE.md)
 
 ### Critical Pitfalls
 
-1. **Singleton composables carry Vue into core** — `useCarrierFrequency`, `useExclusionState`, `useWizard`, `useGeneSearch` all use module-level reactive state (`let instance`, `reactive({})`). Extract only pure functions from `src/utils/`; composables stay in `apps/web`. Warning sign: `import { ref, computed } from 'vue'` anywhere in `packages/core/`.
+1. **Source breakdown double-counting** -- Variants can be both LoF HC AND ClinVar P/LP. The existing filter uses short-circuit logic (returns true on first match). Source classification MUST be a separate function that checks ALL criteria per variant and assigns non-overlapping categories: `lof_only`, `clinvar_only`, `lof_and_clinvar`, `missense_clinvar`. Test with CFTR variants known to have dual classification.
 
-2. **`@/` alias breaks in workspace packages** — the alias is Vite-scoped to `apps/web/src/`. Every file moved to `packages/core/` must have its `@/` imports rewritten to relative paths before extraction. Never define `@/` in core's tsconfig. Use trailing slash in the Vite alias (`'@/':`) to prevent partial matches against `@gnomad-cf/core`.
+2. **URL state backward compatibility** -- The Zod `UrlStateSchema` powers shareable bookmarks used in clinical workflows. Every new parameter (display format, subcontinental selection) MUST use `.optional().default()`. Zod `safeParse` is all-or-nothing at the schema level; one required field breaks ALL old URLs. Add backward-compatibility tests with v1.5 URL fixtures.
 
-3. **`villus useQuery` requires a mounted Vue app** — the CLI has no Vue context; `useQuery()` throws at runtime with "Could not resolve client". The CLI must use plain `fetch()` with shared GraphQL query string constants from core. The pattern already exists: `useClinvarSubmissions.ts` uses native fetch with zero villus dependency.
+3. **gnomAD v4 has no subcontinental data** -- Confirmed by all researchers. The v4 GraphQL API returns only continental-level populations. Subcontinental populations are v2.1.1 only (eas: 3 subgroups, nfe: 6 subgroups). Design must be version-gated. Show "not available for v4" rather than empty space.
 
-4. **Pinia `localStorage` crash in CLI** — `useCarrierFrequency` reads from `useFilterStore` (Pinia + persisted state). Any CLI code path that touches a Pinia store crashes with `localStorage is not defined`. Keep all Pinia stores in `apps/web`; CLI accepts config via flags, not stores.
+4. **TSV encoding for German text in Excel** -- Without UTF-8 BOM prefix (`\uFEFF`), Excel on Windows corrupts German characters (umlauts, gender-inclusive markers). Also use `\r\n` line endings. This is critical because the app generates German clinical documentation.
 
-5. **`bun add --filter` installs to root** — bun issue #18195 confirms `--filter` for package installation is broken in 1.3.x; dependencies land in root `package.json`. Always use `bun add --cwd packages/core zod`. Document in contributing guide immediately.
+5. **Variant type changes ripple through entire pipeline** -- `GnomadVariant` flows through normalization, filtering, display transform, and export. Adding a field requires updating 5-7 files. Make new fields required in types first, then let TypeScript errors guide every necessary change.
 
-6. **`bun install --frozen-lockfile` CI failure** — the deploy workflow uses `--frozen-lockfile`. Adding workspace packages changes `bun.lock`. Always commit the updated lockfile alongside any `package.json` changes. Migrate from `bun.lockb` (binary) to `bun.lock` (text) on day one.
+**Details:** [PITFALLS-v1.6.md](./PITFALLS-v1.6.md)
 
-7. **HWE formula change without golden-value tests** — the existing `2 × Σ(AF)` is an intentional approximation, not a bug. Any change to `calculateCarrierFrequency` without prior golden-value tests (CFTR NFE: expected 2pq≈0.0431; q²≈0.00048) risks silent regression in the deployed app.
+## Disagreements Resolved
 
-See `.planning/research/PITFALLS.md` for the complete pitfall-to-phase mapping, warning signs, and recovery strategies.
+Three points of disagreement emerged across research files:
+
+| Topic | Conflicting Recommendations | Resolution |
+|-------|---------------------------|------------|
+| Charts | Stack + Architecture recommend inline SVG (zero deps). Features recommends Chart.js (~65 KB). Pitfalls warns about CSS conflicts with SVG libraries but suggests Chart.js Canvas as safe. | **Inline SVG.** Requirements are minimal (8 bars, static, print-friendly). Zero bundle cost. Vuetify theme integration is trivial with CSS variables. No CSS conflicts because we control the SVG directly. Revisit if interactive features are needed post-v1.6. |
+| Orphanet data source | Stack researcher tested CORS live and confirmed it works (direct API). Features recommends static bundled JSON. Architecture flags CORS as uncertain. Pitfalls assumes CORS is blocked and recommends static file pattern. | **Live API as primary.** Stack researcher verified CORS with actual curl requests confirming `Access-Control-Allow-Origin` headers. Use session-level Pinia cache. Consider static fallback only for offline/PWA scenarios as a future enhancement. |
+| Subcontinental availability | All four researchers agree: v4 does NOT have subcontinental data. v2.1.1 does. Stack verified via live API testing. | **v2.1.1 only, version-gated.** No disagreement. Design `PopulationConfig` with optional `subpopulations` array so v4 support can be added when gnomAD releases the data. |
 
 ## Implications for Roadmap
 
-Based on combined research, the suggested phase structure has five main blocks. The monorepo setup and core extraction must come before CLI implementation. Calculation improvements belong in the core extraction phase — not later — because they inform test fixtures and the CLI must inherit correct formulas from day one. Testing is woven throughout rather than deferred to a final phase.
+Based on combined research, the suggested phase structure follows the dependency graph identified in ARCHITECTURE.md and minimizes risk by front-loading independent, well-understood features.
 
-### Phase 1: Monorepo Foundation and Core Extraction
+### Phase 1: Formatters, Quality Flags, Source Breakdown, TSV Export
 
-**Rationale:** Everything else depends on this. The CLI cannot exist without core. Tests cannot be meaningful without the correct extraction boundary. The web app cannot be validated without the monorepo build succeeding. This phase has the most pitfall exposure (all six critical pitfalls apply here) and must be established first and correctly. The architecture file provides a complete 25-file migration plan — no design decisions remain open.
+**Rationale:** These four features are independent of each other, require zero new dependencies, touch only the formatter/display/export layers, and deliver immediate clinical value. They form the foundation that later features build on (bar chart uses formatters, Orphanet comparison needs per-100k display).
 
-**Delivers:** Working bun workspace with `packages/core` building via tsdown; `apps/web` importing from `@gnomad-cf/core` and producing an identical GitHub Pages build; `deploy.yml` updated with correct artifact path; `bun.lock` (text format) committed; TypeScript project references configured.
+**Delivers:**
+- BA1/BS1 allele frequency warning chips in variant table
+- LOFTEE `lof_flags` and `lof_filter` display on HC/LC variants (requires adding fields to GraphQL query response handling)
+- Source classification and summary counts (LoF-only, ClinVar-only, Both)
+- Source badge column in main variant table
+- `formatScientific()` with text/HTML/Unicode outputs via `Intl.NumberFormat`
+- Per-100,000 prevalence display
+- `formatFrequencyAs(freq, format)` with display format preference in calc store
+- TSV export for variants, populations, and summary with UTF-8 BOM and Windows line endings
+- TSV option in export dropdown menu
 
-**Addresses:** Monorepo restructure (P1 must-have), extraction boundary definition, CI pipeline stability
+**Addresses features:** #12, #11, #10, #9
+**Avoids pitfalls:** P1 (double-counting via separate classification function), P4 (URL state with `.optional().default()`), P6 (BOM for Excel), P9 (new format functions alongside existing), P10 (explicit locale convention)
 
-**Avoids:** Singleton composable extraction (P1), `@/` alias breakage (P2), villus context leak (P3), locked lockfile CI failure (P6), TypeScript project references gap (P8), alias conflict (P13), binary lockfile (P14)
+### Phase 2: Population Bar Chart
 
-**Research flag:** None needed — ARCHITECTURE.md provides the exact migration plan. The only empirical verification needed is the Vite `@gnomad-cf/core` dev alias resolving correctly alongside `@/` with trailing slash.
+**Rationale:** Independent UI component consuming existing `PopulationFrequency[]` data. Benefits from Phase 1 formatters being available for labels and tooltips. Zero dependency approach (inline SVG) keeps this low-risk.
 
-### Phase 2: Calculation Improvements in Core
+**Delivers:**
+- `PopulationChart.vue` -- horizontal bar chart with population labels, carrier frequency values, founder effect color coding
+- Sorted by frequency descending
+- Low sample size visual indicator (translucent bars)
+- Global frequency reference line
+- Responsive sizing with explicit min-height
+- Vuetify theme integration via CSS variables (dark/light mode compatible)
+- `aria-label` and `role="img"` for accessibility
 
-**Rationale:** Implement HWE 2pq, homozygote exclusion, genetic prevalence q², and inclusion-exclusion GCR directly in core immediately after extraction — before building the CLI or expanding the test suite. This order means calculation improvements are validated with unit tests before being consumed by anything else, and the CLI inherits correct formulas from day one. Golden-value tests for current behavior must be written before any formula changes.
+**Addresses features:** #2
+**Avoids pitfalls:** P5 (no CSS conflicts -- inline SVG, not external library), P12 (explicit sizing, conditional rendering)
 
-**Delivers:** Updated `frequency-calc.ts` in core with published-correct formulas; homozygote count in variant types; reference-value unit tests for CFTR, SMN1, and HEXA passing against literature values.
+### Phase 3: Orphanet Prevalence Integration
 
-**Addresses:** HWE 2pq (P1 must-have), homozygote exclusion (P1 must-have), genetic prevalence q² (P1 must-have), core unit tests (P1 must-have)
+**Rationale:** New external data source requiring API client, caching strategy, and graceful degradation. Isolated from the core calculation pipeline (supplementary data only). Benefits from Phase 1 per-100k formatter for side-by-side comparison display.
 
-**Avoids:** Silent formula regression (P7) — golden-value tests precede every formula change; test isolation failures (P5) — core tests run on pure functions with no singleton state
+**Delivers:**
+- `@gnomad-cf/core/orphanet` subpath with OrphanetClient and Zod-validated types
+- `useOrphanetPrevalence` composable with session-level Pinia cache
+- `OrphanetCard.vue` showing disease name, ORPHA number, prevalence class, geographic scope
+- Side-by-side display: "Calculated: 1:X. Published (Orphanet): 1-9 / 100,000"
+- Source attribution with link to Orphanet disease page
+- Graceful "no data" and "loading" states
+- Handles multi-disease genes (CFTR returns 6 diseases, filter on causative association)
 
-**Research flag:** None needed — FEATURES.md provides reference values table (CFTR NFE: q≈0.022, expected 2pq≈0.0431, q²≈0.00048) from peer-reviewed literature.
+**Addresses features:** #6
+**Avoids pitfalls:** P2 (CORS confirmed -- use live API with caching; add service worker cache entry for offline), P8 (runtime caching for offline PWA)
 
-### Phase 3: CLI Package
+**Implementation notes:**
+- Gene symbols must be **lowercase** in Orphadata API calls (uppercase returns 404)
+- `ValMoy` is per 100,000 -- convert to 1:X via `Math.round(100000 / valMoy)`
+- Filter on `PrevalenceType === "Prevalence at birth"` and `PrevalenceGeographic === "Europe"` as primary display
+- Filter on `DisorderGeneAssociationType === "Disease-causing germline mutation(s) in"` for causative disorders
 
-**Rationale:** CLI is the user-visible milestone deliverable and can only be built after core is stable and calculation-correct. Single gene mode validates the full imperative pipeline before batch mode adds concurrency complexity. Clinical text output extends the value proposition beyond what GeniE provides.
+### Phase 4: Subcontinental Populations
 
-**Delivers:** `gnomad-cf CFTR --format json` producing correct output matching the web app; batch mode with stdin support and configurable concurrency; CLI integration tests with mocked gnomAD responses; clinical text output via `--output text --language de`.
+**Rationale:** Broadest scope, touching config, types, calculations, queries, and UI. v2.1.1 only (version-gated). Benefits from all previous phases being stable. The existing gene-level query already returns subcontinental population codes for v2 -- they are currently ignored because `getPopulationCodes()` only returns top-level codes.
 
-**Addresses:** CLI single gene (P1), CLI batch mode (P1), CLI JSON output (P1), CLI integration tests (P1), clinical text CLI (P3 differentiator)
+**Delivers:**
+- Extended `PopulationConfig` with optional `subpopulations` array
+- Updated `gnomad.json` with v2 subcontinental populations (eas: 3, nfe: 6)
+- Separate `aggregateSubpopulationFrequencies()` function (main aggregation untouched)
+- For detail view: variant-level queries (`VARIANT_DETAIL_QUERY`) to fetch full subcontinental breakdown
+- Hierarchical expandable rows in population table (collapsed by default)
+- Low sample size warnings on subpopulations (most have < 2000 samples)
+- "Subcontinental data not available for gnomAD v4" message
+- Subpopulation rows in TSV/Excel exports with parent population reference
 
-**Avoids:** villus context requirement (P3) — CLI uses plain fetch from core; Pinia localStorage (P10) — CLI uses flags not stores; phantom dependencies (P9) — use bun isolated linker or `--cwd` installs
-
-**Research flag:** gnomAD GraphQL rate limits are undocumented. The recommended default of 3 concurrent requests for batch mode is empirical, not documented by Broad. Implement `--concurrency` as a user-configurable flag to allow adjustment without code changes.
-
-### Phase 4: Gene Config System
-
-**Rationale:** Gene configs depend on having a stable core API to validate against. The schema must be finalized after calculation improvements so configs can encode `excludeHomozygoteThreshold`, `penetrance`, and `founderVariants` in a way the calculation engine actually uses. Community contribution workflow (PR validation via GitHub Actions) requires the schema to be stable before external contributors can participate.
-
-**Delivers:** Zod schema for gene configs with YAML/JSON loading; 4-5 initial configs (CFTR, SMN1, HEXA, PAH); config loader in core; GitHub Actions PR validation; web app integration loading gene config on gene selection.
-
-**Addresses:** Community gene config schema (P1), initial gene configs (P1), PR validation CI (P3), founder variant annotations (P3 differentiator)
-
-**Avoids:** Config validation absence (P11) — Zod validation at load time enforced in CI, not just TypeScript types; lazy loading (performance trap) — load per gene on demand, not all configs at startup
-
-**Research flag:** None needed — STACK.md specifies the full Zod schema pattern with YAML/JSON loading and the required vs. optional field breakdown.
-
-### Phase 5: Test Suite Completion and Web App Validation
-
-**Rationale:** Core unit tests are built in Phase 2. This phase adds the remaining testing layers: Vue component tests (validates web app post-extraction), Playwright E2E (validates wizard flow unchanged end-to-end), and expanded CLI integration tests. This phase confirms the entire system is coherent and the GitHub Pages deployment is regression-free.
-
-**Delivers:** Full test suite across all three packages with coverage reporting; Playwright E2E for wizard completion flow; verified GitHub Pages deploy identical to pre-v1.5 behavior.
-
-**Addresses:** Vue component tests (P2 should-have), Playwright E2E (P2 should-have), full CLI integration test suite (follow-up to P1 must-have)
-
-**Avoids:** Test isolation failures from singleton state (P5) — use `vi.isolateModules()` and `setActivePinia(createPinia())` patterns documented in PITFALLS.md
-
-**Research flag:** None needed — STACK.md provides the complete Vitest 4 `projects` config with the `jsdom`/`node` environment split and the `@vue/test-utils` Vuetify setup pattern.
+**Addresses features:** #5
+**Avoids pitfalls:** P3 (version-gated, v2 only), P7 (add types first, let TypeScript errors guide), P14 (store defaults for new state)
 
 ### Phase Ordering Rationale
 
-- **Foundation before consumers:** Core must build before CLI and the updated web app can function. The build dependency graph is linear: core → web, core → cli.
-- **Calculation correctness before distribution:** Implementing HWE/homozygote improvements in Phase 2 (before CLI in Phase 3) ensures the CLI never ships with the old approximation formulas. CLI integration tests can use the same CFTR reference values that validated the formulas.
-- **Gene configs after stable API:** Phase 4 after Phase 2 ensures the config schema references real calculation parameters rather than being designed speculatively and retrofitted later.
-- **Tests woven throughout, not deferred:** Core unit tests are in Phase 2 (not a final "testing phase") because they validate calculation changes as they are made. Deferring tests risks shipping calculation regressions. Vue component and E2E tests go last because they validate the assembled system, not individual components.
+- **Phase 1 first** because formatters, quality flags, source breakdown, and TSV export are all independent leaf nodes in the dependency graph with zero cross-feature dependencies. They also establish the locale convention and format infrastructure that Phases 2-4 consume.
+- **Phase 2 second** because the bar chart is a standalone UI component consuming existing data. It benefits from Phase 1 formatters but has no other dependencies.
+- **Phase 3 third** because Orphanet integration introduces an external API dependency and caching complexity that should be isolated from the core calculation pipeline. It benefits from Phase 1 per-100k formatter.
+- **Phase 4 last** because subcontinental populations is the broadest-scope feature, touching config, types, calculations, queries, and UI across both core and web packages. It also has the v2-only limitation, making it lower priority than features that work across all gnomAD versions.
 
 ### Research Flags
 
-**Phases needing deeper research during planning:**
-- **Phase 3 (CLI, batch mode):** gnomAD GraphQL rate limits are undocumented. The 3-concurrent-request default is empirical. Implement `--concurrency` as a configurable flag and document the empirical basis in CLI help text. If the rate limit proves more restrictive than observed, sequential processing may be required as a fallback.
+**Phases likely needing deeper research during planning:**
+- **Phase 3 (Orphanet):** While CORS is confirmed working, the caching strategy (session vs localStorage vs service worker) needs design-time decisions. The gene-to-disease mapping can return multiple diseases per gene -- UI/UX for multi-disease display needs wireframing.
+- **Phase 4 (Subcontinental):** The N+1 query pattern (one variant-level query per qualifying variant) needs performance profiling with a real gene. Batch size and parallelism strategy (5-10 concurrent requests to avoid gnomAD rate limiting at 10 queries/minute) needs validation.
 
-**Phases with standard patterns (skip research-phase):**
-- **Phase 1 (Monorepo):** Complete 25-file migration plan with exact paths and import changes in ARCHITECTURE.md. Build dependency order is linear and well-understood.
-- **Phase 2 (Calculations):** Reference values from three peer-reviewed papers; formulas verified. No additional research needed.
-- **Phase 4 (Gene Configs):** Zod schema pattern and YAML/JSON loading strategy fully specified in STACK.md.
-- **Phase 5 (Tests):** Vitest 4 `projects` configuration and environment split fully specified in STACK.md; pitfall mitigations for singleton state in PITFALLS.md.
+**Phases with standard patterns (skip deep research):**
+- **Phase 1 (Formatters, Flags, Export):** All well-documented patterns. `Intl.NumberFormat` is a stable browser API. TSV is trivial. Quality flags derive from existing data.
+- **Phase 2 (Bar Chart):** Inline SVG bar charts in Vue are a straightforward pattern with many open-source references.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All packages verified against npm registry current as of 2026-02-23; bun workspaces verified against official docs; tsdown pre-1.0 but API stable per migration guide — pin version |
-| Features | HIGH | Calculation formulas verified against three peer-reviewed papers; GeniE (official Broad tool) confirms q² method; reference values table available for test fixtures |
-| Architecture | HIGH | Based on direct source-code analysis of every composable and utility file; 25-file migration plan with exact paths; no inference needed |
-| Pitfalls | HIGH | Six of seven critical pitfalls verified by reading specific lines in source files; bun `--filter` bug confirmed via GitHub issue #18195 |
+| Stack | HIGH | Zero new dependencies. All APIs verified live (Orphanet CORS, gnomAD subpopulations, Intl.NumberFormat). |
+| Features | HIGH | Feature scope well-defined against competitor tools (GeniE, gnomAD browser). ACMG thresholds documented in literature. |
+| Architecture | HIGH | Based on direct codebase analysis of all relevant source files. Extension points clearly identified. Core/web boundary established. |
+| Pitfalls | HIGH | Top pitfalls verified from source code (filter short-circuit, URL state schema, variant type pipeline). External pitfalls (TSV BOM, locale formatting) well-documented in community. |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **gnomAD API rate limits:** Undocumented. The recommended 3-concurrent-request default for batch mode is empirical. Flag `--concurrency` should be user-configurable; document the empirical basis in CLI help text and README.
-
-- **tsdown API stability:** At v0.20.x (pre-1.0). The config API is stable per the tsup-to-tsdown migration guide, but a breaking change before 1.0 is possible. Pin the exact version in `package.json` and schedule an update when 1.0 releases.
-
-- **Vite `@gnomad-cf/core` dev alias:** ARCHITECTURE.md recommends pointing the alias to `packages/core/src` for dev mode. This needs empirical verification that it resolves correctly alongside the `@/` alias with trailing slash. Test in Phase 1 before proceeding to Phase 2.
-
-- **`bun.lock` vs `bun.lockb`:** The project uses `packageManager: bun@1.3.9`. Verify which lockfile format is committed on day one and migrate to text `bun.lock` in Phase 1 if still on binary. Binary lockfile merge conflicts are unresolvable.
-
-- **Homozygote count in gnomAD API response:** The homozygote exclusion formula requires `hom` count per variant per population. FEATURES.md states this is available in the gnomAD API. Verify the exact field name and population-level availability in the actual GraphQL response schema before writing the updated type definitions in Phase 2.
+- **Orphanet API stability:** The API is backed by Elasticsearch with no documented SLA or rate limits. For a clinical tool, consider adding a static fallback JSON for the most commonly queried genes (CFTR, HEXA, etc.) in case the API is temporarily unavailable.
+- **gnomAD rate limiting for subcontinental queries:** The N+1 variant query pattern (Phase 4) could hit the 10 queries/minute rate limit documented in gnomAD forums. Need to implement request batching with delays. Profile with CFTR (~30 qualifying variants) during implementation.
+- **LOFTEE `lof_flags` and `lof_filter` display:** These fields are already fetched in the GraphQL query but never displayed. Need to define the exact UI treatment (tooltip vs chip vs expandable section) during Phase 1 design.
+- **Display format toggle UX:** The exact control (three-way button group, dropdown, or settings panel) for switching between percent/ratio/scientific notation needs UX decisions during Phase 1.
+- **Existing `toLocaleString()` inconsistency:** `formatters.ts` uses default locale while `prevalence.ts` uses explicit `en-US`. This should be normalized as part of Phase 1 before adding new formatters.
 
 ## Sources
 
-### Primary (HIGH confidence)
-- Guo et al. 2022, npj Genomic Medicine (PMC9763236) — VCR formula `(AC - 2×Hom) / (AN/2)`, GCR inclusion-exclusion; authoritative pipeline reference
-- Kandolin et al. 2024, AJMG Part A — ACMG carrier screening with gnomAD v4; CFTR reference values
-- Genetics in Medicine 2024 — gnomAD v4.0 carrier frequency validation; peer-reviewed
-- [GeniE — Broad Institute 2024](https://gnomad.broadinstitute.org/news/2024-06-genie/) — genetic prevalence q² method; official gnomAD tool
-- [Bun Workspaces Documentation](https://bun.com/docs/pm/workspaces) — `--filter`, `workspace:*`, isolated installs behavior
-- [Vitest 4.0 Release + Projects Guide](https://vitest.dev/guide/projects) — `projects` config, monorepo test strategy
-- [tsdown Getting Started](https://tsdown.dev/guide/getting-started) — library bundler configuration
-- [commander npm v14.0.3](https://www.npmjs.com/package/commander) — TypeScript types built in
-- Direct codebase analysis — all 12 composable files and all utils read; architecture findings have zero inference
+### Primary (HIGH confidence -- verified live)
+- [Orphadata REST API](https://api.orphadata.com/) -- endpoints, CORS, response format tested with curl
+- [gnomAD GraphQL API](https://gnomad.broadinstitute.org/api) -- gene-level and variant-level queries tested; subcontinental population IDs verified
+- [MDN Intl.NumberFormat.formatToParts()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/formatToParts) -- scientific notation API
+- Direct codebase analysis -- all source files in packages/core and apps/web reviewed for integration points
 
-### Secondary (MEDIUM confidence)
-- [Vitest 3 Monorepo Setup (Sep 2025)](https://www.thecandidstartup.org/2025/09/08/vitest-3-monorepo-setup.html) — `projects` config pattern confirmed
-- [Switching from tsup to tsdown](https://alan.norbauer.com/articles/tsdown-bundler/) — tsup abandonment, API stability
-- [fgbyte.com Bun monorepo experience](https://www.fgbyte.com/blog/02-bun-turborepo-hell/) — `--filter` install bug corroboration
-- [Bun Issue #18195](https://github.com/oven-sh/bun/issues/18195) — `--filter` installs to root confirmed
-- [@clack/prompts npm v1.0.1](https://www.npmjs.com/package/@clack/prompts) — 4000+ dependents, ESM-first, freshly released
+### Secondary (HIGH confidence -- official documentation)
+- [gnomAD v2.1 release notes](https://gnomad.broadinstitute.org/news/2018-10-gnomad-v2-1/) -- subcontinental population descriptions
+- [gnomAD v4.0 release notes](https://gnomad.broadinstitute.org/news/2023-11-gnomad-v4-0/) -- confirmed subcontinental data not in v4
+- [LOFTEE GitHub](https://github.com/konradjk/loftee) -- lof_filter and lof_flags value definitions
+- [Gudmundsson et al. 2022](https://pmc.ncbi.nlm.nih.gov/articles/PMC9160216/) -- BA1/BS1 thresholds, LOFTEE flag prevalence
+- [ACMG carrier screening 2021](https://pmc.ncbi.nlm.nih.gov/articles/PMC8488021/) -- frequency display conventions, tier thresholds
+- [Orphadata API GitHub](https://github.com/Orphanet/API_Orphadata) -- source code and OpenAPI spec
+- [Chart.js tree-shaking docs](https://www.chartjs.org/docs/latest/getting-started/integration.html) -- bundle size analysis (evaluated and rejected)
 
-### Tertiary (supporting context)
-- [ClinGen Community Curation (C3)](https://clinicalgenome.org/working-groups/clingen-community-curation-c3/) — community curation workflow patterns
-- [GeniE GitHub Repository](https://github.com/broadinstitute/genetic-prevalence-estimator) — open-source reference for genetic prevalence implementation
-- [gnomAD-toolbox GitHub](https://github.com/broadinstitute/gnomad-toolbox) — published pipeline for carrier frequency ranking
+### Tertiary (MEDIUM confidence -- community sources)
+- [GeniE blog post](https://gnomad.broadinstitute.org/news/2024-06-genie/) -- competitor features and Orphanet integration approach
+- [gnomAD API rate limiting discussion](https://discuss.gnomad.broadinstitute.org/t/blocked-when-using-api-to-get-af/149) -- 10 queries/minute limit
+- [TSV Excel encoding issues](https://github.com/opentargets/genetics/issues/322) -- UTF-8 BOM requirement documented
+- [Chart library comparison (Luzmo 2025)](https://www.luzmo.com/blog/vue-chart-libraries) -- Vue charting ecosystem overview
 
 ---
-*Research completed: 2026-02-23*
+*Research completed: 2026-02-26*
 *Ready for roadmap: yes*

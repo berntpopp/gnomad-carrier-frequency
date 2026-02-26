@@ -1,711 +1,709 @@
-# Architecture Research
+# Architecture Research: v1.6 Feature Integration
 
-**Domain:** Monorepo extraction for TypeScript genetic carrier frequency calculator
-**Researched:** 2026-02-23
-**Confidence:** HIGH (based on direct codebase analysis — all findings verified against actual source files)
-
----
-
-## Standard Architecture
-
-### System Overview
-
-```
-gnomad-carrier-frequency/          (monorepo root — workspace)
-├── packages/
-│   └── core/                      (pure TypeScript, no Vue, no DOM)
-│       ├── src/
-│       │   ├── api/               # gnomAD GraphQL fetch (plain fetch, not villus)
-│       │   ├── calculations/      # Hardy-Weinberg math (from frequency-calc.ts)
-│       │   ├── filters/           # Variant filtering logic (from variant-filters.ts)
-│       │   ├── text/              # Template renderer (from template-renderer.ts)
-│       │   ├── config/            # Config loaders (from config/index.ts + JSON)
-│       │   └── types/             # Shared TypeScript types (from src/types/)
-│       ├── package.json
-│       └── tsconfig.json
-├── apps/
-│   └── web/                       (current src/ — Vue 3 + Vuetify + Pinia)
-│       ├── src/
-│       │   ├── api/               # villus client (thin Vue wrapper over core fetch)
-│       │   ├── components/        # Vue components (unchanged)
-│       │   ├── composables/       # Vue composables (thin wrappers over core)
-│       │   ├── stores/            # Pinia stores (unchanged)
-│       │   └── ...                # rest unchanged
-│       ├── vite.config.ts
-│       └── package.json
-├── packages/
-│   └── cli/                       (new — Node.js CLI consumer of core)
-│       ├── src/
-│       │   └── index.ts           # CLI entry point
-│       ├── package.json
-│       └── tsconfig.json
-├── package.json                   (workspace root)
-└── bun.lock                       (single lockfile for all packages)
-```
-
-### Component Responsibilities
-
-| Component | Package | Responsibility | Vue Dependency |
-|-----------|---------|----------------|---------------|
-| `gnomad-fetch.ts` | core | Raw GraphQL fetch over native `fetch` | None |
-| `variant-filters.ts` | core | LoF HC + ClinVar pathogenic filtering logic | None |
-| `frequency-calc.ts` | core | Hardy-Weinberg calculation, population aggregation | None |
-| `template-renderer.ts` | core | `{{variable}}` substitution in clinical text | None |
-| `clinvar-submissions.ts` | core | ClinVar batch query builder + parser + P/LP threshold | None |
-| `config/` | core | JSON config loaders + typed helpers | None |
-| `types/` | core | All shared TypeScript interfaces | None |
-| `useGeneVariants.ts` | web | Wraps core fetch with villus reactive caching | Vue (villus) |
-| `useCarrierFrequency.ts` | web | Orchestrates reactive computation pipeline | Vue (computed/ref) |
-| `useExclusionState.ts` | web | Reactive singleton for manual exclusion tracking | Vue (reactive) |
-| `useTextGenerator.ts` | web | Wires template store + core renderer reactively | Vue (computed) |
-| `useTemplateStore.ts` | web | Pinia persisted store for language/gender/sections | Pinia |
-| `CLI entry` | cli | Imperative calls to core, outputs text to stdout | None |
+**Domain:** Integrating 7 new features into existing gnomAD carrier frequency monorepo
+**Researched:** 2026-02-26
+**Confidence:** HIGH (based on direct codebase analysis of all relevant source files)
 
 ---
 
-## Recommended Project Structure
+## Existing Architecture Summary
 
-### packages/core
-
-This is the extraction target. All of the following move with zero logic changes — only import paths change.
+The monorepo has a clean core/web boundary:
 
 ```
-packages/core/
-├── src/
-│   ├── api/
-│   │   ├── gnomad-fetch.ts        # NEW: plain fetch wrapper replacing villus dependency
-│   │   ├── queries/
-│   │   │   ├── gene-search.ts     # MOVED: GENE_SEARCH_QUERY, GENE_DETAILS_QUERY (no change)
-│   │   │   ├── gene-variants.ts   # MOVED: GENE_VARIANTS_QUERY (no change)
-│   │   │   ├── clinvar-submissions.ts  # MOVED: buildSubmissionsQuery, parseSubmissionsResponse,
-│   │   │   │                          #         calculatePathogenicPercentage, meetsConflictingThreshold
-│   │   │   └── types.ts           # MOVED: GeneVariant, GeneData, etc. (no change)
-│   │   └── index.ts
-│   ├── calculations/
-│   │   └── frequency-calc.ts      # MOVED: calculateCarrierFrequency, aggregatePopulationFrequencies,
-│   │                              #         buildPopulationFrequencies, calculateRecurrenceRisk
-│   ├── filters/
-│   │   └── variant-filters.ts     # MOVED: filterPathogenicVariantsConfigurable, shouldIncludeVariant,
-│   │                              #         isHighConfidenceLoF, isPathogenicClinVar, etc.
-│   ├── text/
-│   │   ├── template-renderer.ts   # MOVED: renderTemplate (no change — already pure)
-│   │   └── template-parser.ts     # MOVED: parseTemplate, segmentsToTemplate (no change)
-│   ├── config/
-│   │   ├── index.ts               # MOVED: getGnomadVersion, getPopulationCodes, etc. (no change)
-│   │   ├── types.ts               # MOVED: GnomadConfig, AppSettings, etc. (no change)
-│   │   ├── gnomad.json            # MOVED: version config, population codes
-│   │   ├── settings.json          # MOVED: thresholds, debounce, etc.
-│   │   ├── exclusion-reasons.ts   # MOVED: EXCLUSION_REASONS constant
-│   │   └── templates/
-│   │       ├── de.json            # MOVED: German clinical text templates
-│   │       └── en.json            # MOVED: English clinical text templates
-│   ├── types/
-│   │   ├── variant.ts             # MOVED: GnomadVariant, ClinVarVariant, TranscriptConsequence
-│   │   ├── frequency.ts           # MOVED: CarrierFrequencyResult, PopulationFrequency, IndexPatientStatus
-│   │   ├── filter.ts              # MOVED: FilterConfig, FACTORY_FILTER_DEFAULTS
-│   │   ├── text.ts                # MOVED: TemplateContext, Perspective, GenderStyle, PatientSex
-│   │   ├── exclusion.ts           # MOVED: ExclusionReason, ExclusionState
-│   │   └── index.ts               # Re-exports
-│   └── index.ts                   # Public API surface of the package
-├── package.json
-└── tsconfig.json
+packages/core/     @gnomad-cf/core    Platform-neutral TypeScript
+  src/types/       Shared interfaces (GnomadVariant, PopulationFrequency, etc.)
+  src/config/      JSON configs + typed loaders (gnomad.json, settings.json)
+  src/queries/     GraphQL query strings + response types
+  src/filters/     Variant filtering (LoF HC, ClinVar P/LP, missense)
+  src/calculations/ Carrier frequency math + formatters
+  src/templates/   Clinical text rendering
+  src/utils/       Pure utilities
+  src/client/      fetch-based GraphQL client
+  src/gene-config/ Gene-specific config profiles
+
+apps/web/          Vue 3 + Vuetify 3 SPA
+  src/composables/ Reactive wrappers around core (useCarrierFrequency, etc.)
+  src/stores/      Pinia persisted stores (filter, calc, template, etc.)
+  src/components/  Vuetify components (wizard steps, tables, modals)
+  src/utils/       Web-only utilities (export-utils.ts)
 ```
 
-### apps/web (current repo restructured)
+Core has 10 tsdown entry points: index, types, config, queries, filters, calculations, templates, utils, client, gene-config.
 
+**Key data flow:**
 ```
-apps/web/
-├── src/
-│   ├── api/
-│   │   ├── client.ts              # STAYS: villus client + useGnomadVersion (Vue reactive)
-│   │   └── index.ts
-│   ├── components/                # STAYS: all .vue files unchanged
-│   ├── composables/
-│   │   ├── useCarrierFrequency.ts # STAYS but THINNED: delegates to core, keeps Vue reactivity
-│   │   ├── useGeneVariants.ts     # STAYS: villus useQuery wrapper (pure Vue concern)
-│   │   ├── useGeneSearch.ts       # STAYS: villus useQuery wrapper
-│   │   ├── useTextGenerator.ts    # STAYS but THINNED: wires store to core renderTemplate
-│   │   ├── useExclusionState.ts   # STAYS: Vue reactive singleton (state management only)
-│   │   ├── useClinvarSubmissions.ts # STAYS: Vue ref wrapping (calls core fetch functions)
-│   │   └── ... (all others stay)
-│   ├── stores/                    # STAYS: all Pinia stores unchanged
-│   ├── types/                     # REPLACED: re-exports from @gnomad-cf/core
-│   ├── config/                    # REPLACED: re-exports from @gnomad-cf/core
-│   └── utils/                     # REPLACED: re-exports from @gnomad-cf/core
-├── vite.config.ts                 # STAYS: unchanged
-└── package.json                   # UPDATED: adds @gnomad-cf/core workspace dep
-```
-
-### packages/cli
-
-```
-packages/cli/
-├── src/
-│   ├── index.ts                   # CLI entry (commander or yargs)
-│   ├── commands/
-│   │   ├── calculate.ts           # gnomad-cf calculate CFTR --version v4
-│   │   └── text.ts                # gnomad-cf text CFTR --lang de --status heterozygous
-│   └── output/
-│       └── formatters.ts          # CLI-specific output formatting (TSV, JSON, human-readable)
-├── package.json
-└── tsconfig.json
+gnomAD GraphQL API
+  -> useGeneVariants (villus query, raw variant data)
+  -> filterPathogenicVariantsConfigurable (core/filters)
+  -> aggregatePopulationFrequenciesWithConfig (core/calculations)
+  -> buildPopulationFrequencies (core/calculations)
+  -> PopulationFrequency[] -> displayed in StepResults.vue
 ```
 
 ---
 
-## Architectural Patterns
+## Feature-by-Feature Integration Analysis
 
-### Pattern 1: Vue Coupling Analysis — What Is Actually Coupled
+### Feature 1: Variant Quality Flags (#12)
 
-The key finding from reading the actual code: the Vue coupling in composables is shallow and consistent. Each composable has a clear seam.
+**What:** Annotate variants with quality indicators (low coverage, singleton, population-specific).
 
-**Coupling inventory per composable:**
+**Integration point:** After filtering, before display. The filtering pipeline (`filterPathogenicVariantsConfigurable`) produces `GnomadVariant[]`. The display layer transforms these to `DisplayVariant[]` via `toDisplayVariants()` in `core/filters/variant-display.ts`.
 
-| Composable | Vue APIs Used | Core Logic Status |
-|-----------|---------------|-------------------|
-| `useCarrierFrequency` | `ref`, `computed`, `watch`, `watchDebounced` | Logic is in `frequency-calc.ts` (already pure) |
-| `useGeneVariants` | `useQuery` (villus), `computed` | Query string + types already pure in `api/queries/` |
-| `useTextGenerator` | `computed` | Logic helpers are all pure functions at bottom of file |
-| `useExclusionState` | `reactive`, `computed` | State management only — no domain logic |
-| `useClinvarSubmissions` | `ref` | HTTP fetch using native `fetch` — already framework-free |
+**Where new code goes:**
 
-**Key observation:** `useClinvarSubmissions` already uses native `fetch` directly (not villus). Only `useGeneVariants` and `useGeneSearch` use villus. The submission batching, query building, and ClinVar threshold logic are all pure functions.
+| Layer | File | Change |
+|-------|------|--------|
+| core/types | `types/display.ts` | Add quality flag fields to `DisplayVariant` |
+| core/filters | NEW `variant-quality.ts` | Pure functions: `assessVariantQuality(variant) -> QualityFlags` |
+| core/filters | `variant-display.ts` | Call quality assessment in `toDisplayVariant()` |
+| web/components | `VariantTable.vue` | Render quality flag chips in expanded row |
 
-### Pattern 2: The Extraction Seam
-
-Every composable follows this pattern:
+**New types needed:**
 
 ```typescript
-// BEFORE (in apps/web composable):
-import { computed, ref } from 'vue';
-import { filterPathogenicVariantsConfigurable } from '@/utils/variant-filters';
-import { aggregatePopulationFrequencies } from '@/utils/frequency-calc';
-
-// AFTER (same composable, updated import):
-import { computed, ref } from 'vue';
-import {
-  filterPathogenicVariantsConfigurable,
-  aggregatePopulationFrequencies,
-} from '@gnomad-cf/core';
+// packages/core/src/types/quality.ts (NEW)
+export interface QualityFlags {
+  /** Variant observed only once (AC=1 globally) */
+  isSingleton: boolean;
+  /** Low allele number indicates coverage gaps */
+  isLowCoverage: boolean;
+  /** Variant exists only in one population */
+  isPopulationSpecific: boolean;
+  /** The single population code, if population-specific */
+  specificPopulationCode: string | null;
+}
 ```
 
-No composable logic needs to change — only import paths update from `@/utils/...` to `@gnomad-cf/core`.
-
-### Pattern 3: core/api — Replacing villus with plain fetch
-
-`useGeneVariants` uses villus `useQuery` for reactive caching. The core package needs a non-reactive equivalent for CLI use:
+**Assessment function signature:**
 
 ```typescript
-// packages/core/src/api/gnomad-fetch.ts
-
-export async function fetchGeneVariants(
-  geneSymbol: string,
+// packages/core/src/filters/variant-quality.ts (NEW)
+export function assessVariantQuality(
+  variant: GnomadVariant,
   version: GnomadVersion,
-  config: GnomadVersionConfig
-): Promise<GeneData | null> {
-  const query = GENE_VARIANTS_QUERY;
-  const variables = {
-    geneSymbol: geneSymbol.toUpperCase(),
-    dataset: config.datasetId,
-    referenceGenome: config.referenceGenome,
-  };
-
-  const response = await fetch(config.apiEndpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, variables }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`gnomAD API error: ${response.status}`);
-  }
-
-  const json = await response.json();
-  if (json.errors?.length) {
-    throw new Error(json.errors[0].message);
-  }
-
-  return (json.data as GeneVariantsResponse).gene;
-}
-
-export async function fetchGeneSearch(
-  query: string,
-  referenceGenome: 'GRCh38' | 'GRCh37'
-): Promise<GeneSearchResult[]> { ... }
+): QualityFlags;
 ```
 
-This pattern already exists in the codebase: `useClinvarSubmissions.ts` does exactly this using native `fetch`. The CLI path simply calls these functions imperatively instead of reactively.
+**Rationale for placement:** Quality assessment is pure logic operating on `GnomadVariant` data. It belongs in core, not web. The function reads AC/AN from the variant's population arrays -- same data already available, no new API calls needed.
 
-### Pattern 4: Config Flow — JSON through the system
+**Data already available:** The `GnomadVariant` type has `exome.ac`, `genome.ac`, `joint.ac` (global counts) and per-population `ac`/`an` arrays. All quality flags can be derived from existing data without additional GraphQL fields.
 
-```
-packages/core/src/config/gnomad.json
-    ↓ import (JSON module assertion or bundler resolution)
-packages/core/src/config/index.ts
-    getGnomadVersion(version)    → GnomadVersionConfig
-    getDatasetId(version)        → string ('gnomad_r4', etc.)
-    getReferenceGenome(version)  → 'GRCh38' | 'GRCh37'
-    getPopulationCodes(version)  → string[]
-    getPopulationLabel(code)     → string
-    ↓ re-exported from
-packages/core/src/index.ts
-    ↓ imported by
-apps/web/src/composables/*.ts   → same helpers, same JSON data
-packages/cli/src/commands/*.ts  → same helpers, same JSON data
-```
+**What needs NO change:** The filtering pipeline itself. Quality flags are informational annotations, not filter criteria (at least in v1.6). They do not affect which variants are included in the carrier frequency calculation.
 
-The config is truly shared: one JSON file, one loader, consumed identically by web and CLI. No duplication.
+---
 
-### Pattern 5: Template JSON — Both packages read the same files
+### Feature 2: Source Breakdown (#11)
 
-The clinical text templates (`de.json`, `en.json`) live in `packages/core/src/config/templates/`. The web app's `useTemplateStore` (Pinia) imports them as JSON modules. The CLI can import them the same way — pure JSON, no DOM dependency.
+**What:** Show how much of the carrier frequency comes from ClinVar P/LP variants vs pLoF (LOFTEE HC) variants.
+
+**Integration point:** Inside the aggregation step of `useCarrierFrequency.ts`. Currently `aggregatePopulationFrequenciesWithConfig()` sums allele frequencies across all qualifying variants without distinguishing their source. The breakdown needs a parallel computation tracking source attribution.
+
+**Where new code goes:**
+
+| Layer | File | Change |
+|-------|------|--------|
+| core/types | `types/frequency.ts` | Add `SourceBreakdown` interface |
+| core/calculations | NEW `source-breakdown.ts` | Pure function to partition variants by source and sum AFs |
+| core/calculations | `index.ts` | Export new module |
+| web/composables | `useCarrierFrequency.ts` | Add computed for source breakdown (calls core function) |
+| web/components | `StepResults.vue` | Display breakdown as sub-stats or mini chart |
+
+**New types:**
 
 ```typescript
-// Both web and CLI do this identically:
-import deTemplates from '@gnomad-cf/core/config/templates/de.json';
-import enTemplates from '@gnomad-cf/core/config/templates/en.json';
+// Added to packages/core/src/types/frequency.ts
+export interface SourceBreakdown {
+  /** Fraction of carrier frequency from LoF HC variants */
+  lofHcFraction: number;
+  /** Fraction from ClinVar P/LP variants (excluding LoF HC overlap) */
+  clinvarFraction: number;
+  /** Fraction from missense with ClinVar evidence */
+  missenseFraction: number;
+  /** Raw sumAF contributions */
+  lofHcSumAF: number;
+  clinvarSumAF: number;
+  missenseSumAF: number;
+  /** Variant counts per source */
+  lofHcCount: number;
+  clinvarCount: number;
+  missenseCount: number;
+}
 ```
 
-The Pinia store wraps these with reactive state (language preference, custom overrides). The CLI uses them directly without the store layer.
-
-### Pattern 6: CLI Imperative Pipeline
+**Core function:**
 
 ```typescript
-// packages/cli/src/commands/calculate.ts
-
-import {
-  fetchGeneVariants,
-  fetchClinvarSubmissions,
-  filterPathogenicVariantsConfigurable,
-  aggregatePopulationFrequencies,
-  buildPopulationFrequencies,
-  calculateCarrierFrequency,
-  getGnomadVersion,
-  FACTORY_FILTER_DEFAULTS,
-} from '@gnomad-cf/core';
-
-export async function runCalculate(geneSymbol: string, options: CliOptions) {
-  const versionConfig = getGnomadVersion(options.version);
-
-  // 1. Fetch variants
-  const gene = await fetchGeneVariants(geneSymbol, options.version, versionConfig);
-
-  // 2. Filter to pathogenic
-  const pathogenic = filterPathogenicVariantsConfigurable(
-    gene.variants,
-    gene.clinvar_variants,
-    FACTORY_FILTER_DEFAULTS
-  );
-
-  // 3. Aggregate populations
-  const aggregated = aggregatePopulationFrequencies(pathogenic, options.version);
-
-  // 4. Build result
-  const sumAF = [...aggregated.values()].reduce((s, p) => s + p.sumAF, 0);
-  const carrierFreq = 2 * sumAF;
-
-  console.log(`${geneSymbol}: ${(carrierFreq * 100).toFixed(2)}% carrier frequency`);
-}
+// packages/core/src/calculations/source-breakdown.ts (NEW)
+export function calculateSourceBreakdown(
+  variants: GnomadVariant[],
+  clinvarVariants: ClinVarVariant[],
+  version: GnomadVersion,
+): SourceBreakdown;
 ```
 
-The CLI calls the same pure functions the web composables call. No code duplication.
+**Key design decision:** A variant can be BOTH LoF HC AND ClinVar P/LP. The breakdown must handle overlap. Recommendation: classify each variant into its primary source using priority: LoF HC > missense > ClinVar-only. This avoids double-counting while giving LoF HC precedence (since it is the stronger evidence class).
+
+**Data already available:** The classification functions `isHighConfidenceLoF()` and `isPathogenicClinVar()` already exist in `core/filters/variant-filters.ts`. The breakdown function calls these same functions to classify, then sums AFs per class.
 
 ---
 
-## Data Flow
+### Feature 3: Display Formats (#10)
 
-### Web App Data Flow (current, preserved)
+**What:** Allow users to toggle between percentage (4.00%), ratio (1:25), and scientific notation (4.00e-2) display formats.
 
-```
-User types gene name
-    → useGeneSearch (villus reactive query)
-    → gnomAD GraphQL /api (GENE_SEARCH_QUERY)
-    → GeneSearchResult[]
-    → user selects gene
-    → useGeneVariants (villus useQuery, cache-first)
-    → gnomAD GraphQL /api (GENE_VARIANTS_QUERY)
-    → GeneVariant[] + GeneClinvarVariant[]
-    → useCarrierFrequency.normalizedVariants (computed)
-    → filterPathogenicVariantsConfigurable [core]
-    → aggregatePopulationFrequencies [core]
-    → buildPopulationFrequencies [core]
-    → CarrierFrequencyResult (reactive)
-    → useTextGenerator
-    → renderTemplate [core] (with TemplateContext)
-    → clinical text string displayed in TextOutput.vue
-```
+**Integration point:** The formatter layer in `core/calculations/formatters.ts` and the display components (`StepResults.vue`, `VariantTable.vue`).
 
-### CLI Data Flow (new)
+**Where new code goes:**
 
-```
-$ gnomad-cf calculate CFTR --version v4 --lang de
+| Layer | File | Change |
+|-------|------|--------|
+| core/types | NEW `types/display-format.ts` or add to existing `types/calculations.ts` | Add `DisplayFormat` type |
+| core/calculations | `formatters.ts` | Add `formatFrequencyAs(freq, format)` function |
+| web/stores | `useCalcStore.ts` | Add `displayFormat` field (persisted preference) |
+| web/components | `StepResults.vue` | Use dynamic formatter based on store preference |
+| web/components | `VariantTable.vue` | Use dynamic formatter |
+| web/components | `FilterPanel.vue` or new control | Add format toggle UI (3-way button group) |
 
-fetchGeneVariants('CFTR', 'v4', versionConfig) [core]
-    → gnomAD GraphQL /api (same GENE_VARIANTS_QUERY)
-    → GeneVariant[] + GeneClinvarVariant[]
-filterPathogenicVariantsConfigurable(variants, clinvar, FACTORY_DEFAULTS) [core]
-    → GnomadVariant[] (pathogenic only)
-aggregatePopulationFrequencies(pathogenic, 'v4') [core]
-    → Map<populationCode, {sumAF, totalAC, maxAN}>
-buildPopulationFrequencies(aggregated, globalFreq, 'v4') [core]
-    → PopulationFrequency[]
-renderTemplate(template, context) [core]
-    → clinical text string
-stdout.write(text)
-```
-
-### Config Data Flow
-
-```
-gnomad.json + settings.json (in packages/core/src/config/)
-    → imported via TypeScript JSON module imports
-    → typed via GnomadConfig / AppSettings interfaces
-    → accessed via helper functions (getDatasetId, getPopulationCodes, etc.)
-    → consumed by:
-        - core calculation functions (lowSampleSizeThreshold, founderEffectMultiplier)
-        - web composables (via @gnomad-cf/core re-exports)
-        - CLI commands (via @gnomad-cf/core re-exports)
-```
-
----
-
-## Integration Points
-
-### New Components Required
-
-| Component | Location | Purpose | Dependencies |
-|-----------|----------|---------|--------------|
-| `packages/core/src/api/gnomad-fetch.ts` | NEW | Plain `fetch` wrapper for gene variants + search | Native fetch, core types |
-| `packages/core/src/index.ts` | NEW | Public API barrel — explicit exports only | All core modules |
-| `packages/core/package.json` | NEW | Package manifest with exports map | TypeScript, bun/tsc |
-| `packages/cli/src/index.ts` | NEW | CLI entry point + command registration | commander/yargs, core |
-| `packages/cli/package.json` | NEW | CLI manifest, bin field | core workspace dep |
-| `package.json` (root) | NEW | Workspace root with `workspaces` field | bun workspaces |
-
-### Modified Components (web app)
-
-| Component | Change Required | Risk |
-|-----------|----------------|------|
-| `apps/web/src/utils/*.ts` | Replace with re-exports from `@gnomad-cf/core` | Low — just re-exports |
-| `apps/web/src/types/index.ts` | Replace with re-exports from `@gnomad-cf/core` | Low — just re-exports |
-| `apps/web/src/config/index.ts` | Replace with re-exports from `@gnomad-cf/core` | Low — just re-exports |
-| `apps/web/src/composables/useCarrierFrequency.ts` | Update: `@/utils/variant-filters` → `@gnomad-cf/core` | Low — mechanical change |
-| `apps/web/src/composables/useCarrierFrequency.ts` | Update: `@/utils/frequency-calc` → `@gnomad-cf/core` | Low — mechanical change |
-| `apps/web/src/composables/useClinvarSubmissions.ts` | Update: `@/api/queries` → `@gnomad-cf/core` | Low — mechanical change |
-| `apps/web/vite.config.ts` | Add path alias for `@gnomad-cf/core` workspace | Low |
-| `apps/web/package.json` | Add `"@gnomad-cf/core": "workspace:*"` dependency | Low |
-| `.github/workflows/deploy.yml` | Update working directory for monorepo layout | Low |
-
-### Unchanged Components
-
-Everything in `apps/web/src/components/` stays untouched. Every `.vue` file is unchanged. All Pinia stores are unchanged. The villus client is unchanged. Vite config logic is unchanged.
-
----
-
-## Build Pipeline
-
-### Workspace Root
-
-```json
-{
-  "name": "gnomad-cf-monorepo",
-  "private": true,
-  "workspaces": ["packages/*", "apps/*"],
-  "scripts": {
-    "build": "bun run --filter '@gnomad-cf/core' build && bun run --filter '*' build",
-    "build:web": "bun run --filter '@gnomad-cf/web' build",
-    "build:cli": "bun run --filter '@gnomad-cf/cli' build",
-    "dev": "bun run --filter '@gnomad-cf/web' dev"
-  }
-}
-```
-
-### packages/core Build
-
-Core uses `tsc` directly — no bundler needed for a library package.
-
-```json
-{
-  "name": "@gnomad-cf/core",
-  "version": "1.0.0",
-  "type": "module",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./config/templates/*": "./src/config/templates/*"
-  },
-  "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "typescript": "~5.9.3"
-  }
-}
-```
-
-```json
-// packages/core/tsconfig.json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "outDir": "./dist",
-    "declaration": true,
-    "declarationMap": true,
-    "strict": true,
-    "resolveJsonModule": true
-  },
-  "include": ["src/**/*"]
-}
-```
-
-### apps/web Build
-
-Unchanged from current. Vite handles everything. Only addition is path alias resolution for the workspace package:
+**New types:**
 
 ```typescript
-// apps/web/vite.config.ts (addition only)
-resolve: {
-  alias: {
-    '@': fileURLToPath(new URL('./src', import.meta.url)),
-    // During dev, resolve workspace package to source directly
-    '@gnomad-cf/core': fileURLToPath(new URL('../../packages/core/src', import.meta.url)),
+// packages/core/src/types/calculations.ts (extend existing)
+export type DisplayFormat = 'percent' | 'ratio' | 'scientific';
+```
+
+**New formatter:**
+
+```typescript
+// packages/core/src/calculations/formatters.ts (extend existing)
+export function formatFrequencyAs(
+  frequency: number | null,
+  format: DisplayFormat,
+): string {
+  if (frequency === null) return 'Not detected';
+  switch (format) {
+    case 'percent':
+      return `${(frequency * 100).toFixed(frequencyDecimalPlaces)}%`;
+    case 'ratio':
+      return frequency > 0 ? `1:${Math.round(1 / frequency).toLocaleString()}` : '-';
+    case 'scientific':
+      return frequency > 0 ? frequency.toExponential(2) : '0';
   }
 }
 ```
 
-In production builds, bun workspaces resolve `@gnomad-cf/core` to `packages/core/dist/` automatically after `core` is built.
+**Key design decision:** The format preference should live in `useCalcStore` (persisted Pinia store) alongside other calculation display preferences. It is NOT a filter or calculation parameter -- it only affects rendering. Adding it to `CalcConfig` would be wrong because `CalcConfig` flows into the calculation engine. Create a separate `displayFormat` field on the store state.
 
-### packages/cli Build
+**Existing code to modify:** `StepResults.vue` currently calls local `formatPercent()` and `formatRatio()` helper functions defined inline. These should be replaced with calls to the core `formatFrequencyAs()` function using the store's preference. The `formatCarrierFrequency()` function in `core/calculations/formatters.ts` already returns both percent and ratio -- this can be extended to include scientific.
+
+---
+
+### Feature 4: TSV Export (#9)
+
+**What:** Add TSV (tab-separated values) as an export format alongside existing JSON and Excel.
+
+**Integration point:** The export system in `apps/web/src/utils/export-utils.ts` and `apps/web/src/composables/useExport.ts`.
+
+**Where new code goes:**
+
+| Layer | File | Change |
+|-------|------|--------|
+| web/utils | `export-utils.ts` | Add `buildTsvContent(data: ExportData): string` function |
+| web/composables | `useExport.ts` | Add `exportToTsv()` method |
+| web/components | `StepResults.vue` | Add TSV option to export dropdown menu |
+| web/components | `VariantModal.vue` | Add TSV option to variant export dropdown |
+
+**Why web-only, not core:** The existing `buildExportData()` in `export-utils.ts` already builds a platform-neutral `ExportData` structure (defined in core types). The TSV serializer is a display concern -- it converts `ExportData` to a tab-delimited string. The XLSX export already lives in web (uses `xlsx` library with DOM APIs). TSV follows the same pattern.
+
+**Implementation sketch:**
+
+```typescript
+// apps/web/src/utils/export-utils.ts (extend existing)
+export function buildTsvContent(data: ExportData): string {
+  const lines: string[] = [];
+
+  // Summary header
+  lines.push(['Gene', 'Carrier Frequency', 'Carrier Frequency %',
+    'Allele Count', 'Allele Number', 'Qualifying Variants'].join('\t'));
+  lines.push([data.summary.gene, String(data.summary.globalCarrierFrequency ?? ''),
+    data.summary.globalCarrierFrequencyPercent,
+    String(data.summary.globalAlleleCount),
+    String(data.summary.globalAlleleNumber),
+    String(data.summary.qualifyingVariantCount)].join('\t'));
+  lines.push(''); // blank separator
+
+  // Population rows
+  lines.push(['Population', 'Code', 'Carrier Frequency', '% ', 'Ratio',
+    'AC', 'AN', 'Founder Effect'].join('\t'));
+  for (const pop of data.populations) {
+    lines.push([pop.label, pop.code,
+      String(pop.carrierFrequency ?? ''),
+      pop.carrierFrequencyPercent, pop.carrierFrequencyRatio,
+      String(pop.alleleCount), String(pop.alleleNumber),
+      String(pop.isFounderEffect)].join('\t'));
+  }
+  lines.push('');
+
+  // Variant rows
+  lines.push(['Variant ID', 'Consequence', 'Allele Freq', 'AF %',
+    'AC', 'AN', 'HGVS-c', 'HGVS-p', 'ClinVar',
+    'LoF', 'ClinVar P/LP', 'Excluded', 'Exclusion Reason'].join('\t'));
+  for (const v of data.variants) {
+    lines.push([v.variantId, v.consequence,
+      String(v.alleleFrequency ?? ''), v.alleleFrequencyPercent,
+      String(v.alleleCount), String(v.alleleNumber),
+      v.hgvsC ?? '', v.hgvsP ?? '',
+      v.clinvarStatus ?? '',
+      String(v.isLoF), String(v.isClinvarPathogenic),
+      String(v.excluded), v.exclusionReason ?? ''].join('\t'));
+  }
+
+  return lines.join('\n');
+}
+```
+
+**No new core modules or types needed.** The `ExportData` type already captures everything TSV needs.
+
+---
+
+### Feature 5: Orphanet Integration (#6)
+
+**What:** Fetch gene-disease associations and prevalence data from Orphanet's API to provide disease context alongside gnomAD frequency data.
+
+**Integration point:** New parallel data source, fetched when a gene is selected. Does not modify the filtering or calculation pipeline -- it provides supplementary reference data displayed alongside results.
+
+**Where new code goes:**
+
+| Layer | File | Change |
+|-------|------|--------|
+| core/types | NEW `types/orphanet.ts` | Orphanet response types |
+| core/client | NEW `orphanet-client.ts` | Fetch client for Orphadata REST API |
+| core | `tsdown.config.ts` | Add `orphanet` entry point (if separate subpath desired) |
+| web/composables | NEW `useOrphanetData.ts` | Reactive wrapper, caching, error handling |
+| web/components | NEW `OrphanetCard.vue` | Display diseases, prevalence, inheritance |
+| web/components | `StepResults.vue` | Include OrphanetCard in results view |
+
+**Orphadata API endpoints (verified):**
+
+```
+Base URL: https://api.orphadata.com
+
+Gene -> Diseases:
+  GET /rd-associated-genes/genes/symbols/{symbol}
+  Returns: diseases associated with a gene symbol
+
+Disease -> Epidemiology:
+  GET /rd-epidemiology/orphacodes/{orphacode}
+  Returns: prevalence, incidence, family count
+
+Disease -> Natural History:
+  GET /rd-natural_history/orphacodes/{orphacode}
+  Returns: inheritance mode, age of onset
+```
+
+**New types:**
+
+```typescript
+// packages/core/src/types/orphanet.ts (NEW)
+export interface OrphanetDisease {
+  orphacode: number;
+  preferredTerm: string;
+  geneSymbol: string;
+  associationType: string; // "Disease-causing germline mutation(s) in"
+}
+
+export interface OrphanetPrevalence {
+  orphacode: number;
+  preferredTerm: string;
+  prevalenceType: string;  // "Point prevalence", "Birth prevalence"
+  prevalenceClass: string; // ">1 / 1000", "1-9 / 100 000", etc.
+  prevalenceGeographic: string; // "Europe", "Worldwide"
+  prevalenceValidationStatus: string;
+  source: string;
+}
+
+export interface OrphanetGeneResult {
+  diseases: OrphanetDisease[];
+  prevalences: OrphanetPrevalence[];  // aggregated from all disease orphacodes
+}
+```
+
+**Core client:**
+
+```typescript
+// packages/core/src/client/orphanet-client.ts (NEW)
+const ORPHADATA_BASE = 'https://api.orphadata.com';
+
+export async function fetchOrphanetDiseases(
+  geneSymbol: string,
+): Promise<OrphanetDisease[]>;
+
+export async function fetchOrphanetPrevalence(
+  orphacode: number,
+): Promise<OrphanetPrevalence[]>;
+
+export async function fetchOrphanetGeneData(
+  geneSymbol: string,
+): Promise<OrphanetGeneResult>;
+```
+
+**Caching strategy:** Use the existing web-layer caching pattern (similar to ClinGen in `useClingenStore`). Orphanet data changes infrequently (yearly updates). Cache responses in a Pinia store with localStorage persistence and a 30-day expiry. The web composable manages cache-first fetching.
+
+**Key design decision:** The Orphanet client goes in core (not web) because the CLI could also use it. The reactive caching wrapper stays in web.
+
+**CORS consideration:** The Orphadata API at `api.orphadata.com` is a public REST API. Browser CORS policy must be verified. If CORS headers are not present, a proxy or server-side fetch would be needed. This is a **research flag** -- verify CORS headers before implementation.
+
+---
+
+### Feature 6: Subcontinental Populations (#5)
+
+**What:** Show frequency breakdowns for subcontinental groups (e.g., NFE subdivided into North-Western European, Southern European, etc.).
+
+**CRITICAL FINDING:** gnomAD v4.0/v4.1 does NOT include subcontinental populations in its API or data release. The v4.0 announcement explicitly states sub-genetic ancestry groups are "not yet in v4" and will come in future minor releases. gnomAD v2.1.1 DOES have subcontinental populations (e.g., `nfe_nwe`, `nfe_seu`, `nfe_bgr`, `eas_jpn`, `eas_kor`).
+
+**This means:**
+- For v4 users (default): subcontinental data is unavailable. The feature must gracefully show "not available for v4" or be hidden entirely.
+- For v2 users: subcontinental data IS available in the existing GraphQL response (population IDs include subcontinental codes like `nfe_nwe`).
+
+**Where new code goes:**
+
+| Layer | File | Change |
+|-------|------|--------|
+| core/config | `gnomad.json` | Add `subpopulations` nested array to v2 populations |
+| core/config | `types.ts` | Extend `PopulationConfig` with optional `subpopulations` |
+| core/config | `index.ts` | Add helpers: `getSubpopulations(code, version)`, `isSubpopulation(code)` |
+| core/calculations | `frequency-calc.ts` | Extend aggregation to optionally include subpopulations |
+| core/types | `types/frequency.ts` | Add optional `subpopulations` field to `PopulationFrequency` |
+| web/components | `StepResults.vue` | Expandable rows for populations with subpopulations |
+
+**Config extension:**
 
 ```json
 {
-  "name": "@gnomad-cf/cli",
-  "version": "1.0.0",
-  "type": "module",
-  "bin": {
-    "gnomad-cf": "./dist/index.js"
-  },
-  "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "start": "node dist/index.js"
-  },
-  "dependencies": {
-    "@gnomad-cf/core": "workspace:*",
-    "commander": "^12.0.0"
-  }
+  "code": "nfe",
+  "label": "Non-Finnish European",
+  "subpopulations": [
+    { "code": "nfe_bgr", "label": "Bulgarian" },
+    { "code": "nfe_est", "label": "Estonian" },
+    { "code": "nfe_nwe", "label": "North-Western European" },
+    { "code": "nfe_onf", "label": "Other Non-Finnish European" },
+    { "code": "nfe_seu", "label": "Southern European" },
+    { "code": "nfe_swe", "label": "Swedish" }
+  ]
 }
 ```
 
-### Build Order Dependency
+**Type extension:**
 
-```
-1. packages/core (no workspace deps)
-        ↓
-2. apps/web (depends on @gnomad-cf/core)
-   packages/cli (depends on @gnomad-cf/core)
-        ↓
-3. Deploy artifact from apps/web/dist/
-```
-
-Bun workspaces respects this automatically via the dependency graph.
-
----
-
-## GitHub Actions Deployment
-
-### Current deploy.yml — Minimal Changes Required
-
-The current workflow (`bun install → lint → typecheck → build → docs:build → deploy`) continues to work with monorepo. The `apps/web` build is still `bun run build` — just invoked from the workspace root with filter, or from within `apps/web/`:
-
-```yaml
-# .github/workflows/deploy.yml — updated for monorepo
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: oven-sh/setup-bun@v2
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-        # Bun workspaces: installs all packages in one command
-
-      - name: Build core package
-        run: bun run --filter '@gnomad-cf/core' build
-        # Must run before web build
-
-      - name: Lint web app
-        run: bun run --filter '@gnomad-cf/web' lint
-
-      - name: Type check web app
-        run: bun run --filter '@gnomad-cf/web' typecheck
-
-      - name: Build web app
-        run: bun run --filter '@gnomad-cf/web' build
-
-      - name: Build docs
-        run: bun run --filter '@gnomad-cf/web' docs:build
-
-      - name: Merge docs into artifact
-        run: cp -r apps/web/docs/.vitepress/dist apps/web/dist/docs
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: './apps/web/dist'   # Changed: now in apps/web/
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+```typescript
+// packages/core/src/config/types.ts (extend)
+export interface PopulationConfig {
+  code: string;
+  label: string;
+  description?: string;
+  subpopulations?: PopulationConfig[];  // NEW - optional nested
+}
 ```
 
-The CLI is never built in the deploy workflow — it is not deployed. Only `apps/web` produces the GitHub Pages artifact.
+**Data availability:** The existing `GENE_VARIANTS_QUERY` already requests ALL populations in the `populations { id ac an ac_hom }` array. Subcontinental codes (e.g., `nfe_nwe`) are returned by gnomAD v2 API in the same populations array. No GraphQL query change is needed -- the data is already fetched but currently ignored because `getPopulationCodes()` only returns top-level codes.
+
+**Key design decision:** The aggregation function `aggregatePopulationFrequenciesWithConfig()` iterates over `getPopulationCodes(version)`. To add subpopulations, either:
+1. Extend the function to accept an "include subpopulations" flag and iterate over nested codes too, OR
+2. Build a separate `aggregateSubpopulationFrequencies()` that runs after the main aggregation.
+
+Recommendation: Option 2 -- keep the main aggregation unchanged and add a separate function. This is safer and avoids changing tested calculation logic. The subpopulation aggregation uses the same math but different population codes.
 
 ---
 
-## File-Level Migration Plan
+### Feature 7: Bar Chart (#2)
 
-### Phase 1: Extract packages/core (pure moves, no logic changes)
+**What:** Visualize population carrier frequencies as a horizontal bar chart.
 
-All moves preserve file content exactly — only import paths inside each file change from `@/...` to relative `../` paths within core.
+**Integration point:** Pure UI concern. Consumes `PopulationFrequency[]` data that is already computed by `useCarrierFrequency`.
 
-| Source (current) | Destination (monorepo) | Import path changes |
-|-----------------|----------------------|-------------------|
-| `src/types/variant.ts` | `packages/core/src/types/variant.ts` | None (no internal imports) |
-| `src/types/frequency.ts` | `packages/core/src/types/frequency.ts` | `@/config` → `../config` |
-| `src/types/filter.ts` | `packages/core/src/types/filter.ts` | None |
-| `src/types/text.ts` | `packages/core/src/types/text.ts` | None |
-| `src/types/exclusion.ts` | `packages/core/src/types/exclusion.ts` | None |
-| `src/types/history.ts` | `packages/core/src/types/history.ts` | None |
-| `src/config/types.ts` | `packages/core/src/config/types.ts` | None |
-| `src/config/gnomad.json` | `packages/core/src/config/gnomad.json` | None |
-| `src/config/settings.json` | `packages/core/src/config/settings.json` | None |
-| `src/config/index.ts` | `packages/core/src/config/index.ts` | Relative JSON imports |
-| `src/config/exclusion-reasons.ts` | `packages/core/src/config/exclusion-reasons.ts` | None |
-| `src/config/templates/de.json` | `packages/core/src/config/templates/de.json` | None |
-| `src/config/templates/en.json` | `packages/core/src/config/templates/en.json` | None |
-| `src/utils/variant-filters.ts` | `packages/core/src/filters/variant-filters.ts` | `@/types` → `../types`, `@/api/queries` → `../api/queries` |
-| `src/utils/frequency-calc.ts` | `packages/core/src/calculations/frequency-calc.ts` | `@/config` → `../config`, `@/types` → `../types` |
-| `src/utils/template-renderer.ts` | `packages/core/src/text/template-renderer.ts` | `@/types` → `../types` |
-| `src/utils/template-parser.ts` | `packages/core/src/text/template-parser.ts` | `@/config/template-variables` → `../config/template-variables` |
-| `src/api/queries/types.ts` | `packages/core/src/api/queries/types.ts` | None |
-| `src/api/queries/gene-search.ts` | `packages/core/src/api/queries/gene-search.ts` | None |
-| `src/api/queries/gene-variants.ts` | `packages/core/src/api/queries/gene-variants.ts` | None |
-| `src/api/queries/clinvar-submissions.ts` | `packages/core/src/api/queries/clinvar-submissions.ts` | None |
+**Where new code goes:**
 
-### Phase 2: Create new files
+| Layer | File | Change |
+|-------|------|--------|
+| web/components | NEW `PopulationChart.vue` | Bar chart component |
+| web/components | `StepResults.vue` | Include chart above or below population table |
+| web (package.json) | `package.json` | Add chart library dependency (if using one) |
 
-| File | Content |
-|------|---------|
-| `packages/core/src/api/gnomad-fetch.ts` | Plain `fetch` implementation (see Pattern 3 above) |
-| `packages/core/src/index.ts` | Barrel: explicit re-exports of all public API |
-| `packages/core/package.json` | Package manifest with exports map |
-| `packages/core/tsconfig.json` | TypeScript config for library build |
-| `packages/cli/src/index.ts` | CLI entry point |
-| `packages/cli/package.json` | CLI package manifest |
+**No core changes needed.** The chart consumes existing `PopulationFrequency[]` data from `useCarrierFrequency.populations`.
 
-### Phase 3: Update apps/web (mechanical import path updates)
+**Library options:**
 
-| File | Change |
-|------|--------|
-| `apps/web/src/utils/*.ts` | Replace content with `export * from '@gnomad-cf/core'` |
-| `apps/web/src/types/index.ts` | Replace with `export * from '@gnomad-cf/core'` |
-| `apps/web/src/config/index.ts` | Replace with `export * from '@gnomad-cf/core'` |
-| `apps/web/src/composables/useCarrierFrequency.ts` | Update: `@/utils/variant-filters` → `@gnomad-cf/core` |
-| `apps/web/src/composables/useCarrierFrequency.ts` | Update: `@/utils/frequency-calc` → `@gnomad-cf/core` |
-| `apps/web/src/composables/useClinvarSubmissions.ts` | Update: `@/api/queries` → `@gnomad-cf/core` |
-| `apps/web/vite.config.ts` | Add `@gnomad-cf/core` alias for dev mode |
-| `apps/web/package.json` | Add `"@gnomad-cf/core": "workspace:*"` dependency |
+| Library | Size | Vuetify Integration | Recommendation |
+|---------|------|---------------------|----------------|
+| Chart.js + vue-chartjs | ~65KB | Manual theming | Good for simple charts |
+| Lightweight-charts (TradingView) | ~45KB | None | Overkill -- finance-oriented |
+| D3.js | ~90KB | None | Overkill for bar charts |
+| Native SVG / CSS | 0KB | Perfect Vuetify theming | Best for this use case |
 
-### Phase 4: Root workspace setup
+**Recommendation: Native SVG or CSS bars.** The chart is a simple horizontal bar chart with ~8-10 bars (one per population). There is no interactivity beyond tooltips. Using native SVG with Vuetify theme colors avoids a dependency and integrates perfectly with dark/light mode theming.
 
-| File | Change |
-|------|--------|
-| `package.json` (root) | Add `"workspaces": ["packages/*", "apps/*"]` |
-| `.github/workflows/deploy.yml` | Update paths as shown above |
+**Implementation sketch:**
+
+```vue
+<!-- apps/web/src/components/PopulationChart.vue -->
+<template>
+  <div class="population-chart">
+    <div v-for="pop in sortedPopulations" :key="pop.code" class="chart-row">
+      <span class="chart-label">{{ pop.label }}</span>
+      <div class="chart-bar-container">
+        <div
+          class="chart-bar"
+          :style="{ width: barWidth(pop.carrierFrequency) }"
+          :class="{ 'founder-effect': pop.isFounderEffect }"
+        />
+      </div>
+      <span class="chart-value">{{ formatFrequency(pop.carrierFrequency) }}</span>
+    </div>
+  </div>
+</template>
+```
+
+**Data flow:**
+
+```
+useCarrierFrequency.populations (Ref<PopulationFrequency[]>)
+  -> passed as prop to PopulationChart.vue
+  -> rendered as CSS/SVG bars
+```
 
 ---
 
-## Suggested Build Order for Implementation
+## Dependency Graph: Build Order
 
-This ordering respects the dependency graph and minimizes risk:
+Features have dependencies on each other. This is the safe build order:
 
-1. **Set up monorepo root** — Add workspace config to root `package.json`, verify bun workspaces resolves correctly. No code changes yet.
+```
+                    Independent (no feature deps)
+                    /          |           \
+            Display Formats  TSV Export  Bar Chart
+                 (#10)         (#9)        (#2)
+                    \          |
+                     v         v
+              Quality Flags  Source Breakdown
+                   (#12)        (#11)
+                                 |
+                                 v
+                         Subcontinental Pops    Orphanet
+                              (#5)               (#6)
+```
 
-2. **Create packages/core skeleton** — Empty package with `package.json`, `tsconfig.json`, `src/index.ts`. Verify it compiles.
+**Recommended implementation order:**
 
-3. **Move types first** — `src/types/*.ts` to `packages/core/src/types/`. No internal imports to fix. This is zero-risk.
+1. **Display Formats (#10)** -- Foundation. Other features display frequencies.
+   - No deps on other features
+   - Small scope: 1 core function + 1 store field + UI toggle
+   - Enables all subsequent features to use the new format system
 
-4. **Move config second** — `src/config/` to `packages/core/src/config/`. Depends on types. Fix relative import paths.
+2. **TSV Export (#9)** -- Low risk, independent
+   - No deps on other features
+   - Extends existing export system
+   - Pure web-layer change
 
-5. **Move pure utils third** — `variant-filters.ts`, `frequency-calc.ts`, `template-renderer.ts`, `template-parser.ts`. Depends on types and config. Fix import paths.
+3. **Bar Chart (#2)** -- Independent UI
+   - No deps on other features
+   - Consumes existing PopulationFrequency[] data
+   - Pure web-layer component
 
-6. **Move API queries fourth** — `src/api/queries/` to core. The query strings and types are already pure.
+4. **Quality Flags (#12)** -- Enriches variant display
+   - No deps on other features (uses existing GnomadVariant data)
+   - Extends DisplayVariant type (affects export, variant table)
 
-7. **Write gnomad-fetch.ts** — New file. Uses Pattern 3 (plain fetch). Model it on the existing `useClinvarSubmissions` fetch logic.
+5. **Source Breakdown (#11)** -- Depends on understanding filter classification
+   - Benefits from quality flags being done (shared understanding of variant categories)
+   - Extends calculation layer
 
-8. **Export from packages/core/src/index.ts** — Explicit barrel exports. Verify TypeScript builds with `tsc`.
+6. **Orphanet Integration (#6)** -- New external dependency
+   - Independent of other features but complex (new API, CORS, caching)
+   - Benefits from display format being done
 
-9. **Update apps/web imports** — Change `@/utils/...`, `@/types/...`, `@/config/...` in composables to `@gnomad-cf/core`. The `@/` alias routes in `apps/web/` still work for web-only files (components, stores, composables).
-
-10. **Update deploy.yml** — Adjust paths to monorepo layout.
-
-11. **Create packages/cli** — After core is stable. CLI is the final consumer, can be built independently.
+7. **Subcontinental Populations (#5)** -- Most complex, broadest impact
+   - Benefits from all other features being stable
+   - Touches config, types, calculations, and UI
+   - Only available for gnomAD v2 (v4 data not yet released)
 
 ---
 
-## Critical Constraints Identified
+## Files Modified vs Created
 
-### Constraint 1: formatters.ts stays in apps/web
+### New Files
 
-`src/utils/formatters.ts` uses `config.settings.frequencyDecimalPlaces` from the config, but is display-only. The web composables use it. The CLI would likely want its own output formatting. Keep `formatters.ts` in `apps/web` unless CLI needs the exact same formatted strings.
+| File | Package | Purpose |
+|------|---------|---------|
+| `core/src/types/quality.ts` | core | QualityFlags interface |
+| `core/src/types/orphanet.ts` | core | Orphanet API response types |
+| `core/src/filters/variant-quality.ts` | core | Quality flag assessment |
+| `core/src/calculations/source-breakdown.ts` | core | Source attribution for carrier frequency |
+| `core/src/client/orphanet-client.ts` | core | Orphadata REST API client |
+| `web/src/composables/useOrphanetData.ts` | web | Reactive Orphanet data fetching + caching |
+| `web/src/components/PopulationChart.vue` | web | Bar chart visualization |
+| `web/src/components/OrphanetCard.vue` | web | Orphanet disease/prevalence display |
 
-### Constraint 2: useExclusionState is Vue-only by design
+### Modified Files
 
-`useExclusionState.ts` uses `reactive` and `computed` from Vue. Its state management role is inherently Vue — it is module-level singleton state that components share through reactivity. The CLI has no need for this because exclusions would be CLI flags (`--exclude 1-12345-A-G`), not interactive toggles.
+| File | Package | What Changes |
+|------|---------|--------------|
+| `core/src/types/index.ts` | core | Re-export new types (quality, orphanet) |
+| `core/src/types/frequency.ts` | core | Add `SourceBreakdown`, optional `subpopulations` field |
+| `core/src/types/display.ts` | core | Add `QualityFlags` field to `DisplayVariant` |
+| `core/src/types/calculations.ts` | core | Add `DisplayFormat` type |
+| `core/src/config/gnomad.json` | core | Add subpopulation arrays for v2 |
+| `core/src/config/types.ts` | core | Add optional `subpopulations` to `PopulationConfig` |
+| `core/src/config/index.ts` | core | Add subpopulation helper functions |
+| `core/src/calculations/formatters.ts` | core | Add `formatFrequencyAs(freq, format)` |
+| `core/src/calculations/index.ts` | core | Export source-breakdown module |
+| `core/src/filters/variant-display.ts` | core | Integrate quality flags into `toDisplayVariant()` |
+| `core/src/filters/index.ts` | core | Export variant-quality module |
+| `core/tsdown.config.ts` | core | Potentially add orphanet entry point |
+| `web/src/stores/useCalcStore.ts` | web | Add `displayFormat` field |
+| `web/src/composables/useCarrierFrequency.ts` | web | Add source breakdown computed |
+| `web/src/utils/export-utils.ts` | web | Add TSV builder + export quality flags + source breakdown |
+| `web/src/composables/useExport.ts` | web | Add `exportToTsv()` method |
+| `web/src/components/wizard/StepResults.vue` | web | Add chart, Orphanet card, format toggle, source display |
+| `web/src/components/VariantTable.vue` | web | Render quality flag chips |
+| `web/src/components/VariantModal.vue` | web | Add TSV export option |
+| `web/src/components/FilterPanel.vue` | web | Add display format toggle |
 
-Do not move to core. It stays in `apps/web`.
+### Unchanged Files (notable)
 
-### Constraint 3: template-variables.ts boundary decision
+| File | Why Unchanged |
+|------|---------------|
+| `core/src/filters/variant-filters.ts` | Filter logic unchanged -- quality flags are display-only |
+| `core/src/calculations/frequency-calc.ts` | Main aggregation unchanged -- subpops use separate function |
+| `core/src/queries/gene-variants.ts` | GraphQL query already fetches all population data |
+| `web/src/stores/useFilterStore.ts` | No new filter parameters |
+| `web/src/stores/useTemplateStore.ts` | Template system not affected |
+| `web/src/composables/useGeneVariants.ts` | Variant fetching unchanged |
 
-`src/config/template-variables.ts` (imported by `template-parser.ts`) contains UI-facing metadata (display names for variables shown in the Template Editor UI). If `template-parser.ts` moves to core, `template-variables.ts` must move too. This is fine — it is pure data with no DOM dependency.
+---
 
-### Constraint 4: villus stays in apps/web only
+## Core vs Web Boundary Rules
 
-villus uses Vue's `inject`/`provide` system internally (`useClient()`). It cannot be used outside a Vue component tree. The core package must use plain `fetch` for all HTTP. This is already established by the pattern in `useClinvarSubmissions.ts`.
+For each new piece of code, here is the boundary test:
 
-### Constraint 5: Pinia stores stay in apps/web
+| Code | Core or Web? | Why |
+|------|-------------|-----|
+| `QualityFlags` type | Core | Platform-neutral interface |
+| `assessVariantQuality()` | Core | Pure function, no DOM/Vue |
+| `SourceBreakdown` type | Core | Platform-neutral interface |
+| `calculateSourceBreakdown()` | Core | Pure math function |
+| `DisplayFormat` type | Core | Shared enum for CLI too |
+| `formatFrequencyAs()` | Core | Pure formatter, CLI uses it |
+| Orphanet types | Core | Platform-neutral interfaces |
+| Orphanet fetch client | Core | Uses native fetch (no villus) |
+| `buildTsvContent()` | Web | TSV is a download format, uses ExportData from core |
+| `exportToTsv()` | Web | Triggers DOM download |
+| `PopulationChart.vue` | Web | Vue component |
+| `OrphanetCard.vue` | Web | Vue component |
+| `useOrphanetData` composable | Web | Vue reactivity + caching |
+| `displayFormat` store field | Web | Pinia persistence |
+| Subpopulation config data | Core | JSON config, shared |
 
-`useTemplateStore` uses `defineStore` (Pinia) and `localStorage`. These are web-only. The CLI would accept language/gender style as CLI flags. No store migration needed.
+---
 
-### Constraint 6: JSON import resolution
+## Architecture Patterns to Follow
 
-`packages/core/tsconfig.json` must set `"resolveJsonModule": true`. The config relies on `import gnomadConfig from './gnomad.json'` — this is a direct TypeScript JSON module import, which works in both `tsc` (library) and Vite (web app). For bun CLI runtime, JSON imports work natively.
+### Pattern 1: Extend, Do Not Replace
+
+Every feature integrates by extending existing types and adding new functions. No existing function signatures change. This protects the tested calculation pipeline.
+
+Example: `DisplayVariant` gets a new optional field `qualityFlags?: QualityFlags`. All existing code that reads `DisplayVariant` continues to work because the field is optional.
+
+### Pattern 2: Separate Computation, Shared Display
+
+Source breakdown and quality flags are computed separately from the main carrier frequency pipeline, then attached to the result for display. They do NOT inject into `aggregatePopulationFrequenciesWithConfig()`.
+
+### Pattern 3: Progressive Enhancement for Subpopulations
+
+Subcontinental data is only available for gnomAD v2. The UI must degrade gracefully:
+- v4: Population table shows top-level groups only (current behavior)
+- v2: Population table shows top-level groups with expandable subpopulation rows
+
+The config drives this: `PopulationConfig.subpopulations` is optional. If absent, no expansion is offered.
+
+### Pattern 4: External API as Optional Enrichment
+
+Orphanet data is supplementary. If the API is down, unreachable, or CORS-blocked, the app must work exactly as it does today. The Orphanet card shows "loading", "error", or "no data" states without affecting the core calculation workflow.
+
+---
+
+## Anti-Patterns to Avoid
+
+### Anti-Pattern 1: Modifying the Aggregation Function for Source Breakdown
+
+Do NOT add source tracking inside `aggregatePopulationFrequenciesWithConfig()`. That function is complex (200+ lines), well-tested, and handles three formula paths (simplified, HWE, VCR/GCR). Adding source tracking would complicate every path.
+
+Instead: Run a separate `calculateSourceBreakdown()` function on the same input variants. It is a parallel computation, not a modification.
+
+### Anti-Pattern 2: Adding Chart Library for a Simple Bar Chart
+
+Do NOT add Chart.js, D3, or similar for ~8 horizontal bars. The overhead (bundle size, theming integration, resize handling) is not justified. Use native CSS/SVG bars that naturally inherit Vuetify theme variables.
+
+### Anti-Pattern 3: Putting Orphanet Client in Web
+
+Do NOT put the Orphanet fetch client in `apps/web`. The CLI will also want disease context. Follow the established pattern: fetch client in `core/client/`, reactive wrapper in `web/composables/`.
+
+### Anti-Pattern 4: Blocking on gnomAD v4 Subpopulations
+
+Do NOT defer subcontinental population work waiting for gnomAD v4 sub-ancestry release. Implement for v2 now. When v4 adds subpopulations, the same config+code structure will work -- just add entries to `gnomad.json` for v4.
+
+---
+
+## Scalability Considerations
+
+| Concern | Current (8 pops) | With Subpopulations (~25 pops) | Mitigation |
+|---------|-------------------|-------------------------------|------------|
+| Table rows | 9 (global + 8) | ~30 (if all expanded) | Collapsible rows, expand on click |
+| Aggregation time | <1ms | <3ms | Negligible -- math is simple |
+| API response size | ~200KB for CFTR | Same (subpop data already returned) | No change |
+| Export file size | ~50KB JSON | ~80KB with subpops | Still small |
+| Orphanet API calls | 0 | 1-3 per gene (cached 30 days) | Caching prevents repeat calls |
+
+---
+
+## Open Questions / Research Flags
+
+1. **Orphanet CORS**: Does `api.orphadata.com` return `Access-Control-Allow-Origin: *`? Must be verified before implementation. If not, need a proxy or pre-fetched data approach.
+
+2. **gnomAD v4 subpopulation timeline**: When will gnomAD v4.x release sub-ancestry groups? This determines whether the v2-only approach is temporary or long-lived.
+
+3. **Quality flag thresholds**: What AN threshold constitutes "low coverage"? What defines "population-specific"? These need clinical domain expert input, not just engineering decisions. Config-driven thresholds recommended.
+
+4. **Source breakdown overlap**: How to handle a variant that is both LoF HC AND ClinVar P/LP? Priority-based classification (LoF HC wins) is the recommendation, but this is a domain decision that should be validated.
 
 ---
 
 ## Sources
 
-All findings are from direct source code analysis. No external sources needed — confidence is HIGH because the entire codebase was read before drawing conclusions.
+All architectural findings derived from direct source code analysis of the following files:
 
-| File Analyzed | Key Finding |
-|--------------|-------------|
-| `src/composables/useCarrierFrequency.ts` | Vue coupling is only `ref`, `computed`, `watch` wrappers — all math delegates to utils |
-| `src/composables/useGeneVariants.ts` | villus `useQuery` is the only framework coupling — query strings are pure |
-| `src/composables/useClinvarSubmissions.ts` | Already uses native `fetch` — zero villus dependency, already the CLI pattern |
-| `src/utils/variant-filters.ts` | Zero Vue imports — pure TypeScript functions |
-| `src/utils/frequency-calc.ts` | Zero Vue imports — pure TypeScript functions |
-| `src/utils/template-renderer.ts` | Zero Vue imports — single regex replace |
-| `src/config/index.ts` | Zero Vue imports — JSON loaders and typed helpers |
-| `src/types/` | Zero framework imports in any type file (except `frequency.ts` imports `GnomadVersion` from config) |
-| `src/api/queries/clinvar-submissions.ts` | Zero framework imports — pure query builders and calculators |
-| `.github/workflows/deploy.yml` | Uploads `./dist` — changes to `./apps/web/dist` in monorepo |
+| File | Key Insight |
+|------|-------------|
+| `packages/core/src/types/variant.ts` | GnomadVariant shape -- has per-population ac/an/ac_hom arrays |
+| `packages/core/src/types/frequency.ts` | PopulationFrequency and CarrierFrequencyResult structure |
+| `packages/core/src/types/display.ts` | DisplayVariant -- extension point for quality flags |
+| `packages/core/src/types/export.ts` | ExportData -- TSV can reuse this structure directly |
+| `packages/core/src/filters/variant-filters.ts` | Classification functions available for source breakdown |
+| `packages/core/src/filters/variant-display.ts` | toDisplayVariant() -- integration point for quality flags |
+| `packages/core/src/calculations/frequency-calc.ts` | Aggregation function -- should NOT be modified |
+| `packages/core/src/calculations/formatters.ts` | Existing formatters -- extension point for display formats |
+| `packages/core/src/config/gnomad.json` | Population config structure -- extension point for subpops |
+| `packages/core/src/config/types.ts` | PopulationConfig -- needs optional subpopulations field |
+| `packages/core/tsdown.config.ts` | Entry points -- may need orphanet addition |
+| `apps/web/src/composables/useCarrierFrequency.ts` | Singleton orchestrator -- add source breakdown computed |
+| `apps/web/src/components/wizard/StepResults.vue` | Primary results display -- multiple integration points |
+| `apps/web/src/components/VariantTable.vue` | Variant display -- quality flags rendering |
+| `apps/web/src/utils/export-utils.ts` | Export builder -- TSV extension point |
+| `apps/web/src/stores/useCalcStore.ts` | Calc preferences -- add displayFormat |
+| `packages/core/src/queries/gene-variants.ts` | GraphQL query already fetches all population data |
+
+External sources:
+- [gnomAD v4.0 release announcement](https://gnomad.broadinstitute.org/news/2023-11-gnomad-v4-0/) - Confirmed subcontinental pops not in v4
+- [gnomAD ancestry documentation](https://gnomad.broadinstitute.org/help/ancestry) - Population structure reference
+- [Orphadata API GitHub](https://github.com/Orphanet/API_Orphadata) - API architecture and endpoints
+- [Orphadata API](https://api.orphadata.com/) - Verified endpoint paths for gene-disease and prevalence queries
