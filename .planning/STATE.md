@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 34 in progress (3/5 plans done)
+**Current focus:** v1.6 Analysis & Export -- Phase 34 in progress (4/5 plans done)
 
 ---
 
@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Milestone:** v1.6 Analysis & Export
 **Phase:** 34 of 37 (Quality Flags & Source Breakdown)
-**Plan:** 3/5 complete (34-04 done; 34-03 wave 3 may still be pending)
+**Plan:** 4/5 complete (34-01, 34-02, 34-03, 34-04 done; 34-05 next)
 **Status:** In progress
-**Last activity:** 2026-02-26 -- Completed 34-04-PLAN.md (VariantTable quality/source columns, StepResults quality wiring)
+**Last activity:** 2026-02-26 -- Completed 34-03 and 34-04 (wave 3 parallel)
 
 ### Progress
 
@@ -28,19 +28,19 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [████░░░░░░]  36% - Phase 33 complete (3/3), Phase 34 in progress (3/5)
+v1.6 Analysis:      [████░░░░░░]  40% - Phase 33 complete (3/3), Phase 34 in progress (4/5)
 ```
 
-**Overall:** 120 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 complete, Phase 34 in progress).
+**Overall:** 121 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 complete, Phase 34 in progress).
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 120
+- Total plans completed: 121
 - v1.5 plans completed: 26
-- v1.6 plans completed: 6
+- v1.6 plans completed: 7
 
 ---
 
@@ -86,9 +86,15 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - qualityExcludedCount tracked separately from manual excludedCount (Pitfall 4) — UI can show them independently
 - filteredByPathogenicity exposed in UseCarrierFrequencyReturn for source classification in Plan 04
 
+**34-03 decisions:**
+- highAfPercent computed wraps 0-1 stored value in get/set for 0-100% slider display in SettingsDialog Quality tab
+- FilterPanel quality exclusion section uses template v-if on qualityExclusionConfig prop — backwards-compatible, parent opts in
+- v-model directly on qualityStore.defaults — Pinia persist handles localStorage sync (same pattern as filterStore, logStore)
+- updateQualityExclusion typed helper emits full config spread via update:qualityExclusionConfig (mirrors updateFilter pattern)
+
 **34-04 decisions:**
 - VariantTable accesses useCarrierFrequency singleton directly — no prop drilling through VariantModal (VariantModal unchanged)
-- FilterPanel quality props passed via v-bind spread (forward-compat with 34-03 which will add the props interface)
+- FilterPanel quality props passed via v-bind spread (forward-compat with 34-03 which adds the props interface)
 - Local filteredCount removed from StepResults — qualifyingVariantCount from singleton is single source of truth
 - Second-column sticky CSS removed from VariantTable — new quality/source columns shift nth-child indices
 
@@ -109,8 +115,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** 34-04 executed (2/2 tasks). VariantTable now shows quality flags column (warning icon, badge, tooltip) and source category column (ClinVar/pLoF/Both chip) via singleton composable access. StepResults wired with quality exclusion alert, flagged count in summary, and FilterPanel quality props via v-bind spread. StepResults tests updated with useCarrierFrequency mock. All 508 tests passing.
-**Status:** Phase 34 in progress. Plans 34-03 (FilterPanel/SettingsDialog quality UI) and 34-05 (settings integration) remain.
+**Completed:** Wave 3 parallel (34-03 + 34-04). SettingsDialog Quality tab, FilterPanel exclusion toggles, VariantTable quality/source columns, StepResults wiring. All 508 tests passing.
+**Status:** Phase 34 in progress. Plan 34-05 (per-population source frequency breakdown) remains.
 **Resume file:** None
 
 ### Handoff Notes
