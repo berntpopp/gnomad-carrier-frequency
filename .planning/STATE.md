@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 34 in progress (2/5 plans done)
+**Current focus:** v1.6 Analysis & Export -- Phase 34 in progress (3/5 plans done)
 
 ---
 
@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Milestone:** v1.6 Analysis & Export
 **Phase:** 34 of 37 (Quality Flags & Source Breakdown)
-**Plan:** 2/5 complete
+**Plan:** 3/5 complete (34-04 done; 34-03 wave 3 may still be pending)
 **Status:** In progress
-**Last activity:** 2026-02-26 -- Completed 34-02-PLAN.md (useQualityStore, quality exclusions in useCarrierFrequency)
+**Last activity:** 2026-02-26 -- Completed 34-04-PLAN.md (VariantTable quality/source columns, StepResults quality wiring)
 
 ### Progress
 
@@ -28,19 +28,19 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [████░░░░░░]  30% - Phase 33 complete (3/3), Phase 34 in progress (2/5)
+v1.6 Analysis:      [████░░░░░░]  36% - Phase 33 complete (3/3), Phase 34 in progress (3/5)
 ```
 
-**Overall:** 119 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 complete, Phase 34 in progress).
+**Overall:** 120 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 complete, Phase 34 in progress).
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 119
+- Total plans completed: 120
 - v1.5 plans completed: 26
-- v1.6 plans completed: 5
+- v1.6 plans completed: 6
 
 ---
 
@@ -86,6 +86,12 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - qualityExcludedCount tracked separately from manual excludedCount (Pitfall 4) — UI can show them independently
 - filteredByPathogenicity exposed in UseCarrierFrequencyReturn for source classification in Plan 04
 
+**34-04 decisions:**
+- VariantTable accesses useCarrierFrequency singleton directly — no prop drilling through VariantModal (VariantModal unchanged)
+- FilterPanel quality props passed via v-bind spread (forward-compat with 34-03 which will add the props interface)
+- Local filteredCount removed from StepResults — qualifyingVariantCount from singleton is single source of truth
+- Second-column sticky CSS removed from VariantTable — new quality/source columns shift nth-child indices
+
 ### Pending Todos
 
 None.
@@ -103,8 +109,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** 34-02 executed (2/2 tasks). useQualityStore Pinia store with localStorage persistence. Quality exclusion pipeline wired into useCarrierFrequency: filteredByPathogenicity, qualityFlagsMap, qualityExcludedCount, flaggedVariantCount, qualityExclusionConfig (per-analysis local). All 508 tests passing.
-**Status:** Phase 34 in progress. Plan 34-03 (Quality Flags UI) is next.
+**Completed:** 34-04 executed (2/2 tasks). VariantTable now shows quality flags column (warning icon, badge, tooltip) and source category column (ClinVar/pLoF/Both chip) via singleton composable access. StepResults wired with quality exclusion alert, flagged count in summary, and FilterPanel quality props via v-bind spread. StepResults tests updated with useCarrierFrequency mock. All 508 tests passing.
+**Status:** Phase 34 in progress. Plans 34-03 (FilterPanel/SettingsDialog quality UI) and 34-05 (settings integration) remain.
 **Resume file:** None
 
 ### Handoff Notes
