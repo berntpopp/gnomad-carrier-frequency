@@ -65,13 +65,13 @@
 
 ### Population Bar Chart
 
-- [ ] **VIZ-01**: Horizontal bar chart showing carrier frequency per population in results step
-- [ ] **VIZ-02**: Implemented as inline SVG (zero external dependencies)
-- [ ] **VIZ-03**: Global frequency shown as reference line
-- [ ] **VIZ-04**: Founder effect populations visually distinguished (different color or annotation)
-- [ ] **VIZ-05**: Responsive design (horizontal bars work on mobile)
-- [ ] **VIZ-06**: Respects Vuetify theme (dark/light mode colors)
-- [ ] **VIZ-07**: Chart downloadable as SVG for publication use
+- [x] **VIZ-01**: Horizontal bar chart showing carrier frequency per population in results step
+- [x] **VIZ-02**: Implemented as inline SVG (zero external dependencies)
+- [x] **VIZ-03**: Global frequency shown as reference line
+- [x] **VIZ-04**: Founder effect populations visually distinguished (different color or annotation)
+- [x] **VIZ-05**: Responsive design (horizontal bars work on mobile)
+- [x] **VIZ-06**: Respects Vuetify theme (dark/light mode colors)
+- [x] **VIZ-07**: Chart downloadable as SVG for publication use
 
 ## Future Requirements (v1.7+)
 
@@ -146,13 +146,13 @@
 | SUBP-05 | Phase 37 | Pending |
 | SUBP-06 | Phase 37 | Pending |
 | SUBP-07 | Phase 37 | Pending |
-| VIZ-01 | Phase 35 | Pending |
-| VIZ-02 | Phase 35 | Pending |
-| VIZ-03 | Phase 35 | Pending |
-| VIZ-04 | Phase 35 | Pending |
-| VIZ-05 | Phase 35 | Pending |
-| VIZ-06 | Phase 35 | Pending |
-| VIZ-07 | Phase 35 | Pending |
+| VIZ-01 | Phase 35 | Complete |
+| VIZ-02 | Phase 35 | Complete |
+| VIZ-03 | Phase 35 | Complete |
+| VIZ-04 | Phase 35 | Complete |
+| VIZ-05 | Phase 35 | Complete |
+| VIZ-06 | Phase 35 | Complete |
+| VIZ-07 | Phase 35 | Complete |
 
 **Coverage:**
 - v1.6 requirements: 47 total
