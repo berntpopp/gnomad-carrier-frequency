@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 34 complete, Phase 35 next
+**Current focus:** v1.6 Analysis & Export -- Phase 35 in progress (1/3 plans complete)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.6 Analysis & Export
-**Phase:** 35 of 37 (Population Bar Chart) -- next up
-**Plan:** Not started
-**Status:** Phase 34 complete, ready for Phase 35
-**Last activity:** 2026-02-26 -- Phase 34 complete (5/5 plans, verified)
+**Phase:** 35 of 37 (Population Bar Chart) -- in progress
+**Plan:** 1 of 3 complete
+**Status:** Plan 35-01 complete (PopulationBarChart.vue component)
+**Last activity:** 2026-02-26 -- Plan 35-01 complete (PopulationBarChart.vue created)
 
 ### Progress
 
@@ -28,19 +28,19 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [████████░░]  53% - Phase 33 complete (3/3), Phase 34 complete (5/5)
+v1.6 Analysis:      [████████░░]  60% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 (1/3)
 ```
 
-**Overall:** 122 plans complete across 34 phases in 6 milestones. 3 phases remaining for v1.6.
+**Overall:** 123 plans complete across 34 phases in 6 milestones. 2 plans remaining in Phase 35, then Phases 36-37.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 122
+- Total plans completed: 123
 - v1.5 plans completed: 26
-- v1.6 plans completed: 8
+- v1.6 plans completed: 9
 
 ---
 
@@ -86,6 +86,12 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - qualityExcludedCount tracked separately from manual excludedCount (Pitfall 4) — UI can show them independently
 - filteredByPathogenicity exposed in UseCarrierFrequencyReturn for source classification in Plan 04
 
+**35-01 decisions:**
+- HTML div tooltip positioned absolutely over SVG (not Vuetify v-tooltip — limited with SVG child elements)
+- Responsive constants (barHeight, barGap, labelWidth) as computed refs from smAndDown — single reactive source
+- Touch tooltip auto-dismiss: 3-second setTimeout (simpler than document-level tap detection)
+- BAR_AREA computed from labelWidth — mobile labelWidth smaller means more bar area proportionally
+
 **34-03 decisions:**
 - highAfPercent computed wraps 0-1 stored value in get/set for 0-100% slider display in SettingsDialog Quality tab
 - FilterPanel quality exclusion section uses template v-if on qualityExclusionConfig prop — backwards-compatible, parent opts in
@@ -124,8 +130,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** Phase 34 complete — all 5 plans executed, verified (5/5 must-haves). Fixed source breakdown bug (was using pre-exclusion variants). 508 unit tests + 7 e2e tests passing.
-**Status:** Phase 34 complete. Ready for Phase 35.
+**Completed:** Plan 35-01 — PopulationBarChart.vue component (2 tasks). Fixed pre-existing filteredByPathogenicity unused var lint error in StepResults.vue.
+**Status:** Phase 35 in progress. Plan 35-01 complete. Plans 35-02 (StepResults integration) and 35-03 (SVG/PNG export) remaining.
 **Resume file:** None
 
 ### Handoff Notes
