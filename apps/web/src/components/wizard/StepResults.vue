@@ -652,6 +652,7 @@ const {
   flaggedVariantCount,
   qualifyingVariantCount,
   filteredByPathogenicity,
+  qualifyingVariants,
 } = useCarrierFrequency();
 
 // Quality props forwarded to FilterPanel via v-bind spread
@@ -687,7 +688,7 @@ const sourceBreakdownCache = computed(() => {
     cache.set(
       popCode,
       computeSourceBreakdown(
-        filteredByPathogenicity.value,
+        qualifyingVariants.value,
         props.clinvarVariants,
         props.filterConfig,
         popCode,

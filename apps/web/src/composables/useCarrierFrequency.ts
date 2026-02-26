@@ -97,6 +97,10 @@ export interface UseCarrierFrequencyReturn {
   // Needed by downstream components for source classification
   filteredByPathogenicity: Ref<GnomadVariant[]>;
 
+  // Qualifying variants (after manual + quality exclusions)
+  // Used by source breakdown to match parent population frequencies
+  qualifyingVariants: Ref<GnomadVariant[]>;
+
   // Recurrence risk
   calculateRisk: (status: IndexPatientStatus) => {
     risk: number;
@@ -616,6 +620,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     qualityExcludedCount,
     flaggedVariantCount,
     filteredByPathogenicity,
+    qualifyingVariants: pathogenicVariants,
     calculateRisk,
     refetch,
   };
