@@ -928,7 +928,7 @@ function resetFilters() {
 }
 
 // Chart tab state
-const populationTab = ref<"chart" | "table">("chart");
+const populationTab = ref<"chart" | "table">("table");
 const chartRef = ref<InstanceType<typeof PopulationBarChart> | null>(null);
 const { downloadSvg, downloadPng } = useChartExport();
 
