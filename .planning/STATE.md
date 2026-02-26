@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 35 in progress (1/3 plans complete)
+**Current focus:** v1.6 Analysis & Export -- Phase 35 in progress (2/3 plans complete)
 
 ---
 
@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Milestone:** v1.6 Analysis & Export
 **Phase:** 35 of 37 (Population Bar Chart) -- in progress
-**Plan:** 1 of 3 complete
-**Status:** Plan 35-01 complete (PopulationBarChart.vue component)
-**Last activity:** 2026-02-26 -- Plan 35-01 complete (PopulationBarChart.vue created)
+**Plan:** 2 of 3 complete
+**Status:** Plan 35-02 complete (StepResults tabbed integration + useChartExport)
+**Last activity:** 2026-02-26 -- Plan 35-02 complete (tabbed Chart|Table view, SVG/PNG export)
 
 ### Progress
 
@@ -28,19 +28,19 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [████████░░]  60% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 (1/3)
+v1.6 Analysis:      [████████░░]  66% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 (2/3)
 ```
 
-**Overall:** 123 plans complete across 34 phases in 6 milestones. 2 plans remaining in Phase 35, then Phases 36-37.
+**Overall:** 124 plans complete across 34 phases in 6 milestones. 1 plan remaining in Phase 35, then Phases 36-37.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 123
+- Total plans completed: 124
 - v1.5 plans completed: 26
-- v1.6 plans completed: 9
+- v1.6 plans completed: 10
 
 ---
 
@@ -92,6 +92,14 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - Touch tooltip auto-dismiss: 3-second setTimeout (simpler than document-level tap detection)
 - BAR_AREA computed from labelWidth — mobile labelWidth smaller means more bar area proportionally
 
+**35-02 decisions:**
+- Optional chaining on touches[0]?.clientX — touch array may be empty on touchend (pre-existing bug in PopulationBarChart)
+- v-tabs + v-window (not v-tabs-window) — plan explicitly prohibits v-tabs-window (known Vuetify issues)
+- result?.populations ?? [] null guard — TS type is CarrierFrequencyResult|null; v-if on tableItems.length doesn't narrow TS type
+- Clone SVG before mutation (never touch live DOM) — applyPublicationColors + addPublicationMetadata operate on clone
+- img.onload before img.src — prevents PNG rasterization race condition (Pitfall 5)
+- viewBox expanded: 30px top + 20px bottom for title + footer text without clipping
+
 **34-03 decisions:**
 - highAfPercent computed wraps 0-1 stored value in get/set for 0-100% slider display in SettingsDialog Quality tab
 - FilterPanel quality exclusion section uses template v-if on qualityExclusionConfig prop — backwards-compatible, parent opts in
@@ -130,8 +138,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** Plan 35-01 — PopulationBarChart.vue component (2 tasks). Fixed pre-existing filteredByPathogenicity unused var lint error in StepResults.vue.
-**Status:** Phase 35 in progress. Plan 35-01 complete. Plans 35-02 (StepResults integration) and 35-03 (SVG/PNG export) remaining.
+**Completed:** Plan 35-02 — StepResults tabbed Chart|Table view + useChartExport composable (2 tasks). Fixed pre-existing build errors in PopulationBarChart.vue and SettingsDialog.vue.
+**Status:** Phase 35 in progress. Plans 35-01 and 35-02 complete. Plan 35-03 remaining (note: chart export already integrated in 35-02, scope of 35-03 may be reduced).
 **Resume file:** None
 
 ### Handoff Notes
