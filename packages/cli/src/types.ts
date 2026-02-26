@@ -8,6 +8,11 @@ export interface VariantDetail {
   alleleFrequency: number;
   clinvarSignificance: string | null;
   ac_hom: number;
+  // Phase 33 additions for TSV column compatibility with web export spec
+  hgvsC?: string | null;
+  hgvsP?: string | null;
+  sourceCategory?: string | null; // Phase 34 will populate
+  qualityFlags?: string | null; // Phase 34 will populate
 }
 
 export interface QueryResult {
