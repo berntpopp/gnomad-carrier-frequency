@@ -27,7 +27,7 @@
 ### Display Formats
 
 - [ ] **FMT-01**: Display format selector with 4 options: Percentage, Ratio (1:N), Scientific notation, Per 100,000
-- [ ] **FMT-02**: Scientific notation displayed as Unicode superscript (e.g., 4.31 × 10⁻²)
+- [ ] **FMT-02**: Scientific notation displayed as Unicode superscript (e.g., 4.31 x 10^-2)
 - [ ] **FMT-03**: Per-100,000 format displayed as "X / 100,000" (e.g., 4,310 / 100,000)
 - [ ] **FMT-04**: Selected format applied to population table, summary card, and export output
 - [ ] **FMT-05**: Format preference persisted in Pinia store (not CalcConfig)
@@ -40,7 +40,7 @@
 - [ ] **EXP-02**: Population summary TSV with columns: Population, Carrier Frequency, Ratio, Recurrence Risk, AC, AN, Notes
 - [ ] **EXP-03**: Variant detail TSV with columns: Variant ID, Consequence, AF, Carrier Frequency, ClinVar Significance, Stars, HGVS-c, HGVS-p, Source Category, Quality Flags
 - [ ] **EXP-04**: UTF-8 BOM prefix for Excel compatibility on Windows with German characters
-- [ ] **EXP-05**: TSV output available in CLI via `--format tsv` (already exists — verify compatibility with new columns)
+- [ ] **EXP-05**: TSV output available in CLI via `--format tsv` (already exists -- verify compatibility with new columns)
 
 ### Orphanet Prevalence
 
@@ -83,7 +83,7 @@
 - **FEAT-04**: At-risk couple calculation (both partners)
 - **FEAT-05**: Export results to PDF
 - **FEAT-06**: npm registry publishing for @gnomad-cf/core and @gnomad-cf/cli
-- **FEAT-07**: LOFTEE quality flag details (lof_flags, lof_filter from GraphQL — requires query extension)
+- **FEAT-07**: LOFTEE quality flag details (lof_flags, lof_filter from GraphQL -- requires query extension)
 - **FEAT-08**: Bayesian residual risk for negative carrier test
 
 ### Performance
@@ -106,59 +106,59 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| QUAL-01 | — | Pending |
-| QUAL-02 | — | Pending |
-| QUAL-03 | — | Pending |
-| QUAL-04 | — | Pending |
-| QUAL-05 | — | Pending |
-| QUAL-06 | — | Pending |
-| QUAL-07 | — | Pending |
-| QUAL-08 | — | Pending |
-| SRC-01 | — | Pending |
-| SRC-02 | — | Pending |
-| SRC-03 | — | Pending |
-| SRC-04 | — | Pending |
-| SRC-05 | — | Pending |
-| FMT-01 | — | Pending |
-| FMT-02 | — | Pending |
-| FMT-03 | — | Pending |
-| FMT-04 | — | Pending |
-| FMT-05 | — | Pending |
-| FMT-06 | — | Pending |
-| FMT-07 | — | Pending |
-| EXP-01 | — | Pending |
-| EXP-02 | — | Pending |
-| EXP-03 | — | Pending |
-| EXP-04 | — | Pending |
-| EXP-05 | — | Pending |
-| ORPH-01 | — | Pending |
-| ORPH-02 | — | Pending |
-| ORPH-03 | — | Pending |
-| ORPH-04 | — | Pending |
-| ORPH-05 | — | Pending |
-| ORPH-06 | — | Pending |
-| ORPH-07 | — | Pending |
-| ORPH-08 | — | Pending |
-| SUBP-01 | — | Pending |
-| SUBP-02 | — | Pending |
-| SUBP-03 | — | Pending |
-| SUBP-04 | — | Pending |
-| SUBP-05 | — | Pending |
-| SUBP-06 | — | Pending |
-| SUBP-07 | — | Pending |
-| VIZ-01 | — | Pending |
-| VIZ-02 | — | Pending |
-| VIZ-03 | — | Pending |
-| VIZ-04 | — | Pending |
-| VIZ-05 | — | Pending |
-| VIZ-06 | — | Pending |
-| VIZ-07 | — | Pending |
+| QUAL-01 | Phase 34 | Pending |
+| QUAL-02 | Phase 34 | Pending |
+| QUAL-03 | Phase 34 | Pending |
+| QUAL-04 | Phase 34 | Pending |
+| QUAL-05 | Phase 34 | Pending |
+| QUAL-06 | Phase 34 | Pending |
+| QUAL-07 | Phase 34 | Pending |
+| QUAL-08 | Phase 34 | Pending |
+| SRC-01 | Phase 34 | Pending |
+| SRC-02 | Phase 34 | Pending |
+| SRC-03 | Phase 34 | Pending |
+| SRC-04 | Phase 34 | Pending |
+| SRC-05 | Phase 34 | Pending |
+| FMT-01 | Phase 33 | Pending |
+| FMT-02 | Phase 33 | Pending |
+| FMT-03 | Phase 33 | Pending |
+| FMT-04 | Phase 33 | Pending |
+| FMT-05 | Phase 33 | Pending |
+| FMT-06 | Phase 33 | Pending |
+| FMT-07 | Phase 33 | Pending |
+| EXP-01 | Phase 33 | Pending |
+| EXP-02 | Phase 33 | Pending |
+| EXP-03 | Phase 33 | Pending |
+| EXP-04 | Phase 33 | Pending |
+| EXP-05 | Phase 33 | Pending |
+| ORPH-01 | Phase 36 | Pending |
+| ORPH-02 | Phase 36 | Pending |
+| ORPH-03 | Phase 36 | Pending |
+| ORPH-04 | Phase 36 | Pending |
+| ORPH-05 | Phase 36 | Pending |
+| ORPH-06 | Phase 36 | Pending |
+| ORPH-07 | Phase 36 | Pending |
+| ORPH-08 | Phase 36 | Pending |
+| SUBP-01 | Phase 37 | Pending |
+| SUBP-02 | Phase 37 | Pending |
+| SUBP-03 | Phase 37 | Pending |
+| SUBP-04 | Phase 37 | Pending |
+| SUBP-05 | Phase 37 | Pending |
+| SUBP-06 | Phase 37 | Pending |
+| SUBP-07 | Phase 37 | Pending |
+| VIZ-01 | Phase 35 | Pending |
+| VIZ-02 | Phase 35 | Pending |
+| VIZ-03 | Phase 35 | Pending |
+| VIZ-04 | Phase 35 | Pending |
+| VIZ-05 | Phase 35 | Pending |
+| VIZ-06 | Phase 35 | Pending |
+| VIZ-07 | Phase 35 | Pending |
 
 **Coverage:**
-- v1.6 requirements: 46 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 46
+- v1.6 requirements: 47 total
+- Mapped to phases: 47
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-26*
-*Last updated: 2026-02-26 after initial definition*
+*Last updated: 2026-02-26 after roadmap creation (47/47 requirements mapped to Phases 33-37)*
