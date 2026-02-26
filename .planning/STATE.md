@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Milestone:** v1.6 Analysis & Export
 **Phase:** 33 of 37 (Display Formats & TSV Export)
-**Plan:** --
-**Status:** Ready to plan
-**Last activity:** 2026-02-26 -- Roadmap created for v1.6 (5 phases, 47 requirements)
+**Plan:** 01 of 3 complete
+**Status:** In progress
+**Last activity:** 2026-02-26 -- Completed 33-01-PLAN.md (format infrastructure foundation)
 
 ### Progress
 
@@ -28,10 +28,10 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [░░░░░░░░░░]   0% - Phase 33 ready to plan
+v1.6 Analysis:      [░░░░░░░░░░]   7% - Phase 33 in progress (1/3 plans done)
 ```
 
-**Overall:** 114 plans complete across 32 phases in 6 milestones. 5 new phases for v1.6.
+**Overall:** 115 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (1 plan shipped).
 
 ---
 
@@ -52,6 +52,12 @@ See PROJECT.md Key Decisions table for full history.
 
 v1.5 decisions archived. Starting fresh for v1.6.
 
+**33-01 decisions:**
+- DisplayFormat type co-located in formatters.ts, re-exported via calculations barrel
+- safeResetFormat() guard (getActivePinia() check) prevents Pinia errors in test beforeEach hooks
+- Per-100k denominator locale-formatted with toLocaleString(locale) for consistent separators
+- SUPERSCRIPT_MAP explicit entries (Unicode superscript digits not contiguous)
+
 ### Pending Todos
 
 None.
@@ -69,8 +75,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** Created v1.6 roadmap (5 phases, 47 requirements mapped). Updated ROADMAP.md, STATE.md, REQUIREMENTS.md.
-**Status:** Phase 33 ready to plan.
+**Completed:** Executed 33-01-PLAN.md (format infrastructure). Committed 2 tasks + SUMMARY.md.
+**Status:** Phase 33 in progress. Plan 33-02 (format selector UI + TSV export) is next.
 **Resume file:** None
 
 ### Handoff Notes
