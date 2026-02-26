@@ -395,15 +395,18 @@
             >
               <td>
                 <div class="d-flex align-center">
-                  {{ item.label }}
-                  <v-icon
+                  <!-- Expand/collapse chevron for source breakdown (non-global rows only) -->
+                  <v-btn
                     v-if="!item.isGlobal"
-                    class="ml-1 population-chevron"
+                    :icon="isPopExpanded(item.code) ? 'mdi-chevron-down' : 'mdi-chevron-right'"
+                    variant="plain"
+                    density="compact"
                     size="x-small"
-                    color="grey"
-                  >
-                    mdi-chevron-right
-                  </v-icon>
+                    class="population-expand-btn mr-1"
+                    :aria-label="isPopExpanded(item.code) ? 'Collapse source breakdown' : 'Expand source breakdown'"
+                    @click="togglePopExpand(item.code, $event)"
+                  />
+                  <span class="population-label">{{ item.label }}</span>
                 </div>
               </td>
               <td class="text-right">
@@ -431,6 +434,42 @@
                 </v-chip>
               </td>
             </tr>
+            <!-- Source breakdown expansion rows (rendered inline after population row) -->
+            <template v-if="!item.isGlobal && isPopExpanded(item.code)">
+              <tr
+                v-for="srcRow in getSourceBreakdown(item.code)"
+                :key="`${item.code}-${srcRow.sourceCategory}`"
+                class="source-breakdown-row"
+              >
+                <td>
+                  <div class="d-flex align-center pl-6">
+                    <v-chip
+                      :color="sourceCategoryColor(srcRow.sourceCategory)"
+                      size="x-small"
+                      class="mr-2"
+                    >
+                      {{ srcRow.label }}
+                    </v-chip>
+                    <span class="text-caption text-medium-emphasis">
+                      {{ srcRow.variantCount }} variant{{ srcRow.variantCount === 1 ? '' : 's' }}
+                    </span>
+                  </div>
+                </td>
+                <td class="text-right">
+                  {{ formatSourceFrequency(srcRow.carrierFrequency) }}
+                </td>
+                <td class="text-right">
+                  {{ formatRatioDisplay(srcRow.carrierFrequency) }}
+                </td>
+                <td class="text-right">-</td>
+                <td class="text-right">-</td>
+                <td class="text-right">{{ srcRow.alleleCount }}</td>
+                <td class="text-right">
+                  {{ srcRow.alleleNumber > 0 ? srcRow.alleleNumber.toLocaleString() : "-" }}
+                </td>
+                <td v-if="hasNotes" />
+              </tr>
+            </template>
           </template>
 
           <template #bottom />
@@ -484,7 +523,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useClipboard } from "@vueuse/core";
 import { useDisplay } from "vuetify";
 import {
@@ -495,8 +534,9 @@ import {
 import {
   frequencyToPercent,
   frequencyToRatio,
+  computeSourceBreakdown,
 } from "@gnomad-cf/core/calculations";
-import type { DisplayFormat } from "@gnomad-cf/core/calculations";
+import type { DisplayFormat, SourceBreakdownRow } from "@gnomad-cf/core/calculations";
 import { useDisplayFormat } from "@/composables/useDisplayFormat";
 
 // Responsive breakpoint detection
@@ -524,6 +564,7 @@ import { filterPathogenicVariantsConfigurable } from "@gnomad-cf/core/filters";
 import {
   toDisplayVariants,
   filterVariantsByPopulation,
+  sourceCategoryColor,
 } from "@gnomad-cf/core/filters";
 import { buildExportData } from "@/utils/export-utils";
 import { formatPrevalence } from "@gnomad-cf/core/calculations";
@@ -603,6 +644,7 @@ const {
   qualityExcludedCount,
   flaggedVariantCount,
   qualifyingVariantCount,
+  filteredByPathogenicity,
 } = useCarrierFrequency();
 
 // Quality props forwarded to FilterPanel via v-bind spread
@@ -612,6 +654,60 @@ const qualityFilterPanelProps = computed(() => ({
   qualityExcludedCount: qualityExcludedCount.value,
   flaggedVariantCount: flaggedVariantCount.value,
 }));
+
+// Expandable population row state — tracks which population rows are expanded
+const expandedPops = ref<Set<string>>(new Set());
+
+function togglePopExpand(popCode: string, event: Event) {
+  event.stopPropagation();
+  const newSet = new Set(expandedPops.value);
+  if (newSet.has(popCode)) {
+    newSet.delete(popCode);
+  } else {
+    newSet.add(popCode);
+  }
+  expandedPops.value = newSet;
+}
+
+function isPopExpanded(popCode: string): boolean {
+  return expandedPops.value.has(popCode);
+}
+
+// Lazy source breakdown computation — only computed for expanded populations
+const sourceBreakdownCache = computed(() => {
+  const cache = new Map<string, SourceBreakdownRow[]>();
+  for (const popCode of expandedPops.value) {
+    cache.set(
+      popCode,
+      computeSourceBreakdown(
+        filteredByPathogenicity.value,
+        props.clinvarVariants,
+        props.filterConfig,
+        popCode,
+        calcStore.defaults,
+        props.submissions,
+      ),
+    );
+  }
+  return cache;
+});
+
+function getSourceBreakdown(popCode: string): SourceBreakdownRow[] {
+  return sourceBreakdownCache.value.get(popCode) ?? [];
+}
+
+function formatSourceFrequency(cf: number | null): string {
+  if (cf === null || cf === 0) return "-";
+  return formatFrequency(cf);
+}
+
+// Reset expanded populations when gene result changes
+watch(
+  () => props.result,
+  () => {
+    expandedPops.value = new Set();
+  },
+);
 
 // Computed Set of excluded variant IDs for export
 const excludedSet = computed(() => new Set(excluded.value));
@@ -1067,8 +1163,22 @@ function formatPrevalenceRatio(prevalence: number | null): string {
   background-color: rgb(var(--v-theme-surface-variant)) !important;
 }
 
-.population-row:hover .population-chevron {
+.population-row:hover .population-expand-btn {
   color: rgb(var(--v-theme-primary)) !important;
+}
+
+.source-breakdown-row {
+  background-color: rgba(var(--v-theme-surface-variant), 0.3);
+}
+
+.source-breakdown-row td {
+  font-size: 0.8125rem;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+.source-breakdown-row:hover {
+  background-color: rgba(var(--v-theme-surface-variant), 0.5) !important;
 }
 
 .tooltip-text {
