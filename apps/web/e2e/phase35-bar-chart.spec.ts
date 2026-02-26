@@ -144,7 +144,8 @@ test.describe("Phase 35: Population Bar Chart", () => {
   test("shows SVG download button in chart view", async ({ page }) => {
     await navigateToResults(page);
 
-    // Chart tab is active by default — SVG export button should be visible
+    // Default tab is Table — switch to Chart tab first
+    await page.getByTestId("chart-tab").click();
     await expect(page.getByRole("button", { name: /Download SVG/i })).toBeVisible({
       timeout: 5_000,
     });
@@ -153,21 +154,17 @@ test.describe("Phase 35: Population Bar Chart", () => {
   test("shows PNG download button in chart view", async ({ page }) => {
     await navigateToResults(page);
 
-    // PNG export button should also be visible in chart view
+    // Default tab is Table — switch to Chart tab first
+    await page.getByTestId("chart-tab").click();
     await expect(page.getByRole("button", { name: /Download PNG/i })).toBeVisible({
       timeout: 5_000,
     });
   });
 
-  test("can switch to Table tab and see data table", async ({ page }) => {
+  test("Table tab is default and shows data table", async ({ page }) => {
     await navigateToResults(page);
 
-    // Click the Table tab
-    const tableTab = page.getByTestId("table-tab");
-    await expect(tableTab).toBeVisible({ timeout: 5_000 });
-    await tableTab.click();
-
-    // The population data table should now be visible
+    // Table tab is default — data table should already be visible
     await expect(page.getByTestId("population-table")).toBeVisible({
       timeout: 5_000,
     });
