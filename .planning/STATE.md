@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 34 in progress (4/5 plans done)
+**Current focus:** v1.6 Analysis & Export -- Phase 34 complete, Phase 35 next
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.6 Analysis & Export
-**Phase:** 34 of 37 (Quality Flags & Source Breakdown)
-**Plan:** 4/5 complete (34-01, 34-02, 34-03, 34-04 done; 34-05 next)
-**Status:** In progress
-**Last activity:** 2026-02-26 -- Completed 34-03 and 34-04 (wave 3 parallel)
+**Phase:** 35 of 37 (Population Bar Chart) -- next up
+**Plan:** Not started
+**Status:** Phase 34 complete, ready for Phase 35
+**Last activity:** 2026-02-26 -- Phase 34 complete (5/5 plans, verified)
 
 ### Progress
 
@@ -28,19 +28,19 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [████░░░░░░]  40% - Phase 33 complete (3/3), Phase 34 in progress (4/5)
+v1.6 Analysis:      [████████░░]  53% - Phase 33 complete (3/3), Phase 34 complete (5/5)
 ```
 
-**Overall:** 121 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 complete, Phase 34 in progress).
+**Overall:** 122 plans complete across 34 phases in 6 milestones. 3 phases remaining for v1.6.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 121
+- Total plans completed: 122
 - v1.5 plans completed: 26
-- v1.6 plans completed: 7
+- v1.6 plans completed: 8
 
 ---
 
@@ -124,8 +124,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** UI polish pass — SettingsDialog sidebar nav refactor, TemplateEditor UX rewrite, 8 audit fixes across FilterPanel/StepResults/VariantTable. All 508 tests passing.
-**Status:** Phase 34 in progress. Plan 34-05 checkpoint pending.
+**Completed:** Phase 34 complete — all 5 plans executed, verified (5/5 must-haves). Fixed source breakdown bug (was using pre-exclusion variants). 508 unit tests + 7 e2e tests passing.
+**Status:** Phase 34 complete. Ready for Phase 35.
 **Resume file:** None
 
 ### Handoff Notes

@@ -92,11 +92,11 @@ Plans:
 **Plans:** 5 plans
 
 Plans:
-- [ ] 34-01-PLAN.md -- Core quality types, quality flag functions, source classification, GraphQL query extension
-- [ ] 34-02-PLAN.md -- Quality settings store and carrier frequency composable integration
-- [ ] 34-03-PLAN.md -- SettingsDialog Quality tab and FilterPanel exclusion toggles
-- [ ] 34-04-PLAN.md -- VariantTable quality/source columns, StepResults wiring, summary enhancements
-- [ ] 34-05-PLAN.md -- Per-population source frequency breakdown with expandable rows
+- [x] 34-01-PLAN.md -- Core quality types, quality flag functions, source classification, GraphQL query extension
+- [x] 34-02-PLAN.md -- Quality settings store and carrier frequency composable integration
+- [x] 34-03-PLAN.md -- SettingsDialog Quality tab and FilterPanel exclusion toggles
+- [x] 34-04-PLAN.md -- VariantTable quality/source columns, StepResults wiring, summary enhancements
+- [x] 34-05-PLAN.md -- Per-population source frequency breakdown with expandable rows
 
 ---
 
@@ -162,13 +162,13 @@ Plans:
 | 31. Runtime Gene Config Loading & Submission Modal | v1.5 | 1/1 | Complete | 2026-02-25 |
 | 32. Frequency Accuracy Fixes | v1.5 | 1/1 | Complete | 2026-02-25 |
 | 33. Display Formats & TSV Export | v1.6 | 3/3 | Complete | 2026-02-26 |
-| 34. Quality Flags & Source Breakdown | v1.6 | 0/5 | Not started | - |
+| 34. Quality Flags & Source Breakdown | v1.6 | 5/5 | Complete | 2026-02-26 |
 | 35. Population Bar Chart | v1.6 | 0/TBD | Not started | - |
 | 36. Orphanet Prevalence Integration | v1.6 | 0/TBD | Not started | - |
 | 37. Subcontinental Populations | v1.6 | 0/TBD | Not started | - |
 
-**Total:** 117 plans complete across 33 phases in 6 milestones. 4 phases remaining for v1.6.
+**Total:** 122 plans complete across 34 phases in 6 milestones. 3 phases remaining for v1.6.
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-26 (Phase 34 planned: 5 plans in 4 waves)*
+*Last updated: 2026-02-26 (Phase 34 complete: 5/5 plans, verified)*
