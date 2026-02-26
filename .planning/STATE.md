@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 33 ready to plan
+**Current focus:** v1.6 Analysis & Export -- Phase 33 in progress (Plan 02 complete)
 
 ---
 
@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Milestone:** v1.6 Analysis & Export
 **Phase:** 33 of 37 (Display Formats & TSV Export)
-**Plan:** 01 of 3 complete
+**Plan:** 02 of 3 complete
 **Status:** In progress
-**Last activity:** 2026-02-26 -- Completed 33-01-PLAN.md (format infrastructure foundation)
+**Last activity:** 2026-02-26 -- Completed 33-02-PLAN.md (TSV export functions for web and CLI)
 
 ### Progress
 
@@ -28,10 +28,10 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [░░░░░░░░░░]   7% - Phase 33 in progress (1/3 plans done)
+v1.6 Analysis:      [░░░░░░░░░░]  13% - Phase 33 in progress (2/3 plans done)
 ```
 
-**Overall:** 115 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (1 plan shipped).
+**Overall:** 116 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (2 plans shipped).
 
 ---
 
@@ -58,6 +58,13 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - Per-100k denominator locale-formatted with toLocaleString(locale) for consistent separators
 - SUPERSCRIPT_MAP explicit entries (Unicode superscript digits not contiguous)
 
+**33-02 decisions:**
+- BOM added in composable (download layer), not in pure builder functions
+- Recurrence risk in populations TSV = carrierFrequency / 4 (assumes carrier index status)
+- Carrier frequency per variant = alleleFrequency * 2 (approximate for single variant)
+- Phase 34 columns (Source Category, Quality Flags, Stars) exported as empty strings for schema stability
+- VariantDetail fields use camelCase hgvsC/hgvsP (capital C/P) matching ExportVariant convention
+
 ### Pending Todos
 
 None.
@@ -75,8 +82,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** Executed 33-01-PLAN.md (format infrastructure). Committed 2 tasks + SUMMARY.md.
-**Status:** Phase 33 in progress. Plan 33-02 (format selector UI + TSV export) is next.
+**Completed:** Executed 33-02-PLAN.md (TSV export functions for web + CLI). Committed 2 tasks + docs.
+**Status:** Phase 33 in progress. Plan 33-03 (StepResults UI wiring) is next.
 **Resume file:** None
 
 ### Handoff Notes
