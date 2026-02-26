@@ -1,80 +1,79 @@
-# Requirements: gnomAD Carrier Frequency Calculator v1.5
+# Requirements: gnomAD Carrier Frequency Calculator v1.6
 
-**Defined:** 2026-02-23
+**Defined:** 2026-02-26
 **Core Value:** Accurate recurrence risk calculation from real gnomAD population data, with clinical documentation output that's ready to paste into patient letters.
 
-## v1.5 Requirements
+## v1.6 Requirements
 
-### Monorepo & Core Package
+### Variant Quality Flags
 
-- [ ] **MONO-01**: Repository restructured as bun workspaces monorepo (packages/core, packages/cli, apps/web)
-- [ ] **MONO-02**: Root `package.json` with workspace configuration and shared dev dependencies
-- [ ] **MONO-03**: `@gnomad-cf/core` package with typed barrel export of all calculation, filtering, and template APIs
-- [ ] **MONO-04**: Core package uses tsdown for dual ESM/CJS build output with declaration files
-- [ ] **MONO-05**: TypeScript project references (`tsconfig.json`) across all workspace packages
-- [ ] **MONO-06**: Pure `fetch()`-based gnomAD GraphQL client in core (no villus dependency)
-- [ ] **MONO-07**: All shared types (`Variant`, `GeneInfo`, `PopulationFrequency`, etc.) moved to core
-- [ ] **MONO-08**: All config files (gnomad.json, settings.json, templates) moved to core with typed loaders
-- [ ] **MONO-09**: All pure utility functions (variant-filters, frequency-calc, template-renderer, formatters) moved to core
-- [ ] **MONO-10**: Web app (`apps/web`) imports from `@gnomad-cf/core` instead of local `src/` paths
-- [ ] **MONO-11**: Web app composables remain in `apps/web/src/composables/` as Vue-specific wrappers around core
-- [ ] **MONO-12**: GitHub Actions `deploy.yml` updated for monorepo build (core → web → deploy)
-- [ ] **MONO-13**: Web app continues deploying to same GitHub Pages URL without interruption
+- [ ] **QUAL-01**: Variants with AF >= 5% in any population flagged as "High AF (BA1)" with colored chip in variant table
+- [ ] **QUAL-02**: Variants with unexpectedly high homozygote counts flagged as "High Hom" with chip in variant table
+- [ ] **QUAL-03**: Variants that failed gnomAD quality filters flagged as "gnomAD Filtered" with chip in variant table
+- [ ] **QUAL-04**: Variants present only in genome data (no exome) flagged as "Genomes Only" with chip in variant table
+- [ ] **QUAL-05**: Quality flag thresholds configurable in settings (High AF default: 5%, configurable)
+- [ ] **QUAL-06**: Summary count of flagged variants displayed in results overview
+- [ ] **QUAL-07**: Option to exclude flagged variants from carrier frequency calculation (per flag type)
+- [ ] **QUAL-08**: Tooltip on each flag explaining why it was raised and what the user should consider
 
-### Calculation Improvements
+### ClinVar vs pLoF Source Breakdown
 
-- [ ] **CALC-01**: Hardy-Weinberg 2pq carrier frequency formula (`2pq` where `q = Σ AF` and `p = 1 - q`)
-- [ ] **CALC-02**: Per-variant carrier rate using `VCR = (AC - 2×Hom) / (AN/2)` when homozygote exclusion enabled
-- [ ] **CALC-03**: Gene-level carrier rate via `GCR = 1 - Π(1 - VCRᵢ)` aggregation
-- [ ] **CALC-04**: User-facing toggle in web app to enable/disable homozygote exclusion from carrier count
-- [ ] **CALC-05**: Genetic prevalence calculation as `q²` (disease frequency from allele frequencies)
-- [ ] **CALC-06**: Bayesian prevalence estimate with configurable penetrance parameter
-- [ ] **CALC-07**: Prevalence results displayed in web app results step alongside carrier frequency
-- [ ] **CALC-08**: Both old (simplified) and new (HWE 2pq) formulas available, with HWE as default
-- [ ] **CALC-09**: Golden-value unit tests for all calculations using published reference values (CFTR, HEXA, PKD1)
+- [ ] **SRC-01**: Each variant classified into non-overlapping source category: ClinVar-only, pLoF-only, or Both
+- [ ] **SRC-02**: Source category displayed as badge/tag in variant table
+- [ ] **SRC-03**: Carrier frequency split shown by source: ClinVar-only contribution, pLoF-only contribution, Both contribution
+- [ ] **SRC-04**: Per-population source breakdown available in results
+- [ ] **SRC-05**: Source classification function separate from existing filter pipeline (no modification to shouldIncludeVariantConfigurable)
 
-### CLI
+### Display Formats
 
-- [ ] **CLI-01**: `@gnomad-cf/cli` package with `gnomad-cf` binary entry point
-- [ ] **CLI-02**: Single gene lookup: `gnomad-cf query <gene>` returns carrier frequencies for all populations
-- [ ] **CLI-03**: Batch mode: `gnomad-cf batch <file>` processes gene list from JSON/CSV input
-- [ ] **CLI-04**: Output format flag: `--format json|tsv|text` (default: json)
-- [ ] **CLI-05**: Clinical text output: `--format text` produces German/English clinical documentation
-- [ ] **CLI-06**: Population filter: `--population <id>` to restrict output to specific population
-- [ ] **CLI-07**: Variant filter flags: `--lof`, `--clinvar`, `--star-threshold <n>` matching web app filters
-- [ ] **CLI-08**: Homozygote exclusion flag: `--exclude-homozygotes` (default: on)
-- [ ] **CLI-09**: Output to file: `--output <path>` or stdout by default
-- [ ] **CLI-10**: Interactive mode via `@clack/prompts` when run without arguments
-- [ ] **CLI-11**: Configurable concurrency for batch mode: `--concurrency <n>` (default: 3)
-- [ ] **CLI-12**: `--version` and `--help` with usage examples
-- [ ] **CLI-13**: Gene config support: `--config <gene>` applies community-curated settings for that gene
+- [ ] **FMT-01**: Display format selector with 4 options: Percentage, Ratio (1:N), Scientific notation, Per 100,000
+- [ ] **FMT-02**: Scientific notation displayed as Unicode superscript (e.g., 4.31 × 10⁻²)
+- [ ] **FMT-03**: Per-100,000 format displayed as "X / 100,000" (e.g., 4,310 / 100,000)
+- [ ] **FMT-04**: Selected format applied to population table, summary card, and export output
+- [ ] **FMT-05**: Format preference persisted in Pinia store (not CalcConfig)
+- [ ] **FMT-06**: Locale-aware formatting (German comma decimal, English period decimal)
+- [ ] **FMT-07**: Clinical text templates adapt to selected display format
 
-### Gene Config System
+### TSV Export
 
-- [x] **GENE-01**: JSON per-gene config schema with Zod validation (gene symbol, condition, inheritance, recommended filters, founder variants, notes)
-- [x] **GENE-02**: Gene config loading function in core package (`loadGeneConfig(symbol)`)
-- [x] **GENE-03**: Starter configs for CFTR, HEXA, and GJB2 with recommended filters and founder effect notes
-- [x] **GENE-04**: Gene configs auto-applied in web app when gene is selected (with user override)
-- [x] **GENE-05**: Gene configs applied in CLI via `--config <gene>` flag (stub — prints deferral message, continues with defaults)
-- [x] **GENE-06**: GitHub Actions CI validation workflow for gene config PRs (schema check, lint)
-- [x] **GENE-07**: Contributing guide for community gene config submissions
+- [ ] **EXP-01**: "Download TSV" button alongside existing JSON/Excel export options
+- [ ] **EXP-02**: Population summary TSV with columns: Population, Carrier Frequency, Ratio, Recurrence Risk, AC, AN, Notes
+- [ ] **EXP-03**: Variant detail TSV with columns: Variant ID, Consequence, AF, Carrier Frequency, ClinVar Significance, Stars, HGVS-c, HGVS-p, Source Category, Quality Flags
+- [ ] **EXP-04**: UTF-8 BOM prefix for Excel compatibility on Windows with German characters
+- [ ] **EXP-05**: TSV output available in CLI via `--format tsv` (already exists — verify compatibility with new columns)
 
-### Testing
+### Orphanet Prevalence
 
-- [ ] **TEST-01**: Vitest configured at monorepo root with per-package project configs
-- [ ] **TEST-02**: Core package unit tests for carrier frequency calculation (HWE 2pq, simplified)
-- [ ] **TEST-03**: Core package unit tests for homozygote exclusion (VCR, GCR formulas)
-- [ ] **TEST-04**: Core package unit tests for genetic prevalence (q², Bayesian)
-- [ ] **TEST-05**: Core package unit tests for variant filters (LoF HC, ClinVar pathogenic)
-- [ ] **TEST-06**: Core package unit tests for template renderer (variable substitution, perspective, gender)
-- [x] **TEST-07**: Core package unit tests for gene config loading and validation
-- [ ] **TEST-08**: CLI integration tests (single gene, batch mode, format flags, error handling)
-- [x] **TEST-09**: Web app component tests with Vue Test Utils (wizard steps, settings, results display)
-- [x] **TEST-10**: Playwright E2E tests for critical flows (wizard completion, URL sharing, history restore)
-- [x] **TEST-11**: CI pipeline runs all tests on push/PR with coverage reporting
-- [x] **TEST-12**: Coverage thresholds enforced (core: 90%+, CLI: 80%+, web: 40%+)
+- [ ] **ORPH-01**: Orphanet prevalence data fetched via API for the selected gene (api.orphadata.com)
+- [ ] **ORPH-02**: All associated Orphanet diseases displayed with their prevalence ranges
+- [ ] **ORPH-03**: Prevalence shown as reference card in results step alongside calculated carrier frequency
+- [ ] **ORPH-04**: Link to Orphanet entry for each disease
+- [ ] **ORPH-05**: Orphanet client module in @gnomad-cf/core (platform-neutral, fetch-based)
+- [ ] **ORPH-06**: Response caching (same gene not fetched twice per session)
+- [ ] **ORPH-07**: Graceful degradation when Orphanet API is unavailable (offline PWA, API errors)
+- [ ] **ORPH-08**: Clear disclaimer that Orphanet prevalence reflects reported clinical prevalence, not genetic prevalence
 
-## Future Requirements (v1.6+)
+### Subcontinental Populations
+
+- [ ] **SUBP-01**: Toggle "Show subcontinental populations" in results view (default: off)
+- [ ] **SUBP-02**: Subcontinental data displayed for gnomAD v2.1.1 queries only (NFE: 6 subgroups, EAS: 3 subgroups)
+- [ ] **SUBP-03**: Subgroups nested under parent continental population in frequency table
+- [ ] **SUBP-04**: Founder effect detection and low sample size warnings applied to subpopulations
+- [ ] **SUBP-05**: Subcontinental population definitions added to gnomad.json config
+- [ ] **SUBP-06**: Progress indicator during subcontinental data loading (per-variant queries)
+- [ ] **SUBP-07**: UI clearly indicates subcontinental data is v2.1.1 only (hidden/disabled for v4 queries)
+
+### Population Bar Chart
+
+- [ ] **VIZ-01**: Horizontal bar chart showing carrier frequency per population in results step
+- [ ] **VIZ-02**: Implemented as inline SVG (zero external dependencies)
+- [ ] **VIZ-03**: Global frequency shown as reference line
+- [ ] **VIZ-04**: Founder effect populations visually distinguished (different color or annotation)
+- [ ] **VIZ-05**: Responsive design (horizontal bars work on mobile)
+- [ ] **VIZ-06**: Respects Vuetify theme (dark/light mode colors)
+- [ ] **VIZ-07**: Chart downloadable as SVG for publication use
+
+## Future Requirements (v1.7+)
 
 ### Features
 
@@ -83,7 +82,9 @@
 - **FEAT-03**: Structural variant (SV) support via gnomAD SV API (#8)
 - **FEAT-04**: At-risk couple calculation (both partners)
 - **FEAT-05**: Export results to PDF
-- **FEAT-06**: npm registry publishing for `@gnomad-cf/core` and `@gnomad-cf/cli`
+- **FEAT-06**: npm registry publishing for @gnomad-cf/core and @gnomad-cf/cli
+- **FEAT-07**: LOFTEE quality flag details (lof_flags, lof_filter from GraphQL — requires query extension)
+- **FEAT-08**: Bayesian residual risk for negative carrier test
 
 ### Performance
 
@@ -93,78 +94,71 @@
 
 | Feature | Reason |
 |---------|--------|
-| npm registry publishing | GitHub Pages is primary distribution; publishing deferred to v1.6+ |
-| Structural variant support | Different gnomAD API and data model; deferred to v1.6+ (#8) |
-| SSR / Nuxt migration | Static HTML seed achieves 90% of SSR's SEO benefit |
-| Backend/database | Direct gnomAD GraphQL from browser/CLI |
-| Docker packaging for CLI | Bun binary is sufficient for now |
-| GUI for gene config editing | JSON files + PR workflow is sufficient for v1 |
-| Real-time API caching in CLI | Simple per-session caching sufficient |
+| Chart.js or other chart library | Inline SVG sufficient for ~8 population bars; zero-dependency approach preferred |
+| gnomAD v4 subcontinental populations | v4 API does not include subcontinental data as of Feb 2026 |
+| Orphanet static data bundle | Live API works (CORS confirmed); static fallback only needed for offline |
+| LOFTEE flag details | Requires GraphQL query extension; deferred to v1.7+ |
+| Automatic quality flag exclusion | Users should decide; tool flags but doesn't auto-exclude |
+| npm registry publishing | GitHub Pages is primary distribution |
+| Structural variant support | Different gnomAD API and data model; deferred to v1.7+ (#8) |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MONO-01 | Phase 25 | Complete |
-| MONO-02 | Phase 25 | Complete |
-| MONO-03 | Phase 25 | Complete |
-| MONO-04 | Phase 25 | Complete |
-| MONO-05 | Phase 25 | Complete |
-| MONO-06 | Phase 25 | Complete |
-| MONO-07 | Phase 25 | Complete |
-| MONO-08 | Phase 25 | Complete |
-| MONO-09 | Phase 25 | Complete |
-| MONO-10 | Phase 25 | Complete |
-| MONO-11 | Phase 25 | Complete |
-| MONO-12 | Phase 25 | Complete |
-| MONO-13 | Phase 25 | Complete |
-| CALC-01 | Phase 26 | Complete |
-| CALC-02 | Phase 26 | Complete |
-| CALC-03 | Phase 26 | Complete |
-| CALC-04 | Phase 26 | Complete |
-| CALC-05 | Phase 26 | Complete |
-| CALC-06 | Phase 26 | Complete |
-| CALC-07 | Phase 26 | Complete |
-| CALC-08 | Phase 26 | Complete |
-| CALC-09 | Phase 26 | Complete |
-| CLI-01 | Phase 27 | Complete |
-| CLI-02 | Phase 27 | Complete |
-| CLI-03 | Phase 27 | Complete |
-| CLI-04 | Phase 27 | Complete |
-| CLI-05 | Phase 27 | Complete |
-| CLI-06 | Phase 27 | Complete |
-| CLI-07 | Phase 27 | Complete |
-| CLI-08 | Phase 27 | Complete |
-| CLI-09 | Phase 27 | Complete |
-| CLI-10 | Phase 27 | Complete |
-| CLI-11 | Phase 27 | Complete |
-| CLI-12 | Phase 27 | Complete |
-| CLI-13 | Phase 27 | Complete |
-| GENE-01 | Phase 28 | Complete |
-| GENE-02 | Phase 28 | Complete |
-| GENE-03 | Phase 28 | Complete |
-| GENE-04 | Phase 28 | Complete |
-| GENE-05 | Phase 28 | Complete |
-| GENE-06 | Phase 28 | Complete |
-| GENE-07 | Phase 28 | Complete |
-| TEST-01 | Phase 25 | Complete |
-| TEST-02 | Phase 26 | Complete |
-| TEST-03 | Phase 26 | Complete |
-| TEST-04 | Phase 26 | Complete |
-| TEST-05 | Phase 26 | Complete |
-| TEST-06 | Phase 26 | Complete |
-| TEST-07 | Phase 28 | Complete |
-| TEST-08 | Phase 27 | Complete |
-| TEST-09 | Phase 29 | Complete |
-| TEST-10 | Phase 29 | Complete |
-| TEST-11 | Phase 29 | Complete |
-| TEST-12 | Phase 29 | Complete |
+| QUAL-01 | — | Pending |
+| QUAL-02 | — | Pending |
+| QUAL-03 | — | Pending |
+| QUAL-04 | — | Pending |
+| QUAL-05 | — | Pending |
+| QUAL-06 | — | Pending |
+| QUAL-07 | — | Pending |
+| QUAL-08 | — | Pending |
+| SRC-01 | — | Pending |
+| SRC-02 | — | Pending |
+| SRC-03 | — | Pending |
+| SRC-04 | — | Pending |
+| SRC-05 | — | Pending |
+| FMT-01 | — | Pending |
+| FMT-02 | — | Pending |
+| FMT-03 | — | Pending |
+| FMT-04 | — | Pending |
+| FMT-05 | — | Pending |
+| FMT-06 | — | Pending |
+| FMT-07 | — | Pending |
+| EXP-01 | — | Pending |
+| EXP-02 | — | Pending |
+| EXP-03 | — | Pending |
+| EXP-04 | — | Pending |
+| EXP-05 | — | Pending |
+| ORPH-01 | — | Pending |
+| ORPH-02 | — | Pending |
+| ORPH-03 | — | Pending |
+| ORPH-04 | — | Pending |
+| ORPH-05 | — | Pending |
+| ORPH-06 | — | Pending |
+| ORPH-07 | — | Pending |
+| ORPH-08 | — | Pending |
+| SUBP-01 | — | Pending |
+| SUBP-02 | — | Pending |
+| SUBP-03 | — | Pending |
+| SUBP-04 | — | Pending |
+| SUBP-05 | — | Pending |
+| SUBP-06 | — | Pending |
+| SUBP-07 | — | Pending |
+| VIZ-01 | — | Pending |
+| VIZ-02 | — | Pending |
+| VIZ-03 | — | Pending |
+| VIZ-04 | — | Pending |
+| VIZ-05 | — | Pending |
+| VIZ-06 | — | Pending |
+| VIZ-07 | — | Pending |
 
 **Coverage:**
-- v1.5 requirements: 54 total
-- Mapped to phases: 54
-- Unmapped: 0
+- v1.6 requirements: 46 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 46
 
 ---
-*Requirements defined: 2026-02-23*
-*Last updated: 2026-02-24 (Phase 29 requirements marked Complete: TEST-09, TEST-10, TEST-11, TEST-12)*
+*Requirements defined: 2026-02-26*
+*Last updated: 2026-02-26 after initial definition*
