@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Milestone:** v1.6 Analysis & Export
 **Phase:** 33 of 37 (Display Formats & TSV Export)
-**Plan:** 02 of 3 complete
-**Status:** In progress
-**Last activity:** 2026-02-26 -- Completed 33-02-PLAN.md (TSV export functions for web and CLI)
+**Plan:** 03 of 3 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-26 -- Completed 33-03-PLAN.md (format selector UI + TSV export buttons + settings default format)
 
 ### Progress
 
@@ -28,10 +28,10 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [░░░░░░░░░░]  13% - Phase 33 in progress (2/3 plans done)
+v1.6 Analysis:      [░░░░░░░░░░]  20% - Phase 33 complete (3/3), Phase 34 next
 ```
 
-**Overall:** 116 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (2 plans shipped).
+**Overall:** 117 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 fully shipped).
 
 ---
 
@@ -65,6 +65,14 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - Phase 34 columns (Source Category, Quality Flags, Stars) exported as empty strings for schema stability
 - VariantDetail fields use camelCase hgvsC/hgvsP (capital C/P) matching ExportVariant convention
 
+**33-03 decisions:**
+- Local formatPercent/formatRatio removed from StepResults — useDisplayFormat is single source
+- summaryDetail shows complementary format: ratio active shows percent detail, else shows ratio detail
+- effectiveFrequency used in hero stat computeds (not globalFrequency prop) — consistent with rest of component
+- Default Frequency Format card placed before Data Cache section in Settings General tab
+- v-model directly on formatStore.defaultFormat — Pinia reactive stores trigger localStorage sync automatically
+- Clinical text (TextOutput) untouched — always dual format per locked CONTEXT.md decision
+
 ### Pending Todos
 
 None.
@@ -82,8 +90,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** Executed 33-02-PLAN.md (TSV export functions for web + CLI). Committed 2 tasks + docs.
-**Status:** Phase 33 in progress. Plan 33-03 (StepResults UI wiring) is next.
+**Completed:** Executed 33-03-PLAN.md (format selector UI + TSV export buttons + settings default). Committed 2 tasks + docs. Phase 33 fully complete.
+**Status:** Phase 33 complete. Phase 34 (Quality & Source) is next.
 **Resume file:** None
 
 ### Handoff Notes
