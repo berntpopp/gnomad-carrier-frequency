@@ -1,5 +1,5 @@
 <template>
-  <div class="chart-container" style="position: relative">
+  <div class="chart-container" style="position: relative" data-testid="population-chart">
     <!-- Empty state -->
     <div
       v-if="visiblePops.length === 0"

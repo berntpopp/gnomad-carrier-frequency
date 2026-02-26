@@ -377,11 +377,11 @@
 
       <!-- Chart / Table tabs -->
       <v-tabs v-model="populationTab" density="compact" class="px-4">
-        <v-tab value="chart" size="small">
+        <v-tab value="chart" size="small" data-testid="chart-tab">
           <v-icon start size="small">mdi-chart-bar</v-icon>
           Chart
         </v-tab>
-        <v-tab value="table" size="small">
+        <v-tab value="table" size="small" data-testid="table-tab">
           <v-icon start size="small">mdi-table</v-icon>
           Table
         </v-tab>

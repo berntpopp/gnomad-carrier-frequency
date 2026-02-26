@@ -155,12 +155,15 @@ vi.mock("@vueuse/core", async (importOriginal) => {
   };
 });
 
-// Stub heavy child components — they are tested separately
+// Stub heavy child components — they are tested separately.
+// PopulationBarChart uses useAppTheme → Vuetify useTheme which requires theme injection;
+// stub it to avoid the injection requirement in StepResults unit tests.
 const stubComponents = {
   FilterPanel: { template: '<div data-testid="filter-panel-stub" />' },
   VariantModal: { template: "<div />" },
   TextOutput: { template: '<div data-testid="text-output-stub" />' },
   ClingenWarning: { template: "<div />" },
+  PopulationBarChart: { template: '<div data-testid="population-bar-chart-stub" />' },
 };
 
 // Minimal valid CarrierFrequencyResult for seeding tests
