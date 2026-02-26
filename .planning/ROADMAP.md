@@ -69,7 +69,12 @@
   3. The format preference persists across browser sessions (survives page reload) and clinical text templates adapt to the selected display format
   4. Clicking "Download TSV" produces a UTF-8 TSV file that opens correctly in Excel on Windows with German characters (umlauts, gender-inclusive markers) intact, containing both population summary and variant detail sheets
   5. The CLI `--format tsv` output includes the new source category and quality flag columns alongside existing columns
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 33-01-PLAN.md -- Core formatters, format store, and display format composable
+- [ ] 33-02-PLAN.md -- TSV export functions (web + CLI column expansion)
+- [ ] 33-03-PLAN.md -- Format selector UI, TSV export buttons, settings dialog
 
 ---
 
@@ -149,7 +154,7 @@
 | 30. CLI Integration Fixes | v1.5 | 1/1 | Complete | 2026-02-24 |
 | 31. Runtime Gene Config Loading & Submission Modal | v1.5 | 1/1 | Complete | 2026-02-25 |
 | 32. Frequency Accuracy Fixes | v1.5 | 1/1 | Complete | 2026-02-25 |
-| 33. Display Formats & TSV Export | v1.6 | 0/TBD | Not started | - |
+| 33. Display Formats & TSV Export | v1.6 | 0/3 | Not started | - |
 | 34. Quality Flags & Source Breakdown | v1.6 | 0/TBD | Not started | - |
 | 35. Population Bar Chart | v1.6 | 0/TBD | Not started | - |
 | 36. Orphanet Prevalence Integration | v1.6 | 0/TBD | Not started | - |
@@ -159,4 +164,4 @@
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-26 (v1.6 roadmap: 5 phases, 47 requirements mapped across Phases 33-37)*
+*Last updated: 2026-02-26 (Phase 33 planned: 3 plans in 2 waves)*
