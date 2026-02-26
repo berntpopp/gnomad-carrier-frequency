@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 33 in progress (Plan 02 complete)
+**Current focus:** v1.6 Analysis & Export -- Phase 33 complete, Phase 34 next
 
 ---
 
@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Milestone:** v1.6 Analysis & Export
 **Phase:** 33 of 37 (Display Formats & TSV Export)
-**Plan:** 03 of 3 complete
-**Status:** Phase complete
-**Last activity:** 2026-02-26 -- Completed 33-03-PLAN.md (format selector UI + TSV export buttons + settings default format)
+**Plan:** 3/3 complete
+**Status:** Phase 33 verified and complete
+**Last activity:** 2026-02-26 -- Phase 33 verified (5/5 must-haves passed, Playwright E2E confirmed)
 
 ### Progress
 
@@ -28,7 +28,7 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [░░░░░░░░░░]  20% - Phase 33 complete (3/3), Phase 34 next
+v1.6 Analysis:      [██░░░░░░░░]  20% - Phase 33 complete (3/3), Phase 34 next
 ```
 
 **Overall:** 117 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 fully shipped).
@@ -38,9 +38,9 @@ v1.6 Analysis:      [░░░░░░░░░░]  20% - Phase 33 complete (3
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 114
+- Total plans completed: 117
 - v1.5 plans completed: 26
-- v1.6 plans completed: 0
+- v1.6 plans completed: 3
 
 ---
 
@@ -90,8 +90,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** Executed 33-03-PLAN.md (format selector UI + TSV export buttons + settings default). Committed 2 tasks + docs. Phase 33 fully complete.
-**Status:** Phase 33 complete. Phase 34 (Quality & Source) is next.
+**Completed:** Phase 33 fully executed (3/3 plans, 2 waves) and verified (5/5 must-haves, Playwright E2E). Format selector, TSV export, settings persistence all confirmed.
+**Status:** Phase 33 verified. Phase 34 (Quality Flags & Source Breakdown) is next.
 **Resume file:** None
 
 ### Handoff Notes

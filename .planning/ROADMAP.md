@@ -72,9 +72,9 @@
 **Plans:** 3 plans
 
 Plans:
-- [ ] 33-01-PLAN.md -- Core formatters, format store, and display format composable
-- [ ] 33-02-PLAN.md -- TSV export functions (web + CLI column expansion)
-- [ ] 33-03-PLAN.md -- Format selector UI, TSV export buttons, settings dialog
+- [x] 33-01-PLAN.md -- Core formatters, format store, and display format composable
+- [x] 33-02-PLAN.md -- TSV export functions (web + CLI column expansion)
+- [x] 33-03-PLAN.md -- Format selector UI, TSV export buttons, settings dialog
 
 ---
 
@@ -154,14 +154,14 @@ Plans:
 | 30. CLI Integration Fixes | v1.5 | 1/1 | Complete | 2026-02-24 |
 | 31. Runtime Gene Config Loading & Submission Modal | v1.5 | 1/1 | Complete | 2026-02-25 |
 | 32. Frequency Accuracy Fixes | v1.5 | 1/1 | Complete | 2026-02-25 |
-| 33. Display Formats & TSV Export | v1.6 | 0/3 | Not started | - |
+| 33. Display Formats & TSV Export | v1.6 | 3/3 | Complete | 2026-02-26 |
 | 34. Quality Flags & Source Breakdown | v1.6 | 0/TBD | Not started | - |
 | 35. Population Bar Chart | v1.6 | 0/TBD | Not started | - |
 | 36. Orphanet Prevalence Integration | v1.6 | 0/TBD | Not started | - |
 | 37. Subcontinental Populations | v1.6 | 0/TBD | Not started | - |
 
-**Total:** 114 plans complete across 32 phases in 6 milestones. 5 new phases planned for v1.6.
+**Total:** 117 plans complete across 33 phases in 6 milestones. 4 phases remaining for v1.6.
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-26 (Phase 33 planned: 3 plans in 2 waves)*
+*Last updated: 2026-02-26 (Phase 33 complete: 3/3 plans, verified)*

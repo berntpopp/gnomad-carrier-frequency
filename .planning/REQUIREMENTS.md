@@ -119,18 +119,18 @@
 | SRC-03 | Phase 34 | Pending |
 | SRC-04 | Phase 34 | Pending |
 | SRC-05 | Phase 34 | Pending |
-| FMT-01 | Phase 33 | Pending |
-| FMT-02 | Phase 33 | Pending |
-| FMT-03 | Phase 33 | Pending |
-| FMT-04 | Phase 33 | Pending |
-| FMT-05 | Phase 33 | Pending |
-| FMT-06 | Phase 33 | Pending |
-| FMT-07 | Phase 33 | Pending |
-| EXP-01 | Phase 33 | Pending |
-| EXP-02 | Phase 33 | Pending |
-| EXP-03 | Phase 33 | Pending |
-| EXP-04 | Phase 33 | Pending |
-| EXP-05 | Phase 33 | Pending |
+| FMT-01 | Phase 33 | Complete |
+| FMT-02 | Phase 33 | Complete |
+| FMT-03 | Phase 33 | Complete |
+| FMT-04 | Phase 33 | Complete |
+| FMT-05 | Phase 33 | Complete |
+| FMT-06 | Phase 33 | Complete |
+| FMT-07 | Phase 33 | N/A (clinical text always dual format per design decision) |
+| EXP-01 | Phase 33 | Complete |
+| EXP-02 | Phase 33 | Complete |
+| EXP-03 | Phase 33 | Complete |
+| EXP-04 | Phase 33 | Complete |
+| EXP-05 | Phase 33 | Complete |
 | ORPH-01 | Phase 36 | Pending |
 | ORPH-02 | Phase 36 | Pending |
 | ORPH-03 | Phase 36 | Pending |
@@ -161,4 +161,4 @@
 
 ---
 *Requirements defined: 2026-02-26*
-*Last updated: 2026-02-26 after roadmap creation (47/47 requirements mapped to Phases 33-37)*
+*Last updated: 2026-02-26 (Phase 33: 11 Complete, 1 N/A -- FMT-07 clinical text locked to dual format)*
