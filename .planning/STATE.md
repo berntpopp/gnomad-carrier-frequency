@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 35 in progress (2/3 plans complete)
+**Current focus:** v1.6 Analysis & Export -- Phase 35 complete (3/3 plans), moving to Phase 36
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.6 Analysis & Export
-**Phase:** 35 of 37 (Population Bar Chart) -- in progress
-**Plan:** 2 of 3 complete
-**Status:** Plan 35-02 complete (StepResults tabbed integration + useChartExport)
-**Last activity:** 2026-02-26 -- Plan 35-02 complete (tabbed Chart|Table view, SVG/PNG export)
+**Phase:** 35 of 37 (Population Bar Chart) -- complete
+**Plan:** 3 of 3 complete
+**Status:** Plan 35-03 complete (unit tests, E2E tests, human verification)
+**Last activity:** 2026-02-27 -- Plan 35-03 complete (tests + human approval + orchestrator additions: default tab=Table, core SVG chart, CLI --format svg)
 
 ### Progress
 
@@ -28,19 +28,19 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [████████░░]  66% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 (2/3)
+v1.6 Analysis:      [█████████░]  75% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 complete (3/3)
 ```
 
-**Overall:** 124 plans complete across 34 phases in 6 milestones. 1 plan remaining in Phase 35, then Phases 36-37.
+**Overall:** 125 plans complete across 35 phases in 6 milestones. Phases 36-37 remaining.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 124
+- Total plans completed: 125
 - v1.5 plans completed: 26
-- v1.6 plans completed: 10
+- v1.6 plans completed: 11
 
 ---
 
@@ -100,6 +100,13 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - img.onload before img.src — prevents PNG rasterization race condition (Pitfall 5)
 - viewBox expanded: 30px top + 20px bottom for title + footer text without clipping
 
+**35-03 decisions:**
+- vi.mock useAppTheme at module level in PopulationBarChart.test.ts — useDark from @vueuse/core needs matchMedia/localStorage not in happy-dom
+- vi.mock useDisplayFormat in chart tests — returns (f * 100).toFixed(2) + '%' stub; avoids Pinia store setup
+- PopulationBarChart added to StepResults.test.ts stubComponents — prevents Vuetify useTheme injection error from transitive dependency
+- data-testid on root chart div and v-tab elements — enables stable E2E selectors without brittle text/role matching
+- Orchestrator-level post-approval additions: default tab=Table (user preference), core SVG chart (generateSvgChart() in @gnomad-cf/core/chart), CLI --format svg (gnomad-cf query CFTR --format svg)
+
 **34-03 decisions:**
 - highAfPercent computed wraps 0-1 stored value in get/set for 0-100% slider display in SettingsDialog Quality tab
 - FilterPanel quality exclusion section uses template v-if on qualityExclusionConfig prop — backwards-compatible, parent opts in
@@ -137,17 +144,17 @@ None.
 
 ### Last Session
 
-**Date:** 2026-02-26
-**Completed:** Plan 35-02 — StepResults tabbed Chart|Table view + useChartExport composable (2 tasks). Fixed pre-existing build errors in PopulationBarChart.vue and SettingsDialog.vue.
-**Status:** Phase 35 in progress. Plans 35-01 and 35-02 complete. Plan 35-03 remaining (note: chart export already integrated in 35-02, scope of 35-03 may be reduced).
+**Date:** 2026-02-27
+**Completed:** Plan 35-03 — PopulationBarChart unit tests (10), E2E chart/table tab tests (5), human visual verification. Orchestrator additions post-approval: default tab=Table, tab reorder, @gnomad-cf/core/chart subpath (generateSvgChart()), CLI --format svg.
+**Status:** Phase 35 fully complete (3/3 plans). Ready for Phase 36 (Orphanet integration).
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.6 phase order: 33 (FMT+EXP) -> 34 (QUAL+SRC) -> 35 (VIZ) -> 36 (ORPH) -> 37 (SUBP).
 Phase 33 establishes format infrastructure that Phases 34-37 consume.
-Phases 35 and 36 depend only on Phase 33 (could theoretically run in parallel).
-Phase 37 depends on Phase 34 (quality flags inform subpopulation display).
+Phase 35 complete. Phase 36 (Orphanet) depends only on Phase 33. Phase 37 depends on Phase 34.
+@gnomad-cf/core/chart subpath now available for CLI and any future consumers needing server-side SVG charts.
 
 ---
 
