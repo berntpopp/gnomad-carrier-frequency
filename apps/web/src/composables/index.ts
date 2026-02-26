@@ -60,3 +60,6 @@ export type { UseGeneConfigReturn } from "./useGeneConfig";
 
 export { useDisplayFormat } from "./useDisplayFormat";
 export type { UseDisplayFormatReturn } from "./useDisplayFormat";
+
+export { useChartExport } from "./useChartExport";
+export type { UseChartExportReturn } from "./useChartExport";
