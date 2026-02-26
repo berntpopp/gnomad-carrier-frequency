@@ -104,10 +104,10 @@
                 </span>
               </v-tooltip>
               <div class="stat-value text-h5">
-                {{ globalFrequency?.ratio ?? "-" }}
+                {{ summaryPrimary }}
               </div>
               <div class="stat-detail">
-                {{ globalFrequency?.percent ?? "No variants included" }}
+                {{ summaryDetail }}
               </div>
             </div>
           </v-col>
@@ -209,9 +209,9 @@
           class="text-body-2 text-medium-emphasis mt-3"
         >
           Range across populations:
-          {{ formatRatio(result.minFrequency) }}
+          {{ formatFrequency(result.minFrequency) }}
           to
-          {{ formatRatio(result.maxFrequency) }}
+          {{ formatFrequency(result.maxFrequency) }}
         </div>
 
         <!-- Supporting info -->
@@ -255,6 +255,31 @@
       <!-- Table toolbar -->
       <div class="d-flex align-center flex-wrap ga-2 px-4 py-3">
         <span class="text-subtitle-2">Population Frequencies</span>
+
+        <v-btn-toggle
+          :model-value="currentFormat"
+          mandatory
+          density="compact"
+          color="primary"
+          variant="outlined"
+          aria-label="Frequency display format"
+          @update:model-value="setFormat($event as DisplayFormat)"
+        >
+          <v-tooltip v-for="option in formatOptions" :key="option.value" location="top">
+            <template #activator="{ props: tooltipProps }">
+              <v-btn
+                v-bind="tooltipProps"
+                :value="option.value"
+                size="small"
+                :aria-label="option.label"
+              >
+                {{ option.symbol }}
+              </v-btn>
+            </template>
+            {{ option.tooltip }}
+          </v-tooltip>
+        </v-btn-toggle>
+
         <v-spacer />
 
         <v-btn
@@ -292,6 +317,18 @@
               @click="handleExport('xlsx')"
             >
               <v-list-item-title>Export as Excel</v-list-item-title>
+            </v-list-item>
+            <v-list-item
+              prepend-icon="mdi-file-delimited"
+              @click="handleExport('tsv-populations')"
+            >
+              <v-list-item-title>Populations TSV</v-list-item-title>
+            </v-list-item>
+            <v-list-item
+              prepend-icon="mdi-file-delimited"
+              @click="handleExport('tsv-variants')"
+            >
+              <v-list-item-title>Variants TSV</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -350,10 +387,10 @@
                 </div>
               </td>
               <td class="text-right">
-                {{ formatPercent(item.carrierFrequency) }}
+                {{ formatFrequency(item.carrierFrequency) }}
               </td>
               <td class="text-right">
-                {{ formatRatio(item.carrierFrequency) }}
+                {{ formatRatioDisplay(item.carrierFrequency) }}
               </td>
               <td class="text-right">
                 {{ formatPrevalenceRatio(item.geneticPrevalence) }}
@@ -435,6 +472,9 @@ import {
   getGnomadVersion,
   getPopulationLabel,
 } from "@gnomad-cf/core/config";
+import { frequencyToPercent, frequencyToRatio } from "@gnomad-cf/core/calculations";
+import type { DisplayFormat } from "@gnomad-cf/core/calculations";
+import { useDisplayFormat } from "@/composables/useDisplayFormat";
 
 // Responsive breakpoint detection
 const { smAndDown } = useDisplay();
@@ -532,7 +572,18 @@ const { excludedCount, excluded, reasons } = useExclusionState();
 const excludedSet = computed(() => new Set(excluded.value));
 
 // Set up export composable
-const { exportToJson, exportToExcel } = useExport();
+const { exportToJson, exportToExcel, exportPopulationsTsv, exportVariantsTsv } = useExport();
+
+// Display format composable — reactive frequency formatting
+const { currentFormat, setFormat, formatFrequency, formatRatio: formatRatioDisplay } = useDisplayFormat();
+
+// Format selector options for v-btn-toggle
+const formatOptions = [
+  { value: "percent" as DisplayFormat, symbol: "%", label: "Percentage", tooltip: "Display as percentage (e.g. 4.31%)" },
+  { value: "ratio" as DisplayFormat, symbol: "1:N", label: "Ratio", tooltip: "Display as ratio (e.g. 1:23)" },
+  { value: "scientific" as DisplayFormat, symbol: "sci", label: "Scientific notation", tooltip: "Display in scientific notation (e.g. 4.31 × 10⁻²)" },
+  { value: "per100k" as DisplayFormat, symbol: "/100k", label: "Per 100,000", tooltip: "Display per 100,000 individuals" },
+];
 
 // Set up announcer for screen reader notifications
 const { polite: announcePolite, assertive: announceAssertive } =
@@ -559,7 +610,7 @@ async function copyShareLink() {
 }
 
 // Export handler function
-function handleExport(format: "json" | "xlsx") {
+function handleExport(format: "json" | "xlsx" | "tsv-populations" | "tsv-variants") {
   if (!props.result) return;
 
   // Convert filtered variants to display format for export
@@ -585,10 +636,19 @@ function handleExport(format: "json" | "xlsx") {
     reasons,
   );
 
-  if (format === "json") {
-    exportToJson(exportData, props.result.gene);
-  } else {
-    exportToExcel(exportData, props.result.gene);
+  switch (format) {
+    case "json":
+      exportToJson(exportData, props.result.gene);
+      break;
+    case "xlsx":
+      exportToExcel(exportData, props.result.gene);
+      break;
+    case "tsv-populations":
+      exportPopulationsTsv(exportData, props.result.gene);
+      break;
+    case "tsv-variants":
+      exportVariantsTsv(exportData, props.result.gene);
+      break;
   }
 }
 
@@ -681,7 +741,7 @@ const headers = computed(() => {
   const base = [
     { title: "Population", key: "label", sortable: true },
     {
-      title: "Carrier Freq (%)",
+      title: "Carrier Frequency",
       key: "carrierFrequency",
       sortable: true,
       align: "end" as const,
@@ -720,6 +780,21 @@ const headers = computed(() => {
 
 // Default sort by carrier frequency descending
 const sortBy = ref([{ key: "carrierFrequency", order: "desc" as const }]);
+
+// Format-aware display for the hero stat in the summary card
+const summaryPrimary = computed(() => {
+  if (effectiveFrequency.value === null) return "-";
+  return formatFrequency(effectiveFrequency.value);
+});
+
+const summaryDetail = computed(() => {
+  if (effectiveFrequency.value === null) return "No variants included";
+  // Show a complementary format as detail line
+  if (currentFormat.value === "ratio") {
+    return frequencyToPercent(effectiveFrequency.value);
+  }
+  return frequencyToRatio(effectiveFrequency.value);
+});
 
 // Calculate effective carrier frequency based on source
 const effectiveFrequency = computed((): number | null => {
@@ -860,17 +935,6 @@ function getRowClass(item: TableItem): string {
   if (item.isGlobal) return "bg-grey-lighten-4 font-weight-bold";
   if (item.isFounderEffect) return "bg-blue-lighten-5";
   return "";
-}
-
-// Formatters
-function formatPercent(freq: number | null): string {
-  if (freq === null) return "Not detected";
-  return `${(freq * 100).toFixed(config.settings.frequencyDecimalPlaces)}%`;
-}
-
-function formatRatio(freq: number | null): string {
-  if (freq === null || freq === 0) return "-";
-  return `1:${Math.round(1 / freq).toLocaleString()}`;
 }
 
 // Format prevalence as ratio for table display (returns '-' for null/zero)
