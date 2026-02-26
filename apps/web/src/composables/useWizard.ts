@@ -1,11 +1,24 @@
 // Wizard state management composable
 
 import { reactive, computed, watch } from "vue";
+import { getActivePinia } from "pinia";
 import type {
   WizardState,
   WizardStep,
   FrequencySource,
 } from "@gnomad-cf/core/types";
+import { useFormatStore } from "@/stores/useFormatStore";
+
+/**
+ * Safe wrapper around useFormatStore().resetToDefault().
+ * No-ops when called outside a Pinia context (e.g. in unit tests that reset
+ * the wizard state in beforeEach before mounting a component with Pinia).
+ */
+function safeResetFormat(): void {
+  if (getActivePinia()) {
+    useFormatStore().resetToDefault();
+  }
+}
 
 // Singleton state - shared across all useWizard() calls
 const state = reactive<WizardState>({
@@ -28,6 +41,8 @@ watch(
       state.frequencySource = "gnomad";
       state.literatureFrequency = null;
       state.literaturePmid = null;
+      // Reset display format to user's default when changing gene
+      safeResetFormat();
     }
   },
 );
@@ -113,6 +128,8 @@ export function useWizard() {
     state.frequencySource = "gnomad";
     state.literatureFrequency = null;
     state.literaturePmid = null;
+    // Reset display format to user's default when starting over
+    safeResetFormat();
   }
 
   // Setter for frequency source with type narrowing

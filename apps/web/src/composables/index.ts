@@ -57,3 +57,6 @@ export type { ConfirmDialogOptions } from "./useConfirmDialog";
 
 export { useGeneConfig } from "./useGeneConfig";
 export type { UseGeneConfigReturn } from "./useGeneConfig";
+
+export { useDisplayFormat } from "./useDisplayFormat";
+export type { UseDisplayFormatReturn } from "./useDisplayFormat";
