@@ -31,6 +31,58 @@ vi.mock("vuetify", async (importOriginal) => {
   };
 });
 
+// Mock useCarrierFrequency singleton (has complex dependencies: villus client, Pinia stores)
+vi.mock("@/composables/useCarrierFrequency", () => ({
+  useCarrierFrequency: () => ({
+    geneSymbol: ref(null),
+    setGeneSymbol: vi.fn(),
+    isLoading: ref(false),
+    hasError: ref(false),
+    errorMessage: ref(null),
+    result: ref(null),
+    globalFrequency: ref(null),
+    populations: ref([]),
+    qualifyingVariantCount: computed(() => 0),
+    hasFounderEffect: ref(false),
+    usingDefault: ref(false),
+    geneticPrevalenceFormatted: ref(null),
+    bayesianPrevalenceFormatted: ref(null),
+    variants: ref([]),
+    clinvarVariants: ref([]),
+    filterConfig: ref({
+      lofHcEnabled: true,
+      missenseEnabled: false,
+      clinvarEnabled: true,
+      clinvarStarThreshold: 1,
+      clinvarIncludeConflicting: false,
+      clinvarConflictingThreshold: 75,
+    }),
+    setFilterConfig: vi.fn(),
+    submissions: ref(new Map()),
+    conflictingVariantIds: ref([]),
+    isLoadingSubmissions: ref(false),
+    submissionsProgress: ref(0),
+    submissionsError: ref(null),
+    retryFailedSubmissions: vi.fn(),
+    currentVersion: ref("v4"),
+    excludedCount: computed(() => 0),
+    totalPathogenicCount: computed(() => 0),
+    qualityExclusionConfig: ref({
+      excludeHighAf: false,
+      excludeHighHom: false,
+      excludeGnomadFiltered: false,
+      excludeGenomesOnly: false,
+    }),
+    setQualityExclusionConfig: vi.fn(),
+    qualityFlagsMap: computed(() => new Map()),
+    qualityExcludedCount: computed(() => 0),
+    flaggedVariantCount: computed(() => 0),
+    filteredByPathogenicity: computed(() => []),
+    calculateRisk: vi.fn(() => null),
+    refetch: vi.fn(),
+  }),
+}));
+
 // Mock composables with side effects (API calls, singletons with complex dependencies)
 vi.mock("@/composables/useExclusionState", () => ({
   useExclusionState: () => ({

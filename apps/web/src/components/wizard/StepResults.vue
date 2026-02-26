@@ -27,6 +27,17 @@
       </template>
     </v-alert>
 
+    <!-- Quality exclusion alert - shows when variants excluded by quality flags -->
+    <v-alert
+      v-if="qualityExcludedCount > 0"
+      type="warning"
+      variant="tonal"
+      class="mb-4"
+      density="compact"
+    >
+      {{ qualityExcludedCount }} variant(s) excluded by quality flags.
+    </v-alert>
+
     <!-- Summary card -->
     <v-card
       v-if="result"
@@ -64,7 +75,7 @@
       <v-card-text class="pt-4">
         <!-- All-excluded warning -->
         <v-alert
-          v-if="filteredCount === 0 && excludedCount > 0"
+          v-if="qualifyingVariantCount === 0 && excludedCount > 0"
           type="warning"
           variant="tonal"
           density="compact"
@@ -218,9 +229,12 @@
         <div
           class="text-caption text-medium-emphasis mt-1 d-flex align-center flex-wrap"
         >
-          Based on {{ filteredCount }} qualifying variant(s)
+          Based on {{ qualifyingVariantCount }} qualifying variant(s)
           <span v-if="excludedCount > 0" class="ml-1 text-warning">
             ({{ excludedCount }} manually excluded)
+          </span>
+          <span v-if="flaggedVariantCount > 0" class="ml-1 text-warning">
+            ({{ flaggedVariantCount }} flagged)
           </span>
         </div>
       </v-card-text>
@@ -230,13 +244,15 @@
     <FilterPanel
       v-model="filters"
       :calc-config="calcStore.defaults"
-      :variant-count="filteredCount"
+      :variant-count="qualifyingVariantCount"
       :conflicting-count="props.conflictingVariantIds.length"
       :is-loading-submissions="props.isLoadingSubmissions"
       :submissions-progress="props.submissionsProgress"
       :submissions-error="props.submissionsError"
+      v-bind="qualityFilterPanelProps"
       @retry-submissions="emit('retrySubmissions')"
       @update:calc-config="calcStore.setDefaults($event)"
+      @update:quality-exclusion-config="setQualityExclusionConfig($event)"
       @reset="resetFilters"
     />
 
@@ -293,7 +309,7 @@
           prepend-icon="mdi-table-eye"
           @click="openAllVariantsModal"
         >
-          Variants ({{ filteredCount }})
+          Variants ({{ qualifyingVariantCount }})
         </v-btn>
 
         <!-- Export dropdown -->
@@ -497,7 +513,12 @@ import type {
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useCalcStore } from "@/stores/useCalcStore";
-import { useExport, useAppAnnouncer, useExclusionState } from "@/composables";
+import {
+  useExport,
+  useAppAnnouncer,
+  useExclusionState,
+  useCarrierFrequency,
+} from "@/composables";
 import { useGeneSearch } from "@/composables/useGeneSearch";
 import { filterPathogenicVariantsConfigurable } from "@gnomad-cf/core/filters";
 import {
@@ -574,6 +595,23 @@ const { canonicalTranscript } = useGeneSearch();
 
 // Get exclusion state (singleton) for displaying excluded count and export data
 const { excludedCount, excluded, reasons } = useExclusionState();
+
+// Quality data from the singleton composable
+const {
+  qualityExclusionConfig,
+  setQualityExclusionConfig,
+  qualityExcludedCount,
+  flaggedVariantCount,
+  qualifyingVariantCount,
+} = useCarrierFrequency();
+
+// Quality props forwarded to FilterPanel via v-bind spread
+// (FilterPanel will accept these when Plan 34-03 adds the props interface)
+const qualityFilterPanelProps = computed(() => ({
+  qualityExclusionConfig: qualityExclusionConfig.value,
+  qualityExcludedCount: qualityExcludedCount.value,
+  flaggedVariantCount: flaggedVariantCount.value,
+}));
 
 // Computed Set of excluded variant IDs for export
 const excludedSet = computed(() => new Set(excluded.value));
@@ -706,9 +744,6 @@ const filteredVariants = computed(() => {
     props.submissions,
   );
 });
-
-// Count of filtered variants
-const filteredCount = computed(() => filteredVariants.value.length);
 
 // Reset local filters and calc settings to store defaults
 function resetFilters() {
