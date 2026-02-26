@@ -110,7 +110,12 @@ Plans:
   2. Founder effect populations are visually distinguished (different color or annotation) so users can immediately identify elevated frequencies
   3. The chart renders correctly on mobile (horizontal bars remain readable on narrow screens) and respects Vuetify dark/light theme colors
   4. The chart is implemented as inline SVG with zero external dependencies, and users can download it as an SVG file for publication use
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 35-01-PLAN.md -- PopulationBarChart component (inline SVG, theme colors, tooltips, mobile responsive)
+- [ ] 35-02-PLAN.md -- StepResults tab integration and SVG/PNG export composable
+- [ ] 35-03-PLAN.md -- Tests and human verification of chart quality
 
 ---
 
@@ -163,7 +168,7 @@ Plans:
 | 32. Frequency Accuracy Fixes | v1.5 | 1/1 | Complete | 2026-02-25 |
 | 33. Display Formats & TSV Export | v1.6 | 3/3 | Complete | 2026-02-26 |
 | 34. Quality Flags & Source Breakdown | v1.6 | 5/5 | Complete | 2026-02-26 |
-| 35. Population Bar Chart | v1.6 | 0/TBD | Not started | - |
+| 35. Population Bar Chart | v1.6 | 0/3 | Not started | - |
 | 36. Orphanet Prevalence Integration | v1.6 | 0/TBD | Not started | - |
 | 37. Subcontinental Populations | v1.6 | 0/TBD | Not started | - |
 
@@ -171,4 +176,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-26 (Phase 34 complete: 5/5 plans, verified)*
+*Last updated: 2026-02-26 (Phase 35 planned: 3 plans in 3 waves)*
