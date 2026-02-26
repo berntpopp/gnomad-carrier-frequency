@@ -238,6 +238,33 @@
               </v-card>
             </v-dialog>
 
+            <!-- Default Frequency Format Section -->
+            <v-card variant="outlined" class="mb-4">
+              <v-card-title class="text-subtitle-1">
+                <v-icon start size="small">mdi-format-list-numbered</v-icon>
+                Default Frequency Format
+              </v-card-title>
+
+              <v-card-text>
+                <p class="text-body-2 text-medium-emphasis mb-3">
+                  Choose the default display format when starting a new analysis.
+                  You can switch formats at any time in the results view.
+                </p>
+                <v-btn-toggle
+                  v-model="formatStore.defaultFormat"
+                  mandatory
+                  density="compact"
+                  color="primary"
+                  variant="outlined"
+                >
+                  <v-btn value="percent" size="small">%</v-btn>
+                  <v-btn value="ratio" size="small">1:N</v-btn>
+                  <v-btn value="scientific" size="small">sci</v-btn>
+                  <v-btn value="per100k" size="small">/100k</v-btn>
+                </v-btn-toggle>
+              </v-card-text>
+            </v-card>
+
             <!-- Data Cache Section -->
             <v-card variant="outlined" class="mb-4">
               <v-card-title class="text-subtitle-1">
@@ -506,6 +533,7 @@ import { useAppStore } from "@/stores/useAppStore";
 import { useLogStore } from "@/stores/useLogStore";
 import { useTemplateStore } from "@/stores/useTemplateStore";
 import { useHistoryStore } from "@/stores/useHistoryStore";
+import { useFormatStore } from "@/stores/useFormatStore";
 import {
   useClingenValidity,
   usePwaInstall,
@@ -532,6 +560,7 @@ const appStore = useAppStore();
 const logStore = useLogStore();
 const templateStore = useTemplateStore();
 const historyStore = useHistoryStore();
+const formatStore = useFormatStore();
 const templateEditorRef = ref<InstanceType<typeof TemplateEditor> | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
