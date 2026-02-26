@@ -6,6 +6,8 @@ import { useExclusionState } from "./useExclusionState";
 import {
   filterPathogenicVariantsConfigurable,
   getConflictingVariantIds,
+  computeQualityFlags,
+  shouldExcludeByQuality,
 } from "@gnomad-cf/core/filters";
 import {
   aggregatePopulationFrequenciesWithConfig,
@@ -23,6 +25,7 @@ import { config, type GnomadVersion } from "@gnomad-cf/core/config";
 import { useGnomadVersion } from "@/api";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useCalcStore } from "@/stores/useCalcStore";
+import { useQualityStore } from "@/stores/useQualityStore";
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 import type {
   CarrierFrequencyResult,
@@ -31,6 +34,8 @@ import type {
   GnomadVariant,
   ClinVarVariant,
   FilterConfig,
+  QualityFlag,
+  QualityExclusionConfig,
 } from "@gnomad-cf/core/types";
 
 // Default fallback from config - NO MAGIC NUMBERS
@@ -77,9 +82,20 @@ export interface UseCarrierFrequencyReturn {
   // Version
   currentVersion: Ref<GnomadVersion>;
 
-  // Exclusion state
+  // Exclusion state (manual)
   excludedCount: Ref<number>;
   totalPathogenicCount: Ref<number>;
+
+  // Quality flags
+  qualityExclusionConfig: Ref<QualityExclusionConfig>;
+  setQualityExclusionConfig: (config: QualityExclusionConfig) => void;
+  qualityFlagsMap: Ref<Map<string, QualityFlag[]>>;
+  qualityExcludedCount: Ref<number>;
+  flaggedVariantCount: Ref<number>;
+
+  // Pathogenicity-filtered variants (before manual/quality exclusions)
+  // Needed by downstream components for source classification
+  filteredByPathogenicity: Ref<GnomadVariant[]>;
 
   // Recurrence risk
   calculateRisk: (status: IndexPatientStatus) => {
@@ -103,6 +119,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   const { version } = useGnomadVersion();
   const filterStore = useFilterStore();
   const calcStore = useCalcStore();
+  const qualityStore = useQualityStore();
 
   const setGeneSymbol = (symbol: string | null) => {
     geneSymbol.value = symbol?.toUpperCase() ?? null;
@@ -121,6 +138,16 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
 
   const setFilterConfig = (config: FilterConfig) => {
     filterConfig.value = { ...config };
+  };
+
+  // Per-analysis quality exclusion config — local state, initialized from store defaults
+  // Not persisted back to store on every toggle (Pitfall 7 in RESEARCH.md)
+  const qualityExclusionConfig = ref<QualityExclusionConfig>({
+    ...qualityStore.exclusionDefaults,
+  });
+
+  const setQualityExclusionConfig = (config: QualityExclusionConfig) => {
+    qualityExclusionConfig.value = { ...config };
   };
 
   // Get exclusion state (singleton)
@@ -210,38 +237,64 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     { immediate: true },
   );
 
-  // Clear submissions when gene changes
+  // Clear submissions and reset quality exclusion config when gene changes
   watch(geneSymbol, () => {
     clearSubmissions();
+    qualityExclusionConfig.value = { ...qualityStore.exclusionDefaults };
   });
 
-  // Filter to pathogenic variants using configurable filters (FILT-01 through FILT-09)
-  // This is the count BEFORE manual exclusions (for display purposes)
-  const totalPathogenicCount = computed(() => {
-    if (!normalizedVariants.value.length) return 0;
+  // Variants that pass pathogenicity filters (before any manual/quality exclusions)
+  // This is the single source for pathogenicity-filtered variants used by all downstream computeds
+  const filteredByPathogenicity = computed((): GnomadVariant[] => {
+    if (!normalizedVariants.value.length) return [];
     return filterPathogenicVariantsConfigurable(
       normalizedVariants.value,
       normalizedClinvar.value,
       filterConfig.value,
       submissions.value,
-    ).length;
+    );
   });
 
+  // Compute quality flags for all pathogenicity-filtered variants
+  const qualityFlagsMap = computed((): Map<string, QualityFlag[]> => {
+    const map = new Map<string, QualityFlag[]>();
+    for (const variant of filteredByPathogenicity.value) {
+      const flags = computeQualityFlags(variant, qualityStore.defaults);
+      if (flags.length > 0) {
+        map.set(variant.variant_id, flags);
+      }
+    }
+    return map;
+  });
+
+  // Count of flagged variants (QUAL-06: summary count)
+  const flaggedVariantCount = computed(() => qualityFlagsMap.value.size);
+
+  // Variant IDs excluded by quality flags based on current exclusion config
+  const qualityExcludedIds = computed((): Set<string> => {
+    const excluded = new Set<string>();
+    for (const [variantId, flags] of qualityFlagsMap.value) {
+      if (shouldExcludeByQuality(flags, qualityExclusionConfig.value)) {
+        excluded.add(variantId);
+      }
+    }
+    return excluded;
+  });
+
+  // Count of quality-excluded variants (tracked separately from manual exclusions — Pitfall 4)
+  const qualityExcludedCount = computed(() => qualityExcludedIds.value.size);
+
+  // Total pathogenic count = all variants passing pathogenicity filters (before any exclusions)
+  const totalPathogenicCount = computed(() => filteredByPathogenicity.value.length);
+
   // Filter to pathogenic variants using configurable filters (FILT-01 through FILT-09)
-  // Then filter out manually excluded variants (EXCL-04)
+  // Then filter out BOTH manually excluded AND quality-excluded variants (EXCL-04, QUAL-07)
   const pathogenicVariants = computed(() => {
-    if (!normalizedVariants.value.length) return [];
-
-    // First apply standard pathogenicity filters
-    const filtered = filterPathogenicVariantsConfigurable(
-      normalizedVariants.value,
-      normalizedClinvar.value,
-      filterConfig.value,
-      submissions.value,
+    return filteredByPathogenicity.value.filter(
+      (v) =>
+        !debouncedExcluded.value.has(v.variant_id) &&
+        !qualityExcludedIds.value.has(v.variant_id),
     );
-
-    // Then filter out manually excluded variants
-    return filtered.filter((v) => !debouncedExcluded.value.has(v.variant_id));
   });
 
   const qualifyingVariantCount = computed(
@@ -557,6 +610,12 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     currentVersion,
     excludedCount,
     totalPathogenicCount,
+    qualityExclusionConfig,
+    setQualityExclusionConfig,
+    qualityFlagsMap,
+    qualityExcludedCount,
+    flaggedVariantCount,
+    filteredByPathogenicity,
     calculateRisk,
     refetch,
   };
