@@ -234,7 +234,7 @@
             ({{ excludedCount }} manually excluded)
           </span>
           <span v-if="flaggedVariantCount > 0" class="ml-1 text-warning">
-            ({{ flaggedVariantCount }} flagged)
+            <v-icon size="x-small" class="mr-1">mdi-alert-outline</v-icon>({{ flaggedVariantCount }} flagged)
           </span>
         </div>
       </v-card-text>
@@ -396,16 +396,22 @@
               <td>
                 <div class="d-flex align-center">
                   <!-- Expand/collapse chevron for source breakdown (non-global rows only) -->
-                  <v-btn
-                    v-if="!item.isGlobal"
-                    :icon="isPopExpanded(item.code) ? 'mdi-chevron-down' : 'mdi-chevron-right'"
-                    variant="plain"
-                    density="compact"
-                    size="x-small"
-                    class="population-expand-btn mr-1"
-                    :aria-label="isPopExpanded(item.code) ? 'Collapse source breakdown' : 'Expand source breakdown'"
-                    @click="togglePopExpand(item.code, $event)"
-                  />
+                  <v-tooltip location="top">
+                    <template #activator="{ props: tooltipProps }">
+                      <v-btn
+                        v-if="!item.isGlobal"
+                        v-bind="tooltipProps"
+                        :icon="isPopExpanded(item.code) ? 'mdi-chevron-down' : 'mdi-chevron-right'"
+                        variant="plain"
+                        density="compact"
+                        size="small"
+                        class="population-expand-btn mr-1"
+                        :aria-label="isPopExpanded(item.code) ? 'Collapse source breakdown' : 'Expand source breakdown'"
+                        @click="togglePopExpand(item.code, $event)"
+                      />
+                    </template>
+                    {{ isPopExpanded(item.code) ? 'Hide source breakdown' : 'Show source breakdown' }}
+                  </v-tooltip>
                   <span class="population-label">{{ item.label }}</span>
                 </div>
               </td>
@@ -440,6 +446,7 @@
                 v-for="srcRow in getSourceBreakdown(item.code)"
                 :key="`${item.code}-${srcRow.sourceCategory}`"
                 class="source-breakdown-row"
+                :style="{ borderLeft: `3px solid ${getSourceBorderColor(srcRow.sourceCategory)}` }"
               >
                 <td>
                   <div class="d-flex align-center pl-6">
@@ -699,6 +706,20 @@ function getSourceBreakdown(popCode: string): SourceBreakdownRow[] {
 function formatSourceFrequency(cf: number | null): string {
   if (cf === null || cf === 0) return "-";
   return formatFrequency(cf);
+}
+
+// CSS hex colors for source breakdown left border accent
+function getSourceBorderColor(category: string): string {
+  switch (category) {
+    case "clinvar_only":
+      return "#2196F3"; // blue
+    case "plof_only":
+      return "#673AB7"; // deep-purple
+    case "both":
+      return "#4CAF50"; // green
+    default:
+      return "transparent";
+  }
 }
 
 // Reset expanded populations when gene result changes
@@ -1172,7 +1193,7 @@ function formatPrevalenceRatio(prevalence: number | null): string {
 }
 
 .source-breakdown-row td {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   padding-top: 2px !important;
   padding-bottom: 2px !important;
 }

@@ -441,7 +441,7 @@
               />
             </v-col>
 
-            <v-col v-if="activeQualityExclusionCount > 0" cols="12">
+            <v-col v-if="qualityExcludedDisplay > 0" cols="12">
               <v-alert type="info" variant="tonal" density="compact">
                 Excluding {{ qualityExcludedDisplay }} variant(s) by quality flags.
               </v-alert>
@@ -575,12 +575,6 @@ const penetrancePercent = computed(() =>
 // Quality exclusion computeds
 const flaggedCount = computed(() => props.flaggedVariantCount ?? 0);
 const qualityExcludedDisplay = computed(() => props.qualityExcludedCount ?? 0);
-const activeQualityExclusionCount = computed(() => {
-  const c = props.qualityExclusionConfig;
-  if (!c) return 0;
-  return [c.excludeHighAf, c.excludeHighHom, c.excludeGnomadFiltered, c.excludeGenomesOnly]
-    .filter(Boolean).length;
-});
 
 function updateFilter<K extends keyof FilterConfig>(
   key: K,

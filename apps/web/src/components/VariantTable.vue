@@ -76,6 +76,7 @@
                   :key="flag.type"
                   class="mb-1"
                 >
+                  <span class="sr-only">{{ flag.severity }}:</span>
                   <strong :style="{ color: flagTypeColorCss(flag.type) }">
                     {{ flag.label }}
                   </strong><br />
@@ -595,6 +596,19 @@ function formatClinvarStatus(status: string): string {
 <style scoped>
 .text-mono {
   font-family: monospace;
+}
+
+/* Screen reader only - visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Horizontal scroll wrapper for mobile */

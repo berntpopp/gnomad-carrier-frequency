@@ -98,6 +98,15 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - Local filteredCount removed from StepResults — qualifyingVariantCount from singleton is single source of truth
 - Second-column sticky CSS removed from VariantTable — new quality/source columns shift nth-child indices
 
+**UI polish decisions:**
+- SettingsDialog refactored: horizontal tabs → sidebar nav (220px) with search, fixed 810px height via `:deep(.v-overlay__content)` targeting Vuetify's flex container
+- TemplateEditor refactored: removed VariablePicker side column, added inline variable toolbar with quick-access chips + searchable "More" dropdown, Edit/Preview tab toggle
+- Variable-only template sections show info alert in Edit tab and example text in Preview tab
+- Default template section changed from geneIntro (just `{{statusIntro}}`) to inheritance (has visible prose)
+- FilterPanel: fixed "Excluding 0 variant(s)" showing when toggles ON but no variants match
+- StepResults: source breakdown left-border color per category, flagged count icon, chevron tooltip
+- VariantTable: screen reader accessibility for quality flag severity
+
 ### Pending Todos
 
 None.
@@ -115,8 +124,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** Wave 3 parallel (34-03 + 34-04). SettingsDialog Quality tab, FilterPanel exclusion toggles, VariantTable quality/source columns, StepResults wiring. All 508 tests passing.
-**Status:** Phase 34 in progress. Plan 34-05 (per-population source frequency breakdown) remains.
+**Completed:** UI polish pass — SettingsDialog sidebar nav refactor, TemplateEditor UX rewrite, 8 audit fixes across FilterPanel/StepResults/VariantTable. All 508 tests passing.
+**Status:** Phase 34 in progress. Plan 34-05 checkpoint pending.
 **Resume file:** None
 
 ### Handoff Notes
