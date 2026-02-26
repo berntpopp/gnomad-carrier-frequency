@@ -242,9 +242,9 @@ function showTooltip(
   if (!rect) return;
 
   const clientX =
-    "touches" in event ? event.touches[0].clientX : event.clientX;
+    "touches" in event ? (event.touches[0]?.clientX ?? 0) : event.clientX;
   const clientY =
-    "touches" in event ? event.touches[0].clientY : event.clientY;
+    "touches" in event ? (event.touches[0]?.clientY ?? 0) : event.clientY;
 
   tooltipX.value = clientX - rect.left + 12;
   tooltipY.value = clientY - rect.top - 10;

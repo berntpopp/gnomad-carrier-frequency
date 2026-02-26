@@ -515,7 +515,7 @@
                 <v-btn value="en"> English </v-btn>
               </v-btn-toggle>
 
-              <TemplateEditor ref="templateEditorRef" />
+              <TemplateEditor />
 
               <!-- Import/Export/Reset buttons -->
               <v-divider class="my-4" />
@@ -812,7 +812,8 @@ const dialogCard = ref<HTMLElement | null>(null);
 const navSelection = computed({
   get: () => [activeSection.value],
   set: (val: string[]) => {
-    if (val.length) activeSection.value = val[0];
+    const first = val[0];
+    if (first !== undefined) activeSection.value = first;
   },
 });
 
@@ -831,7 +832,8 @@ const filteredSections = computed(() => {
 // Auto-select first match when search narrows results
 watch(filteredSections, (filtered) => {
   if (filtered.length > 0 && !filtered.some((s) => s.id === activeSection.value)) {
-    activeSection.value = filtered[0].id;
+    const first = filtered[0];
+    if (first !== undefined) activeSection.value = first.id;
   }
 });
 
@@ -842,7 +844,6 @@ const templateStore = useTemplateStore();
 const historyStore = useHistoryStore();
 const formatStore = useFormatStore();
 const qualityStore = useQualityStore();
-const templateEditorRef = ref<InstanceType<typeof TemplateEditor> | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const {

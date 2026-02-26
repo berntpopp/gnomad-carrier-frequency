@@ -375,113 +375,162 @@
         </v-tooltip>
       </div>
 
+      <!-- Chart / Table tabs -->
+      <v-tabs v-model="populationTab" density="compact" class="px-4">
+        <v-tab value="chart" size="small">
+          <v-icon start size="small">mdi-chart-bar</v-icon>
+          Chart
+        </v-tab>
+        <v-tab value="table" size="small">
+          <v-icon start size="small">mdi-table</v-icon>
+          Table
+        </v-tab>
+      </v-tabs>
+
       <v-divider />
 
-      <!-- Sortable data table -->
-      <div class="table-scroll-wrapper">
-        <v-data-table
-          :items="tableItems"
-          :headers="headers"
-          :sort-by="sortBy"
-          density="compact"
-          items-per-page="-1"
-          class="results-table"
-          data-testid="population-table"
-        >
-          <template #item="{ item }">
-            <tr
-              :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
-              @click="!item.isGlobal && openPopulationModal(item.code)"
-            >
-              <td>
-                <div class="d-flex align-center">
-                  <!-- Expand/collapse chevron for source breakdown (non-global rows only) -->
-                  <v-tooltip location="top">
-                    <template #activator="{ props: tooltipProps }">
-                      <v-btn
-                        v-if="!item.isGlobal"
-                        v-bind="tooltipProps"
-                        :icon="isPopExpanded(item.code) ? 'mdi-chevron-down' : 'mdi-chevron-right'"
-                        variant="plain"
-                        density="compact"
-                        size="small"
-                        class="population-expand-btn mr-1"
-                        :aria-label="isPopExpanded(item.code) ? 'Collapse source breakdown' : 'Expand source breakdown'"
-                        @click="togglePopExpand(item.code, $event)"
-                      />
-                    </template>
-                    {{ isPopExpanded(item.code) ? 'Hide source breakdown' : 'Show source breakdown' }}
-                  </v-tooltip>
-                  <span class="population-label">{{ item.label }}</span>
-                </div>
-              </td>
-              <td class="text-right">
-                {{ formatFrequency(item.carrierFrequency) }}
-              </td>
-              <td class="text-right">
-                {{ formatRatioDisplay(item.carrierFrequency) }}
-              </td>
-              <td class="text-right">
-                {{ formatPrevalenceRatio(item.geneticPrevalence) }}
-              </td>
-              <td class="text-right">
-                {{ item.recurrenceRisk }}
-              </td>
-              <td class="text-right">
-                {{ item.alleleCount }}
-              </td>
-              <td class="text-right">
-                {{ item.alleleNumber?.toLocaleString() ?? "-" }}
-              </td>
-              <td>
-                <v-chip v-if="item.notes" color="info" size="x-small">
-                  <v-icon start size="x-small">mdi-star</v-icon>
-                  {{ item.notes }}
-                </v-chip>
-              </td>
-            </tr>
-            <!-- Source breakdown expansion rows (rendered inline after population row) -->
-            <template v-if="!item.isGlobal && isPopExpanded(item.code)">
-              <tr
-                v-for="srcRow in getSourceBreakdown(item.code)"
-                :key="`${item.code}-${srcRow.sourceCategory}`"
-                class="source-breakdown-row"
-                :style="{ borderLeft: `3px solid ${getSourceBorderColor(srcRow.sourceCategory)}` }"
+      <v-window v-model="populationTab">
+        <!-- Chart tab -->
+        <v-window-item value="chart">
+          <div class="pa-4">
+            <PopulationBarChart
+              ref="chartRef"
+              :populations="result?.populations ?? []"
+              :global-carrier-frequency="effectiveFrequency"
+              :gene="result?.gene ?? ''"
+              :gnomad-version="sourceAttribution"
+              @bar-click="openPopulationModal"
+            />
+            <!-- Chart export buttons -->
+            <div class="d-flex justify-end ga-2 mt-3">
+              <v-btn
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-file-image"
+                @click="handleChartExportSvg"
               >
-                <td>
-                  <div class="d-flex align-center pl-6">
-                    <v-chip
-                      :color="sourceCategoryColor(srcRow.sourceCategory)"
-                      size="x-small"
-                      class="mr-2"
-                    >
-                      {{ srcRow.label }}
-                    </v-chip>
-                    <span class="text-caption text-medium-emphasis">
-                      {{ srcRow.variantCount }} variant{{ srcRow.variantCount === 1 ? '' : 's' }}
-                    </span>
-                  </div>
-                </td>
-                <td class="text-right">
-                  {{ formatSourceFrequency(srcRow.carrierFrequency) }}
-                </td>
-                <td class="text-right">
-                  {{ formatRatioDisplay(srcRow.carrierFrequency) }}
-                </td>
-                <td class="text-right">-</td>
-                <td class="text-right">-</td>
-                <td class="text-right">{{ srcRow.alleleCount }}</td>
-                <td class="text-right">
-                  {{ srcRow.alleleNumber > 0 ? srcRow.alleleNumber.toLocaleString() : "-" }}
-                </td>
-                <td v-if="hasNotes" />
-              </tr>
-            </template>
-          </template>
+                Download SVG
+              </v-btn>
+              <v-btn
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-image"
+                @click="handleChartExportPng"
+              >
+                Download PNG
+              </v-btn>
+            </div>
+          </div>
+        </v-window-item>
 
-          <template #bottom />
-        </v-data-table>
-      </div>
+        <!-- Table tab -->
+        <v-window-item value="table">
+          <div class="table-scroll-wrapper">
+            <v-data-table
+              :items="tableItems"
+              :headers="headers"
+              :sort-by="sortBy"
+              density="compact"
+              items-per-page="-1"
+              class="results-table"
+              data-testid="population-table"
+            >
+              <template #item="{ item }">
+                <tr
+                  :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
+                  @click="!item.isGlobal && openPopulationModal(item.code)"
+                >
+                  <td>
+                    <div class="d-flex align-center">
+                      <!-- Expand/collapse chevron for source breakdown (non-global rows only) -->
+                      <v-tooltip location="top">
+                        <template #activator="{ props: tooltipProps }">
+                          <v-btn
+                            v-if="!item.isGlobal"
+                            v-bind="tooltipProps"
+                            :icon="isPopExpanded(item.code) ? 'mdi-chevron-down' : 'mdi-chevron-right'"
+                            variant="plain"
+                            density="compact"
+                            size="small"
+                            class="population-expand-btn mr-1"
+                            :aria-label="isPopExpanded(item.code) ? 'Collapse source breakdown' : 'Expand source breakdown'"
+                            @click="togglePopExpand(item.code, $event)"
+                          />
+                        </template>
+                        {{ isPopExpanded(item.code) ? 'Hide source breakdown' : 'Show source breakdown' }}
+                      </v-tooltip>
+                      <span class="population-label">{{ item.label }}</span>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    {{ formatFrequency(item.carrierFrequency) }}
+                  </td>
+                  <td class="text-right">
+                    {{ formatRatioDisplay(item.carrierFrequency) }}
+                  </td>
+                  <td class="text-right">
+                    {{ formatPrevalenceRatio(item.geneticPrevalence) }}
+                  </td>
+                  <td class="text-right">
+                    {{ item.recurrenceRisk }}
+                  </td>
+                  <td class="text-right">
+                    {{ item.alleleCount }}
+                  </td>
+                  <td class="text-right">
+                    {{ item.alleleNumber?.toLocaleString() ?? "-" }}
+                  </td>
+                  <td>
+                    <v-chip v-if="item.notes" color="info" size="x-small">
+                      <v-icon start size="x-small">mdi-star</v-icon>
+                      {{ item.notes }}
+                    </v-chip>
+                  </td>
+                </tr>
+                <!-- Source breakdown expansion rows (rendered inline after population row) -->
+                <template v-if="!item.isGlobal && isPopExpanded(item.code)">
+                  <tr
+                    v-for="srcRow in getSourceBreakdown(item.code)"
+                    :key="`${item.code}-${srcRow.sourceCategory}`"
+                    class="source-breakdown-row"
+                    :style="{ borderLeft: `3px solid ${getSourceBorderColor(srcRow.sourceCategory)}` }"
+                  >
+                    <td>
+                      <div class="d-flex align-center pl-6">
+                        <v-chip
+                          :color="sourceCategoryColor(srcRow.sourceCategory)"
+                          size="x-small"
+                          class="mr-2"
+                        >
+                          {{ srcRow.label }}
+                        </v-chip>
+                        <span class="text-caption text-medium-emphasis">
+                          {{ srcRow.variantCount }} variant{{ srcRow.variantCount === 1 ? '' : 's' }}
+                        </span>
+                      </div>
+                    </td>
+                    <td class="text-right">
+                      {{ formatSourceFrequency(srcRow.carrierFrequency) }}
+                    </td>
+                    <td class="text-right">
+                      {{ formatRatioDisplay(srcRow.carrierFrequency) }}
+                    </td>
+                    <td class="text-right">-</td>
+                    <td class="text-right">-</td>
+                    <td class="text-right">{{ srcRow.alleleCount }}</td>
+                    <td class="text-right">
+                      {{ srcRow.alleleNumber > 0 ? srcRow.alleleNumber.toLocaleString() : "-" }}
+                    </td>
+                    <td v-if="hasNotes" />
+                  </tr>
+                </template>
+              </template>
+
+              <template #bottom />
+            </v-data-table>
+          </div>
+        </v-window-item>
+      </v-window>
     </v-card>
 
     <!-- Text output section -->
@@ -579,6 +628,8 @@ import TextOutput from "./TextOutput.vue";
 import FilterPanel from "@/components/FilterPanel.vue";
 import VariantModal from "@/components/VariantModal.vue";
 import ClingenWarning from "@/components/ClingenWarning.vue";
+import PopulationBarChart from "@/components/PopulationBarChart.vue";
+import { useChartExport } from "@/composables/useChartExport";
 
 interface TableItem {
   label: string;
@@ -874,6 +925,24 @@ function resetFilters() {
     clinvarConflictingThreshold: defaults.clinvarConflictingThreshold,
   });
   calcStore.resetToFactoryDefaults();
+}
+
+// Chart tab state
+const populationTab = ref<"chart" | "table">("chart");
+const chartRef = ref<InstanceType<typeof PopulationBarChart> | null>(null);
+const { downloadSvg, downloadPng } = useChartExport();
+
+// Chart export handlers
+function handleChartExportSvg() {
+  const svgEl = chartRef.value?.svgRef;
+  if (!svgEl || !props.result) return;
+  downloadSvg(svgEl, props.result.gene, sourceAttribution.value);
+}
+
+function handleChartExportPng() {
+  const svgEl = chartRef.value?.svgRef;
+  if (!svgEl || !props.result) return;
+  downloadPng(svgEl, props.result.gene, sourceAttribution.value);
 }
 
 // Variant modal state
