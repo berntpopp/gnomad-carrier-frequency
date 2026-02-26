@@ -651,7 +651,6 @@ const {
   qualityExcludedCount,
   flaggedVariantCount,
   qualifyingVariantCount,
-  filteredByPathogenicity,
   qualifyingVariants,
 } = useCarrierFrequency();
 
