@@ -8,29 +8,29 @@ A progressive web application for genetic counselors to calculate carrier freque
 
 Accurate recurrence risk calculation from real gnomAD population data, with clinical documentation output that's ready to paste into patient letters.
 
-## Current Milestone: v1.5 Core Extraction & CLI
+## Current Milestone: v1.6 Analysis & Export
 
-**Goal:** Extract calculation engine into a reusable monorepo package with CLI for batch analyses, improve carrier frequency math (Hardy-Weinberg 2pq, homozygote exclusion, genetic prevalence), add community-curated gene configs, and build a comprehensive test suite.
+**Goal:** Improve data quality transparency with variant quality flags and source contribution breakdown, add new display formats (scientific notation, per-100k) and TSV export, integrate Orphanet prevalence reference data, enable subcontinental population breakdown for gnomAD v2.1.1, and add population frequency bar chart visualization.
 
 **Target features:**
-- Monorepo restructure (bun workspaces: core, cli, web)
-- Full CLI pipeline (gene lookup → status → recurrence risk → clinical text, batch mode)
-- Hardy-Weinberg 2pq carrier frequency calculation (#1)
-- gnomAD homozygote exclusion toggle (#3)
-- Genetic prevalence calculation q² + Bayesian (#7)
-- Community-curated gene-specific configs (JSON/YAML, PR-based) (#14)
-- Core package unit tests + CLI integration tests + web app component/E2E tests (#2)
+- Variant quality flags: High AF, High Hom Count, gnomAD Filtered, Genomes Only (#12)
+- ClinVar vs pLoF variant source contribution breakdown (#11)
+- Scientific notation and per-100,000 display formats (#10)
+- TSV export format for bioinformatics pipelines (#9)
+- Orphanet prevalence reference data integration (#6)
+- Subcontinental population breakdown for gnomAD v2.1.1 (#5)
+- Population frequency bar chart visualization (#2)
 
-**GitHub issues:** #1, #2, #3, #7, #14, #16
+**GitHub issues:** #2, #5, #6, #9, #10, #11, #12
 
 ## Current State
 
-**Version:** v1.4 Discoverability & Polish (shipped 2026-02-23)
+**Version:** v1.5 Core Extraction & CLI (shipped 2026-02-25)
 **Deployed:** https://gnomad-carrier-frequency.kidney-genetics.org/
 **Docs:** https://gnomad-carrier-frequency.kidney-genetics.org/docs/
 **Codebase:** ~76,044 lines TypeScript/Vue/Markdown
 
-**Features delivered (v1.0-v1.4):**
+**Features delivered (v1.0-v1.5):**
 - gnomAD API integration (v4, v3, v2 support)
 - 4-step wizard: Gene → Status → Frequency → Results
 - Population-specific carrier frequencies with founder effect detection
@@ -58,6 +58,14 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - **v1.4:** Gene context chip on Steps 2-4, mobile title hiding
 - **v1.4:** useConfirmDialog composable replacing native dialogs
 - **v1.4:** Educational docs (carrier frequency explainer, calculation tutorial, expanded FAQ)
+- **v1.5:** Bun workspaces monorepo (packages/core, packages/cli, apps/web)
+- **v1.5:** @gnomad-cf/core package with typed API (calculations, filters, templates, client)
+- **v1.5:** Hardy-Weinberg 2pq carrier frequency + homozygote exclusion (VCR/GCR)
+- **v1.5:** Genetic prevalence (q²) + Bayesian prevalence with configurable penetrance
+- **v1.5:** Full CLI: single gene, batch mode, interactive wizard, JSON/TSV/text output
+- **v1.5:** Community gene configs (CFTR, HEXA, GJB2) with CI validation + runtime GitHub loading
+- **v1.5:** Comprehensive test suite (426 tests: core unit, CLI integration, web component, E2E)
+- **v1.5:** gnomAD v4 joint field support for accurate AN/AC values
 
 ## Requirements
 
@@ -111,38 +119,36 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - ✓ useConfirmDialog replacing native dialogs — v1.4
 - ✓ Educational docs pages (carrier frequency, Hardy-Weinberg) — v1.4
 - ✓ Expanded FAQ with FAQPage structured data — v1.4
+- ✓ Bun workspaces monorepo (packages/core, packages/cli, apps/web) — v1.5
+- ✓ @gnomad-cf/core package with typed barrel exports — v1.5
+- ✓ Web app imports from @gnomad-cf/core instead of local utils — v1.5
+- ✓ Hardy-Weinberg 2pq carrier frequency formula — v1.5
+- ✓ Homozygote exclusion (VCR/GCR) with toggle — v1.5
+- ✓ Genetic prevalence (q²) + Bayesian with penetrance — v1.5
+- ✓ Full CLI pipeline (single gene, batch, interactive wizard) — v1.5
+- ✓ Community gene configs (CFTR, HEXA, GJB2) with CI validation — v1.5
+- ✓ Runtime GitHub gene config loading + submission modal — v1.5
+- ✓ Comprehensive test suite (426 tests, coverage thresholds) — v1.5
+- ✓ gnomAD v4 joint field for accurate AN/AC — v1.5
 
 ### Active
 
-**Monorepo & Core Package**
-- [ ] Bun workspaces monorepo restructure (packages/core, packages/cli, apps/web)
-- [ ] Core package with typed API: carrier frequency, recurrence risk, clinical text
-- [ ] Web app imports core package instead of inline composables
+**Data Quality & Transparency**
+- [ ] Variant quality flags: High AF, High Hom Count, gnomAD Filtered, Genomes Only (#12)
+- [ ] ClinVar vs pLoF variant source contribution breakdown (#11)
 
-**CLI**
-- [ ] Full calculation pipeline from terminal (gene → status → frequency → risk → text)
-- [ ] Batch processing for multiple genes (JSON/CSV input and output)
-- [ ] Programmatic API for use as a library
+**Display Formats & Export**
+- [ ] Scientific notation and per-100,000 display formats (#10)
+- [ ] TSV export format for bioinformatics pipelines (#9)
 
-**Calculation Improvements**
-- [ ] Hardy-Weinberg 2pq carrier frequency formula (#1)
-- [ ] gnomAD homozygote exclusion toggle (#3)
-- [ ] Genetic prevalence calculation (q² and Bayesian) (#7)
+**Extended Data Sources**
+- [ ] Orphanet prevalence reference data integration (#6)
+- [ ] Subcontinental population breakdown for gnomAD v2.1.1 (#5)
 
-**Community Gene Configs**
-- [ ] JSON/YAML per-gene configuration files (recommended filters, founder effects, notes)
-- [ ] Config loading in core package
-- [ ] PR-based contribution workflow with validation (#14)
+**Visualization**
+- [ ] Population frequency bar chart (#2)
 
-**Testing**
-- [ ] Vitest setup with coverage reporting
-- [ ] Core package unit tests (carrier frequency, recurrence risk, Hardy-Weinberg, template renderer)
-- [ ] CLI integration tests
-- [ ] Vue component tests with Vue Test Utils
-- [ ] Playwright E2E tests for critical flows (wizard completion, URL sharing, history)
-- [ ] CI integration for test coverage reporting
-
-### Future (v1.6+)
+### Future (v1.7+)
 
 **Features**
 - [ ] X-linked recessive inheritance calculation
@@ -163,7 +169,7 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - SSR / Nuxt migration — static HTML seed achieves 90% of SSR's SEO benefit
 - Full product tour library — genetic counselors are domain experts
 - Google Analytics — privacy concerns for medical tool
-- Structural variant support — deferred to v1.6+ (#8)
+- Structural variant support — deferred to v1.7+ (#8)
 - npm registry publishing — not yet needed, GitHub Pages is primary distribution
 
 ## Context
@@ -213,7 +219,7 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 | Module-level useConfirmDialog | Singleton refs ensure all consumers share same dialog state — v1.4 | ✓ Good |
 | German FAQ natural language | Different search terminology (Heterozygotenfrequenz vs carrier frequency) — v1.4 | ✓ Good |
 
-| Monorepo with bun workspaces | Core logic reusable across CLI + web + tests; single repo simplicity — v1.5 | — Pending |
+| Monorepo with bun workspaces | Core logic reusable across CLI + web + tests; single repo simplicity — v1.5 | ✓ Good |
 
 ---
-*Last updated: 2026-02-23 after v1.5 milestone start*
+*Last updated: 2026-02-26 after v1.6 milestone start*
