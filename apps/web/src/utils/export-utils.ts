@@ -171,6 +171,85 @@ export function buildExportMetadata(
 }
 
 /**
+ * Escape a field value for TSV output.
+ * - Wrap every field in double quotes
+ * - Escape internal double quotes as ""
+ * - Replace newlines with a space
+ * - Replace tab characters with a space
+ */
+export function escapeTsv(
+  value: string | number | boolean | null | undefined,
+): string {
+  if (value === null || value === undefined) return '""';
+  const str = String(value)
+    .replace(/\n/g, " ")
+    .replace(/\t/g, " ")
+    .replace(/"/g, '""');
+  return `"${str}"`;
+}
+
+/**
+ * Build a populations TSV string (no BOM — composable adds it).
+ * Columns: Population, Carrier Frequency, Ratio, Recurrence Risk, AC, AN, Notes
+ */
+export function buildPopulationsTsv(data: ExportData): string {
+  const header =
+    "Population\tCarrier Frequency\tRatio\tRecurrence Risk\tAC\tAN\tNotes";
+  const rows = data.populations.map((pop) => {
+    const recurrenceRisk =
+      pop.carrierFrequency !== null ? pop.carrierFrequency / 4 : null;
+    return [
+      escapeTsv(pop.label),
+      escapeTsv(pop.carrierFrequency),
+      escapeTsv(pop.carrierFrequencyRatio),
+      escapeTsv(recurrenceRisk),
+      escapeTsv(pop.alleleCount),
+      escapeTsv(pop.alleleNumber),
+      escapeTsv(pop.isFounderEffect ? "Founder effect" : ""),
+    ].join("\t");
+  });
+  return [header, ...rows].join("\n");
+}
+
+/**
+ * Build a variants TSV string (no BOM — composable adds it).
+ * Columns: Variant ID, Consequence, AF, Carrier Frequency, ClinVar Significance,
+ *          Stars, HGVS-c, HGVS-p, Source Category, Quality Flags
+ * Source Category and Quality Flags are Phase 34 placeholders (empty).
+ */
+export function buildVariantsTsv(data: ExportData): string {
+  const header = [
+    "Variant ID",
+    "Consequence",
+    "AF",
+    "Carrier Frequency",
+    "ClinVar Significance",
+    "Stars",
+    "HGVS-c",
+    "HGVS-p",
+    "Source Category",
+    "Quality Flags",
+  ].join("\t");
+  const rows = data.variants.map((v) => {
+    const carrierFreq =
+      v.alleleFrequency !== null ? v.alleleFrequency * 2 : null;
+    return [
+      escapeTsv(v.variantId),
+      escapeTsv(v.consequence),
+      escapeTsv(v.alleleFrequency),
+      escapeTsv(carrierFreq),
+      escapeTsv(v.clinvarStatus ?? ""),
+      escapeTsv(""), // Stars — Phase 34 will add goldStars to ExportVariant
+      escapeTsv(v.hgvsC ?? ""),
+      escapeTsv(v.hgvsP ?? ""),
+      escapeTsv(""), // Source Category — Phase 34 placeholder
+      escapeTsv(""), // Quality Flags — Phase 34 placeholder
+    ].join("\t");
+  });
+  return [header, ...rows].join("\n");
+}
+
+/**
  * Build complete ExportData object
  */
 export function buildExportData(

@@ -2,7 +2,12 @@
 
 import * as XLSX from "xlsx";
 import type { ExportData, LogEntry, LogStats } from "@gnomad-cf/core/types";
-import { generateFilename } from "@/utils/export-utils";
+import {
+  generateFilename,
+  sanitizeFilename,
+  buildPopulationsTsv,
+  buildVariantsTsv,
+} from "@/utils/export-utils";
 
 /**
  * Download a blob as a file
@@ -22,6 +27,8 @@ export interface UseExportReturn {
   exportToJson: (data: ExportData, gene: string, population?: string) => void;
   exportToExcel: (data: ExportData, gene: string, population?: string) => void;
   exportLogsToJson: (entries: LogEntry[], stats: LogStats) => void;
+  exportPopulationsTsv: (data: ExportData, gene: string) => void;
+  exportVariantsTsv: (data: ExportData, gene: string) => void;
 }
 
 /**
@@ -112,6 +119,34 @@ export function useExport(): UseExportReturn {
   }
 
   /**
+   * Export populations data as TSV file with UTF-8 BOM for Excel compatibility
+   */
+  function exportPopulationsTsv(data: ExportData, gene: string): void {
+    const BOM = "\uFEFF";
+    const tsv = BOM + buildPopulationsTsv(data);
+    const blob = new Blob([tsv], {
+      type: "text/tab-separated-values;charset=utf-8",
+    });
+    const date = new Date().toISOString().split("T")[0];
+    const filename = `${sanitizeFilename(gene)}_populations_${date}.tsv`;
+    downloadBlob(blob, filename);
+  }
+
+  /**
+   * Export variants data as TSV file with UTF-8 BOM for Excel compatibility
+   */
+  function exportVariantsTsv(data: ExportData, gene: string): void {
+    const BOM = "\uFEFF";
+    const tsv = BOM + buildVariantsTsv(data);
+    const blob = new Blob([tsv], {
+      type: "text/tab-separated-values;charset=utf-8",
+    });
+    const date = new Date().toISOString().split("T")[0];
+    const filename = `${sanitizeFilename(gene)}_variants_${date}.tsv`;
+    downloadBlob(blob, filename);
+  }
+
+  /**
    * Export logs as JSON file (for LogViewer)
    */
   function exportLogsToJson(entries: LogEntry[], stats: LogStats): void {
@@ -130,5 +165,7 @@ export function useExport(): UseExportReturn {
     exportToJson,
     exportToExcel,
     exportLogsToJson,
+    exportPopulationsTsv,
+    exportVariantsTsv,
   };
 }
