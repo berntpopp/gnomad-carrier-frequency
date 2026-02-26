@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 33 complete, Phase 34 next
+**Current focus:** v1.6 Analysis & Export -- Phase 34 in progress (1/5 plans done)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.6 Analysis & Export
-**Phase:** 33 of 37 (Display Formats & TSV Export)
-**Plan:** 3/3 complete
-**Status:** Phase 33 verified and complete
-**Last activity:** 2026-02-26 -- Phase 33 verified (5/5 must-haves passed, Playwright E2E confirmed)
+**Phase:** 34 of 37 (Quality Flags & Source Breakdown)
+**Plan:** 1/5 complete
+**Status:** In progress
+**Last activity:** 2026-02-26 -- Completed 34-01-PLAN.md (core types, pure functions, GraphQL extension)
 
 ### Progress
 
@@ -28,19 +28,19 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [██░░░░░░░░]  20% - Phase 33 complete (3/3), Phase 34 next
+v1.6 Analysis:      [███░░░░░░░]  25% - Phase 33 complete (3/3), Phase 34 in progress (1/5)
 ```
 
-**Overall:** 117 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 fully shipped).
+**Overall:** 118 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 complete, Phase 34 in progress).
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 117
+- Total plans completed: 118
 - v1.5 plans completed: 26
-- v1.6 plans completed: 3
+- v1.6 plans completed: 4
 
 ---
 
@@ -73,6 +73,13 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - v-model directly on formatStore.defaultFormat — Pinia reactive stores trigger localStorage sync automatically
 - Clinical text (TextOutput) untouched — always dual format per locked CONTEXT.md decision
 
+**34-01 decisions:**
+- computeQualityFlags returns dynamic explanation strings with interpolated values (AF%, filter names, hom counts) — QUAL-08
+- isHighAF checks per-population AF in addition to global AF (joint-first) — ACMG BA1 applies per population (Pitfall 3)
+- isGenomesOnly returns false when joint data is present — joint = exome+genome combined (Pitfall 1)
+- classifyVariantSource accepts optional submissionsMap to mirror shouldIncludeVariantConfigurable signature
+- FACTORY_EXCLUSION_DEFAULTS has all false — no exclusions by default (user opts in per CONTEXT.md)
+
 ### Pending Todos
 
 None.
@@ -90,8 +97,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** Phase 33 fully executed (3/3 plans, 2 waves) and verified (5/5 must-haves, Playwright E2E). Format selector, TSV export, settings persistence all confirmed.
-**Status:** Phase 33 verified. Phase 34 (Quality Flags & Source Breakdown) is next.
+**Completed:** 34-01 executed (3/3 tasks). Core quality types, pure flag functions (isHighAF, isHighHom, isGnomadFiltered, isGenomesOnly, computeQualityFlags), source classification (classifyVariantSource), GraphQL query extended with filters field. 64 new unit tests, 508 total passing.
+**Status:** Phase 34 in progress. Plan 34-02 (useQualityStore) is next.
 **Resume file:** None
 
 ### Handoff Notes
