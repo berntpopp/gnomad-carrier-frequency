@@ -12,6 +12,7 @@ export default defineConfig({
     utils:        'src/utils/index.ts',
     client:       'src/client/index.ts',
     'gene-config': 'src/gene-config/index.ts',
+    chart:        'src/chart/index.ts',
   },
   format: ['esm'],
   dts: true,
