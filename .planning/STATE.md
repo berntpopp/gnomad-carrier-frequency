@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 34 in progress (1/5 plans done)
+**Current focus:** v1.6 Analysis & Export -- Phase 34 in progress (2/5 plans done)
 
 ---
 
@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Milestone:** v1.6 Analysis & Export
 **Phase:** 34 of 37 (Quality Flags & Source Breakdown)
-**Plan:** 1/5 complete
+**Plan:** 2/5 complete
 **Status:** In progress
-**Last activity:** 2026-02-26 -- Completed 34-01-PLAN.md (core types, pure functions, GraphQL extension)
+**Last activity:** 2026-02-26 -- Completed 34-02-PLAN.md (useQualityStore, quality exclusions in useCarrierFrequency)
 
 ### Progress
 
@@ -28,19 +28,19 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [███░░░░░░░]  25% - Phase 33 complete (3/3), Phase 34 in progress (1/5)
+v1.6 Analysis:      [████░░░░░░]  30% - Phase 33 complete (3/3), Phase 34 in progress (2/5)
 ```
 
-**Overall:** 118 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 complete, Phase 34 in progress).
+**Overall:** 119 plans complete across 32+ phases in 6 milestones. 5 new phases for v1.6 (Phase 33 complete, Phase 34 in progress).
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 118
+- Total plans completed: 119
 - v1.5 plans completed: 26
-- v1.6 plans completed: 4
+- v1.6 plans completed: 5
 
 ---
 
@@ -80,6 +80,12 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - classifyVariantSource accepts optional submissionsMap to mirror shouldIncludeVariantConfigurable signature
 - FACTORY_EXCLUSION_DEFAULTS has all false — no exclusions by default (user opts in per CONTEXT.md)
 
+**34-02 decisions:**
+- qualityExclusionConfig is per-analysis local ref: initialized from store defaults, not persisted back on toggle (Pitfall 7)
+- filteredByPathogenicity replaces two separate filterPathogenicVariantsConfigurable calls — single source computed (DRY)
+- qualityExcludedCount tracked separately from manual excludedCount (Pitfall 4) — UI can show them independently
+- filteredByPathogenicity exposed in UseCarrierFrequencyReturn for source classification in Plan 04
+
 ### Pending Todos
 
 None.
@@ -97,8 +103,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-26
-**Completed:** 34-01 executed (3/3 tasks). Core quality types, pure flag functions (isHighAF, isHighHom, isGnomadFiltered, isGenomesOnly, computeQualityFlags), source classification (classifyVariantSource), GraphQL query extended with filters field. 64 new unit tests, 508 total passing.
-**Status:** Phase 34 in progress. Plan 34-02 (useQualityStore) is next.
+**Completed:** 34-02 executed (2/2 tasks). useQualityStore Pinia store with localStorage persistence. Quality exclusion pipeline wired into useCarrierFrequency: filteredByPathogenicity, qualityFlagsMap, qualityExcludedCount, flaggedVariantCount, qualityExclusionConfig (per-analysis local). All 508 tests passing.
+**Status:** Phase 34 in progress. Plan 34-03 (Quality Flags UI) is next.
 **Resume file:** None
 
 ### Handoff Notes
