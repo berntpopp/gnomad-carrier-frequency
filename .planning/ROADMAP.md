@@ -89,7 +89,14 @@ Plans:
   3. Users can exclude flagged variants per flag type from the carrier frequency calculation, and the frequency updates in real time when exclusions change
   4. Each variant displays a source badge (ClinVar-only, pLoF-only, or Both) and the results view shows carrier frequency split by source contribution for each population
   5. Source classification operates as a separate function from the existing filter pipeline -- enabling or disabling source breakdown does not alter which variants pass the inclusion filter
-**Plans**: TBD
+**Plans:** 5 plans
+
+Plans:
+- [ ] 34-01-PLAN.md -- Core quality types, quality flag functions, source classification, GraphQL query extension
+- [ ] 34-02-PLAN.md -- Quality settings store and carrier frequency composable integration
+- [ ] 34-03-PLAN.md -- SettingsDialog Quality tab and FilterPanel exclusion toggles
+- [ ] 34-04-PLAN.md -- VariantTable quality/source columns, StepResults wiring, summary enhancements
+- [ ] 34-05-PLAN.md -- Per-population source frequency breakdown with expandable rows
 
 ---
 
@@ -155,7 +162,7 @@ Plans:
 | 31. Runtime Gene Config Loading & Submission Modal | v1.5 | 1/1 | Complete | 2026-02-25 |
 | 32. Frequency Accuracy Fixes | v1.5 | 1/1 | Complete | 2026-02-25 |
 | 33. Display Formats & TSV Export | v1.6 | 3/3 | Complete | 2026-02-26 |
-| 34. Quality Flags & Source Breakdown | v1.6 | 0/TBD | Not started | - |
+| 34. Quality Flags & Source Breakdown | v1.6 | 0/5 | Not started | - |
 | 35. Population Bar Chart | v1.6 | 0/TBD | Not started | - |
 | 36. Orphanet Prevalence Integration | v1.6 | 0/TBD | Not started | - |
 | 37. Subcontinental Populations | v1.6 | 0/TBD | Not started | - |
@@ -164,4 +171,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-26 (Phase 33 complete: 3/3 plans, verified)*
+*Last updated: 2026-02-26 (Phase 34 planned: 5 plans in 4 waves)*
