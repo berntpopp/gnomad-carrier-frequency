@@ -64,10 +64,10 @@
 **Depends on**: Phase 32 (v1.5 complete)
 **Requirements**: FMT-01, FMT-02, FMT-03, FMT-04, FMT-05, FMT-06, FMT-07, EXP-01, EXP-02, EXP-03, EXP-04, EXP-05
 **Success Criteria** (what must be TRUE):
-  1. A format selector in the results step lets the user switch between Percentage, Ratio (1:N), Scientific notation, and Per 100,000 -- and the population table, summary card, and export output all update to reflect the selected format
+  1. A format selector in the results step lets the user switch between Percentage, Ratio (1:N), Scientific notation, and Per 100,000 -- and the population table, summary card, and range text all update to reflect the selected format
   2. Scientific notation displays with proper Unicode superscript characters (e.g., 4.31 x 10^-2) and per-100k displays as "X / 100,000", with locale-aware decimal separators (comma for German, period for English)
-  3. The format preference persists across browser sessions (survives page reload) and clinical text templates adapt to the selected display format
-  4. Clicking "Download TSV" produces a UTF-8 TSV file that opens correctly in Excel on Windows with German characters (umlauts, gender-inclusive markers) intact, containing both population summary and variant detail sheets
+  3. The default format preference persists across browser sessions (survives page reload), and clinical text always uses dual format (ratio + percentage) regardless of the display format selector
+  4. Two separate TSV download options (Populations TSV and Variants TSV) produce UTF-8 BOM-prefixed files that open correctly in Excel on Windows with German characters intact, using raw decimal values for machine parseability
   5. The CLI `--format tsv` output includes the new source category and quality flag columns alongside existing columns
 **Plans:** 3 plans
 
