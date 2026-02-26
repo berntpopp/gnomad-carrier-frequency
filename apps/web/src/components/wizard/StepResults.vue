@@ -265,7 +265,11 @@
           aria-label="Frequency display format"
           @update:model-value="setFormat($event as DisplayFormat)"
         >
-          <v-tooltip v-for="option in formatOptions" :key="option.value" location="top">
+          <v-tooltip
+            v-for="option in formatOptions"
+            :key="option.value"
+            location="top"
+          >
             <template #activator="{ props: tooltipProps }">
               <v-btn
                 v-bind="tooltipProps"
@@ -289,7 +293,7 @@
           prepend-icon="mdi-table-eye"
           @click="openAllVariantsModal"
         >
-          View all variants ({{ filteredCount }})
+          Variants ({{ filteredCount }})
         </v-btn>
 
         <!-- Export dropdown -->
@@ -346,7 +350,7 @@
               aria-label="Copy shareable link to clipboard"
               @click="copyShareLink"
             >
-              {{ copied ? "Copied!" : "Copy link" }}
+              {{ copied ? "Copied!" : "Link" }}
             </v-btn>
           </template>
           <span class="tooltip-text">
@@ -472,7 +476,10 @@ import {
   getGnomadVersion,
   getPopulationLabel,
 } from "@gnomad-cf/core/config";
-import { frequencyToPercent, frequencyToRatio } from "@gnomad-cf/core/calculations";
+import {
+  frequencyToPercent,
+  frequencyToRatio,
+} from "@gnomad-cf/core/calculations";
 import type { DisplayFormat } from "@gnomad-cf/core/calculations";
 import { useDisplayFormat } from "@/composables/useDisplayFormat";
 
@@ -572,17 +579,43 @@ const { excludedCount, excluded, reasons } = useExclusionState();
 const excludedSet = computed(() => new Set(excluded.value));
 
 // Set up export composable
-const { exportToJson, exportToExcel, exportPopulationsTsv, exportVariantsTsv } = useExport();
+const { exportToJson, exportToExcel, exportPopulationsTsv, exportVariantsTsv } =
+  useExport();
 
 // Display format composable — reactive frequency formatting
-const { currentFormat, setFormat, formatFrequency, formatRatio: formatRatioDisplay } = useDisplayFormat();
+const {
+  currentFormat,
+  setFormat,
+  formatFrequency,
+  formatRatio: formatRatioDisplay,
+} = useDisplayFormat();
 
 // Format selector options for v-btn-toggle
 const formatOptions = [
-  { value: "percent" as DisplayFormat, symbol: "%", label: "Percentage", tooltip: "Display as percentage (e.g. 4.31%)" },
-  { value: "ratio" as DisplayFormat, symbol: "1:N", label: "Ratio", tooltip: "Display as ratio (e.g. 1:23)" },
-  { value: "scientific" as DisplayFormat, symbol: "sci", label: "Scientific notation", tooltip: "Display in scientific notation (e.g. 4.31 × 10⁻²)" },
-  { value: "per100k" as DisplayFormat, symbol: "/100k", label: "Per 100,000", tooltip: "Display per 100,000 individuals" },
+  {
+    value: "percent" as DisplayFormat,
+    symbol: "%",
+    label: "Percentage",
+    tooltip: "Display as percentage (e.g. 4.31%)",
+  },
+  {
+    value: "ratio" as DisplayFormat,
+    symbol: "1:N",
+    label: "Ratio",
+    tooltip: "Display as ratio (e.g. 1:23)",
+  },
+  {
+    value: "scientific" as DisplayFormat,
+    symbol: "sci",
+    label: "Scientific notation",
+    tooltip: "Display in scientific notation (e.g. 4.31 × 10⁻²)",
+  },
+  {
+    value: "per100k" as DisplayFormat,
+    symbol: "/100k",
+    label: "Per 100,000",
+    tooltip: "Display per 100,000 individuals",
+  },
 ];
 
 // Set up announcer for screen reader notifications
@@ -610,7 +643,9 @@ async function copyShareLink() {
 }
 
 // Export handler function
-function handleExport(format: "json" | "xlsx" | "tsv-populations" | "tsv-variants") {
+function handleExport(
+  format: "json" | "xlsx" | "tsv-populations" | "tsv-variants",
+) {
   if (!props.result) return;
 
   // Convert filtered variants to display format for export
