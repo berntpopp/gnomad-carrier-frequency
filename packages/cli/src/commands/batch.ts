@@ -20,6 +20,7 @@ import { resolvePopulation } from "../utils/population-aliases.js";
 import { formatText } from "../output/text-formatter.js";
 import { formatJson } from "../output/json-formatter.js";
 import { formatTsv } from "../output/tsv-formatter.js";
+import { formatSvg } from "../output/svg-formatter.js";
 import type { QueryResult } from "../types.js";
 
 // ---------------------------------------------------------------------------
@@ -89,7 +90,7 @@ export function parseGeneListFile(content: string): string[] {
 export const batchCommand = new Command("batch")
   .description("Process multiple genes from a file with concurrent API calls")
   .argument("<file>", "Path to gene list file (plain text or JSON)")
-  .option("-f, --format <fmt>", "Output format: text|json|tsv", "json")
+  .option("-f, --format <fmt>", "Output format: text|json|tsv|svg", "json")
   .option("--variants", "Include per-variant breakdown in output")
   .option(
     "-p, --population <id>",
@@ -271,6 +272,13 @@ export const batchCommand = new Command("batch")
       case "tsv":
         // Include variants only if requested (adds variant section after main table)
         output = formatTsv(results, { includeVariants });
+        break;
+
+      case "svg":
+        // For SVG format, concatenate each gene's chart separated by a comment
+        output = results
+          .map((r) => formatSvg(r))
+          .join("\n\n<!-- ─── next gene ─── -->\n\n");
         break;
 
       case "text":

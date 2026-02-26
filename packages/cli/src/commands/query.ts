@@ -7,7 +7,7 @@
  *
  * CLI requirements addressed:
  *   CLI-02: Single gene lookup
- *   CLI-04: Output formats (text, json, tsv)
+ *   CLI-04: Output formats (text, json, tsv, svg)
  *   CLI-05: Clinical text generation
  *   CLI-06: Population filter
  *   CLI-07: Variant filter flags (LoF, ClinVar, star threshold)
@@ -25,6 +25,7 @@ import { formatText } from "../output/text-formatter.js";
 import { formatJson } from "../output/json-formatter.js";
 import { formatTsv } from "../output/tsv-formatter.js";
 import { formatClinical } from "../output/clinical-formatter.js";
+import { formatSvg } from "../output/svg-formatter.js";
 
 export const queryCommand = new Command("query")
   .description("Query gnomAD carrier frequency for a single gene")
@@ -35,7 +36,7 @@ export const queryCommand = new Command("query")
     "Filter to a specific population (e.g. nfe, european, east-asian)",
   )
   // ── Output format ────────────────────────────────────────────────────────
-  .option("-f, --format <fmt>", "Output format: text | json | tsv", "text")
+  .option("-f, --format <fmt>", "Output format: text | json | tsv | svg", "text")
   // ── Variant breakdown ─────────────────────────────────────────────────────
   .option("--variants", "Include per-variant breakdown in output", false)
   // ── Clinical text ─────────────────────────────────────────────────────────
@@ -138,7 +139,9 @@ export const queryCommand = new Command("query")
       let output: string;
 
       const format = merged.format;
-      if (format === "json") {
+      if (format === "svg") {
+        output = formatSvg(result);
+      } else if (format === "json") {
         output = formatJson(result, {
           includeVariants: opts["variants"] === true,
           pretty: true,
