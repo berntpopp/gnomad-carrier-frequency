@@ -14,6 +14,7 @@ export const GENE_VARIANTS_QUERY = `
           ac
           an
           ac_hom
+          filters
           populations {
             id
             ac
@@ -25,6 +26,7 @@ export const GENE_VARIANTS_QUERY = `
           ac
           an
           ac_hom
+          filters
           populations {
             id
             ac

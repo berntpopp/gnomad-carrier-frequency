@@ -50,12 +50,16 @@ export interface VariantFrequencyData {
     ac: number;
     an: number;
     ac_hom: number;
+    /** gnomAD QC filter names; empty array or ["PASS"] means passed; other values indicate failure */
+    filters?: string[];
     populations: VariantPopulation[];
   };
   genome?: {
     ac: number;
     an: number;
     ac_hom: number;
+    /** gnomAD QC filter names; empty array or ["PASS"] means passed; other values indicate failure */
+    filters?: string[];
     populations: VariantPopulation[];
   };
   joint?: JointFrequencyData;
