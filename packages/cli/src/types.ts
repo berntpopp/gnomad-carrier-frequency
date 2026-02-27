@@ -1,6 +1,7 @@
 import type { GnomadVersion } from "@gnomad-cf/core/config";
 import type { PopulationFrequency } from "@gnomad-cf/core/types";
 import type { FilterConfig, CalcConfig } from "@gnomad-cf/core/types";
+import type { OrphanetDisease } from "@gnomad-cf/core/orphanet";
 
 export interface VariantDetail {
   variant_id: string;
@@ -30,6 +31,7 @@ export interface QueryResult {
   homExclusionActive: boolean;
   penetrance: number;
   variants?: VariantDetail[];
+  orphanetDiseases?: OrphanetDisease[];
 }
 
 export interface QueryOptions {

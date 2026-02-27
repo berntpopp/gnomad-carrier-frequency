@@ -26,6 +26,7 @@ import { formatJson } from "../output/json-formatter.js";
 import { formatTsv } from "../output/tsv-formatter.js";
 import { formatClinical } from "../output/clinical-formatter.js";
 import { formatSvg } from "../output/svg-formatter.js";
+import { fetchOrphanetData } from "@gnomad-cf/core/orphanet";
 
 export const queryCommand = new Command("query")
   .description("Query gnomAD carrier frequency for a single gene")
@@ -134,6 +135,16 @@ export const queryCommand = new Command("query")
         calcConfig: merged.calcConfig,
         population: pop,
       });
+
+      // Fetch Orphanet data (non-blocking -- failure is OK)
+      try {
+        const orphanetResult = await fetchOrphanetData(gene);
+        if (orphanetResult.diseases.length > 0 && !orphanetResult.error) {
+          result.orphanetDiseases = orphanetResult.diseases;
+        }
+      } catch {
+        // Silently skip Orphanet data on failure
+      }
 
       // Format main output
       let output: string;

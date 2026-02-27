@@ -3,6 +3,7 @@ import {
   formatPrevalence,
 } from "@gnomad-cf/core/calculations";
 import { getGnomadVersion } from "@gnomad-cf/core/config";
+import type { OrphanetDisease } from "@gnomad-cf/core/orphanet";
 import type { QueryResult } from "../types.js";
 
 /**
@@ -104,6 +105,25 @@ function formatPopulationBlock(
 }
 
 /**
+ * Format Orphanet prevalence data as a text section.
+ * Returns empty string when no diseases are provided.
+ */
+function formatOrphanetSection(diseases: OrphanetDisease[]): string {
+  if (diseases.length === 0) return '';
+  const lines: string[] = ['', '--- Orphanet Prevalence ---'];
+  for (const d of diseases) {
+    const prev = d.bestPrevalence
+      ? `${d.bestPrevalence.prevalenceClass} (${d.bestPrevalence.geographic})`
+      : 'Unknown';
+    const ar = d.isAutosomalRecessive ? ' [AR]' : '';
+    lines.push(labelLine(`${d.name}${ar}:`, prev));
+    lines.push(`    ${d.orphanetUrl}`);
+  }
+  lines.push('  Note: Orphanet reports clinical prevalence, not genetic carrier prevalence.');
+  return lines.join('\n');
+}
+
+/**
  * Format QueryResult as human-readable summary blocks with labeled key:value lines
  * grouped by population.
  *
@@ -177,6 +197,11 @@ export function formatText(
         "equals",
       ),
     );
+  }
+
+  // Orphanet prevalence section (when data available)
+  if (result.orphanetDiseases && result.orphanetDiseases.length > 0) {
+    sections.push(formatOrphanetSection(result.orphanetDiseases));
   }
 
   // Optional variants section
