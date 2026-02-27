@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Milestone:** v1.6 Analysis & Export
 **Phase:** 36 of 37 (Orphanet Prevalence Integration) -- in progress
-**Plan:** 1 of 3 complete
-**Status:** Plan 36-01 complete (Orphanet core client in @gnomad-cf/core/orphanet)
-**Last activity:** 2026-02-27 -- Plan 36-01 complete (types, client functions, tsdown subpath entry)
+**Plan:** 2 of 3 complete
+**Status:** Plan 36-02 complete (Pinia store, useOrphanetData composable, OrphanetSection.vue)
+**Last activity:** 2026-02-27 -- Plan 36-02 complete (useOrphanetStore, useOrphanetData, OrphanetSection.vue)
 
 ### Progress
 
@@ -28,10 +28,10 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [█████████░]  78% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 complete (3/3), Phase 36 in progress (1/3)
+v1.6 Analysis:      [█████████░]  83% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 complete (3/3), Phase 36 in progress (2/3)
 ```
 
-**Overall:** 126 plans complete across 36 phases in 6 milestones. Phase 36 (2/3 remaining), Phase 37 remaining.
+**Overall:** 127 plans complete across 36 phases in 6 milestones. Phase 36 (1/3 remaining), Phase 37 remaining.
 
 ---
 
@@ -116,6 +116,13 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - Promise.allSettled across orphacodes prevents single 404 failure from blocking all disease enrichment
 - tsdown exports:true auto-rewrites package.json exports on each build — this is expected, not a bug
 
+**36-02 decisions:**
+- Record<string, OrphanetResult> in Pinia store state (not Map) — Pinia reactivity and JSON serialization both require plain objects
+- additionalDiseases filtered to diseases with bestPrevalence !== null — diseases without prevalence add no clinical value
+- expanded ref stays local to OrphanetSection.vue (not lifted to composable) — pure display concern
+- v-expand-transition for +N more list — consistent with FilterPanel pattern used elsewhere in app
+- No persist on useOrphanetStore — session-level cache per CONTEXT.md
+
 **34-03 decisions:**
 - highAfPercent computed wraps 0-1 stored value in get/set for 0-100% slider display in SettingsDialog Quality tab
 - FilterPanel quality exclusion section uses template v-if on qualityExclusionConfig prop — backwards-compatible, parent opts in
@@ -154,8 +161,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-27
-**Completed:** Plan 36-01 — @gnomad-cf/core/orphanet subpath with Orphanet REST API client (types.ts, client.ts, index.ts) + tsdown entry + package.json export.
-**Status:** Phase 36 plan 1 of 3 complete. Ready for Plan 36-02 (Pinia store + useOrphanetData composable).
+**Completed:** Plan 36-02 — useOrphanetStore (Pinia session cache), useOrphanetData (reactive composable with cache-first fetchForGene), OrphanetSection.vue (skeleton + primary disease + +N more + disclaimer).
+**Status:** Phase 36 plan 2 of 3 complete. Ready for Plan 36-03 (StepResults integration + wizard eager fetch trigger + Workbox cache).
 **Resume file:** None
 
 ### Handoff Notes
@@ -163,8 +170,8 @@ None.
 v1.6 phase order: 33 (FMT+EXP) -> 34 (QUAL+SRC) -> 35 (VIZ) -> 36 (ORPH) -> 37 (SUBP).
 Phase 33 establishes format infrastructure that Phases 34-37 consume.
 Phase 35 complete. Phase 36 plan 1 complete — @gnomad-cf/core/orphanet subpath available.
-Phase 36 plan 2 (Pinia store useOrphanetStore + composable useOrphanetData) ready to execute.
-Phase 36 plan 3 (OrphanetSection.vue + StepResults integration + Workbox cache) follows plan 2.
+Phase 36 plan 2 complete — useOrphanetStore + useOrphanetData + OrphanetSection.vue delivered.
+Phase 36 plan 3 (StepResults integration + wizard eager fetch trigger + Workbox cache) ready to execute.
 Phase 37 depends on Phase 34.
 
 ---
