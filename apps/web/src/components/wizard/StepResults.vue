@@ -361,6 +361,35 @@
           </v-list>
         </v-menu>
 
+        <!-- Subcontinental toggle (v2 only) -->
+        <v-switch
+          v-if="isV2"
+          v-model="showSubcontinental"
+          label="Subcontinental"
+          density="compact"
+          hide-details
+          :disabled="qualifyingVariantCount === 0 || isLoading"
+          :loading="isLoadingSubcontinental ? 'primary' : false"
+          class="ml-2 flex-grow-0"
+          data-testid="subcontinental-toggle"
+        />
+        <v-tooltip v-else location="top">
+          <template #activator="{ props: tooltipProps }">
+            <v-chip
+              v-bind="tooltipProps"
+              size="small"
+              variant="outlined"
+              color="grey"
+              class="ml-2"
+              data-testid="subcontinental-v2-only"
+            >
+              <v-icon start size="x-small">mdi-information</v-icon>
+              Subcontinental (v2 only)
+            </v-chip>
+          </template>
+          Subcontinental population breakdowns are only available for gnomAD v2.1.1 queries.
+        </v-tooltip>
+
         <!-- Copy link button -->
         <v-tooltip location="top">
           <template #activator="{ props: tooltipProps }">
@@ -594,7 +623,13 @@ import {
   config,
   getGnomadVersion,
   getPopulationLabel,
+  getSubpopulations,
+  getSubpopulationParent,
 } from "@gnomad-cf/core/config";
+import {
+  useSubcontinentalData,
+  type SubcontinentalPopulationFrequency,
+} from "@/composables";
 import {
   frequencyToPercent,
   frequencyToRatio,
@@ -727,6 +762,7 @@ const { excludedCount, excluded, reasons } = useExclusionState();
 
 // Quality data from the singleton composable
 const {
+  isLoading,
   qualityExclusionConfig,
   setQualityExclusionConfig,
   qualityExcludedCount,
@@ -742,6 +778,44 @@ const qualityFilterPanelProps = computed(() => ({
   qualityExcludedCount: qualityExcludedCount.value,
   flaggedVariantCount: flaggedVariantCount.value,
 }));
+
+// Subcontinental population data — v2 only
+const isV2 = computed(() => props.result?.version === 'v2');
+const showSubcontinental = ref(false);
+
+const {
+  isLoading: isLoadingSubcontinental,
+  progress: subcontinentalProgress,
+  error: subcontinentalError,
+  subcontinentalFrequencies,
+  fetchForVariants: fetchSubcontinental,
+  clear: clearSubcontinental,
+} = useSubcontinentalData();
+
+// Watch toggle to trigger subcontinental fetch on enable
+watch(showSubcontinental, async (enabled) => {
+  if (enabled && isV2.value && qualifyingVariants.value.length > 0) {
+    const variantIds = qualifyingVariants.value.map(v => v.variant_id);
+    const gene = props.result?.gene ?? '';
+    // Build parent frequency map for founder effect detection
+    const parentFreqs = new Map<string, number | null>();
+    for (const pop of props.result?.populations ?? []) {
+      parentFreqs.set(pop.code, pop.carrierFrequency);
+    }
+    await fetchSubcontinental(variantIds, gene, parentFreqs);
+  }
+});
+
+// Helper: get subcontinental rows for a parent population
+function getSubcontinentalRows(parentCode: string): SubcontinentalPopulationFrequency[] {
+  return subcontinentalFrequencies.value.filter(f => f.parentCode === parentCode);
+}
+
+function hasSubpopulations(popCode: string): boolean {
+  if (!isV2.value) return false;
+  const pops = getSubpopulations('v2');
+  return pops.some(s => getSubpopulationParent(s.code, 'v2') === popCode);
+}
 
 // Expandable population row state — tracks which population rows are expanded
 const expandedPops = ref<Set<string>>(new Set());
@@ -803,11 +877,13 @@ function getSourceBorderColor(category: string): string {
   }
 }
 
-// Reset expanded populations when gene result changes
+// Reset expanded populations and subcontinental data when gene result changes
 watch(
   () => props.result,
   () => {
     expandedPops.value = new Set();
+    showSubcontinental.value = false;
+    clearSubcontinental();
   },
 );
 
