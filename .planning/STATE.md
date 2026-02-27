@@ -14,10 +14,10 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 **Milestone:** v1.6 Analysis & Export
-**Phase:** 35 of 37 (Population Bar Chart) -- complete
-**Plan:** 3 of 3 complete
-**Status:** Plan 35-03 complete (unit tests, E2E tests, human verification)
-**Last activity:** 2026-02-27 -- Plan 35-03 complete (tests + human approval + orchestrator additions: default tab=Table, core SVG chart, CLI --format svg)
+**Phase:** 36 of 37 (Orphanet Prevalence Integration) -- in progress
+**Plan:** 1 of 3 complete
+**Status:** Plan 36-01 complete (Orphanet core client in @gnomad-cf/core/orphanet)
+**Last activity:** 2026-02-27 -- Plan 36-01 complete (types, client functions, tsdown subpath entry)
 
 ### Progress
 
@@ -28,10 +28,10 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [█████████░]  75% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 complete (3/3)
+v1.6 Analysis:      [█████████░]  78% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 complete (3/3), Phase 36 in progress (1/3)
 ```
 
-**Overall:** 125 plans complete across 35 phases in 6 milestones. Phases 36-37 remaining.
+**Overall:** 126 plans complete across 36 phases in 6 milestones. Phase 36 (2/3 remaining), Phase 37 remaining.
 
 ---
 
@@ -107,6 +107,15 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - data-testid on root chart div and v-tab elements — enables stable E2E selectors without brittle text/role matching
 - Orchestrator-level post-approval additions: default tab=Table (user preference), core SVG chart (generateSvgChart() in @gnomad-cf/core/chart), CLI --format svg (gnomad-cf query CFTR --format svg)
 
+**36-01 decisions:**
+- Gene symbol always lowercased before Orphanet API call — uppercase returns 404 (empirically verified)
+- fetchEpidemiology + fetchNaturalHistory return [] on any error including 404 — disease subtypes commonly lack epi data (HEXA case)
+- OrphanetURL constructed from orphacode: https://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&Expert={orphacode} (safe fallback)
+- selectBestPrevalence priority: Validated > Point prevalence > Prevalence at birth > Europe preferred > Specific population deprioritized
+- selectPrimaryDisease: AR diseases preferred over non-AR; among candidates sort by valMoy descending
+- Promise.allSettled across orphacodes prevents single 404 failure from blocking all disease enrichment
+- tsdown exports:true auto-rewrites package.json exports on each build — this is expected, not a bug
+
 **34-03 decisions:**
 - highAfPercent computed wraps 0-1 stored value in get/set for 0-100% slider display in SettingsDialog Quality tab
 - FilterPanel quality exclusion section uses template v-if on qualityExclusionConfig prop — backwards-compatible, parent opts in
@@ -145,16 +154,18 @@ None.
 ### Last Session
 
 **Date:** 2026-02-27
-**Completed:** Plan 35-03 — PopulationBarChart unit tests (10), E2E chart/table tab tests (5), human visual verification. Orchestrator additions post-approval: default tab=Table, tab reorder, @gnomad-cf/core/chart subpath (generateSvgChart()), CLI --format svg.
-**Status:** Phase 35 fully complete (3/3 plans). Ready for Phase 36 (Orphanet integration).
+**Completed:** Plan 36-01 — @gnomad-cf/core/orphanet subpath with Orphanet REST API client (types.ts, client.ts, index.ts) + tsdown entry + package.json export.
+**Status:** Phase 36 plan 1 of 3 complete. Ready for Plan 36-02 (Pinia store + useOrphanetData composable).
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.6 phase order: 33 (FMT+EXP) -> 34 (QUAL+SRC) -> 35 (VIZ) -> 36 (ORPH) -> 37 (SUBP).
 Phase 33 establishes format infrastructure that Phases 34-37 consume.
-Phase 35 complete. Phase 36 (Orphanet) depends only on Phase 33. Phase 37 depends on Phase 34.
-@gnomad-cf/core/chart subpath now available for CLI and any future consumers needing server-side SVG charts.
+Phase 35 complete. Phase 36 plan 1 complete — @gnomad-cf/core/orphanet subpath available.
+Phase 36 plan 2 (Pinia store useOrphanetStore + composable useOrphanetData) ready to execute.
+Phase 36 plan 3 (OrphanetSection.vue + StepResults integration + Workbox cache) follows plan 2.
+Phase 37 depends on Phase 34.
 
 ---
 
