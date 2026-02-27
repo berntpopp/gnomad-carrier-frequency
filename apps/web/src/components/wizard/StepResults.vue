@@ -237,6 +237,14 @@
             <v-icon size="x-small" class="mr-1">mdi-alert-outline</v-icon>({{ flaggedVariantCount }} flagged)
           </span>
         </div>
+
+        <!-- Orphanet prevalence section — at bottom of summary card -->
+        <OrphanetSection
+          :loading="orphanetLoading"
+          :diseases="orphanetDiseases"
+          :primary-disease="primaryDisease"
+          :additional-diseases="additionalDiseases"
+        />
       </v-card-text>
     </v-card>
 
@@ -624,10 +632,12 @@ import {
 } from "@gnomad-cf/core/filters";
 import { buildExportData } from "@/utils/export-utils";
 import { formatPrevalence } from "@gnomad-cf/core/calculations";
+import { useOrphanetData } from "@/composables/useOrphanetData";
 import TextOutput from "./TextOutput.vue";
 import FilterPanel from "@/components/FilterPanel.vue";
 import VariantModal from "@/components/VariantModal.vue";
 import ClingenWarning from "@/components/ClingenWarning.vue";
+import OrphanetSection from "@/components/OrphanetSection.vue";
 import PopulationBarChart from "@/components/PopulationBarChart.vue";
 import { useChartExport } from "@/composables/useChartExport";
 
@@ -691,6 +701,26 @@ const bayesianPrevalenceFormatted = computed(() => {
 
 // Get canonical transcript from gene details (fetched at gene selection time)
 const { canonicalTranscript } = useGeneSearch();
+
+// Orphanet data — reads from Pinia store cache (pre-filled by WizardStepper eager fetch).
+// If cache miss (e.g. direct navigation to Step 4), fetchForGene triggers a network request.
+const {
+  loading: orphanetLoading,
+  primaryDisease,
+  additionalDiseases,
+  diseases: orphanetDiseases,
+  fetchForGene: fetchOrphanetForGene,
+} = useOrphanetData();
+
+watch(
+  () => props.result?.gene,
+  (geneSymbol) => {
+    if (geneSymbol) {
+      fetchOrphanetForGene(geneSymbol);
+    }
+  },
+  { immediate: true },
+);
 
 // Get exclusion state (singleton) for displaying excluded count and export data
 const { excludedCount, excluded, reasons } = useExclusionState();
