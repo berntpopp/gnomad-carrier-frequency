@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 37 in progress (2/3 plans complete)
+**Current focus:** v1.6 Analysis & Export -- Phase 37 in progress (awaiting checkpoint verification for Plan 03)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.6 Analysis & Export
-**Phase:** 37 of 37 (Subcontinental Populations) -- in progress
-**Plan:** 2 of 3 complete
-**Status:** Plan 37-02 complete — web data layer (useSubcontinentalStore Pinia cache, useSubcontinentalData composable with N+1 fetch + aggregation)
-**Last activity:** 2026-02-27 -- Plan 37-02 complete (Pinia store, composable, composables barrel re-export)
+**Phase:** 37 of 37 (Subcontinental Populations) -- awaiting checkpoint
+**Plan:** 2.5 of 3 (Tasks 1-2 of Plan 37-03 complete; stopped at checkpoint:human-verify Task 3)
+**Status:** Plan 37-03 Tasks 1 and 2 complete — subcontinental toggle, nested rows, quality chips, CSS. Awaiting user verification at http://localhost:5173.
+**Last activity:** 2026-02-27 -- Plan 37-03 Tasks 1+2 committed (5ec9378, d14042e); at checkpoint
 
 ### Progress
 
@@ -31,7 +31,7 @@ v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
 v1.6 Analysis:      [█████████░] ~98% - Phase 33-36 complete, Phase 37 in progress (2/3)
 ```
 
-**Overall:** 130 plans complete across 37 phases in 6 milestones. Plan 37-03 remaining.
+**Overall:** 130 plans complete across 37 phases in 6 milestones. Plan 37-03 Tasks 1-2 complete, at checkpoint for Task 3 (human-verify).
 
 ---
 
@@ -130,6 +130,12 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - $referenceGenome: ReferenceGenomeId! included in VARIANT_SUBCONTINENTAL_QUERY — gnomAD schema requires it (v2=GRCh37), consistent with GENE_VARIANTS_QUERY
 - No joint field in VARIANT_SUBCONTINENTAL_QUERY — gnomAD v2.1.1 has no joint coverage for individual variants
 
+**37-03 decisions:**
+- isLoading from useCarrierFrequency added to destructure in StepResults — used for toggle disabled state (prevents enabling subcontinental while main gnomAD query in progress)
+- isV2 computed from props.result?.version === 'v2' (NOT useGnomadVersion) — result prop is authoritative version source in StepResults
+- Subcontinental toggle reset added inside existing props.result watcher — avoids second watcher for same signal
+- Last column in subcontinental rows uses unconditional <td /> (not v-if="hasNotes") — subcontinental rows always match headers.length regardless of notes presence
+
 **37-02 decisions:**
 - Aggregation uses only variantIds passed to fetchForVariants (not all store contents) — prevents stale variants from old filter configs contaminating aggregation
 - Variants absent from gnomAD v2 stored as empty array [] (not omitted) — hasVariant() returns true, preventing redundant refetches
@@ -190,8 +196,8 @@ None.
 ### Last Session
 
 **Date:** 2026-02-27
-**Completed:** Phase 37 Plan 02 — Subcontinental Populations Data Layer. useSubcontinentalStore (Pinia session cache, clearForGene, hasVariant, reset), useSubcontinentalData composable (N+1 fetch BATCH_SIZE=10, progress 0-100%, 2*sumAF aggregation, isLowSampleSize, isFounderEffect with optional parentFrequencies).
-**Status:** Plan 37-02 verified. 519 unit tests pass. Build and typecheck clean.
+**Completed:** Phase 37 Plan 03 Tasks 1-2 — StepResults.vue subcontinental UI. Toggle in toolbar, nested rows under NFE/EAS, progress bar, Low sample/Founder effect quality chips, CSS. Stopped at checkpoint:human-verify (Task 3).
+**Status:** 519 unit tests pass. Build and typecheck clean. Awaiting user verification.
 **Resume file:** None
 
 ### Handoff Notes
@@ -199,7 +205,8 @@ None.
 v1.6 phase order: 33 (FMT+EXP) -> 34 (QUAL+SRC) -> 35 (VIZ) -> 36 (ORPH) -> 37 (SUBP).
 Phase 37-01 complete: config foundation in @gnomad-cf/core/config and @gnomad-cf/core/queries.
 Phase 37-02 complete: web data layer (useSubcontinentalStore Pinia cache + useSubcontinentalData composable).
-Next: Plan 37-03 — UI SubcontinentalPanel component. Pass parentFrequencies as Map(populations.map(p => [p.code, p.carrierFrequency])) to fetchForVariants for founder effect detection.
+Phase 37-03 Tasks 1-2 complete: StepResults.vue wired up. At checkpoint — user needs to verify subcontinental UI at http://localhost:5173 with CFTR gene on gnomAD v2.1.1.
+After approval: commit planning docs, Phase 37 complete, v1.6 milestone done.
 
 ---
 
