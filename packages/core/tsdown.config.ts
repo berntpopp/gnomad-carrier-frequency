@@ -13,6 +13,7 @@ export default defineConfig({
     client:       'src/client/index.ts',
     'gene-config': 'src/gene-config/index.ts',
     chart:        'src/chart/index.ts',
+    orphanet:     'src/orphanet/index.ts',
   },
   format: ['esm'],
   dts: true,
