@@ -8,7 +8,7 @@
 - **v1.3 Documentation Site** - Phases 16-20 (shipped 2026-02-23)
 - **v1.4 Discoverability & Polish** - Phases 21-24 (shipped 2026-02-23)
 - **v1.5 Core Extraction & CLI** - Phases 25-32 (shipped 2026-02-25)
-- **v1.6 Analysis & Export** - Phases 33-37 (in progress)
+- **v1.6 Analysis & Export** - Phases 33-37 (shipped 2026-02-27)
 
 ## Phases
 
@@ -54,7 +54,7 @@
 
 </details>
 
-### v1.6 Analysis & Export (In Progress)
+### v1.6 Analysis & Export (SHIPPED 2026-02-27)
 
 **Milestone Goal:** Improve data quality transparency with variant quality flags and source contribution breakdown, add new display formats (scientific notation, per-100k) and TSV export, integrate Orphanet prevalence reference data, enable subcontinental population breakdown for gnomAD v2.1.1, and add population frequency bar chart visualization.
 
@@ -151,9 +151,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 37-01-PLAN.md -- Config subpopulations, types, helpers, and GraphQL query
-- [ ] 37-02-PLAN.md -- Pinia session store and useSubcontinentalData composable
-- [ ] 37-03-PLAN.md -- StepResults UI: toggle, nested rows, progress, warnings, verification
+- [x] 37-01-PLAN.md -- Config subpopulations, types, helpers, and GraphQL query
+- [x] 37-02-PLAN.md -- Pinia session store and useSubcontinentalData composable
+- [x] 37-03-PLAN.md -- StepResults UI: toggle, nested rows, progress, warnings, verification
 
 ---
 
@@ -180,10 +180,10 @@ Plans:
 | 34. Quality Flags & Source Breakdown | v1.6 | 5/5 | Complete | 2026-02-26 |
 | 35. Population Bar Chart | v1.6 | 3/3 | Complete | 2026-02-27 |
 | 36. Orphanet Prevalence Integration | v1.6 | 3/3 | Complete | 2026-02-27 |
-| 37. Subcontinental Populations | v1.6 | 0/3 | Not started | - |
+| 37. Subcontinental Populations | v1.6 | 3/3 | Complete | 2026-02-27 |
 
-**Total:** 128 plans complete across 36 phases in 6 milestones. 1 phase remaining for v1.6.
+**Total:** 131 plans complete across 37 phases in 6 milestones. v1.6 complete.
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-27 (Phase 37 planned: 3 plans in 3 waves)*
+*Last updated: 2026-02-27 (Phase 37 complete: v1.6 milestone shipped)*

@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 37 in progress (awaiting checkpoint verification for Plan 03)
+**Current focus:** v1.6 Analysis & Export -- Complete (all 5 phases shipped)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.6 Analysis & Export
-**Phase:** 37 of 37 (Subcontinental Populations) -- awaiting checkpoint
-**Plan:** 2.5 of 3 (Tasks 1-2 of Plan 37-03 complete; stopped at checkpoint:human-verify Task 3)
-**Status:** Plan 37-03 Tasks 1 and 2 complete — subcontinental toggle, nested rows, quality chips, CSS. Awaiting user verification at http://localhost:5173.
-**Last activity:** 2026-02-27 -- Plan 37-03 Tasks 1+2 committed (5ec9378, d14042e); at checkpoint
+**Phase:** 37 of 37 (Subcontinental Populations) -- Complete
+**Plan:** 3/3 complete
+**Status:** Phase 37 verified (4/4 must-haves). v1.6 milestone complete.
+**Last activity:** 2026-02-27 -- Phase 37 verified and complete
 
 ### Progress
 
@@ -28,19 +28,19 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [█████████░] ~98% - Phase 33-36 complete, Phase 37 in progress (2/3)
+v1.6 Analysis:      [##########] 100% - SHIPPED 2026-02-27 (17/17 plans)
 ```
 
-**Overall:** 130 plans complete across 37 phases in 6 milestones. Plan 37-03 Tasks 1-2 complete, at checkpoint for Task 3 (human-verify).
+**Overall:** 131 plans complete across 37 phases in 6 milestones. v1.6 complete.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 128
+- Total plans completed: 131
 - v1.5 plans completed: 26
-- v1.6 plans completed: 14
+- v1.6 plans completed: 17
 
 ---
 
@@ -196,17 +196,16 @@ None.
 ### Last Session
 
 **Date:** 2026-02-27
-**Completed:** Phase 37 Plan 03 Tasks 1-2 — StepResults.vue subcontinental UI. Toggle in toolbar, nested rows under NFE/EAS, progress bar, Low sample/Founder effect quality chips, CSS. Stopped at checkpoint:human-verify (Task 3).
-**Status:** 519 unit tests pass. Build and typecheck clean. Awaiting user verification.
+**Completed:** Phase 37 (Subcontinental Populations) — all 3 plans complete, verified 4/4 must-haves.
+**Status:** 519 unit tests pass. 9 E2E tests pass. Build and typecheck clean. v1.6 milestone complete.
 **Resume file:** None
 
 ### Handoff Notes
 
-v1.6 phase order: 33 (FMT+EXP) -> 34 (QUAL+SRC) -> 35 (VIZ) -> 36 (ORPH) -> 37 (SUBP).
-Phase 37-01 complete: config foundation in @gnomad-cf/core/config and @gnomad-cf/core/queries.
-Phase 37-02 complete: web data layer (useSubcontinentalStore Pinia cache + useSubcontinentalData composable).
-Phase 37-03 Tasks 1-2 complete: StepResults.vue wired up. At checkpoint — user needs to verify subcontinental UI at http://localhost:5173 with CFTR gene on gnomAD v2.1.1.
-After approval: commit planning docs, Phase 37 complete, v1.6 milestone done.
+v1.6 complete: 5 phases (33-37), 17 plans, 47 requirements all verified.
+Phase 37 additions: subcontinental populations for gnomAD v2.1.1 (NFE: 6 subgroups, EAS: 3 subgroups).
+Post-plan fixes: retry backoff, E2E route intercepts, URL state for ver/sub params, Link button moved to title.
+Next: /gsd:audit-milestone or /gsd:complete-milestone for v1.6 archival.
 
 ---
 

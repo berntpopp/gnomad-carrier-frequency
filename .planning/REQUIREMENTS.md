@@ -55,13 +55,13 @@
 
 ### Subcontinental Populations
 
-- [ ] **SUBP-01**: Toggle "Show subcontinental populations" in results view (default: off)
-- [ ] **SUBP-02**: Subcontinental data displayed for gnomAD v2.1.1 queries only (NFE: 6 subgroups, EAS: 3 subgroups)
-- [ ] **SUBP-03**: Subgroups nested under parent continental population in frequency table
-- [ ] **SUBP-04**: Founder effect detection and low sample size warnings applied to subpopulations
-- [ ] **SUBP-05**: Subcontinental population definitions added to gnomad.json config
-- [ ] **SUBP-06**: Progress indicator during subcontinental data loading (per-variant queries)
-- [ ] **SUBP-07**: UI clearly indicates subcontinental data is v2.1.1 only (hidden/disabled for v4 queries)
+- [x] **SUBP-01**: Toggle "Show subcontinental populations" in results view (default: off)
+- [x] **SUBP-02**: Subcontinental data displayed for gnomAD v2.1.1 queries only (NFE: 6 subgroups, EAS: 3 subgroups)
+- [x] **SUBP-03**: Subgroups nested under parent continental population in frequency table
+- [x] **SUBP-04**: Founder effect detection and low sample size warnings applied to subpopulations
+- [x] **SUBP-05**: Subcontinental population definitions added to gnomad.json config
+- [x] **SUBP-06**: Progress indicator during subcontinental data loading (per-variant queries)
+- [x] **SUBP-07**: UI clearly indicates subcontinental data is v2.1.1 only (hidden/disabled for v4 queries)
 
 ### Population Bar Chart
 
@@ -139,13 +139,13 @@
 | ORPH-06 | Phase 36 | Complete |
 | ORPH-07 | Phase 36 | Complete |
 | ORPH-08 | Phase 36 | Complete |
-| SUBP-01 | Phase 37 | Pending |
-| SUBP-02 | Phase 37 | Pending |
-| SUBP-03 | Phase 37 | Pending |
-| SUBP-04 | Phase 37 | Pending |
-| SUBP-05 | Phase 37 | Pending |
-| SUBP-06 | Phase 37 | Pending |
-| SUBP-07 | Phase 37 | Pending |
+| SUBP-01 | Phase 37 | Complete |
+| SUBP-02 | Phase 37 | Complete |
+| SUBP-03 | Phase 37 | Complete |
+| SUBP-04 | Phase 37 | Complete |
+| SUBP-05 | Phase 37 | Complete |
+| SUBP-06 | Phase 37 | Complete |
+| SUBP-07 | Phase 37 | Complete |
 | VIZ-01 | Phase 35 | Complete |
 | VIZ-02 | Phase 35 | Complete |
 | VIZ-03 | Phase 35 | Complete |
@@ -161,4 +161,4 @@
 
 ---
 *Requirements defined: 2026-02-26*
-*Last updated: 2026-02-27 (Phase 36: 8 Complete -- ORPH-01..08)*
+*Last updated: 2026-02-27 (Phase 37: 7 Complete -- SUBP-01..07)*
