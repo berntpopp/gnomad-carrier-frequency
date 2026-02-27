@@ -373,7 +373,7 @@
           data-testid="subcontinental-toggle"
           @click="showSubcontinental = !showSubcontinental"
         >
-          Subcontinental
+          Sub
         </v-btn>
         <v-tooltip v-else location="top">
           <template #activator="{ props: tooltipProps }">
@@ -386,32 +386,12 @@
               data-testid="subcontinental-v2-only"
             >
               <v-icon start size="x-small">mdi-information</v-icon>
-              Subcontinental (v2 only)
+              Sub (v2 only)
             </v-chip>
           </template>
           Subcontinental population breakdowns are only available for gnomAD v2.1.1 queries.
         </v-tooltip>
 
-        <!-- Copy link button -->
-        <v-tooltip location="top">
-          <template #activator="{ props: tooltipProps }">
-            <v-btn
-              v-bind="tooltipProps"
-              variant="outlined"
-              size="small"
-              :color="copied ? 'success' : undefined"
-              :prepend-icon="copied ? 'mdi-check' : 'mdi-link'"
-              :disabled="!clipboardSupported"
-              aria-label="Copy shareable link to clipboard"
-              @click="copyShareLink"
-            >
-              {{ copied ? "Copied!" : "Link" }}
-            </v-btn>
-          </template>
-          <span class="tooltip-text">
-            Copy a shareable link with your current gene, filters, and settings.
-          </span>
-        </v-tooltip>
       </div>
 
       <!-- Table / Chart tabs -->
@@ -686,7 +666,6 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useClipboard } from "@vueuse/core";
 import { useDisplay } from "vuetify";
 import {
   config,
@@ -723,9 +702,9 @@ import { useFilterStore } from "@/stores/useFilterStore";
 import { useCalcStore } from "@/stores/useCalcStore";
 import {
   useExport,
-  useAppAnnouncer,
   useExclusionState,
   useCarrierFrequency,
+  useUrlState,
 } from "@/composables";
 import { useGeneSearch } from "@/composables/useGeneSearch";
 import { filterPathogenicVariantsConfigurable } from "@gnomad-cf/core/filters";
@@ -850,7 +829,8 @@ const qualityFilterPanelProps = computed(() => ({
 
 // Subcontinental population data — v2 only
 const isV2 = computed(() => props.result?.version === 'v2');
-const showSubcontinental = ref(false);
+// Use shared ref from URL state so toggle is synced to shareable URL
+const { subcontinentalEnabled: showSubcontinental } = useUrlState();
 
 const {
   isLoading: isLoadingSubcontinental,
@@ -998,30 +978,6 @@ const formatOptions = [
     tooltip: "Display per 100,000 individuals",
   },
 ];
-
-// Set up announcer for screen reader notifications
-const { polite: announcePolite, assertive: announceAssertive } =
-  useAppAnnouncer();
-
-// Clipboard for copy link functionality
-const {
-  copy,
-  copied,
-  isSupported: clipboardSupported,
-} = useClipboard({
-  copiedDuring: 2000, // Show "copied" state for 2 seconds
-  legacy: true, // Fallback for older browsers
-});
-
-// Copy current URL handler with screen reader announcement
-async function copyShareLink() {
-  try {
-    await copy(window.location.href);
-    announcePolite("Link copied to clipboard");
-  } catch {
-    announceAssertive("Failed to copy link");
-  }
-}
 
 // Export handler function
 function handleExport(

@@ -412,7 +412,7 @@ test.describe("Phase 37: Subcontinental Populations", () => {
       await expect(page.getByTestId("subcontinental-v2-only")).not.toBeVisible();
     });
 
-    test("shows 'Subcontinental (v2 only)' chip with tooltip for v4 queries", async ({
+    test("shows 'Sub (v2 only)' chip with tooltip for v4 queries", async ({
       page,
     }) => {
       await interceptGnomadApi(page);
@@ -424,7 +424,7 @@ test.describe("Phase 37: Subcontinental Populations", () => {
       // v2-only chip exists
       const chip = page.getByTestId("subcontinental-v2-only");
       await expect(chip).toBeVisible();
-      await expect(chip).toContainText("Subcontinental (v2 only)");
+      await expect(chip).toContainText("Sub (v2 only)");
 
       // Toggle should NOT be visible
       await expect(page.getByTestId("subcontinental-toggle")).not.toBeVisible();
