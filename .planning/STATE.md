@@ -7,17 +7,17 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 36 complete (3/3 plans), moving to Phase 37
+**Current focus:** v1.6 Analysis & Export -- Phase 37 in progress (1/3 plans complete)
 
 ---
 
 ## Current Position
 
 **Milestone:** v1.6 Analysis & Export
-**Phase:** 36 of 37 (Orphanet Prevalence Integration) -- complete
-**Plan:** 3 of 3 complete
-**Status:** Phase 36 complete — Orphanet integration across web (summary card, eager prefetch) and CLI (analytical text output, PWA cache)
-**Last activity:** 2026-02-27 -- Plan 36-03 complete (WizardStepper eager fetch, StepResults summary card, CLI integration, Workbox PWA cache)
+**Phase:** 37 of 37 (Subcontinental Populations) -- in progress
+**Plan:** 1 of 3 complete
+**Status:** Plan 37-01 complete — config foundation (SubpopulationConfig type, gnomad.json v2 subpopulations, helpers, VARIANT_SUBCONTINENTAL_QUERY)
+**Last activity:** 2026-02-27 -- Plan 37-01 complete (config types, JSON subpopulations, helper functions, GraphQL query)
 
 ### Progress
 
@@ -28,10 +28,10 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [██████████] 100% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 complete (3/3), Phase 36 complete (3/3)
+v1.6 Analysis:      [█████████░] ~97% - Phase 33-36 complete, Phase 37 in progress (1/3)
 ```
 
-**Overall:** 128 plans complete across 36 phases in 6 milestones. Phase 37 remaining.
+**Overall:** 129 plans complete across 37 phases in 6 milestones. Plans 37-02 and 37-03 remaining.
 
 ---
 
@@ -123,6 +123,13 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - v-expand-transition for +N more list — consistent with FilterPanel pattern used elsewhere in app
 - No persist on useOrphanetStore — session-level cache per CONTEXT.md
 
+**37-01 decisions:**
+- SubpopulationConfig is a standalone interface (not extending PopulationConfig) — subpopulations never have description or nesting
+- VariantSubcontinentalPopulation extracted as named type for Plan 02 composable re-use
+- No top-level ac/an on exome/genome in VARIANT_SUBCONTINENTAL_QUERY — composable aggregates from populations[] only, reduces payload
+- $referenceGenome: ReferenceGenomeId! included in VARIANT_SUBCONTINENTAL_QUERY — gnomAD schema requires it (v2=GRCh37), consistent with GENE_VARIANTS_QUERY
+- No joint field in VARIANT_SUBCONTINENTAL_QUERY — gnomAD v2.1.1 has no joint coverage for individual variants
+
 **36-03 decisions:**
 - WizardStepper watches state.gene (Step 1), NOT result (Step 4) — eager prefetch must trigger before gnomAD query completes
 - StepResults watches result.value?.gene?.symbol (resolved Step 4 result) — reads from Pinia cache instantly (no duplicate network request)
@@ -175,15 +182,15 @@ None.
 ### Last Session
 
 **Date:** 2026-02-27
-**Completed:** Phase 36 — Orphanet Prevalence Integration (3/3 plans). Bugfix: stale data when switching genes (fetchForGene now resets diseases before cache check).
-**Status:** Phase 36 verified (4/4 must-haves). 519 unit tests pass. 22 E2E tests pass (12 existing + 10 new).
+**Completed:** Phase 37 Plan 01 — Subcontinental Populations Foundation. SubpopulationConfig type, gnomad.json v2 NFE (6) + EAS (3) subpopulations, config helpers (getSubpopulations, hasSubcontinentalData, getSubpopulationParent, getSubpopulationLabel), VARIANT_SUBCONTINENTAL_QUERY with typed response.
+**Status:** Plan 37-01 verified. 519 unit tests pass. Build and typecheck clean.
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.6 phase order: 33 (FMT+EXP) -> 34 (QUAL+SRC) -> 35 (VIZ) -> 36 (ORPH) -> 37 (SUBP).
-Phase 36 complete: @gnomad-cf/core/orphanet subpath, Pinia session cache, eager prefetch at Step 1, summary card section, CLI text output, PWA Workbox cache, stale data bugfix.
-Phase 37 (Subcontinental Populations) is the last phase of v1.6. Depends on Phase 34.
+Phase 37-01 complete: config foundation in @gnomad-cf/core/config and @gnomad-cf/core/queries.
+Next: Plan 37-02 (composable useSubcontinentalFrequency in apps/web), then Plan 37-03 (UI SubcontinentalPanel component).
 
 ---
 
