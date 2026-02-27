@@ -247,6 +247,200 @@ function interceptOrphanetApi(page: Page): { calledEndpoints: string[] } {
   return { calledEndpoints };
 }
 
+// ─── HEXA fixtures (for gene-switching regression test) ───────────────────────
+
+const HEXA_GENE_SEARCH_RESPONSE = {
+  data: { gene_search: [{ ensembl_id: "ENSG00000213614", symbol: "HEXA" }] },
+};
+const HEXA_GENE_DETAILS_RESPONSE = {
+  data: {
+    gene: {
+      gene_id: "ENSG00000213614",
+      symbol: "HEXA",
+      gnomad_constraint: {
+        exp_lof: 30,
+        obs_lof: 10,
+        oe_lof: 0.33,
+        oe_lof_lower: 0.2,
+        oe_lof_upper: 0.55,
+        pLI: 0.9,
+        lof_z: 3.5,
+        flags: [],
+      },
+    },
+  },
+};
+const HEXA_POPULATIONS = [
+  { id: "afr", ac: 2, an: 24000, ac_hom: 0 },
+  { id: "ami", ac: 0, an: 1200, ac_hom: 0 },
+  { id: "amr", ac: 3, an: 18000, ac_hom: 0 },
+  { id: "asj", ac: 15, an: 4000, ac_hom: 0 },
+  { id: "eas", ac: 1, an: 10000, ac_hom: 0 },
+  { id: "fin", ac: 1, an: 11000, ac_hom: 0 },
+  { id: "mid", ac: 1, an: 3000, ac_hom: 0 },
+  { id: "nfe", ac: 20, an: 72000, ac_hom: 0 },
+  { id: "sas", ac: 2, an: 14000, ac_hom: 0 },
+  { id: "remaining", ac: 1, an: 6000, ac_hom: 0 },
+];
+const HEXA_GENE_VARIANTS_RESPONSE = {
+  data: {
+    gene: {
+      gene_id: "ENSG00000213614",
+      symbol: "HEXA",
+      variants: [
+        {
+          variant_id: "15-72638892-C-T",
+          pos: 72638892,
+          ref: "C",
+          alt: "T",
+          exome: { ac: 46, an: 163200, ac_hom: 0, populations: HEXA_POPULATIONS },
+          genome: null,
+          joint: null,
+          transcript_consequence: {
+            gene_symbol: "HEXA",
+            transcript_id: "ENST00000261416",
+            canonical: true,
+            consequence_terms: ["stop_gained"],
+            lof: "HC",
+            lof_filter: null,
+            lof_flags: null,
+            hgvsc: "c.1274_1278dup",
+            hgvsp: "p.Tyr427Ilefs*5",
+          },
+        },
+      ],
+      clinvar_variants: [
+        {
+          variant_id: "15-72638892-C-T",
+          clinvar_variation_id: "3291",
+          clinical_significance: "Pathogenic",
+          gold_stars: 4,
+          review_status: "reviewed by expert panel",
+          pos: 72638892,
+          ref: "C",
+          alt: "T",
+        },
+      ],
+    },
+  },
+};
+
+/** Orphanet mock for HEXA — Tay-Sachs disease */
+const ORPHANET_GENE_DISEASES_HEXA = {
+  data: {
+    results: [
+      {
+        ORPHAcode: 845,
+        "Preferred term": "Tay-Sachs disease",
+        OrphanetURL: "https://www.orpha.net/en/disease/detail/845",
+        Date: "2024-01-01",
+        DisorderGeneAssociation: [
+          {
+            DisorderGeneAssociationType: "Disease-causing germline mutation(s) in",
+            DisorderGeneAssociationStatus: "Assessed",
+            Gene: { Symbol: "HEXA", name: "hexosaminidase subunit alpha", GeneType: "gene with protein product", ExternalReference: [] },
+          },
+        ],
+      },
+    ],
+  },
+};
+const ORPHANET_EPI_845 = {
+  data: {
+    results: {
+      Prevalence: [
+        {
+          PrevalenceClass: "1-9 / 1 000 000",
+          PrevalenceGeographic: "Europe",
+          PrevalenceType: "Point prevalence",
+          PrevalenceQualification: "Value and class",
+          PrevalenceValidationStatus: "Validated",
+          Source: "Literature",
+          ValMoy: "0.5",
+        },
+      ],
+    },
+  },
+};
+const ORPHANET_NAT_HIST_845 = {
+  data: { results: { TypeOfInheritance: ["Autosomal recessive"] } },
+};
+
+/**
+ * Intercept gnomAD API that responds differently based on gene query.
+ * Routes CFTR queries to CFTR fixtures, HEXA queries to HEXA fixtures.
+ */
+async function interceptGnomadApiMultiGene(page: Page): Promise<void> {
+  await page.route(
+    "https://gnomad.broadinstitute.org/api",
+    async (route: Route) => {
+      const postData = route.request().postDataJSON() as {
+        operationName?: string;
+        variables?: { query?: string; geneSymbol?: string };
+      } | null;
+      const op = postData?.operationName;
+      const query = postData?.variables?.query ?? "";
+      const geneSym = postData?.variables?.geneSymbol ?? "";
+
+      if (op === "GeneSearch") {
+        const isHEXA = query.toUpperCase().includes("HEXA");
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(isHEXA ? HEXA_GENE_SEARCH_RESPONSE : GENE_SEARCH_RESPONSE),
+        });
+      } else if (op === "GeneDetails") {
+        const isHEXA = geneSym.toUpperCase() === "HEXA";
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(isHEXA ? HEXA_GENE_DETAILS_RESPONSE : GENE_DETAILS_RESPONSE),
+        });
+      } else if (op === "GeneVariants") {
+        const isHEXA = geneSym.toUpperCase() === "HEXA";
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(isHEXA ? HEXA_GENE_VARIANTS_RESPONSE : GENE_VARIANTS_RESPONSE),
+        });
+      } else {
+        await route.continue();
+      }
+    },
+  );
+}
+
+/**
+ * Intercept Orphanet API for both CFTR and HEXA genes.
+ */
+function interceptOrphanetApiMultiGene(page: Page): void {
+  page.route("**/api.orphadata.com/**", async (route: Route) => {
+    const url = route.request().url();
+    // CFTR routes
+    if (url.includes("/genes/symbols/cftr")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(ORPHANET_GENE_DISEASES_CFTR) });
+    } else if (url.includes("/rd-epidemiology/orphacodes/586")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(ORPHANET_EPI_586) });
+    } else if (url.includes("/rd-epidemiology/orphacodes/48")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(ORPHANET_EPI_48) });
+    } else if (url.includes("/rd-natural_history/orphacodes/586")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(ORPHANET_NAT_HIST_586) });
+    } else if (url.includes("/rd-natural_history/orphacodes/48")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(ORPHANET_NAT_HIST_48) });
+    }
+    // HEXA routes
+    else if (url.includes("/genes/symbols/hexa")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(ORPHANET_GENE_DISEASES_HEXA) });
+    } else if (url.includes("/rd-epidemiology/orphacodes/845")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(ORPHANET_EPI_845) });
+    } else if (url.includes("/rd-natural_history/orphacodes/845")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(ORPHANET_NAT_HIST_845) });
+    } else {
+      await route.fulfill({ status: 404, body: "Not found" });
+    }
+  });
+}
+
 /** Intercept Orphanet API with error responses (simulates offline/timeout) */
 function interceptOrphanetApiWithError(page: Page): void {
   page.route("**/api.orphadata.com/**", async (route: Route) => {
@@ -577,6 +771,87 @@ test.describe("Phase 36: Orphanet Prevalence Integration", () => {
       await expect(additionalLink).toBeVisible();
       expect(await additionalLink.getAttribute("target")).toBe("_blank");
       expect(await additionalLink.getAttribute("rel")).toContain("noopener");
+    });
+  });
+
+  test.describe("Regression — Gene Switching (stale data bug)", () => {
+    test("switching from CFTR to HEXA shows Tay-Sachs, not Cystic fibrosis", async ({
+      page,
+    }) => {
+      await interceptGnomadApiMultiGene(page);
+      await interceptClingenApi(page);
+      interceptOrphanetApiMultiGene(page);
+
+      // First: complete CFTR flow to Step 4
+      await page.goto("/");
+      await dismissDisclaimer(page);
+
+      const geneInput = page.getByTestId("gene-search-input").locator("input");
+      await geneInput.click();
+      await geneInput.fill("CFTR");
+      await expect(
+        page.getByRole("option", { name: /CFTR/ }).first(),
+      ).toBeVisible({ timeout: 10_000 });
+      await page.getByRole("option", { name: /^CFTR\b/ }).first().click();
+      await page.getByTestId("step-gene-next-btn").click();
+
+      await expect(page.getByTestId("step-status")).toBeVisible();
+      await page.getByTestId("status-option-heterozygous").click();
+      await page.getByTestId("step-status-next-btn").click();
+
+      await expect(
+        page.getByText("Carrier frequency calculated from gnomAD data."),
+      ).toBeVisible({ timeout: 15_000 });
+      await page.getByTestId("step-frequency-next-btn").click();
+
+      // Verify CFTR Orphanet data at Step 4
+      const orphanetSection = page.getByTestId("orphanet-section");
+      await expect(orphanetSection).toBeVisible({ timeout: 10_000 });
+      await expect(
+        orphanetSection.locator('a:has-text("Cystic fibrosis")'),
+      ).toBeVisible();
+
+      // Go BACK to Step 1 by clicking the step header (editable when completed)
+      await page.getByTestId("wizard-step-1").click();
+      await expect(page.getByTestId("step-gene")).toBeVisible();
+
+      // Select HEXA
+      const geneInput2 = page.getByTestId("gene-search-input").locator("input");
+      await geneInput2.click();
+      await geneInput2.fill("");
+      await geneInput2.fill("HEXA");
+      await expect(
+        page.getByRole("option", { name: /HEXA/ }).first(),
+      ).toBeVisible({ timeout: 10_000 });
+      await page.getByRole("option", { name: /^HEXA\b/ }).first().click();
+      await page.getByTestId("step-gene-next-btn").click();
+
+      // Step 2
+      await expect(page.getByTestId("step-status")).toBeVisible();
+      await page.getByTestId("status-option-heterozygous").click();
+      await page.getByTestId("step-status-next-btn").click();
+
+      // Step 3
+      await expect(
+        page.getByText("Carrier frequency calculated from gnomAD data."),
+      ).toBeVisible({ timeout: 15_000 });
+      await page.getByTestId("step-frequency-next-btn").click();
+
+      // Step 4: Verify HEXA Orphanet data (NOT CFTR!)
+      await expect(page.getByTestId("step-results")).toBeVisible();
+      const orphanetSection2 = page.getByTestId("orphanet-section");
+      await expect(orphanetSection2).toBeVisible({ timeout: 10_000 });
+
+      // Must show Tay-Sachs (HEXA), NOT Cystic fibrosis (CFTR)
+      await expect(
+        orphanetSection2.locator('a:has-text("Tay-Sachs disease")'),
+      ).toBeVisible();
+      await expect(
+        orphanetSection2.locator('a:has-text("Cystic fibrosis")'),
+      ).not.toBeVisible();
+
+      // Verify HEXA-specific prevalence
+      await expect(orphanetSection2).toContainText("1-9 / 1 000 000");
     });
   });
 });

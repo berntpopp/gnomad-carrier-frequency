@@ -82,6 +82,11 @@ export function useOrphanetData(): UseOrphanetDataReturn {
   }
 
   async function fetchForGene(geneSymbol: string): Promise<void> {
+    // Always reset local refs first — prevents showing stale data from a
+    // previously selected gene while the new gene's data loads.
+    diseases.value = [];
+    error.value = null;
+
     // --- Cache-first path ---
     const cached = store.getCached(geneSymbol);
     if (cached) {
@@ -89,14 +94,11 @@ export function useOrphanetData(): UseOrphanetDataReturn {
       return;
     }
 
-    // --- Skip duplicate in-flight fetch ---
-    if (store.isPending(geneSymbol)) {
-      return;
-    }
-
     // --- Network fetch path ---
+    // Note: no isPending skip — each composable instance must populate its own
+    // local refs. Duplicate fetches are harmless (idempotent GET requests) and
+    // the first to complete fills the cache for subsequent callers.
     loading.value = true;
-    error.value = null;
     store.setPending(geneSymbol, true);
 
     try {
