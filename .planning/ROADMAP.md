@@ -148,7 +148,12 @@ Plans:
   2. Subcontinental data is only available for gnomAD v2.1.1 queries -- for v4 queries, the toggle is hidden or disabled with a clear "not available for v4" indicator
   3. Founder effect detection and low sample size warnings are applied to subpopulations, and a progress indicator shows during subcontinental data loading
   4. Subcontinental population definitions are driven by the gnomad.json config file, making it straightforward to add new subgroups when gnomAD releases updated data
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 37-01-PLAN.md -- Config subpopulations, types, helpers, and GraphQL query
+- [ ] 37-02-PLAN.md -- Pinia session store and useSubcontinentalData composable
+- [ ] 37-03-PLAN.md -- StepResults UI: toggle, nested rows, progress, warnings, verification
 
 ---
 
@@ -175,10 +180,10 @@ Plans:
 | 34. Quality Flags & Source Breakdown | v1.6 | 5/5 | Complete | 2026-02-26 |
 | 35. Population Bar Chart | v1.6 | 3/3 | Complete | 2026-02-27 |
 | 36. Orphanet Prevalence Integration | v1.6 | 3/3 | Complete | 2026-02-27 |
-| 37. Subcontinental Populations | v1.6 | 0/TBD | Not started | - |
+| 37. Subcontinental Populations | v1.6 | 0/3 | Not started | - |
 
 **Total:** 128 plans complete across 36 phases in 6 milestones. 1 phase remaining for v1.6.
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-27 (Phase 36 complete: 3/3 plans)*
+*Last updated: 2026-02-27 (Phase 37 planned: 3 plans in 3 waves)*
