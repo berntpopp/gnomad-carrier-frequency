@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 37 in progress (1/3 plans complete)
+**Current focus:** v1.6 Analysis & Export -- Phase 37 in progress (2/3 plans complete)
 
 ---
 
@@ -15,9 +15,9 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Milestone:** v1.6 Analysis & Export
 **Phase:** 37 of 37 (Subcontinental Populations) -- in progress
-**Plan:** 1 of 3 complete
-**Status:** Plan 37-01 complete — config foundation (SubpopulationConfig type, gnomad.json v2 subpopulations, helpers, VARIANT_SUBCONTINENTAL_QUERY)
-**Last activity:** 2026-02-27 -- Plan 37-01 complete (config types, JSON subpopulations, helper functions, GraphQL query)
+**Plan:** 2 of 3 complete
+**Status:** Plan 37-02 complete — web data layer (useSubcontinentalStore Pinia cache, useSubcontinentalData composable with N+1 fetch + aggregation)
+**Last activity:** 2026-02-27 -- Plan 37-02 complete (Pinia store, composable, composables barrel re-export)
 
 ### Progress
 
@@ -28,10 +28,10 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [█████████░] ~97% - Phase 33-36 complete, Phase 37 in progress (1/3)
+v1.6 Analysis:      [█████████░] ~98% - Phase 33-36 complete, Phase 37 in progress (2/3)
 ```
 
-**Overall:** 129 plans complete across 37 phases in 6 milestones. Plans 37-02 and 37-03 remaining.
+**Overall:** 130 plans complete across 37 phases in 6 milestones. Plan 37-03 remaining.
 
 ---
 
@@ -130,6 +130,14 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - $referenceGenome: ReferenceGenomeId! included in VARIANT_SUBCONTINENTAL_QUERY — gnomAD schema requires it (v2=GRCh37), consistent with GENE_VARIANTS_QUERY
 - No joint field in VARIANT_SUBCONTINENTAL_QUERY — gnomAD v2.1.1 has no joint coverage for individual variants
 
+**37-02 decisions:**
+- Aggregation uses only variantIds passed to fetchForVariants (not all store contents) — prevents stale variants from old filter configs contaminating aggregation
+- Variants absent from gnomAD v2 stored as empty array [] (not omitted) — hasVariant() returns true, preventing redundant refetches
+- Module-level API constants (GNOMAD_API_URL, DATASET_ID, REFERENCE_GENOME) — subcontinental is v2-only, version is fixed
+- Individual variant failures log console.warn and continue; error.value accumulates count summary (partial results > no results)
+- Simplified 2*sumAF for subcontinental (not VCR/GCR) — per-subpopulation homozygote counts unreliable at small AN
+- isFounderEffect defaults false when parentFrequencies not provided; becomes functional when Plan 03 passes parent CFs from UI
+
 **36-03 decisions:**
 - WizardStepper watches state.gene (Step 1), NOT result (Step 4) — eager prefetch must trigger before gnomAD query completes
 - StepResults watches result.value?.gene?.symbol (resolved Step 4 result) — reads from Pinia cache instantly (no duplicate network request)
@@ -182,15 +190,16 @@ None.
 ### Last Session
 
 **Date:** 2026-02-27
-**Completed:** Phase 37 Plan 01 — Subcontinental Populations Foundation. SubpopulationConfig type, gnomad.json v2 NFE (6) + EAS (3) subpopulations, config helpers (getSubpopulations, hasSubcontinentalData, getSubpopulationParent, getSubpopulationLabel), VARIANT_SUBCONTINENTAL_QUERY with typed response.
-**Status:** Plan 37-01 verified. 519 unit tests pass. Build and typecheck clean.
+**Completed:** Phase 37 Plan 02 — Subcontinental Populations Data Layer. useSubcontinentalStore (Pinia session cache, clearForGene, hasVariant, reset), useSubcontinentalData composable (N+1 fetch BATCH_SIZE=10, progress 0-100%, 2*sumAF aggregation, isLowSampleSize, isFounderEffect with optional parentFrequencies).
+**Status:** Plan 37-02 verified. 519 unit tests pass. Build and typecheck clean.
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.6 phase order: 33 (FMT+EXP) -> 34 (QUAL+SRC) -> 35 (VIZ) -> 36 (ORPH) -> 37 (SUBP).
 Phase 37-01 complete: config foundation in @gnomad-cf/core/config and @gnomad-cf/core/queries.
-Next: Plan 37-02 (composable useSubcontinentalFrequency in apps/web), then Plan 37-03 (UI SubcontinentalPanel component).
+Phase 37-02 complete: web data layer (useSubcontinentalStore Pinia cache + useSubcontinentalData composable).
+Next: Plan 37-03 — UI SubcontinentalPanel component. Pass parentFrequencies as Map(populations.map(p => [p.code, p.carrierFrequency])) to fetchForVariants for founder effect detection.
 
 ---
 
