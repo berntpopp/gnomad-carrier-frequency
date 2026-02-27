@@ -561,6 +561,73 @@
                     <td v-if="hasNotes" />
                   </tr>
                 </template>
+
+                <!-- Subcontinental loading row (shown while fetching) -->
+                <template v-if="showSubcontinental && hasSubpopulations(item.code) && isLoadingSubcontinental && !item.isGlobal">
+                  <tr class="subcontinental-loading-row">
+                    <td :colspan="headers.length">
+                      <v-progress-linear
+                        :model-value="subcontinentalProgress"
+                        color="primary"
+                        height="4"
+                        class="my-1"
+                      />
+                    </td>
+                  </tr>
+                </template>
+
+                <!-- Subcontinental error row -->
+                <template v-if="showSubcontinental && subcontinentalError && hasSubpopulations(item.code) && !item.isGlobal">
+                  <tr class="subcontinental-error-row">
+                    <td :colspan="headers.length">
+                      <v-alert type="warning" variant="tonal" density="compact" class="ma-1">
+                        Failed to load subcontinental data. {{ subcontinentalError }}
+                      </v-alert>
+                    </td>
+                  </tr>
+                </template>
+
+                <!-- Subcontinental sub-rows (nested under parent) -->
+                <template v-if="showSubcontinental && !isLoadingSubcontinental && !item.isGlobal">
+                  <tr
+                    v-for="sub in getSubcontinentalRows(item.code)"
+                    :key="`subpop-${sub.code}`"
+                    class="subcontinental-row"
+                  >
+                    <td>
+                      <div class="d-flex align-center pl-8">
+                        <span class="text-body-2">{{ sub.label }}</span>
+                        <v-chip
+                          v-if="sub.isLowSampleSize"
+                          color="warning"
+                          size="x-small"
+                          class="ml-2"
+                          variant="tonal"
+                        >
+                          <v-icon start size="x-small">mdi-alert</v-icon>
+                          Low sample
+                        </v-chip>
+                        <v-chip
+                          v-if="sub.isFounderEffect"
+                          color="info"
+                          size="x-small"
+                          class="ml-2"
+                          variant="tonal"
+                        >
+                          <v-icon start size="x-small">mdi-star</v-icon>
+                          Founder effect
+                        </v-chip>
+                      </div>
+                    </td>
+                    <td class="text-right">{{ formatFrequency(sub.carrierFrequency) }}</td>
+                    <td class="text-right">{{ formatRatioDisplay(sub.carrierFrequency) }}</td>
+                    <td class="text-right">-</td>
+                    <td class="text-right">-</td>
+                    <td class="text-right">{{ sub.alleleCount }}</td>
+                    <td class="text-right">{{ sub.alleleNumber > 0 ? sub.alleleNumber.toLocaleString() : '-' }}</td>
+                    <td />
+                  </tr>
+                </template>
               </template>
 
               <template #bottom />
@@ -1375,6 +1442,18 @@ function formatPrevalenceRatio(prevalence: number | null): string {
 
 .source-breakdown-row:hover {
   background-color: rgba(var(--v-theme-surface-variant), 0.5) !important;
+}
+
+.subcontinental-row {
+  background: rgba(var(--v-theme-surface-variant), 0.15);
+}
+
+.subcontinental-row td {
+  font-size: 0.85em;
+}
+
+.subcontinental-loading-row td {
+  padding: 0 !important;
 }
 
 .tooltip-text {
