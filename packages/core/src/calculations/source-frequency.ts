@@ -11,6 +11,12 @@ import type { SourceCategory } from "../filters/source-classification.js";
 import { classifyVariantSource } from "../filters/source-classification.js";
 import type { ClinVarSubmission } from "../queries/index.js";
 
+const SOURCE_LABELS: Record<SourceCategory, string> = {
+  clinvar_only: "ClinVar",
+  plof_only: "pLoF",
+  both: "Both",
+};
+
 export interface SourceBreakdownRow {
   sourceCategory: SourceCategory;
   label: string;
@@ -61,11 +67,6 @@ export function computeSourceBreakdown(
   }
 
   const rows: SourceBreakdownRow[] = [];
-  const labels: Record<SourceCategory, string> = {
-    clinvar_only: "ClinVar",
-    plof_only: "pLoF",
-    both: "Both",
-  };
 
   for (const cat of ["clinvar_only", "plof_only", "both"] as SourceCategory[]) {
     const groupVariants = groups[cat];
@@ -115,7 +116,7 @@ export function computeSourceBreakdown(
 
     rows.push({
       sourceCategory: cat,
-      label: labels[cat],
+      label: SOURCE_LABELS[cat],
       variantCount: groupVariants.length,
       carrierFrequency,
       alleleCount: totalAC,
