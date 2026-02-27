@@ -310,28 +310,39 @@
 
         <v-spacer />
 
-        <v-btn
-          variant="flat"
-          color="primary"
-          size="small"
-          prepend-icon="mdi-table-eye"
-          @click="openAllVariantsModal"
-        >
-          Variants ({{ qualifyingVariantCount }})
-        </v-btn>
+        <v-tooltip location="top">
+          <template #activator="{ props: tooltipProps }">
+            <v-btn
+              v-bind="tooltipProps"
+              variant="flat"
+              color="primary"
+              size="small"
+              prepend-icon="mdi-table-eye"
+              @click="openAllVariantsModal"
+            >
+              Variants ({{ qualifyingVariantCount }})
+            </v-btn>
+          </template>
+          View all qualifying variants with details, quality flags, and source classification.
+        </v-tooltip>
 
         <!-- Export dropdown -->
         <v-menu>
           <template #activator="{ props: menuProps }">
-            <v-btn
-              v-bind="menuProps"
-              variant="outlined"
-              size="small"
-              prepend-icon="mdi-download"
-            >
-              Export
-              <v-icon end size="x-small">mdi-chevron-down</v-icon>
-            </v-btn>
+            <v-tooltip location="top">
+              <template #activator="{ props: tooltipProps }">
+                <v-btn
+                  v-bind="{ ...menuProps, ...tooltipProps }"
+                  variant="outlined"
+                  size="small"
+                  prepend-icon="mdi-download"
+                >
+                  Export
+                  <v-icon end size="x-small">mdi-chevron-down</v-icon>
+                </v-btn>
+              </template>
+              Download results as JSON, Excel, or TSV.
+            </v-tooltip>
           </template>
           <v-list density="compact">
             <v-list-item
@@ -362,19 +373,24 @@
         </v-menu>
 
         <!-- Subcontinental toggle (v2 only) -->
-        <v-btn
-          v-if="isV2"
-          size="small"
-          :variant="showSubcontinental ? 'flat' : 'outlined'"
-          :color="showSubcontinental ? 'primary' : undefined"
-          :disabled="qualifyingVariantCount === 0 || isLoading"
-          :loading="isLoadingSubcontinental"
-          prepend-icon="mdi-sitemap"
-          data-testid="subcontinental-toggle"
-          @click="showSubcontinental = !showSubcontinental"
-        >
-          Sub
-        </v-btn>
+        <v-tooltip v-if="isV2" location="top">
+          <template #activator="{ props: tooltipProps }">
+            <v-btn
+              v-bind="tooltipProps"
+              size="small"
+              :variant="showSubcontinental ? 'flat' : 'outlined'"
+              :color="showSubcontinental ? 'primary' : undefined"
+              :disabled="qualifyingVariantCount === 0 || isLoading"
+              :loading="isLoadingSubcontinental"
+              prepend-icon="mdi-sitemap"
+              data-testid="subcontinental-toggle"
+              @click="showSubcontinental = !showSubcontinental"
+            >
+              Sub
+            </v-btn>
+          </template>
+          Fetch subcontinental breakdowns (NFE/EAS). May be slow — queries each variant individually.
+        </v-tooltip>
         <v-tooltip v-else location="top">
           <template #activator="{ props: tooltipProps }">
             <v-chip
