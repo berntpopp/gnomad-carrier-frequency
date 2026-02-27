@@ -14,10 +14,10 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 **Milestone:** v1.6 Analysis & Export
-**Phase:** 36 of 37 (Orphanet Prevalence Integration) -- in progress
-**Plan:** 2 of 3 complete
-**Status:** Plan 36-02 complete (Pinia store, useOrphanetData composable, OrphanetSection.vue)
-**Last activity:** 2026-02-27 -- Plan 36-02 complete (useOrphanetStore, useOrphanetData, OrphanetSection.vue)
+**Phase:** 36 of 37 (Orphanet Prevalence Integration) -- complete
+**Plan:** 3 of 3 complete
+**Status:** Phase 36 complete — Orphanet integration across web (summary card, eager prefetch) and CLI (analytical text output, PWA cache)
+**Last activity:** 2026-02-27 -- Plan 36-03 complete (WizardStepper eager fetch, StepResults summary card, CLI integration, Workbox PWA cache)
 
 ### Progress
 
@@ -28,10 +28,10 @@ v1.2 Sharing:       [##########] 100% - SHIPPED 2026-01-20
 v1.3 Docs:          [##########] 100% - SHIPPED 2026-02-23 (14/14 plans)
 v1.4 Discover:      [##########] 100% - SHIPPED 2026-02-23 (12/12 plans)
 v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
-v1.6 Analysis:      [█████████░]  83% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 complete (3/3), Phase 36 in progress (2/3)
+v1.6 Analysis:      [██████████] 100% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 complete (3/3), Phase 36 complete (3/3)
 ```
 
-**Overall:** 127 plans complete across 36 phases in 6 milestones. Phase 36 (1/3 remaining), Phase 37 remaining.
+**Overall:** 129 plans complete across 36 phases in 6 milestones. Phase 37 remaining.
 
 ---
 
@@ -123,6 +123,17 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - v-expand-transition for +N more list — consistent with FilterPanel pattern used elsewhere in app
 - No persist on useOrphanetStore — session-level cache per CONTEXT.md
 
+**36-03 decisions:**
+- WizardStepper watches state.gene (Step 1), NOT result (Step 4) — eager prefetch must trigger before gnomAD query completes
+- StepResults watches result.value?.gene?.symbol (resolved Step 4 result) — reads from Pinia cache instantly (no duplicate network request)
+- Two separate useOrphanetData() instances with shared Pinia store cache — each component has own loading/diseases refs, network deduplication via cache-first fetchForGene
+- immediate:true on both watchers — handles remounts and fresh page loads correctly
+- CLI Orphanet fetch wrapped in try/catch with silent failure — supplementary reference data only
+- formatOrphanetSection uses labelLine helper for alignment; shows all diseases (not just primary) with prevalence and URL
+- Workbox StaleWhileRevalidate for api.orphadata.com (24h expiry, 50 entries max) — offline resilience for slow-changing reference data
+- Orphanet data NOT added to clinical letter templates — only analytical CLI text and web summary card per CONTEXT.md
+- OrphanetSection hides entirely on error/zero diseases — no empty state UI per CONTEXT.md
+
 **34-03 decisions:**
 - highAfPercent computed wraps 0-1 stored value in get/set for 0-100% slider display in SettingsDialog Quality tab
 - FilterPanel quality exclusion section uses template v-if on qualityExclusionConfig prop — backwards-compatible, parent opts in
@@ -161,18 +172,16 @@ None.
 ### Last Session
 
 **Date:** 2026-02-27
-**Completed:** Plan 36-02 — useOrphanetStore (Pinia session cache), useOrphanetData (reactive composable with cache-first fetchForGene), OrphanetSection.vue (skeleton + primary disease + +N more + disclaimer).
-**Status:** Phase 36 plan 2 of 3 complete. Ready for Plan 36-03 (StepResults integration + wizard eager fetch trigger + Workbox cache).
+**Completed:** Plan 36-03 — WizardStepper eager Orphanet fetch at Step 1, StepResults summary card integration with cache-read, CLI query command and text-formatter integration, Workbox PWA cache for api.orphadata.com.
+**Status:** Phase 36 complete (3/3 plans). All 519 unit tests pass. 21 E2E tests pass (12 existing + 9 new Playwright tests added by orchestrator).
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.6 phase order: 33 (FMT+EXP) -> 34 (QUAL+SRC) -> 35 (VIZ) -> 36 (ORPH) -> 37 (SUBP).
 Phase 33 establishes format infrastructure that Phases 34-37 consume.
-Phase 35 complete. Phase 36 plan 1 complete — @gnomad-cf/core/orphanet subpath available.
-Phase 36 plan 2 complete — useOrphanetStore + useOrphanetData + OrphanetSection.vue delivered.
-Phase 36 plan 3 (StepResults integration + wizard eager fetch trigger + Workbox cache) ready to execute.
-Phase 37 depends on Phase 34.
+Phase 36 complete: @gnomad-cf/core/orphanet subpath with platform-neutral API client, Pinia session cache with composables, web UI integration (eager prefetch + summary card), CLI integration (analytical text output), and PWA offline cache.
+Phase 37 (Subcontinental analysis) ready to execute — assumes Orphanet context available if population-level disease prevalence calculations needed.
 
 ---
 
