@@ -132,9 +132,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 36-01-PLAN.md -- Core Orphanet client: types, REST API functions, prevalence selection, tsdown entry
-- [ ] 36-02-PLAN.md -- Web integration: Pinia store, composable, OrphanetSection component
-- [ ] 36-03-PLAN.md -- StepResults wiring, CLI text output, PWA Workbox cache, human verification
+- [x] 36-01-PLAN.md -- Core Orphanet client: types, REST API functions, prevalence selection, tsdown entry
+- [x] 36-02-PLAN.md -- Web integration: Pinia store, composable, OrphanetSection component
+- [x] 36-03-PLAN.md -- StepResults wiring, CLI text output, PWA Workbox cache, human verification
 
 ---
 
@@ -174,11 +174,11 @@ Plans:
 | 33. Display Formats & TSV Export | v1.6 | 3/3 | Complete | 2026-02-26 |
 | 34. Quality Flags & Source Breakdown | v1.6 | 5/5 | Complete | 2026-02-26 |
 | 35. Population Bar Chart | v1.6 | 3/3 | Complete | 2026-02-27 |
-| 36. Orphanet Prevalence Integration | v1.6 | 0/3 | Not started | - |
+| 36. Orphanet Prevalence Integration | v1.6 | 3/3 | Complete | 2026-02-27 |
 | 37. Subcontinental Populations | v1.6 | 0/TBD | Not started | - |
 
-**Total:** 125 plans complete across 35 phases in 6 milestones. 2 phases remaining for v1.6.
+**Total:** 128 plans complete across 36 phases in 6 milestones. 1 phase remaining for v1.6.
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-02-27 (Phase 36 planned: 3 plans in 3 waves)*
+*Last updated: 2026-02-27 (Phase 36 complete: 3/3 plans)*

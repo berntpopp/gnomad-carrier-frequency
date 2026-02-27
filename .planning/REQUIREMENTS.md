@@ -44,14 +44,14 @@
 
 ### Orphanet Prevalence
 
-- [ ] **ORPH-01**: Orphanet prevalence data fetched via API for the selected gene (api.orphadata.com)
-- [ ] **ORPH-02**: All associated Orphanet diseases displayed with their prevalence ranges
-- [ ] **ORPH-03**: Prevalence shown as reference card in results step alongside calculated carrier frequency
-- [ ] **ORPH-04**: Link to Orphanet entry for each disease
-- [ ] **ORPH-05**: Orphanet client module in @gnomad-cf/core (platform-neutral, fetch-based)
-- [ ] **ORPH-06**: Response caching (same gene not fetched twice per session)
-- [ ] **ORPH-07**: Graceful degradation when Orphanet API is unavailable (offline PWA, API errors)
-- [ ] **ORPH-08**: Clear disclaimer that Orphanet prevalence reflects reported clinical prevalence, not genetic prevalence
+- [x] **ORPH-01**: Orphanet prevalence data fetched via API for the selected gene (api.orphadata.com)
+- [x] **ORPH-02**: All associated Orphanet diseases displayed with their prevalence ranges
+- [x] **ORPH-03**: Prevalence shown as reference card in results step alongside calculated carrier frequency
+- [x] **ORPH-04**: Link to Orphanet entry for each disease
+- [x] **ORPH-05**: Orphanet client module in @gnomad-cf/core (platform-neutral, fetch-based)
+- [x] **ORPH-06**: Response caching (same gene not fetched twice per session)
+- [x] **ORPH-07**: Graceful degradation when Orphanet API is unavailable (offline PWA, API errors)
+- [x] **ORPH-08**: Clear disclaimer that Orphanet prevalence reflects reported clinical prevalence, not genetic prevalence
 
 ### Subcontinental Populations
 
@@ -131,14 +131,14 @@
 | EXP-03 | Phase 33 | Complete |
 | EXP-04 | Phase 33 | Complete |
 | EXP-05 | Phase 33 | Complete |
-| ORPH-01 | Phase 36 | Pending |
-| ORPH-02 | Phase 36 | Pending |
-| ORPH-03 | Phase 36 | Pending |
-| ORPH-04 | Phase 36 | Pending |
-| ORPH-05 | Phase 36 | Pending |
-| ORPH-06 | Phase 36 | Pending |
-| ORPH-07 | Phase 36 | Pending |
-| ORPH-08 | Phase 36 | Pending |
+| ORPH-01 | Phase 36 | Complete |
+| ORPH-02 | Phase 36 | Complete |
+| ORPH-03 | Phase 36 | Complete |
+| ORPH-04 | Phase 36 | Complete |
+| ORPH-05 | Phase 36 | Complete |
+| ORPH-06 | Phase 36 | Complete |
+| ORPH-07 | Phase 36 | Complete |
+| ORPH-08 | Phase 36 | Complete |
 | SUBP-01 | Phase 37 | Pending |
 | SUBP-02 | Phase 37 | Pending |
 | SUBP-03 | Phase 37 | Pending |
@@ -161,4 +161,4 @@
 
 ---
 *Requirements defined: 2026-02-26*
-*Last updated: 2026-02-26 (Phase 34: 13 Complete -- QUAL-01..08, SRC-01..05)*
+*Last updated: 2026-02-27 (Phase 36: 8 Complete -- ORPH-01..08)*

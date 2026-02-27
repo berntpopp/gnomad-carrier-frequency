@@ -7,7 +7,7 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Accurate recurrence risk calculation from gnomAD population data with clinical documentation output
-**Current focus:** v1.6 Analysis & Export -- Phase 35 complete (3/3 plans), moving to Phase 36
+**Current focus:** v1.6 Analysis & Export -- Phase 36 complete (3/3 plans), moving to Phase 37
 
 ---
 
@@ -31,16 +31,16 @@ v1.5 Core & CLI:    [##########] 100% - SHIPPED 2026-02-25 (26/26 plans)
 v1.6 Analysis:      [██████████] 100% - Phase 33 complete (3/3), Phase 34 complete (5/5), Phase 35 complete (3/3), Phase 36 complete (3/3)
 ```
 
-**Overall:** 129 plans complete across 36 phases in 6 milestones. Phase 37 remaining.
+**Overall:** 128 plans complete across 36 phases in 6 milestones. Phase 37 remaining.
 
 ---
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 125
+- Total plans completed: 128
 - v1.5 plans completed: 26
-- v1.6 plans completed: 11
+- v1.6 plans completed: 14
 
 ---
 
@@ -133,6 +133,9 @@ v1.5 decisions archived. Starting fresh for v1.6.
 - Workbox StaleWhileRevalidate for api.orphadata.com (24h expiry, 50 entries max) — offline resilience for slow-changing reference data
 - Orphanet data NOT added to clinical letter templates — only analytical CLI text and web summary card per CONTEXT.md
 - OrphanetSection hides entirely on error/zero diseases — no empty state UI per CONTEXT.md
+- fetchForGene resets diseases/error before cache check — prevents stale data when switching genes (bugfix)
+- isPending skip removed — each composable instance must populate its own local refs; duplicate fetches are idempotent
+- 10 Playwright E2E tests including CFTR→HEXA gene-switching regression test
 
 **34-03 decisions:**
 - highAfPercent computed wraps 0-1 stored value in get/set for 0-100% slider display in SettingsDialog Quality tab
@@ -172,16 +175,15 @@ None.
 ### Last Session
 
 **Date:** 2026-02-27
-**Completed:** Plan 36-03 — WizardStepper eager Orphanet fetch at Step 1, StepResults summary card integration with cache-read, CLI query command and text-formatter integration, Workbox PWA cache for api.orphadata.com.
-**Status:** Phase 36 complete (3/3 plans). All 519 unit tests pass. 21 E2E tests pass (12 existing + 9 new Playwright tests added by orchestrator).
+**Completed:** Phase 36 — Orphanet Prevalence Integration (3/3 plans). Bugfix: stale data when switching genes (fetchForGene now resets diseases before cache check).
+**Status:** Phase 36 verified (4/4 must-haves). 519 unit tests pass. 22 E2E tests pass (12 existing + 10 new).
 **Resume file:** None
 
 ### Handoff Notes
 
 v1.6 phase order: 33 (FMT+EXP) -> 34 (QUAL+SRC) -> 35 (VIZ) -> 36 (ORPH) -> 37 (SUBP).
-Phase 33 establishes format infrastructure that Phases 34-37 consume.
-Phase 36 complete: @gnomad-cf/core/orphanet subpath with platform-neutral API client, Pinia session cache with composables, web UI integration (eager prefetch + summary card), CLI integration (analytical text output), and PWA offline cache.
-Phase 37 (Subcontinental analysis) ready to execute — assumes Orphanet context available if population-level disease prevalence calculations needed.
+Phase 36 complete: @gnomad-cf/core/orphanet subpath, Pinia session cache, eager prefetch at Step 1, summary card section, CLI text output, PWA Workbox cache, stale data bugfix.
+Phase 37 (Subcontinental Populations) is the last phase of v1.6. Depends on Phase 34.
 
 ---
 
