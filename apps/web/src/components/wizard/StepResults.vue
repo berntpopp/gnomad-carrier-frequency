@@ -27,6 +27,17 @@
       </template>
     </v-alert>
 
+    <!-- Quality exclusion alert - shows when variants excluded by quality flags -->
+    <v-alert
+      v-if="qualityExcludedCount > 0"
+      type="warning"
+      variant="tonal"
+      class="mb-4"
+      density="compact"
+    >
+      {{ qualityExcludedCount }} variant(s) excluded by quality flags.
+    </v-alert>
+
     <!-- Summary card -->
     <v-card
       v-if="result"
@@ -64,7 +75,7 @@
       <v-card-text class="pt-4">
         <!-- All-excluded warning -->
         <v-alert
-          v-if="filteredCount === 0 && excludedCount > 0"
+          v-if="qualifyingVariantCount === 0 && excludedCount > 0"
           type="warning"
           variant="tonal"
           density="compact"
@@ -104,10 +115,10 @@
                 </span>
               </v-tooltip>
               <div class="stat-value text-h5">
-                {{ globalFrequency?.ratio ?? "-" }}
+                {{ summaryPrimary }}
               </div>
               <div class="stat-detail">
-                {{ globalFrequency?.percent ?? "No variants included" }}
+                {{ summaryDetail }}
               </div>
             </div>
           </v-col>
@@ -209,20 +220,34 @@
           class="text-body-2 text-medium-emphasis mt-3"
         >
           Range across populations:
-          {{ formatRatio(result.minFrequency) }}
+          {{ formatFrequency(result.minFrequency) }}
           to
-          {{ formatRatio(result.maxFrequency) }}
+          {{ formatFrequency(result.maxFrequency) }}
         </div>
 
         <!-- Supporting info -->
         <div
           class="text-caption text-medium-emphasis mt-1 d-flex align-center flex-wrap"
         >
-          Based on {{ filteredCount }} qualifying variant(s)
+          Based on {{ qualifyingVariantCount }} qualifying variant(s)
           <span v-if="excludedCount > 0" class="ml-1 text-warning">
             ({{ excludedCount }} manually excluded)
           </span>
+          <span v-if="flaggedVariantCount > 0" class="ml-1 text-warning">
+            <v-icon size="x-small" class="mr-1">mdi-alert-outline</v-icon>({{
+              flaggedVariantCount
+            }}
+            flagged)
+          </span>
         </div>
+
+        <!-- Orphanet prevalence section — at bottom of summary card -->
+        <OrphanetSection
+          :loading="orphanetLoading"
+          :diseases="orphanetDiseases"
+          :primary-disease="primaryDisease"
+          :additional-diseases="additionalDiseases"
+        />
       </v-card-text>
     </v-card>
 
@@ -230,13 +255,15 @@
     <FilterPanel
       v-model="filters"
       :calc-config="calcStore.defaults"
-      :variant-count="filteredCount"
+      :variant-count="qualifyingVariantCount"
       :conflicting-count="props.conflictingVariantIds.length"
       :is-loading-submissions="props.isLoadingSubmissions"
       :submissions-progress="props.submissionsProgress"
       :submissions-error="props.submissionsError"
+      v-bind="qualityFilterPanelProps"
       @retry-submissions="emit('retrySubmissions')"
       @update:calc-config="calcStore.setDefaults($event)"
+      @update:quality-exclusion-config="setQualityExclusionConfig($event)"
       @reset="resetFilters"
     />
 
@@ -255,30 +282,71 @@
       <!-- Table toolbar -->
       <div class="d-flex align-center flex-wrap ga-2 px-4 py-3">
         <span class="text-subtitle-2">Population Frequencies</span>
+
+        <v-btn-toggle
+          :model-value="currentFormat"
+          mandatory
+          density="compact"
+          color="primary"
+          variant="outlined"
+          aria-label="Frequency display format"
+          @update:model-value="setFormat($event as DisplayFormat)"
+        >
+          <v-tooltip
+            v-for="option in formatOptions"
+            :key="option.value"
+            location="top"
+          >
+            <template #activator="{ props: tooltipProps }">
+              <v-btn
+                v-bind="tooltipProps"
+                :value="option.value"
+                size="small"
+                :aria-label="option.label"
+              >
+                {{ option.symbol }}
+              </v-btn>
+            </template>
+            {{ option.tooltip }}
+          </v-tooltip>
+        </v-btn-toggle>
+
         <v-spacer />
 
-        <v-btn
-          variant="flat"
-          color="primary"
-          size="small"
-          prepend-icon="mdi-table-eye"
-          @click="openAllVariantsModal"
-        >
-          View all variants ({{ filteredCount }})
-        </v-btn>
+        <v-tooltip location="top">
+          <template #activator="{ props: tooltipProps }">
+            <v-btn
+              v-bind="tooltipProps"
+              variant="flat"
+              color="primary"
+              size="small"
+              prepend-icon="mdi-table-eye"
+              @click="openAllVariantsModal"
+            >
+              Variants ({{ qualifyingVariantCount }})
+            </v-btn>
+          </template>
+          View all qualifying variants with details, quality flags, and source
+          classification.
+        </v-tooltip>
 
         <!-- Export dropdown -->
         <v-menu>
           <template #activator="{ props: menuProps }">
-            <v-btn
-              v-bind="menuProps"
-              variant="outlined"
-              size="small"
-              prepend-icon="mdi-download"
-            >
-              Export
-              <v-icon end size="x-small">mdi-chevron-down</v-icon>
-            </v-btn>
+            <v-tooltip location="top">
+              <template #activator="{ props: tooltipProps }">
+                <v-btn
+                  v-bind="{ ...menuProps, ...tooltipProps }"
+                  variant="outlined"
+                  size="small"
+                  prepend-icon="mdi-download"
+                >
+                  Export
+                  <v-icon end size="x-small">mdi-chevron-down</v-icon>
+                </v-btn>
+              </template>
+              Download results as JSON, Excel, or TSV.
+            </v-tooltip>
           </template>
           <v-list density="compact">
             <v-list-item
@@ -293,92 +361,342 @@
             >
               <v-list-item-title>Export as Excel</v-list-item-title>
             </v-list-item>
+            <v-list-item
+              prepend-icon="mdi-file-delimited"
+              @click="handleExport('tsv-populations')"
+            >
+              <v-list-item-title>Populations TSV</v-list-item-title>
+            </v-list-item>
+            <v-list-item
+              prepend-icon="mdi-file-delimited"
+              @click="handleExport('tsv-variants')"
+            >
+              <v-list-item-title>Variants TSV</v-list-item-title>
+            </v-list-item>
           </v-list>
         </v-menu>
 
-        <!-- Copy link button -->
-        <v-tooltip location="top">
+        <!-- Subcontinental toggle (v2 only) -->
+        <v-tooltip v-if="isV2" location="top">
           <template #activator="{ props: tooltipProps }">
             <v-btn
               v-bind="tooltipProps"
-              variant="outlined"
               size="small"
-              :color="copied ? 'success' : undefined"
-              :prepend-icon="copied ? 'mdi-check' : 'mdi-link'"
-              :disabled="!clipboardSupported"
-              aria-label="Copy shareable link to clipboard"
-              @click="copyShareLink"
+              :variant="showSubcontinental ? 'flat' : 'outlined'"
+              :color="showSubcontinental ? 'primary' : undefined"
+              :disabled="qualifyingVariantCount === 0 || isLoading"
+              :loading="isLoadingSubcontinental"
+              prepend-icon="mdi-sitemap"
+              data-testid="subcontinental-toggle"
+              @click="showSubcontinental = !showSubcontinental"
             >
-              {{ copied ? "Copied!" : "Copy link" }}
+              Sub
             </v-btn>
           </template>
-          <span class="tooltip-text">
-            Copy a shareable link with your current gene, filters, and settings.
-          </span>
+          Fetch subcontinental breakdowns (NFE/EAS). May be slow — queries each
+          variant individually.
+        </v-tooltip>
+        <v-tooltip v-else location="top">
+          <template #activator="{ props: tooltipProps }">
+            <v-chip
+              v-bind="tooltipProps"
+              size="small"
+              variant="outlined"
+              color="grey"
+              class="ml-2"
+              data-testid="subcontinental-v2-only"
+            >
+              <v-icon start size="x-small">mdi-information</v-icon>
+              Sub (v2 only)
+            </v-chip>
+          </template>
+          Subcontinental population breakdowns are only available for gnomAD
+          v2.1.1 queries.
         </v-tooltip>
       </div>
 
+      <!-- Table / Chart tabs -->
+      <v-tabs v-model="populationTab" density="compact" class="px-4">
+        <v-tab value="table" size="small" data-testid="table-tab">
+          <v-icon start size="small">mdi-table</v-icon>
+          Table
+        </v-tab>
+        <v-tab value="chart" size="small" data-testid="chart-tab">
+          <v-icon start size="small">mdi-chart-bar</v-icon>
+          Chart
+        </v-tab>
+      </v-tabs>
+
       <v-divider />
 
-      <!-- Sortable data table -->
-      <div class="table-scroll-wrapper">
-        <v-data-table
-          :items="tableItems"
-          :headers="headers"
-          :sort-by="sortBy"
-          density="compact"
-          items-per-page="-1"
-          class="results-table"
-          data-testid="population-table"
-        >
-          <template #item="{ item }">
-            <tr
-              :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
-              @click="!item.isGlobal && openPopulationModal(item.code)"
-            >
-              <td>
-                <div class="d-flex align-center">
-                  {{ item.label }}
-                  <v-icon
-                    v-if="!item.isGlobal"
-                    class="ml-1 population-chevron"
-                    size="x-small"
-                    color="grey"
-                  >
-                    mdi-chevron-right
-                  </v-icon>
-                </div>
-              </td>
-              <td class="text-right">
-                {{ formatPercent(item.carrierFrequency) }}
-              </td>
-              <td class="text-right">
-                {{ formatRatio(item.carrierFrequency) }}
-              </td>
-              <td class="text-right">
-                {{ formatPrevalenceRatio(item.geneticPrevalence) }}
-              </td>
-              <td class="text-right">
-                {{ item.recurrenceRisk }}
-              </td>
-              <td class="text-right">
-                {{ item.alleleCount }}
-              </td>
-              <td class="text-right">
-                {{ item.alleleNumber?.toLocaleString() ?? "-" }}
-              </td>
-              <td>
-                <v-chip v-if="item.notes" color="info" size="x-small">
-                  <v-icon start size="x-small">mdi-star</v-icon>
-                  {{ item.notes }}
-                </v-chip>
-              </td>
-            </tr>
-          </template>
+      <v-window v-model="populationTab">
+        <!-- Chart tab -->
+        <v-window-item value="chart">
+          <div class="pa-4">
+            <PopulationBarChart
+              ref="chartRef"
+              :populations="result?.populations ?? []"
+              :global-carrier-frequency="effectiveFrequency"
+              :gene="result?.gene ?? ''"
+              :gnomad-version="sourceAttribution"
+              @bar-click="openPopulationModal"
+            />
+            <!-- Chart export buttons -->
+            <div class="d-flex justify-end ga-2 mt-3">
+              <v-btn
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-file-image"
+                @click="handleChartExportSvg"
+              >
+                Download SVG
+              </v-btn>
+              <v-btn
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-image"
+                @click="handleChartExportPng"
+              >
+                Download PNG
+              </v-btn>
+            </div>
+          </div>
+        </v-window-item>
 
-          <template #bottom />
-        </v-data-table>
-      </div>
+        <!-- Table tab -->
+        <v-window-item value="table">
+          <div class="table-scroll-wrapper">
+            <v-data-table
+              :items="tableItems"
+              :headers="headers"
+              :sort-by="sortBy"
+              density="compact"
+              items-per-page="-1"
+              class="results-table"
+              data-testid="population-table"
+            >
+              <template #item="{ item }">
+                <tr
+                  :class="[
+                    getRowClass(item),
+                    { 'population-row': !item.isGlobal },
+                  ]"
+                  @click="!item.isGlobal && openPopulationModal(item.code)"
+                >
+                  <td>
+                    <div class="d-flex align-center">
+                      <!-- Expand/collapse chevron for source breakdown (non-global rows only) -->
+                      <v-tooltip location="top">
+                        <template #activator="{ props: tooltipProps }">
+                          <v-btn
+                            v-if="!item.isGlobal"
+                            v-bind="tooltipProps"
+                            :icon="
+                              isPopExpanded(item.code)
+                                ? 'mdi-chevron-down'
+                                : 'mdi-chevron-right'
+                            "
+                            variant="plain"
+                            density="compact"
+                            size="small"
+                            class="population-expand-btn mr-1"
+                            :aria-label="
+                              isPopExpanded(item.code)
+                                ? 'Collapse source breakdown'
+                                : 'Expand source breakdown'
+                            "
+                            @click="togglePopExpand(item.code, $event)"
+                          />
+                        </template>
+                        {{
+                          isPopExpanded(item.code)
+                            ? "Hide source breakdown"
+                            : "Show source breakdown"
+                        }}
+                      </v-tooltip>
+                      <span class="population-label">{{ item.label }}</span>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    {{ formatFrequency(item.carrierFrequency) }}
+                  </td>
+                  <td class="text-right">
+                    {{ formatRatioDisplay(item.carrierFrequency) }}
+                  </td>
+                  <td class="text-right">
+                    {{ formatPrevalenceRatio(item.geneticPrevalence) }}
+                  </td>
+                  <td class="text-right">
+                    {{ item.recurrenceRisk }}
+                  </td>
+                  <td class="text-right">
+                    {{ item.alleleCount }}
+                  </td>
+                  <td class="text-right">
+                    {{ item.alleleNumber?.toLocaleString() ?? "-" }}
+                  </td>
+                  <td>
+                    <v-chip v-if="item.notes" color="info" size="x-small">
+                      <v-icon start size="x-small">mdi-star</v-icon>
+                      {{ item.notes }}
+                    </v-chip>
+                  </td>
+                </tr>
+                <!-- Source breakdown expansion rows (rendered inline after population row) -->
+                <template v-if="!item.isGlobal && isPopExpanded(item.code)">
+                  <tr
+                    v-for="srcRow in getSourceBreakdown(item.code)"
+                    :key="`${item.code}-${srcRow.sourceCategory}`"
+                    class="source-breakdown-row"
+                    :style="{
+                      borderLeft: `3px solid ${getSourceBorderColor(srcRow.sourceCategory)}`,
+                    }"
+                  >
+                    <td>
+                      <div class="d-flex align-center pl-6">
+                        <v-chip
+                          :color="sourceCategoryColor(srcRow.sourceCategory)"
+                          size="x-small"
+                          class="mr-2"
+                        >
+                          {{ srcRow.label }}
+                        </v-chip>
+                        <span class="text-caption text-medium-emphasis">
+                          {{ srcRow.variantCount }} variant{{
+                            srcRow.variantCount === 1 ? "" : "s"
+                          }}
+                        </span>
+                      </div>
+                    </td>
+                    <td class="text-right">
+                      {{ formatSourceFrequency(srcRow.carrierFrequency) }}
+                    </td>
+                    <td class="text-right">
+                      {{ formatRatioDisplay(srcRow.carrierFrequency) }}
+                    </td>
+                    <td class="text-right">-</td>
+                    <td class="text-right">-</td>
+                    <td class="text-right">{{ srcRow.alleleCount }}</td>
+                    <td class="text-right">
+                      {{
+                        srcRow.alleleNumber > 0
+                          ? srcRow.alleleNumber.toLocaleString()
+                          : "-"
+                      }}
+                    </td>
+                    <td v-if="hasNotes" />
+                  </tr>
+                </template>
+
+                <!-- Subcontinental loading row (shown while fetching) -->
+                <template
+                  v-if="
+                    showSubcontinental &&
+                    hasSubpopulations(item.code) &&
+                    isLoadingSubcontinental &&
+                    !item.isGlobal
+                  "
+                >
+                  <tr class="subcontinental-loading-row">
+                    <td :colspan="headers.length">
+                      <v-progress-linear
+                        :model-value="subcontinentalProgress"
+                        color="primary"
+                        height="4"
+                        class="my-1"
+                      />
+                    </td>
+                  </tr>
+                </template>
+
+                <!-- Subcontinental error row -->
+                <template
+                  v-if="
+                    showSubcontinental &&
+                    subcontinentalError &&
+                    hasSubpopulations(item.code) &&
+                    !item.isGlobal
+                  "
+                >
+                  <tr class="subcontinental-error-row">
+                    <td :colspan="headers.length">
+                      <v-alert
+                        type="warning"
+                        variant="tonal"
+                        density="compact"
+                        class="ma-1"
+                      >
+                        Failed to load subcontinental data.
+                        {{ subcontinentalError }}
+                      </v-alert>
+                    </td>
+                  </tr>
+                </template>
+
+                <!-- Subcontinental sub-rows (nested under parent) -->
+                <template
+                  v-if="
+                    showSubcontinental &&
+                    !isLoadingSubcontinental &&
+                    !item.isGlobal
+                  "
+                >
+                  <tr
+                    v-for="sub in getSubcontinentalRows(item.code)"
+                    :key="`subpop-${sub.code}`"
+                    class="subcontinental-row"
+                  >
+                    <td>
+                      <div class="d-flex align-center pl-8">
+                        <span class="text-body-2">{{ sub.label }}</span>
+                        <v-chip
+                          v-if="sub.isLowSampleSize"
+                          color="warning"
+                          size="x-small"
+                          class="ml-2"
+                          variant="tonal"
+                        >
+                          <v-icon start size="x-small">mdi-alert</v-icon>
+                          Low sample
+                        </v-chip>
+                        <v-chip
+                          v-if="sub.isFounderEffect"
+                          color="info"
+                          size="x-small"
+                          class="ml-2"
+                          variant="tonal"
+                        >
+                          <v-icon start size="x-small">mdi-star</v-icon>
+                          Founder effect
+                        </v-chip>
+                      </div>
+                    </td>
+                    <td class="text-right">
+                      {{ formatFrequency(sub.carrierFrequency) }}
+                    </td>
+                    <td class="text-right">
+                      {{ formatRatioDisplay(sub.carrierFrequency) }}
+                    </td>
+                    <td class="text-right">-</td>
+                    <td class="text-right">-</td>
+                    <td class="text-right">{{ sub.alleleCount }}</td>
+                    <td class="text-right">
+                      {{
+                        sub.alleleNumber > 0
+                          ? sub.alleleNumber.toLocaleString()
+                          : "-"
+                      }}
+                    </td>
+                    <td />
+                  </tr>
+                </template>
+              </template>
+
+              <template #bottom />
+            </v-data-table>
+          </div>
+        </v-window-item>
+      </v-window>
     </v-card>
 
     <!-- Text output section -->
@@ -427,14 +745,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { useClipboard } from "@vueuse/core";
+import { computed, ref, watch } from "vue";
 import { useDisplay } from "vuetify";
 import {
   config,
   getGnomadVersion,
   getPopulationLabel,
+  getSubpopulations,
+  getSubpopulationParent,
 } from "@gnomad-cf/core/config";
+import {
+  useSubcontinentalData,
+  type SubcontinentalPopulationFrequency,
+} from "@/composables";
+import {
+  frequencyToPercent,
+  frequencyToRatio,
+  computeSourceBreakdown,
+} from "@gnomad-cf/core/calculations";
+import type {
+  DisplayFormat,
+  SourceBreakdownRow,
+} from "@gnomad-cf/core/calculations";
+import { useDisplayFormat } from "@/composables/useDisplayFormat";
 
 // Responsive breakpoint detection
 const { smAndDown } = useDisplay();
@@ -450,19 +783,29 @@ import type {
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useCalcStore } from "@/stores/useCalcStore";
-import { useExport, useAppAnnouncer, useExclusionState } from "@/composables";
+import {
+  useExport,
+  useExclusionState,
+  useCarrierFrequency,
+  useUrlState,
+} from "@/composables";
 import { useGeneSearch } from "@/composables/useGeneSearch";
 import { filterPathogenicVariantsConfigurable } from "@gnomad-cf/core/filters";
 import {
   toDisplayVariants,
   filterVariantsByPopulation,
+  sourceCategoryColor,
 } from "@gnomad-cf/core/filters";
 import { buildExportData } from "@/utils/export-utils";
 import { formatPrevalence } from "@gnomad-cf/core/calculations";
+import { useOrphanetData } from "@/composables/useOrphanetData";
 import TextOutput from "./TextOutput.vue";
 import FilterPanel from "@/components/FilterPanel.vue";
 import VariantModal from "@/components/VariantModal.vue";
 import ClingenWarning from "@/components/ClingenWarning.vue";
+import OrphanetSection from "@/components/OrphanetSection.vue";
+import PopulationBarChart from "@/components/PopulationBarChart.vue";
+import { useChartExport } from "@/composables/useChartExport";
 
 interface TableItem {
   label: string;
@@ -525,41 +868,208 @@ const bayesianPrevalenceFormatted = computed(() => {
 // Get canonical transcript from gene details (fetched at gene selection time)
 const { canonicalTranscript } = useGeneSearch();
 
+// Orphanet data — reads from Pinia store cache (pre-filled by WizardStepper eager fetch).
+// If cache miss (e.g. direct navigation to Step 4), fetchForGene triggers a network request.
+const {
+  loading: orphanetLoading,
+  primaryDisease,
+  additionalDiseases,
+  diseases: orphanetDiseases,
+  fetchForGene: fetchOrphanetForGene,
+} = useOrphanetData();
+
+watch(
+  () => props.result?.gene,
+  (geneSymbol) => {
+    if (geneSymbol) {
+      fetchOrphanetForGene(geneSymbol);
+    }
+  },
+  { immediate: true },
+);
+
 // Get exclusion state (singleton) for displaying excluded count and export data
 const { excludedCount, excluded, reasons } = useExclusionState();
+
+// Quality data from the singleton composable
+const {
+  isLoading,
+  qualityExclusionConfig,
+  setQualityExclusionConfig,
+  qualityExcludedCount,
+  flaggedVariantCount,
+  qualifyingVariantCount,
+  qualifyingVariants,
+} = useCarrierFrequency();
+
+// Quality props forwarded to FilterPanel via v-bind spread
+// (FilterPanel will accept these when Plan 34-03 adds the props interface)
+const qualityFilterPanelProps = computed(() => ({
+  qualityExclusionConfig: qualityExclusionConfig.value,
+  qualityExcludedCount: qualityExcludedCount.value,
+  flaggedVariantCount: flaggedVariantCount.value,
+}));
+
+// Subcontinental population data — v2 only
+const isV2 = computed(() => props.result?.version === "v2");
+// Use shared ref from URL state so toggle is synced to shareable URL
+const { subcontinentalEnabled: showSubcontinental } = useUrlState();
+
+const {
+  isLoading: isLoadingSubcontinental,
+  progress: subcontinentalProgress,
+  error: subcontinentalError,
+  subcontinentalFrequencies,
+  fetchForVariants: fetchSubcontinental,
+  clear: clearSubcontinental,
+} = useSubcontinentalData();
+
+// Watch toggle to trigger subcontinental fetch on enable
+watch(showSubcontinental, async (enabled) => {
+  if (enabled && isV2.value && qualifyingVariants.value.length > 0) {
+    const variantIds = qualifyingVariants.value.map((v) => v.variant_id);
+    const gene = props.result?.gene ?? "";
+    // Build parent frequency map for founder effect detection
+    const parentFreqs = new Map<string, number | null>();
+    for (const pop of props.result?.populations ?? []) {
+      parentFreqs.set(pop.code, pop.carrierFrequency);
+    }
+    await fetchSubcontinental(variantIds, gene, parentFreqs);
+  }
+});
+
+// Helper: get subcontinental rows for a parent population
+function getSubcontinentalRows(
+  parentCode: string,
+): SubcontinentalPopulationFrequency[] {
+  return subcontinentalFrequencies.value.filter(
+    (f) => f.parentCode === parentCode,
+  );
+}
+
+function hasSubpopulations(popCode: string): boolean {
+  if (!isV2.value) return false;
+  const pops = getSubpopulations("v2");
+  return pops.some((s) => getSubpopulationParent(s.code, "v2") === popCode);
+}
+
+// Expandable population row state — tracks which population rows are expanded
+const expandedPops = ref<Set<string>>(new Set());
+
+function togglePopExpand(popCode: string, event: Event) {
+  event.stopPropagation();
+  const newSet = new Set(expandedPops.value);
+  if (newSet.has(popCode)) {
+    newSet.delete(popCode);
+  } else {
+    newSet.add(popCode);
+  }
+  expandedPops.value = newSet;
+}
+
+function isPopExpanded(popCode: string): boolean {
+  return expandedPops.value.has(popCode);
+}
+
+// Lazy source breakdown computation — only computed for expanded populations
+const sourceBreakdownCache = computed(() => {
+  const cache = new Map<string, SourceBreakdownRow[]>();
+  for (const popCode of expandedPops.value) {
+    cache.set(
+      popCode,
+      computeSourceBreakdown(
+        qualifyingVariants.value,
+        props.clinvarVariants,
+        props.filterConfig,
+        popCode,
+        calcStore.defaults,
+        props.submissions,
+      ),
+    );
+  }
+  return cache;
+});
+
+function getSourceBreakdown(popCode: string): SourceBreakdownRow[] {
+  return sourceBreakdownCache.value.get(popCode) ?? [];
+}
+
+function formatSourceFrequency(cf: number | null): string {
+  if (cf === null || cf === 0) return "-";
+  return formatFrequency(cf);
+}
+
+// CSS hex colors for source breakdown left border accent
+function getSourceBorderColor(category: string): string {
+  switch (category) {
+    case "clinvar_only":
+      return "#2196F3"; // blue
+    case "plof_only":
+      return "#673AB7"; // deep-purple
+    case "both":
+      return "#4CAF50"; // green
+    default:
+      return "transparent";
+  }
+}
+
+// Reset expanded populations and subcontinental data when gene result changes
+watch(
+  () => props.result,
+  () => {
+    expandedPops.value = new Set();
+    showSubcontinental.value = false;
+    clearSubcontinental();
+  },
+);
 
 // Computed Set of excluded variant IDs for export
 const excludedSet = computed(() => new Set(excluded.value));
 
 // Set up export composable
-const { exportToJson, exportToExcel } = useExport();
+const { exportToJson, exportToExcel, exportPopulationsTsv, exportVariantsTsv } =
+  useExport();
 
-// Set up announcer for screen reader notifications
-const { polite: announcePolite, assertive: announceAssertive } =
-  useAppAnnouncer();
-
-// Clipboard for copy link functionality
+// Display format composable — reactive frequency formatting
 const {
-  copy,
-  copied,
-  isSupported: clipboardSupported,
-} = useClipboard({
-  copiedDuring: 2000, // Show "copied" state for 2 seconds
-  legacy: true, // Fallback for older browsers
-});
+  currentFormat,
+  setFormat,
+  formatFrequency,
+  formatRatio: formatRatioDisplay,
+} = useDisplayFormat();
 
-// Copy current URL handler with screen reader announcement
-async function copyShareLink() {
-  try {
-    await copy(window.location.href);
-    announcePolite("Link copied to clipboard");
-  } catch {
-    announceAssertive("Failed to copy link");
-  }
-}
+// Format selector options for v-btn-toggle
+const formatOptions = [
+  {
+    value: "percent" as DisplayFormat,
+    symbol: "%",
+    label: "Percentage",
+    tooltip: "Display as percentage (e.g. 4.31%)",
+  },
+  {
+    value: "ratio" as DisplayFormat,
+    symbol: "1:N",
+    label: "Ratio",
+    tooltip: "Display as ratio (e.g. 1:23)",
+  },
+  {
+    value: "scientific" as DisplayFormat,
+    symbol: "sci",
+    label: "Scientific notation",
+    tooltip: "Display in scientific notation (e.g. 4.31 × 10⁻²)",
+  },
+  {
+    value: "per100k" as DisplayFormat,
+    symbol: "/100k",
+    label: "Per 100,000",
+    tooltip: "Display per 100,000 individuals",
+  },
+];
 
 // Export handler function
-function handleExport(format: "json" | "xlsx") {
+function handleExport(
+  format: "json" | "xlsx" | "tsv-populations" | "tsv-variants",
+) {
   if (!props.result) return;
 
   // Convert filtered variants to display format for export
@@ -585,10 +1095,19 @@ function handleExport(format: "json" | "xlsx") {
     reasons,
   );
 
-  if (format === "json") {
-    exportToJson(exportData, props.result.gene);
-  } else {
-    exportToExcel(exportData, props.result.gene);
+  switch (format) {
+    case "json":
+      exportToJson(exportData, props.result.gene);
+      break;
+    case "xlsx":
+      exportToExcel(exportData, props.result.gene);
+      break;
+    case "tsv-populations":
+      exportPopulationsTsv(exportData, props.result.gene);
+      break;
+    case "tsv-variants":
+      exportVariantsTsv(exportData, props.result.gene);
+      break;
   }
 }
 
@@ -612,9 +1131,6 @@ const filteredVariants = computed(() => {
   );
 });
 
-// Count of filtered variants
-const filteredCount = computed(() => filteredVariants.value.length);
-
 // Reset local filters and calc settings to store defaults
 function resetFilters() {
   const defaults = filterStore.defaults;
@@ -627,6 +1143,24 @@ function resetFilters() {
     clinvarConflictingThreshold: defaults.clinvarConflictingThreshold,
   });
   calcStore.resetToFactoryDefaults();
+}
+
+// Chart tab state
+const populationTab = ref<"chart" | "table">("table");
+const chartRef = ref<InstanceType<typeof PopulationBarChart> | null>(null);
+const { downloadSvg, downloadPng } = useChartExport();
+
+// Chart export handlers
+function handleChartExportSvg() {
+  const svgEl = chartRef.value?.svgRef;
+  if (!svgEl || !props.result) return;
+  downloadSvg(svgEl, props.result.gene, sourceAttribution.value);
+}
+
+function handleChartExportPng() {
+  const svgEl = chartRef.value?.svgRef;
+  if (!svgEl || !props.result) return;
+  downloadPng(svgEl, props.result.gene, sourceAttribution.value);
 }
 
 // Variant modal state
@@ -681,7 +1215,7 @@ const headers = computed(() => {
   const base = [
     { title: "Population", key: "label", sortable: true },
     {
-      title: "Carrier Freq (%)",
+      title: "Carrier Frequency",
       key: "carrierFrequency",
       sortable: true,
       align: "end" as const,
@@ -720,6 +1254,21 @@ const headers = computed(() => {
 
 // Default sort by carrier frequency descending
 const sortBy = ref([{ key: "carrierFrequency", order: "desc" as const }]);
+
+// Format-aware display for the hero stat in the summary card
+const summaryPrimary = computed(() => {
+  if (effectiveFrequency.value === null) return "-";
+  return formatFrequency(effectiveFrequency.value);
+});
+
+const summaryDetail = computed(() => {
+  if (effectiveFrequency.value === null) return "No variants included";
+  // Show a complementary format as detail line
+  if (currentFormat.value === "ratio") {
+    return frequencyToPercent(effectiveFrequency.value);
+  }
+  return frequencyToRatio(effectiveFrequency.value);
+});
 
 // Calculate effective carrier frequency based on source
 const effectiveFrequency = computed((): number | null => {
@@ -862,17 +1411,6 @@ function getRowClass(item: TableItem): string {
   return "";
 }
 
-// Formatters
-function formatPercent(freq: number | null): string {
-  if (freq === null) return "Not detected";
-  return `${(freq * 100).toFixed(config.settings.frequencyDecimalPlaces)}%`;
-}
-
-function formatRatio(freq: number | null): string {
-  if (freq === null || freq === 0) return "-";
-  return `1:${Math.round(1 / freq).toLocaleString()}`;
-}
-
 // Format prevalence as ratio for table display (returns '-' for null/zero)
 function formatPrevalenceRatio(prevalence: number | null): string {
   if (prevalence === null || prevalence === 0) return "-";
@@ -933,8 +1471,34 @@ function formatPrevalenceRatio(prevalence: number | null): string {
   background-color: rgb(var(--v-theme-surface-variant)) !important;
 }
 
-.population-row:hover .population-chevron {
+.population-row:hover .population-expand-btn {
   color: rgb(var(--v-theme-primary)) !important;
+}
+
+.source-breakdown-row {
+  background-color: rgba(var(--v-theme-surface-variant), 0.3);
+}
+
+.source-breakdown-row td {
+  font-size: 0.875rem;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+.source-breakdown-row:hover {
+  background-color: rgba(var(--v-theme-surface-variant), 0.5) !important;
+}
+
+.subcontinental-row {
+  background: rgba(var(--v-theme-surface-variant), 0.15);
+}
+
+.subcontinental-row td {
+  font-size: 0.85em;
+}
+
+.subcontinental-loading-row td {
+  padding: 0 !important;
 }
 
 .tooltip-text {

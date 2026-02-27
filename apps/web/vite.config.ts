@@ -115,6 +115,21 @@ export default defineConfig({
               },
             },
           },
+          {
+            // Orphanet API caching — StaleWhileRevalidate for resilience
+            urlPattern: /^https:\/\/api\.orphadata\.com\//,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'orphanet-api-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 86400, // 24 hours
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
         ],
       },
       devOptions: {

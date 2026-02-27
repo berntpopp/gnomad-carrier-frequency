@@ -11,7 +11,25 @@
 
     <v-main id="main-content" tabindex="-1">
       <v-container max-width="900">
-        <h1 class="text-h4 mb-2">gnomAD Carrier Frequency Calculator</h1>
+        <div class="d-flex align-center ga-2 mb-2">
+          <h1 class="text-h4">gnomAD Carrier Frequency Calculator</h1>
+          <v-tooltip v-if="wizardState.currentStep === 4" location="top">
+            <template #activator="{ props: tooltipProps }">
+              <v-btn
+                v-bind="tooltipProps"
+                variant="outlined"
+                size="small"
+                :color="linkCopied ? 'success' : undefined"
+                :prepend-icon="linkCopied ? 'mdi-check' : 'mdi-link'"
+                aria-label="Copy shareable link to clipboard"
+                @click="copyShareLink"
+              >
+                {{ linkCopied ? "Copied!" : "Link" }}
+              </v-btn>
+            </template>
+            Copy a shareable link with your current gene, filters, and settings.
+          </v-tooltip>
+        </div>
         <p class="text-body-2 text-medium-emphasis mb-6">
           Calculate carrier frequency and recurrence risk from gnomAD population
           data.
@@ -79,6 +97,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
+import { useClipboard } from "@vueuse/core";
 import AppBar from "@/components/AppBar.vue";
 import AppFooter from "@/components/AppFooter.vue";
 import DisclaimerBanner from "@/components/DisclaimerBanner.vue";
@@ -101,7 +120,15 @@ const showLogViewer = ref(false);
 const showHistory = ref(false);
 
 // Wizard reset
-const { resetWizard } = useWizard();
+const { state: wizardState, resetWizard } = useWizard();
+
+// Share link clipboard
+const { copy: copyLink, copied: linkCopied } = useClipboard({
+  copiedDuring: 2000,
+});
+function copyShareLink() {
+  copyLink(window.location.href);
+}
 
 // Initialize URL state synchronization
 // This handles restoring state from URL on mount and updating URL as state changes

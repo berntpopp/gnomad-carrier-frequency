@@ -8,6 +8,7 @@ import type {
   GnomadVersionConfig,
   AppSettings,
   PopulationConfig,
+  SubpopulationConfig,
 } from "./types";
 
 import gnomadConfig from "./gnomad.json";
@@ -80,6 +81,44 @@ export function getAvailableVersions(): GnomadVersion[] {
   return Object.keys(gnomad.versions) as GnomadVersion[];
 }
 
+// Helper: Get flat list of all subcontinental subpopulations for a version
+export function getSubpopulations(
+  version?: GnomadVersion,
+): SubpopulationConfig[] {
+  const pops = getGnomadVersion(version).populations;
+  return pops.flatMap((p) => p.subpopulations ?? []);
+}
+
+// Helper: Returns true if the version has subcontinental population data
+export function hasSubcontinentalData(version?: GnomadVersion): boolean {
+  return getSubpopulations(version).length > 0;
+}
+
+// Helper: Given a subpopulation code (e.g. "nfe_bgr"), returns the parent population code ("nfe")
+// Returns null if not found in config
+export function getSubpopulationParent(
+  subCode: string,
+  version?: GnomadVersion,
+): string | null {
+  const pops = getGnomadVersion(version).populations;
+  for (const pop of pops) {
+    if (pop.subpopulations?.some((s) => s.code === subCode)) {
+      return pop.code;
+    }
+  }
+  return null;
+}
+
+// Helper: Get label for a subcontinental subpopulation code; falls back to code if not found
+export function getSubpopulationLabel(
+  code: string,
+  version?: GnomadVersion,
+): string {
+  const subs = getSubpopulations(version);
+  const found = subs.find((s) => s.code === code);
+  return found?.label ?? code;
+}
+
 // Re-export types for convenience
 export type {
   Config,
@@ -88,6 +127,7 @@ export type {
   GnomadVersionConfig,
   AppSettings,
   PopulationConfig,
+  SubpopulationConfig,
 } from "./types";
 
 // Re-export exclusion reasons config

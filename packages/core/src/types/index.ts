@@ -82,3 +82,14 @@ export type {
 
 export type { CalcConfig, CalcResult } from "./calculations";
 export { FACTORY_CALC_DEFAULTS } from "./calculations";
+
+export type {
+  QualityFlagType,
+  QualityFlag,
+  QualitySettings,
+  QualityExclusionConfig,
+} from "./quality";
+export {
+  FACTORY_QUALITY_DEFAULTS,
+  FACTORY_EXCLUSION_DEFAULTS,
+} from "./quality";

@@ -1,6 +1,7 @@
 import type { GnomadVersion } from "@gnomad-cf/core/config";
 import type { PopulationFrequency } from "@gnomad-cf/core/types";
 import type { FilterConfig, CalcConfig } from "@gnomad-cf/core/types";
+import type { OrphanetDisease } from "@gnomad-cf/core/orphanet";
 
 export interface VariantDetail {
   variant_id: string;
@@ -8,6 +9,11 @@ export interface VariantDetail {
   alleleFrequency: number;
   clinvarSignificance: string | null;
   ac_hom: number;
+  // Phase 33 additions for TSV column compatibility with web export spec
+  hgvsC?: string | null;
+  hgvsP?: string | null;
+  sourceCategory?: string | null; // Phase 34 will populate
+  qualityFlags?: string | null; // Phase 34 will populate
 }
 
 export interface QueryResult {
@@ -25,6 +31,7 @@ export interface QueryResult {
   homExclusionActive: boolean;
   penetrance: number;
   variants?: VariantDetail[];
+  orphanetDiseases?: OrphanetDisease[];
 }
 
 export interface QueryOptions {

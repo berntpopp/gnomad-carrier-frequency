@@ -63,6 +63,12 @@ export const UrlStateSchema = z.object({
 
   /** Penetrance fraction 0.0-1.0 (default 1.0) */
   penetrance: z.coerce.number().min(0).max(1).optional(),
+
+  /** gnomAD version: 'v2' or 'v4' (default v4) */
+  ver: z.enum(["v2", "v4"]).optional(),
+
+  /** Subcontinental toggle: '1'=on (only meaningful for v2) */
+  sub: z.enum(["0", "1"]).optional(),
 });
 
 /**

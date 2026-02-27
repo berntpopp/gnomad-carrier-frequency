@@ -51,6 +51,63 @@
           />
         </template>
 
+        <!-- Quality flags column - warning icon with count badge and tooltip -->
+        <template #[`item.qualityFlags`]="{ item }">
+          <template v-if="getVariantFlags(item.variant_id).length > 0">
+            <v-tooltip location="top" max-width="360">
+              <template #activator="{ props: tooltipProps }">
+                <v-badge
+                  v-bind="tooltipProps"
+                  :content="getVariantFlags(item.variant_id).length"
+                  :color="worstFlagColor(getVariantFlags(item.variant_id))"
+                  inline
+                >
+                  <v-icon
+                    :color="worstFlagColor(getVariantFlags(item.variant_id))"
+                    size="small"
+                  >
+                    mdi-alert
+                  </v-icon>
+                </v-badge>
+              </template>
+              <div>
+                <div
+                  v-for="flag in getVariantFlags(item.variant_id)"
+                  :key="flag.type"
+                  class="mb-1"
+                >
+                  <span class="sr-only">{{ flag.severity }}:</span>
+                  <strong :style="{ color: flagTypeColorCss(flag.type) }">
+                    {{ flag.label }} </strong
+                  ><br />
+                  <span class="text-caption">{{ flag.explanation }}</span>
+                </div>
+              </div>
+            </v-tooltip>
+          </template>
+        </template>
+
+        <!-- Source category column - colored chip -->
+        <template #[`item.sourceCategory`]="{ item }">
+          <v-tooltip v-if="getSourceCategory(item.variant_id)" location="top">
+            <template #activator="{ props: tooltipProps }">
+              <v-chip
+                v-bind="tooltipProps"
+                :color="
+                  sourceCategoryColor(getSourceCategory(item.variant_id)!)
+                "
+                size="x-small"
+                variant="tonal"
+              >
+                {{ sourceCategoryLabel(getSourceCategory(item.variant_id)!) }}
+              </v-chip>
+            </template>
+            <span>{{
+              sourceExplanation(getSourceCategory(item.variant_id)!)
+            }}</span>
+          </v-tooltip>
+        </template>
+
         <!-- Variant ID column - links to gnomAD -->
         <template #[`item.variant_id`]="{ item }">
           <a
@@ -284,12 +341,17 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { DisplayVariant } from "@gnomad-cf/core/types";
+import type { QualityFlag, QualityFlagType } from "@gnomad-cf/core/types";
 import {
   getClinvarColor,
   formatAlleleFrequency,
+  classifyVariantSource,
+  sourceCategoryLabel,
+  sourceCategoryColor,
 } from "@gnomad-cf/core/filters";
+import type { SourceCategory } from "@gnomad-cf/core/filters";
 import { getDatasetId, getReferenceGenome } from "@gnomad-cf/core/config";
-import { useExclusionState } from "@/composables";
+import { useExclusionState, useCarrierFrequency } from "@/composables";
 
 const props = defineProps<{
   /** Variants to display in the table */
@@ -303,6 +365,33 @@ const props = defineProps<{
 // Get exclusion state composable
 const { excludeAll, includeVariant, toggleVariant, isExcluded } =
   useExclusionState();
+
+// Access quality/source data from the singleton composable (same pattern as useExclusionState)
+const {
+  qualityFlagsMap,
+  filteredByPathogenicity,
+  clinvarVariants,
+  filterConfig,
+  submissions,
+} = useCarrierFrequency();
+
+// Compute source category map from pathogenicity-filtered variants
+// Uses the singleton's filteredByPathogenicity to avoid re-running filter logic
+const sourceCategoryMap = computed((): Map<string, SourceCategory> => {
+  const map = new Map<string, SourceCategory>();
+  for (const variant of filteredByPathogenicity.value) {
+    map.set(
+      variant.variant_id,
+      classifyVariantSource(
+        variant,
+        clinvarVariants.value,
+        filterConfig.value,
+        submissions.value,
+      ),
+    );
+  }
+  return map;
+});
 
 // All variants are included (none excluded)
 const allIncluded = computed(() => {
@@ -339,9 +428,60 @@ function getRowClass(item: DisplayVariant): string {
   return isExcluded(item.variant_id) ? "excluded-row" : "";
 }
 
+// Quality flag helpers
+function getVariantFlags(variantId: string): QualityFlag[] {
+  return qualityFlagsMap.value.get(variantId) ?? [];
+}
+
+function worstFlagColor(flags: QualityFlag[]): string {
+  if (flags.some((f) => f.severity === "critical")) return "error";
+  if (flags.some((f) => f.severity === "warning")) return "warning";
+  return "blue-grey";
+}
+
+function flagTypeColorCss(type: QualityFlagType): string {
+  const map: Record<QualityFlagType, string> = {
+    high_af: "#F44336",
+    high_hom: "#FF9800",
+    gnomad_filtered: "#FFC107",
+    genomes_only: "#607D8B",
+  };
+  return map[type];
+}
+
+// Source category helpers
+function getSourceCategory(variantId: string): SourceCategory | undefined {
+  return sourceCategoryMap.value.get(variantId);
+}
+
+function sourceExplanation(cat: SourceCategory): string {
+  switch (cat) {
+    case "clinvar_only":
+      return "Included based on ClinVar Pathogenic/Likely Pathogenic classification only.";
+    case "plof_only":
+      return "Included based on predicted loss-of-function (LOFTEE HC) only.";
+    case "both":
+      return "Included based on both LoF HC prediction and ClinVar P/LP classification.";
+  }
+}
+
 // Table headers with sorting configuration
-const headers = ref([
+// Quality flags and source columns inserted after include checkbox, before variant_id
+const headers = computed(() => [
   { title: "", key: "include", sortable: false, width: "48px" },
+  {
+    title: "Qual",
+    key: "qualityFlags",
+    sortable: false,
+    width: "60px",
+    align: "center" as const,
+  },
+  {
+    title: "Source",
+    key: "sourceCategory",
+    sortable: false,
+    width: "80px",
+  },
   { title: "Variant ID", key: "variant_id", sortable: true },
   { title: "Consequence", key: "consequence", sortable: true },
   {
@@ -462,6 +602,19 @@ function formatClinvarStatus(status: string): string {
   font-family: monospace;
 }
 
+/* Screen reader only - visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Horizontal scroll wrapper for mobile */
 .table-scroll-wrapper {
   overflow-x: auto;
@@ -469,7 +622,7 @@ function formatClinvarStatus(status: string): string {
   position: relative;
 }
 
-/* Freeze first column (checkbox) */
+/* Freeze first column (checkbox) only */
 :deep(.variant-table) th:first-child,
 :deep(.variant-table) td:first-child {
   position: sticky;
@@ -478,18 +631,9 @@ function formatClinvarStatus(status: string): string {
   background: rgb(var(--v-theme-surface));
 }
 
-/* Freeze second column (variant ID) */
-:deep(.variant-table) th:nth-child(2),
-:deep(.variant-table) td:nth-child(2) {
-  position: sticky;
-  left: 48px; /* Width of checkbox column */
-  z-index: 2;
-  background: rgb(var(--v-theme-surface));
-}
-
-/* Add shadow to indicate scrollable content */
-:deep(.variant-table) th:nth-child(2)::after,
-:deep(.variant-table) td:nth-child(2)::after {
+/* Add shadow after last sticky column (checkbox) to indicate scrollable content */
+:deep(.variant-table) th:first-child::after,
+:deep(.variant-table) td:first-child::after {
   content: "";
   position: absolute;
   top: 0;
@@ -519,7 +663,6 @@ function formatClinvarStatus(status: string): string {
 }
 
 :deep(.excluded-row) td:first-child,
-:deep(.excluded-row) td:nth-child(2),
 :deep(.excluded-row) td:last-child {
   background: rgb(var(--v-theme-surface));
 }
@@ -531,7 +674,6 @@ function formatClinvarStatus(status: string): string {
 
 /* Expanded row background - ensure frozen cells inherit */
 :deep(.bg-grey-lighten-5) td:first-child,
-:deep(.bg-grey-lighten-5) td:nth-child(2),
 :deep(.bg-grey-lighten-5) td:last-child {
   background: #fafafa; /* grey-lighten-5 */
 }

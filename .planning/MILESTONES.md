@@ -1,5 +1,61 @@
 # Project Milestones: gnomAD Carrier Frequency Calculator
 
+## v1.6 Analysis & Export (Shipped: 2026-02-27)
+
+**Delivered:** Data quality transparency with variant quality flags and source breakdown, display format system (scientific notation, per-100k), TSV export, Orphanet prevalence integration, subcontinental population breakdown for gnomAD v2.1.1, and population bar chart visualization.
+
+**Phases completed:** 33-37 (17 plans total)
+
+**Key accomplishments:**
+
+- Display format system with 4 formats (percentage, ratio, scientific notation, per-100k) and persisted preferences
+- TSV export for bioinformatics pipelines (populations + variants) with UTF-8 BOM Excel compatibility
+- Variant quality flags (High AF, High Hom, gnomAD Filtered, Genomes Only) with configurable exclusions and real-time recalculation
+- ClinVar vs pLoF source breakdown with per-population expandable rows and source badges
+- Inline SVG population bar chart with Okabe-Ito palette, theme support, and publication-ready SVG/PNG export
+- Orphanet disease prevalence integration (web + CLI, eager prefetch, PWA offline cache, clinical disclaimer)
+- Subcontinental population breakdown for gnomAD v2.1.1 (9 subpopulations: 6 NFE + 3 EAS)
+
+**Stats:**
+
+- 126 files created/modified (+24,173 / -3,641 lines)
+- 27,028 lines source TypeScript/Vue
+- 5 phases, 17 plans, 35 tasks
+- 2 days from start to ship (2026-02-25 → 2026-02-27)
+
+**Git range:** `feat(33-01)` → `feat(37)`
+
+**What's next:** v1.7 — export pipeline data completion, X-linked inheritance, or new feature milestone
+
+---
+
+## v1.5 Core Extraction & CLI (Shipped: 2026-02-25)
+
+**Delivered:** Bun workspaces monorepo with @gnomad-cf/core package, Hardy-Weinberg 2pq carrier frequency, genetic prevalence calculations, full CLI pipeline, and community gene configs.
+
+**Phases completed:** 25-32 (26 plans total)
+
+**Key accomplishments:**
+
+- Bun workspaces monorepo (packages/core, packages/cli, apps/web)
+- @gnomad-cf/core package with typed barrel exports and 9 subpath entry points
+- Hardy-Weinberg 2pq carrier frequency with homozygote exclusion (VCR/GCR)
+- Genetic prevalence (q²) + Bayesian prevalence with configurable penetrance
+- Full CLI: single gene, batch mode, interactive wizard, JSON/TSV/text/SVG output
+- Community gene configs (CFTR, HEXA, GJB2) with CI validation + runtime GitHub loading
+- Comprehensive test suite (426 tests with coverage thresholds)
+
+**Stats:**
+
+- 8 phases, 26 plans
+- Shipped 2026-02-25
+
+**Git range:** `feat(25)` → `feat(32)`
+
+**What's next:** v1.6 Analysis & Export
+
+---
+
 ## v1.4 Discoverability & Polish (Shipped: 2026-02-23)
 
 **Delivered:** SEO-ready static HTML seed content with structured data, WCAG AA teal color system, first-time onboarding experience, and educational documentation pages.

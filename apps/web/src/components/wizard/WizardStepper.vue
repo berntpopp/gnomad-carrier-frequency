@@ -124,6 +124,7 @@ import {
   useAppAnnouncer,
   useGeneConfig,
 } from "@/composables";
+import { useOrphanetData } from "@/composables/useOrphanetData";
 import type { WizardStep } from "@gnomad-cf/core/types";
 import StepGene from "./StepGene.vue";
 import StepStatus from "./StepStatus.vue";
@@ -137,6 +138,10 @@ const { smAndDown, xs } = useDisplay();
 // Initialize gene config watcher early so configs load as soon as a gene is selected,
 // before the user navigates to step 4 where FilterPanel renders.
 useGeneConfig();
+
+// Initialize Orphanet data composable early for eager prefetch at gene selection (Step 1).
+// Prefills the Pinia store cache so StepResults reads from cache instantly at Step 4.
+const { fetchForGene: fetchOrphanet } = useOrphanetData();
 
 // Wizard state management
 const { state, nextStep, prevStep, goToStep, resetWizard } = useWizard();
@@ -188,6 +193,18 @@ watch(
   () => state.gene,
   (newGene) => {
     setGeneSymbol(newGene?.symbol ?? null);
+  },
+  { immediate: true },
+);
+
+// Eager Orphanet prefetch: triggered as soon as a gene is selected at Step 1.
+// Populates the Pinia store cache before the user navigates to results (Step 4).
+watch(
+  () => state.gene,
+  (newGene) => {
+    if (newGene?.symbol) {
+      fetchOrphanet(newGene.symbol);
+    }
   },
   { immediate: true },
 );

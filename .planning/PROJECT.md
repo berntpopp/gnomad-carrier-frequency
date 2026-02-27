@@ -8,27 +8,12 @@ A progressive web application for genetic counselors to calculate carrier freque
 
 Accurate recurrence risk calculation from real gnomAD population data, with clinical documentation output that's ready to paste into patient letters.
 
-## Current Milestone: v1.6 Analysis & Export
-
-**Goal:** Improve data quality transparency with variant quality flags and source contribution breakdown, add new display formats (scientific notation, per-100k) and TSV export, integrate Orphanet prevalence reference data, enable subcontinental population breakdown for gnomAD v2.1.1, and add population frequency bar chart visualization.
-
-**Target features:**
-- Variant quality flags: High AF, High Hom Count, gnomAD Filtered, Genomes Only (#12)
-- ClinVar vs pLoF variant source contribution breakdown (#11)
-- Scientific notation and per-100,000 display formats (#10)
-- TSV export format for bioinformatics pipelines (#9)
-- Orphanet prevalence reference data integration (#6)
-- Subcontinental population breakdown for gnomAD v2.1.1 (#5)
-- Population frequency bar chart visualization (#2)
-
-**GitHub issues:** #2, #5, #6, #9, #10, #11, #12
-
 ## Current State
 
-**Version:** v1.5 Core Extraction & CLI (shipped 2026-02-25)
+**Version:** v1.6 Analysis & Export (shipped 2026-02-27)
 **Deployed:** https://gnomad-carrier-frequency.kidney-genetics.org/
 **Docs:** https://gnomad-carrier-frequency.kidney-genetics.org/docs/
-**Codebase:** ~76,044 lines TypeScript/Vue/Markdown
+**Codebase:** ~27,028 lines source TypeScript/Vue
 
 **Features delivered (v1.0-v1.5):**
 - gnomAD API integration (v4, v3, v2 support)
@@ -66,6 +51,13 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - **v1.5:** Community gene configs (CFTR, HEXA, GJB2) with CI validation + runtime GitHub loading
 - **v1.5:** Comprehensive test suite (426 tests: core unit, CLI integration, web component, E2E)
 - **v1.5:** gnomAD v4 joint field support for accurate AN/AC values
+- **v1.6:** Display format system (percentage, ratio, scientific notation, per-100k) with persisted preferences
+- **v1.6:** TSV export (populations + variants) with UTF-8 BOM Excel compatibility
+- **v1.6:** Variant quality flags (High AF, High Hom, gnomAD Filtered, Genomes Only) with configurable exclusions
+- **v1.6:** ClinVar vs pLoF source breakdown with per-population expandable rows
+- **v1.6:** Inline SVG population bar chart with publication-ready SVG/PNG export
+- **v1.6:** Orphanet disease prevalence integration (web + CLI, eager prefetch, PWA offline cache)
+- **v1.6:** Subcontinental populations for gnomAD v2.1.1 (6 NFE + 3 EAS subgroups)
 
 ## Requirements
 
@@ -130,23 +122,17 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 - ✓ Runtime GitHub gene config loading + submission modal — v1.5
 - ✓ Comprehensive test suite (426 tests, coverage thresholds) — v1.5
 - ✓ gnomAD v4 joint field for accurate AN/AC — v1.5
+- ✓ Variant quality flags (High AF, High Hom, gnomAD Filtered, Genomes Only) with configurable exclusions — v1.6
+- ✓ ClinVar vs pLoF source breakdown with per-population expandable rows — v1.6
+- ✓ Display format system (percentage, ratio, scientific notation, per-100k) with persistence — v1.6
+- ✓ TSV export for bioinformatics pipelines (populations + variants, UTF-8 BOM) — v1.6
+- ✓ Orphanet disease prevalence integration (web + CLI, eager prefetch, PWA offline) — v1.6
+- ✓ Subcontinental population breakdown for gnomAD v2.1.1 (9 subpopulations) — v1.6
+- ✓ Population bar chart (inline SVG, theme-aware, SVG/PNG publication export) — v1.6
 
 ### Active
 
-**Data Quality & Transparency**
-- [ ] Variant quality flags: High AF, High Hom Count, gnomAD Filtered, Genomes Only (#12)
-- [ ] ClinVar vs pLoF variant source contribution breakdown (#11)
-
-**Display Formats & Export**
-- [ ] Scientific notation and per-100,000 display formats (#10)
-- [ ] TSV export format for bioinformatics pipelines (#9)
-
-**Extended Data Sources**
-- [ ] Orphanet prevalence reference data integration (#6)
-- [ ] Subcontinental population breakdown for gnomAD v2.1.1 (#5)
-
-**Visualization**
-- [ ] Population frequency bar chart (#2)
+(No active requirements — next milestone not yet defined)
 
 ### Future (v1.7+)
 
@@ -220,6 +206,14 @@ Accurate recurrence risk calculation from real gnomAD population data, with clin
 | German FAQ natural language | Different search terminology (Heterozygotenfrequenz vs carrier frequency) — v1.4 | ✓ Good |
 
 | Monorepo with bun workspaces | Core logic reusable across CLI + web + tests; single repo simplicity — v1.5 | ✓ Good |
+| DisplayFormat in core formatters | Co-located with formatter functions, re-exported via calculations barrel — v1.6 | ✓ Good |
+| UTF-8 BOM in download layer | Pure builder functions stay platform-neutral; BOM added in composable — v1.6 | ✓ Good |
+| Quality flags as pure functions | Platform-neutral in @gnomad-cf/core; UI wiring in web only — v1.6 | ✓ Good |
+| Inline SVG over chart library | Zero dependencies for ~8 population bars; Okabe-Ito colorblind-safe — v1.6 | ✓ Good |
+| Orphanet gene symbol lowercase | API returns 404 for uppercase; always lowercase before fetch — v1.6 | ✓ Good |
+| Orphanet not in clinical text | Analytical reference only; clinical prevalence ≠ genetic prevalence — v1.6 | ✓ Good |
+| Simplified 2*sumAF for subcontinental | Per-subpopulation hom counts unreliable at small AN — v1.6 | ✓ Good |
+| Session-level Orphanet/subcontinental cache | No persist; data is supplementary and session-scoped — v1.6 | ✓ Good |
 
 ---
-*Last updated: 2026-02-26 after v1.6 milestone start*
+*Last updated: 2026-02-27 after v1.6 milestone*

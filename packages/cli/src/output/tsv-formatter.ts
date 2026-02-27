@@ -32,9 +32,9 @@ const MAIN_HEADER =
   "genetic_prevalence\tbayesian_prevalence\tallele_count\tallele_number\tsum_af\t" +
   "founder_effect\tlow_sample_size";
 
-/** TSV header columns for variant table */
+/** TSV header columns for variant table (EXP-03 column spec) */
 const VARIANT_HEADER =
-  "variant_id\tgene\tconsequence\tallele_frequency\tclinvar\tac_hom";
+  "variant_id\tgene\tconsequence\tallele_frequency\tcarrier_frequency\tclinvar\tac_hom\thgvs_c\thgvs_p\tsource_category\tquality_flags";
 
 /**
  * Compute sum_af from allele count/number.
@@ -153,8 +153,13 @@ export function formatTsv(
             escapeTsv(result.gene),
             escapeTsv(v.consequence),
             escapeTsv(v.alleleFrequency.toPrecision(5)),
+            escapeTsv((v.alleleFrequency * 2).toPrecision(5)), // approx carrier freq
             escapeTsv(v.clinvarSignificance ?? "N/A"),
             escapeTsv(v.ac_hom),
+            escapeTsv(v.hgvsC ?? ""),
+            escapeTsv(v.hgvsP ?? ""),
+            escapeTsv(v.sourceCategory ?? ""), // Phase 34 placeholder
+            escapeTsv(v.qualityFlags ?? ""), // Phase 34 placeholder
           ].join("\t"),
         );
       }

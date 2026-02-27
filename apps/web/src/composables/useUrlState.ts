@@ -13,22 +13,28 @@ import {
   FACTORY_CALC_DEFAULTS,
 } from "@gnomad-cf/core/types";
 import type { UrlState } from "@gnomad-cf/core/types";
+import type { GnomadVersion } from "@gnomad-cf/core/config";
 import { useWizard } from "./useWizard";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useCalcStore } from "@/stores/useCalcStore";
 import { useGeneSearch } from "./useGeneSearch";
 import { useExclusionState } from "./useExclusionState";
 import { encodeExclusions, decodeExclusions } from "@gnomad-cf/core/utils";
+import { useGnomadVersion } from "@/api";
 
 // Module-level singleton state
 const isInitialized = ref(false);
 const isRestoringFromUrl = ref(false);
+/** Shared subcontinental toggle state — set by StepResults, synced to URL */
+const subcontinentalEnabled = ref(false);
 
 export interface UseUrlStateReturn {
   /** Whether URL state initialization is complete */
   isInitialized: typeof isInitialized;
   /** Whether URL state is currently being restored (show loading indicator) */
   isRestoringFromUrl: typeof isRestoringFromUrl;
+  /** Shared subcontinental toggle state — synced to URL */
+  subcontinentalEnabled: typeof subcontinentalEnabled;
   /** Get current URL as shareable link */
   getShareableUrl: () => string;
 }
@@ -56,6 +62,7 @@ export function useUrlState(): UseUrlStateReturn {
   const calcStore = useCalcStore();
   const geneSearch = useGeneSearch();
   const { excluded, setExclusions, excludedCount } = useExclusionState();
+  const { version, setVersion } = useGnomadVersion();
 
   /**
    * Restore application state from URL parameters
@@ -64,6 +71,11 @@ export function useUrlState(): UseUrlStateReturn {
   async function restoreFromUrl(): Promise<void> {
     // Parse and validate URL parameters
     const urlState: UrlState = parseUrlState(params as Record<string, unknown>);
+
+    // Restore gnomAD version before gene (affects which API dataset is used)
+    if (urlState.ver) {
+      setVersion(urlState.ver as GnomadVersion);
+    }
 
     // Restore gene if present in URL
     if (urlState.gene) {
@@ -170,6 +182,11 @@ export function useUrlState(): UseUrlStateReturn {
         );
       }
 
+      // Restore subcontinental toggle if present
+      if (urlState.sub === "1") {
+        subcontinentalEnabled.value = true;
+      }
+
       // Restore calc settings if present in URL
       if (urlState.hweFormula !== undefined) {
         calcStore.setUseHWEFormula(urlState.hweFormula === "1");
@@ -195,6 +212,13 @@ export function useUrlState(): UseUrlStateReturn {
     if (!isInitialized.value) return;
 
     // Build params from current state
+    // gnomAD version (only if not default v4)
+    if (version.value !== "v4") {
+      params.ver = version.value;
+    } else {
+      delete params.ver;
+    }
+
     // Gene symbol
     if (wizardState.gene?.symbol) {
       params.gene = wizardState.gene.symbol;
@@ -296,6 +320,13 @@ export function useUrlState(): UseUrlStateReturn {
       delete params.conflictThreshold;
     }
 
+    // Subcontinental toggle (only if enabled and v2)
+    if (subcontinentalEnabled.value && version.value === "v2") {
+      params.sub = "1";
+    } else {
+      delete params.sub;
+    }
+
     // Exclusion state
     if (excludedCount.value > 0) {
       const encoded = encodeExclusions(excluded.value);
@@ -366,6 +397,10 @@ export function useUrlState(): UseUrlStateReturn {
 
   watch(excluded, () => updateUrlFromState(), { deep: true });
 
+  watch(version, () => updateUrlFromState());
+
+  watch(subcontinentalEnabled, () => updateUrlFromState());
+
   // On mount, check for URL state and restore if present
   onMounted(async () => {
     // Only initialize once
@@ -382,6 +417,8 @@ export function useUrlState(): UseUrlStateReturn {
       "hweFormula",
       "homExclusion",
       "penetrance",
+      "ver",
+      "sub",
     ].some(
       (k) => params[k] !== undefined && params[k] !== null && params[k] !== "",
     );
@@ -398,6 +435,7 @@ export function useUrlState(): UseUrlStateReturn {
   return {
     isInitialized,
     isRestoringFromUrl,
+    subcontinentalEnabled,
     getShareableUrl: () => window.location.href,
   };
 }

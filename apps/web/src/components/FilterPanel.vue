@@ -385,6 +385,83 @@
               </span>
             </v-tooltip>
           </v-col>
+
+          <!-- Quality Flag Exclusions (only shown when qualityExclusionConfig prop is provided) -->
+          <template v-if="qualityExclusionConfig">
+            <v-col cols="12">
+              <v-divider class="mb-3" />
+              <div class="text-subtitle-2 mb-2">Quality Flag Exclusions</div>
+              <div class="text-caption text-medium-emphasis mb-3">
+                Exclude flagged variants from the carrier frequency calculation.
+                {{ flaggedCount }} of {{ variantCount }} variant(s) flagged.
+              </div>
+            </v-col>
+
+            <v-col cols="12" md="6">
+              <v-switch
+                :model-value="qualityExclusionConfig.excludeHighAf"
+                color="error"
+                label="Exclude High AF"
+                :density="smAndDown ? 'default' : 'compact'"
+                hide-details
+                @update:model-value="
+                  updateQualityExclusion('excludeHighAf', $event as boolean)
+                "
+              />
+            </v-col>
+
+            <v-col cols="12" md="6">
+              <v-switch
+                :model-value="qualityExclusionConfig.excludeHighHom"
+                color="orange"
+                label="Exclude High Hom"
+                :density="smAndDown ? 'default' : 'compact'"
+                hide-details
+                @update:model-value="
+                  updateQualityExclusion('excludeHighHom', $event as boolean)
+                "
+              />
+            </v-col>
+
+            <v-col cols="12" md="6">
+              <v-switch
+                :model-value="qualityExclusionConfig.excludeGnomadFiltered"
+                color="amber"
+                label="Exclude gnomAD Filtered"
+                :density="smAndDown ? 'default' : 'compact'"
+                hide-details
+                @update:model-value="
+                  updateQualityExclusion(
+                    'excludeGnomadFiltered',
+                    $event as boolean,
+                  )
+                "
+              />
+            </v-col>
+
+            <v-col cols="12" md="6">
+              <v-switch
+                :model-value="qualityExclusionConfig.excludeGenomesOnly"
+                color="blue-grey"
+                label="Exclude Genomes Only"
+                :density="smAndDown ? 'default' : 'compact'"
+                hide-details
+                @update:model-value="
+                  updateQualityExclusion(
+                    'excludeGenomesOnly',
+                    $event as boolean,
+                  )
+                "
+              />
+            </v-col>
+
+            <v-col v-if="qualityExcludedDisplay > 0" cols="12">
+              <v-alert type="info" variant="tonal" density="compact">
+                Excluding {{ qualityExcludedDisplay }} variant(s) by quality
+                flags.
+              </v-alert>
+            </v-col>
+          </template>
         </v-row>
 
         <v-divider class="my-3" />
@@ -392,6 +469,9 @@
         <div class="d-flex align-center justify-space-between flex-wrap ga-2">
           <div class="text-body-2">
             <strong>{{ variantCount }}</strong> qualifying variant(s)
+            <span v-if="qualityExcludedDisplay > 0" class="text-warning">
+              ({{ qualityExcludedDisplay }} quality-excluded)
+            </span>
           </div>
 
           <div class="d-flex align-center flex-wrap ga-2">
@@ -435,7 +515,11 @@ import { ref, computed } from "vue";
 import { useDisplay } from "vuetify";
 import FilterChips from "./FilterChips.vue";
 import GeneConfigSubmitDialog from "./GeneConfigSubmitDialog.vue";
-import type { FilterConfig, CalcConfig } from "@gnomad-cf/core/types";
+import type {
+  FilterConfig,
+  CalcConfig,
+  QualityExclusionConfig,
+} from "@gnomad-cf/core/types";
 import { useGeneConfig } from "@/composables/useGeneConfig";
 import { useGeneSearch } from "@/composables/useGeneSearch";
 
@@ -457,11 +541,15 @@ const props = defineProps<{
   isLoadingSubmissions?: boolean;
   submissionsProgress?: number;
   submissionsError?: string | null;
+  qualityExclusionConfig?: QualityExclusionConfig;
+  qualityExcludedCount?: number;
+  flaggedVariantCount?: number;
 }>();
 
 const emit = defineEmits<{
   "update:modelValue": [value: FilterConfig];
   "update:calcConfig": [value: CalcConfig];
+  "update:qualityExclusionConfig": [value: QualityExclusionConfig];
   retrySubmissions: [];
   reset: [];
 }>();
@@ -503,6 +591,10 @@ const penetrancePercent = computed(() =>
   Math.round(props.calcConfig.penetrance * 100),
 );
 
+// Quality exclusion computeds
+const flaggedCount = computed(() => props.flaggedVariantCount ?? 0);
+const qualityExcludedDisplay = computed(() => props.qualityExcludedCount ?? 0);
+
 function updateFilter<K extends keyof FilterConfig>(
   key: K,
   value: FilterConfig[K],
@@ -522,6 +614,16 @@ function updateCalcConfig<K extends keyof CalcConfig>(
 
 function updatePenetrance(percentValue: number) {
   updateCalcConfig("penetrance", percentValue / 100);
+}
+
+function updateQualityExclusion<K extends keyof QualityExclusionConfig>(
+  key: K,
+  value: QualityExclusionConfig[K],
+) {
+  emit("update:qualityExclusionConfig", {
+    ...props.qualityExclusionConfig!,
+    [key]: value,
+  });
 }
 </script>
 
