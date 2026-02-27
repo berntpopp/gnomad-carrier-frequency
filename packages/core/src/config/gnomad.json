@@ -47,9 +47,20 @@
         { "code": "afr", "label": "African/African-American" },
         { "code": "amr", "label": "Admixed American" },
         { "code": "asj", "label": "Ashkenazi Jewish" },
-        { "code": "eas", "label": "East Asian" },
+        { "code": "eas", "label": "East Asian", "subpopulations": [
+          { "code": "eas_jpn", "label": "Japanese" },
+          { "code": "eas_kor", "label": "Korean" },
+          { "code": "eas_oea", "label": "Other East Asian" }
+        ]},
         { "code": "fin", "label": "Finnish" },
-        { "code": "nfe", "label": "Non-Finnish European" },
+        { "code": "nfe", "label": "Non-Finnish European", "subpopulations": [
+          { "code": "nfe_bgr", "label": "Bulgarian (Eastern European)" },
+          { "code": "nfe_est", "label": "Estonian" },
+          { "code": "nfe_nwe", "label": "North-Western European" },
+          { "code": "nfe_seu", "label": "Southern European" },
+          { "code": "nfe_swe", "label": "Swedish" },
+          { "code": "nfe_onf", "label": "Other Non-Finnish European" }
+        ]},
         { "code": "oth", "label": "Other", "description": "Other/unknown ancestry" },
         { "code": "sas", "label": "South Asian" }
       ],

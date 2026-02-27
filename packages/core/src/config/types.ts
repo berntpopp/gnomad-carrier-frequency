@@ -1,11 +1,18 @@
 // gnomAD version identifiers
 export type GnomadVersion = "v4" | "v3" | "v2";
 
+// Subcontinental population (e.g. NFE subgroups, EAS subgroups) — v2 only
+export interface SubpopulationConfig {
+  code: string;
+  label: string;
+}
+
 // Population code varies by version
 export interface PopulationConfig {
   code: string;
   label: string;
   description?: string;
+  subpopulations?: SubpopulationConfig[];
 }
 
 // Version-specific gnomAD configuration
