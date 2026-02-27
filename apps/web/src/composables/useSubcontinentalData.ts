@@ -6,7 +6,6 @@ import {
   getSubpopulationParent,
   getApiEndpoint,
   getDatasetId,
-  getReferenceGenome,
 } from "@gnomad-cf/core/config";
 import {
   VARIANT_SUBCONTINENTAL_QUERY,
@@ -82,18 +81,36 @@ export interface UseSubcontinentalDataReturn {
   clear: () => void;
 }
 
-/** Per-variant fetch batch size. 10 concurrent requests avoids gnomAD rate limits. */
-const BATCH_SIZE = 10;
+/** Per-variant fetch batch size. 5 concurrent requests balances speed vs gnomAD rate limits. */
+const BATCH_SIZE = 5;
+
+/** Delay (ms) between consecutive batches to avoid overwhelming gnomAD API. */
+const INTER_BATCH_DELAY_MS = 500;
+
+/** Maximum retry attempts per variant when rate-limited or server error. */
+const MAX_RETRIES = 4;
+
+/** Base delay (ms) for exponential backoff. Actual delay = baseDelay * 2^attempt. */
+const RETRY_BASE_DELAY_MS = 1000;
 
 /** gnomAD v2 API endpoint (subcontinental populations are v2-only) */
 const GNOMAD_API_URL = getApiEndpoint("v2");
 /** gnomAD v2 dataset identifier */
 const DATASET_ID = getDatasetId("v2");
-/** gnomAD v2 reference genome (GRCh37) */
-const REFERENCE_GENOME = getReferenceGenome("v2");
+
+/** Sleep helper for delays between batches and retries. */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** Returns true if the HTTP status code is retryable (rate limit or server error). */
+function isRetryableStatus(status: number): boolean {
+  return status === 429 || status >= 500;
+}
 
 /**
- * Fetch subcontinental population data for a single variant from gnomAD v2.
+ * Fetch subcontinental population data for a single variant from gnomAD v2
+ * with retry and exponential backoff for rate-limited/server-error responses.
  *
  * Combines exome and genome population arrays by summing AC and AN for matching
  * population IDs. Returns the combined array for this variant.
@@ -104,64 +121,69 @@ const REFERENCE_GENOME = getReferenceGenome("v2");
 async function fetchSingleVariant(
   variantId: string,
 ): Promise<Array<{ id: string; ac: number; an: number; ac_hom: number }> | null> {
-  const response = await fetch(GNOMAD_API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      query: VARIANT_SUBCONTINENTAL_QUERY,
-      variables: {
-        variantId,
-        dataset: DATASET_ID,
-        referenceGenome: REFERENCE_GENOME,
-      },
-    }),
-  });
+  let lastError: Error | null = null;
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt - 1);
+      await sleep(delay);
+    }
 
-  const json = (await response.json()) as {
-    data?: VariantSubcontinentalResponse;
-    errors?: Array<{ message: string }>;
-  };
+    let response: Response;
+    try {
+      response = await fetch(GNOMAD_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: VARIANT_SUBCONTINENTAL_QUERY,
+          variables: {
+            variantId,
+            dataset: DATASET_ID,
+          },
+        }),
+      });
+    } catch (networkError) {
+      // Network failure (DNS, timeout, connection refused) — retryable
+      lastError =
+        networkError instanceof Error
+          ? networkError
+          : new Error(String(networkError));
+      continue;
+    }
 
-  if (json.errors && json.errors.length > 0) {
-    throw new Error(json.errors[0]?.message ?? "Unknown gnomAD API error");
-  }
+    if (!response.ok) {
+      if (isRetryableStatus(response.status) && attempt < MAX_RETRIES) {
+        lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
+        continue;
+      }
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
 
-  const variant = json.data?.variant;
-  if (!variant) {
-    // Variant not found in gnomAD v2 — this is normal for v4-only variants
-    return null;
-  }
+    const json = (await response.json()) as {
+      data?: VariantSubcontinentalResponse;
+      errors?: Array<{ message: string }>;
+    };
 
-  // Collect all unique population IDs from exome and genome
-  const combinedMap = new Map<
-    string,
-    { id: string; ac: number; an: number; ac_hom: number }
-  >();
+    if (json.errors && json.errors.length > 0) {
+      throw new Error(json.errors[0]?.message ?? "Unknown gnomAD API error");
+    }
 
-  const exomePops = variant.exome?.populations ?? [];
-  const genomePops = variant.genome?.populations ?? [];
+    const variant = json.data?.variant;
+    if (!variant) {
+      // Variant not found in gnomAD v2 — this is normal for v4-only variants
+      return null;
+    }
 
-  for (const pop of exomePops) {
-    combinedMap.set(pop.id, {
-      id: pop.id,
-      ac: pop.ac,
-      an: pop.an,
-      ac_hom: pop.ac_hom,
-    });
-  }
+    // Collect all unique population IDs from exome and genome
+    const combinedMap = new Map<
+      string,
+      { id: string; ac: number; an: number; ac_hom: number }
+    >();
 
-  for (const pop of genomePops) {
-    const existing = combinedMap.get(pop.id);
-    if (existing) {
-      // Sum AC, AN, and ac_hom across exome + genome
-      existing.ac += pop.ac;
-      existing.an += pop.an;
-      existing.ac_hom += pop.ac_hom;
-    } else {
+    const exomePops = variant.exome?.populations ?? [];
+    const genomePops = variant.genome?.populations ?? [];
+
+    for (const pop of exomePops) {
       combinedMap.set(pop.id, {
         id: pop.id,
         ac: pop.ac,
@@ -169,9 +191,29 @@ async function fetchSingleVariant(
         ac_hom: pop.ac_hom,
       });
     }
+
+    for (const pop of genomePops) {
+      const existing = combinedMap.get(pop.id);
+      if (existing) {
+        // Sum AC, AN, and ac_hom across exome + genome
+        existing.ac += pop.ac;
+        existing.an += pop.an;
+        existing.ac_hom += pop.ac_hom;
+      } else {
+        combinedMap.set(pop.id, {
+          id: pop.id,
+          ac: pop.ac,
+          an: pop.an,
+          ac_hom: pop.ac_hom,
+        });
+      }
+    }
+
+    return Array.from(combinedMap.values());
   }
 
-  return Array.from(combinedMap.values());
+  // All retries exhausted
+  throw lastError ?? new Error(`Failed after ${MAX_RETRIES + 1} attempts`);
 }
 
 /**
@@ -315,6 +357,11 @@ export function useSubcontinentalData(): UseSubcontinentalDataReturn {
       let batchFailures = 0;
 
       for (let i = 0; i < toFetch.length; i += BATCH_SIZE) {
+        // Delay between batches to avoid rate limiting (skip for first batch)
+        if (i > 0) {
+          await sleep(INTER_BATCH_DELAY_MS);
+        }
+
         const batch = toFetch.slice(i, i + BATCH_SIZE);
 
         // Fetch all variants in this batch in parallel

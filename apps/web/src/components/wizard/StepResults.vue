@@ -362,17 +362,19 @@
         </v-menu>
 
         <!-- Subcontinental toggle (v2 only) -->
-        <v-switch
+        <v-btn
           v-if="isV2"
-          v-model="showSubcontinental"
-          label="Subcontinental"
-          density="compact"
-          hide-details
+          size="small"
+          :variant="showSubcontinental ? 'flat' : 'outlined'"
+          :color="showSubcontinental ? 'primary' : undefined"
           :disabled="qualifyingVariantCount === 0 || isLoading"
-          :loading="isLoadingSubcontinental ? 'primary' : false"
-          class="ml-2 flex-grow-0"
+          :loading="isLoadingSubcontinental"
+          prepend-icon="mdi-sitemap"
           data-testid="subcontinental-toggle"
-        />
+          @click="showSubcontinental = !showSubcontinental"
+        >
+          Subcontinental
+        </v-btn>
         <v-tooltip v-else location="top">
           <template #activator="{ props: tooltipProps }">
             <v-chip
