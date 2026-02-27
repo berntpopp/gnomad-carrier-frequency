@@ -1,7 +1,13 @@
 import { describe, it, expect } from "vitest";
 import type { GnomadVariant } from "../../types/index.js";
-import type { QualitySettings, QualityExclusionConfig } from "../../types/index.js";
-import { FACTORY_QUALITY_DEFAULTS, FACTORY_EXCLUSION_DEFAULTS } from "../../types/index.js";
+import type {
+  QualitySettings,
+  QualityExclusionConfig,
+} from "../../types/index.js";
+import {
+  FACTORY_QUALITY_DEFAULTS,
+  FACTORY_EXCLUSION_DEFAULTS,
+} from "../../types/index.js";
 import {
   isHighAF,
   isHighHom,
@@ -17,7 +23,12 @@ function makeJointVariant(
   ac: number,
   an: number,
   hom: number,
-  populations?: Array<{ id: string; ac: number; an: number; homozygote_count: number }>,
+  populations?: Array<{
+    id: string;
+    ac: number;
+    an: number;
+    homozygote_count: number;
+  }>,
 ): GnomadVariant {
   return {
     variant_id: "1-12345-A-G",
@@ -218,12 +229,17 @@ describe("isGnomadFiltered", () => {
   });
 
   it("flags a variant with failing genome filters", () => {
-    const variant = makeExomeGenomeVariant(0, 0, 0, 10, 10000, 0, undefined, ["AC0"]);
+    const variant = makeExomeGenomeVariant(0, 0, 0, 10, 10000, 0, undefined, [
+      "AC0",
+    ]);
     expect(isGnomadFiltered(variant)).toBe(true);
   });
 
   it("flags a variant with multiple failing filters", () => {
-    const variant = makeExomeGenomeVariant(10, 10000, 0, 0, 0, 0, ["RF", "InbreedingCoeff"]);
+    const variant = makeExomeGenomeVariant(10, 10000, 0, 0, 0, 0, [
+      "RF",
+      "InbreedingCoeff",
+    ]);
     expect(isGnomadFiltered(variant)).toBe(true);
   });
 
@@ -248,7 +264,16 @@ describe("isGnomadFiltered", () => {
   });
 
   it("flags a variant where both exome and genome have failing filters", () => {
-    const variant = makeExomeGenomeVariant(10, 10000, 0, 10, 10000, 0, ["RF"], ["AC0"]);
+    const variant = makeExomeGenomeVariant(
+      10,
+      10000,
+      0,
+      10,
+      10000,
+      0,
+      ["RF"],
+      ["AC0"],
+    );
     expect(isGnomadFiltered(variant)).toBe(true);
   });
 });
@@ -351,7 +376,10 @@ describe("computeQualityFlags", () => {
   });
 
   it("gnomad_filtered explanation lists multiple filter names", () => {
-    const variant = makeExomeGenomeVariant(10, 10000, 0, 0, 0, 0, ["RF", "AC0"]);
+    const variant = makeExomeGenomeVariant(10, 10000, 0, 0, 0, 0, [
+      "RF",
+      "AC0",
+    ]);
     const flags = computeQualityFlags(variant, FACTORY_QUALITY_DEFAULTS);
     const filteredFlag = flags.find((f) => f.type === "gnomad_filtered");
     expect(filteredFlag!.explanation).toContain("RF");
@@ -518,6 +546,8 @@ describe("shouldExcludeByQuality", () => {
         severity: "info" as const,
       },
     ];
-    expect(shouldExcludeByQuality(flags, FACTORY_EXCLUSION_DEFAULTS)).toBe(false);
+    expect(shouldExcludeByQuality(flags, FACTORY_EXCLUSION_DEFAULTS)).toBe(
+      false,
+    );
   });
 });

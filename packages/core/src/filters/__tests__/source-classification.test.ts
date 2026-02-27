@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import type { GnomadVariant, ClinVarVariant, FilterConfig } from "../../types/index.js";
+import type {
+  GnomadVariant,
+  ClinVarVariant,
+  FilterConfig,
+} from "../../types/index.js";
 import { FACTORY_FILTER_DEFAULTS } from "../../types/index.js";
 import type { ClinVarSubmission } from "../../queries/index.js";
 import {
@@ -17,7 +21,13 @@ function makeVariant(overrides: Partial<GnomadVariant> = {}): GnomadVariant {
     ref: "A",
     alt: "G",
     transcript_consequence: null,
-    joint: { ac: 10, an: 10000, homozygote_count: 0, hemizygote_count: 0, populations: [] },
+    joint: {
+      ac: 10,
+      an: 10000,
+      homozygote_count: 0,
+      hemizygote_count: 0,
+      populations: [],
+    },
     ...overrides,
   };
 }
@@ -106,7 +116,11 @@ describe("classifyVariantSource", () => {
     const clinvarVariants = [
       makeClinvarVariant("1-12345-A-G", "Pathogenic", 2),
     ];
-    const result = classifyVariantSource(variant, clinvarVariants, defaultFilter);
+    const result = classifyVariantSource(
+      variant,
+      clinvarVariants,
+      defaultFilter,
+    );
     expect(result).toBe("clinvar_only");
   });
 
@@ -115,7 +129,11 @@ describe("classifyVariantSource", () => {
     const clinvarVariants = [
       makeClinvarVariant("1-12345-A-G", "Pathogenic", 2),
     ];
-    const result = classifyVariantSource(variant, clinvarVariants, defaultFilter);
+    const result = classifyVariantSource(
+      variant,
+      clinvarVariants,
+      defaultFilter,
+    );
     expect(result).toBe("both");
   });
 
@@ -125,7 +143,11 @@ describe("classifyVariantSource", () => {
     const clinvarVariants = [
       makeClinvarVariant("1-12345-A-G", "Pathogenic/Likely pathogenic", 2),
     ];
-    const result = classifyVariantSource(variant, clinvarVariants, defaultFilter);
+    const result = classifyVariantSource(
+      variant,
+      clinvarVariants,
+      defaultFilter,
+    );
     expect(result).toBe("clinvar_only");
   });
 
@@ -135,7 +157,11 @@ describe("classifyVariantSource", () => {
     const clinvarVariants = [
       makeClinvarVariant("1-12345-A-G", "Likely pathogenic", 1),
     ];
-    const result = classifyVariantSource(variant, clinvarVariants, defaultFilter);
+    const result = classifyVariantSource(
+      variant,
+      clinvarVariants,
+      defaultFilter,
+    );
     expect(result).toBe("clinvar_only");
   });
 
@@ -155,7 +181,11 @@ describe("classifyVariantSource", () => {
     const clinvarVariants = [
       makeClinvarVariant("1-12345-A-G", "Pathogenic", 0), // 0 stars, below threshold
     ];
-    const result = classifyVariantSource(variant, clinvarVariants, highThresholdFilter);
+    const result = classifyVariantSource(
+      variant,
+      clinvarVariants,
+      highThresholdFilter,
+    );
     // ClinVar evidence not counted due to insufficient stars → pLoF only
     expect(result).toBe("plof_only");
   });
@@ -168,7 +198,11 @@ describe("classifyVariantSource", () => {
       clinvarStarThreshold: 1,
     };
     const clinvarVariants = [
-      makeClinvarVariant("1-12345-A-G", "Conflicting classifications of pathogenicity", 1),
+      makeClinvarVariant(
+        "1-12345-A-G",
+        "Conflicting classifications of pathogenicity",
+        1,
+      ),
     ];
     const result = classifyVariantSource(
       variant,
@@ -189,7 +223,11 @@ describe("classifyVariantSource", () => {
       clinvarStarThreshold: 1,
     };
     const clinvarVariants = [
-      makeClinvarVariant("1-12345-A-G", "Conflicting classifications of pathogenicity", 1),
+      makeClinvarVariant(
+        "1-12345-A-G",
+        "Conflicting classifications of pathogenicity",
+        1,
+      ),
     ];
     // 4 out of 5 submissions are pathogenic (80%) — meets threshold
     const submissions: ClinVarSubmission[] = [
@@ -219,7 +257,11 @@ describe("classifyVariantSource", () => {
       clinvarStarThreshold: 1,
     };
     const clinvarVariants = [
-      makeClinvarVariant("1-12345-A-G", "Conflicting classifications of pathogenicity", 1),
+      makeClinvarVariant(
+        "1-12345-A-G",
+        "Conflicting classifications of pathogenicity",
+        1,
+      ),
     ];
     // Only 1 out of 5 pathogenic (20%) — does NOT meet 80% threshold
     const submissions: ClinVarSubmission[] = [
@@ -258,7 +300,11 @@ describe("classifyVariantSource", () => {
     const clinvarVariants = [
       makeClinvarVariant("1-12345-A-G", "Pathogenic", 2),
     ];
-    const result = classifyVariantSource(variant, clinvarVariants, defaultFilter);
+    const result = classifyVariantSource(
+      variant,
+      clinvarVariants,
+      defaultFilter,
+    );
     // Non-canonical HC LoF → not counted as pLoF → ClinVar only
     expect(result).toBe("clinvar_only");
   });

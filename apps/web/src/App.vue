@@ -123,7 +123,9 @@ const showHistory = ref(false);
 const { state: wizardState, resetWizard } = useWizard();
 
 // Share link clipboard
-const { copy: copyLink, copied: linkCopied } = useClipboard({ copiedDuring: 2000 });
+const { copy: copyLink, copied: linkCopied } = useClipboard({
+  copiedDuring: 2000,
+});
 function copyShareLink() {
   copyLink(window.location.href);
 }

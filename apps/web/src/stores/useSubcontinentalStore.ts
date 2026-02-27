@@ -42,7 +42,12 @@ export const useSubcontinentalStore = defineStore("subcontinental", {
      */
     setVariantData(
       variantId: string,
-      populations: Array<{ id: string; ac: number; an: number; ac_hom: number }>,
+      populations: Array<{
+        id: string;
+        ac: number;
+        an: number;
+        ac_hom: number;
+      }>,
     ): void {
       this.variantData[variantId] = populations;
     },

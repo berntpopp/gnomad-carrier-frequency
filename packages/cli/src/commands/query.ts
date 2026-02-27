@@ -37,7 +37,11 @@ export const queryCommand = new Command("query")
     "Filter to a specific population (e.g. nfe, european, east-asian)",
   )
   // ── Output format ────────────────────────────────────────────────────────
-  .option("-f, --format <fmt>", "Output format: text | json | tsv | svg", "text")
+  .option(
+    "-f, --format <fmt>",
+    "Output format: text | json | tsv | svg",
+    "text",
+  )
   // ── Variant breakdown ─────────────────────────────────────────────────────
   .option("--variants", "Include per-variant breakdown in output", false)
   // ── Clinical text ─────────────────────────────────────────────────────────

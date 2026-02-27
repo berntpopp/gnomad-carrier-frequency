@@ -234,7 +234,10 @@
             ({{ excludedCount }} manually excluded)
           </span>
           <span v-if="flaggedVariantCount > 0" class="ml-1 text-warning">
-            <v-icon size="x-small" class="mr-1">mdi-alert-outline</v-icon>({{ flaggedVariantCount }} flagged)
+            <v-icon size="x-small" class="mr-1">mdi-alert-outline</v-icon>({{
+              flaggedVariantCount
+            }}
+            flagged)
           </span>
         </div>
 
@@ -323,7 +326,8 @@
               Variants ({{ qualifyingVariantCount }})
             </v-btn>
           </template>
-          View all qualifying variants with details, quality flags, and source classification.
+          View all qualifying variants with details, quality flags, and source
+          classification.
         </v-tooltip>
 
         <!-- Export dropdown -->
@@ -389,7 +393,8 @@
               Sub
             </v-btn>
           </template>
-          Fetch subcontinental breakdowns (NFE/EAS). May be slow — queries each variant individually.
+          Fetch subcontinental breakdowns (NFE/EAS). May be slow — queries each
+          variant individually.
         </v-tooltip>
         <v-tooltip v-else location="top">
           <template #activator="{ props: tooltipProps }">
@@ -405,9 +410,9 @@
               Sub (v2 only)
             </v-chip>
           </template>
-          Subcontinental population breakdowns are only available for gnomAD v2.1.1 queries.
+          Subcontinental population breakdowns are only available for gnomAD
+          v2.1.1 queries.
         </v-tooltip>
-
       </div>
 
       <!-- Table / Chart tabs -->
@@ -472,7 +477,10 @@
             >
               <template #item="{ item }">
                 <tr
-                  :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
+                  :class="[
+                    getRowClass(item),
+                    { 'population-row': !item.isGlobal },
+                  ]"
                   @click="!item.isGlobal && openPopulationModal(item.code)"
                 >
                   <td>
@@ -483,16 +491,28 @@
                           <v-btn
                             v-if="!item.isGlobal"
                             v-bind="tooltipProps"
-                            :icon="isPopExpanded(item.code) ? 'mdi-chevron-down' : 'mdi-chevron-right'"
+                            :icon="
+                              isPopExpanded(item.code)
+                                ? 'mdi-chevron-down'
+                                : 'mdi-chevron-right'
+                            "
                             variant="plain"
                             density="compact"
                             size="small"
                             class="population-expand-btn mr-1"
-                            :aria-label="isPopExpanded(item.code) ? 'Collapse source breakdown' : 'Expand source breakdown'"
+                            :aria-label="
+                              isPopExpanded(item.code)
+                                ? 'Collapse source breakdown'
+                                : 'Expand source breakdown'
+                            "
                             @click="togglePopExpand(item.code, $event)"
                           />
                         </template>
-                        {{ isPopExpanded(item.code) ? 'Hide source breakdown' : 'Show source breakdown' }}
+                        {{
+                          isPopExpanded(item.code)
+                            ? "Hide source breakdown"
+                            : "Show source breakdown"
+                        }}
                       </v-tooltip>
                       <span class="population-label">{{ item.label }}</span>
                     </div>
@@ -528,7 +548,9 @@
                     v-for="srcRow in getSourceBreakdown(item.code)"
                     :key="`${item.code}-${srcRow.sourceCategory}`"
                     class="source-breakdown-row"
-                    :style="{ borderLeft: `3px solid ${getSourceBorderColor(srcRow.sourceCategory)}` }"
+                    :style="{
+                      borderLeft: `3px solid ${getSourceBorderColor(srcRow.sourceCategory)}`,
+                    }"
                   >
                     <td>
                       <div class="d-flex align-center pl-6">
@@ -540,7 +562,9 @@
                           {{ srcRow.label }}
                         </v-chip>
                         <span class="text-caption text-medium-emphasis">
-                          {{ srcRow.variantCount }} variant{{ srcRow.variantCount === 1 ? '' : 's' }}
+                          {{ srcRow.variantCount }} variant{{
+                            srcRow.variantCount === 1 ? "" : "s"
+                          }}
                         </span>
                       </div>
                     </td>
@@ -554,14 +578,25 @@
                     <td class="text-right">-</td>
                     <td class="text-right">{{ srcRow.alleleCount }}</td>
                     <td class="text-right">
-                      {{ srcRow.alleleNumber > 0 ? srcRow.alleleNumber.toLocaleString() : "-" }}
+                      {{
+                        srcRow.alleleNumber > 0
+                          ? srcRow.alleleNumber.toLocaleString()
+                          : "-"
+                      }}
                     </td>
                     <td v-if="hasNotes" />
                   </tr>
                 </template>
 
                 <!-- Subcontinental loading row (shown while fetching) -->
-                <template v-if="showSubcontinental && hasSubpopulations(item.code) && isLoadingSubcontinental && !item.isGlobal">
+                <template
+                  v-if="
+                    showSubcontinental &&
+                    hasSubpopulations(item.code) &&
+                    isLoadingSubcontinental &&
+                    !item.isGlobal
+                  "
+                >
                   <tr class="subcontinental-loading-row">
                     <td :colspan="headers.length">
                       <v-progress-linear
@@ -575,18 +610,37 @@
                 </template>
 
                 <!-- Subcontinental error row -->
-                <template v-if="showSubcontinental && subcontinentalError && hasSubpopulations(item.code) && !item.isGlobal">
+                <template
+                  v-if="
+                    showSubcontinental &&
+                    subcontinentalError &&
+                    hasSubpopulations(item.code) &&
+                    !item.isGlobal
+                  "
+                >
                   <tr class="subcontinental-error-row">
                     <td :colspan="headers.length">
-                      <v-alert type="warning" variant="tonal" density="compact" class="ma-1">
-                        Failed to load subcontinental data. {{ subcontinentalError }}
+                      <v-alert
+                        type="warning"
+                        variant="tonal"
+                        density="compact"
+                        class="ma-1"
+                      >
+                        Failed to load subcontinental data.
+                        {{ subcontinentalError }}
                       </v-alert>
                     </td>
                   </tr>
                 </template>
 
                 <!-- Subcontinental sub-rows (nested under parent) -->
-                <template v-if="showSubcontinental && !isLoadingSubcontinental && !item.isGlobal">
+                <template
+                  v-if="
+                    showSubcontinental &&
+                    !isLoadingSubcontinental &&
+                    !item.isGlobal
+                  "
+                >
                   <tr
                     v-for="sub in getSubcontinentalRows(item.code)"
                     :key="`subpop-${sub.code}`"
@@ -617,12 +671,22 @@
                         </v-chip>
                       </div>
                     </td>
-                    <td class="text-right">{{ formatFrequency(sub.carrierFrequency) }}</td>
-                    <td class="text-right">{{ formatRatioDisplay(sub.carrierFrequency) }}</td>
+                    <td class="text-right">
+                      {{ formatFrequency(sub.carrierFrequency) }}
+                    </td>
+                    <td class="text-right">
+                      {{ formatRatioDisplay(sub.carrierFrequency) }}
+                    </td>
                     <td class="text-right">-</td>
                     <td class="text-right">-</td>
                     <td class="text-right">{{ sub.alleleCount }}</td>
-                    <td class="text-right">{{ sub.alleleNumber > 0 ? sub.alleleNumber.toLocaleString() : '-' }}</td>
+                    <td class="text-right">
+                      {{
+                        sub.alleleNumber > 0
+                          ? sub.alleleNumber.toLocaleString()
+                          : "-"
+                      }}
+                    </td>
                     <td />
                   </tr>
                 </template>
@@ -699,7 +763,10 @@ import {
   frequencyToRatio,
   computeSourceBreakdown,
 } from "@gnomad-cf/core/calculations";
-import type { DisplayFormat, SourceBreakdownRow } from "@gnomad-cf/core/calculations";
+import type {
+  DisplayFormat,
+  SourceBreakdownRow,
+} from "@gnomad-cf/core/calculations";
 import { useDisplayFormat } from "@/composables/useDisplayFormat";
 
 // Responsive breakpoint detection
@@ -844,7 +911,7 @@ const qualityFilterPanelProps = computed(() => ({
 }));
 
 // Subcontinental population data — v2 only
-const isV2 = computed(() => props.result?.version === 'v2');
+const isV2 = computed(() => props.result?.version === "v2");
 // Use shared ref from URL state so toggle is synced to shareable URL
 const { subcontinentalEnabled: showSubcontinental } = useUrlState();
 
@@ -860,8 +927,8 @@ const {
 // Watch toggle to trigger subcontinental fetch on enable
 watch(showSubcontinental, async (enabled) => {
   if (enabled && isV2.value && qualifyingVariants.value.length > 0) {
-    const variantIds = qualifyingVariants.value.map(v => v.variant_id);
-    const gene = props.result?.gene ?? '';
+    const variantIds = qualifyingVariants.value.map((v) => v.variant_id);
+    const gene = props.result?.gene ?? "";
     // Build parent frequency map for founder effect detection
     const parentFreqs = new Map<string, number | null>();
     for (const pop of props.result?.populations ?? []) {
@@ -872,14 +939,18 @@ watch(showSubcontinental, async (enabled) => {
 });
 
 // Helper: get subcontinental rows for a parent population
-function getSubcontinentalRows(parentCode: string): SubcontinentalPopulationFrequency[] {
-  return subcontinentalFrequencies.value.filter(f => f.parentCode === parentCode);
+function getSubcontinentalRows(
+  parentCode: string,
+): SubcontinentalPopulationFrequency[] {
+  return subcontinentalFrequencies.value.filter(
+    (f) => f.parentCode === parentCode,
+  );
 }
 
 function hasSubpopulations(popCode: string): boolean {
   if (!isV2.value) return false;
-  const pops = getSubpopulations('v2');
-  return pops.some(s => getSubpopulationParent(s.code, 'v2') === popCode);
+  const pops = getSubpopulations("v2");
+  return pops.some((s) => getSubpopulationParent(s.code, "v2") === popCode);
 }
 
 // Expandable population row state — tracks which population rows are expanded

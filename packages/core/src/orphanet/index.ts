@@ -5,7 +5,7 @@ export type {
   OrphanetGeneResult,
   OrphanetPrevalenceEntry,
   OrphanetResult,
-} from './types.js';
+} from "./types.js";
 
 // Re-export public client API
 export {
@@ -15,4 +15,4 @@ export {
   fetchOrphanetData,
   selectBestPrevalence,
   selectPrimaryDisease,
-} from './client.js';
+} from "./client.js";

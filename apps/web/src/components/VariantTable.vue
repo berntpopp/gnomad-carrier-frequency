@@ -78,8 +78,8 @@
                 >
                   <span class="sr-only">{{ flag.severity }}:</span>
                   <strong :style="{ color: flagTypeColorCss(flag.type) }">
-                    {{ flag.label }}
-                  </strong><br />
+                    {{ flag.label }} </strong
+                  ><br />
                   <span class="text-caption">{{ flag.explanation }}</span>
                 </div>
               </div>
@@ -93,14 +93,18 @@
             <template #activator="{ props: tooltipProps }">
               <v-chip
                 v-bind="tooltipProps"
-                :color="sourceCategoryColor(getSourceCategory(item.variant_id)!)"
+                :color="
+                  sourceCategoryColor(getSourceCategory(item.variant_id)!)
+                "
                 size="x-small"
                 variant="tonal"
               >
                 {{ sourceCategoryLabel(getSourceCategory(item.variant_id)!) }}
               </v-chip>
             </template>
-            <span>{{ sourceExplanation(getSourceCategory(item.variant_id)!) }}</span>
+            <span>{{
+              sourceExplanation(getSourceCategory(item.variant_id)!)
+            }}</span>
           </v-tooltip>
         </template>
 

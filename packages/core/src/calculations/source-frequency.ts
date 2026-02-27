@@ -1,10 +1,15 @@
 // Per-population carrier frequency breakdown by evidence source category
 // SRC-03, SRC-04: Split carrier frequency contribution by ClinVar / pLoF / Both
 
-import type { GnomadVariant, ClinVarVariant, FilterConfig, CalcConfig } from '../types/index.js';
-import type { SourceCategory } from '../filters/source-classification.js';
-import { classifyVariantSource } from '../filters/source-classification.js';
-import type { ClinVarSubmission } from '../queries/index.js';
+import type {
+  GnomadVariant,
+  ClinVarVariant,
+  FilterConfig,
+  CalcConfig,
+} from "../types/index.js";
+import type { SourceCategory } from "../filters/source-classification.js";
+import { classifyVariantSource } from "../filters/source-classification.js";
+import type { ClinVarSubmission } from "../queries/index.js";
 
 export interface SourceBreakdownRow {
   sourceCategory: SourceCategory;
@@ -46,18 +51,23 @@ export function computeSourceBreakdown(
   };
 
   for (const variant of variants) {
-    const cat = classifyVariantSource(variant, clinvarVariants, filterConfig, submissionsMap);
+    const cat = classifyVariantSource(
+      variant,
+      clinvarVariants,
+      filterConfig,
+      submissionsMap,
+    );
     groups[cat].push(variant);
   }
 
   const rows: SourceBreakdownRow[] = [];
   const labels: Record<SourceCategory, string> = {
-    clinvar_only: 'ClinVar',
-    plof_only: 'pLoF',
-    both: 'Both',
+    clinvar_only: "ClinVar",
+    plof_only: "pLoF",
+    both: "Both",
   };
 
-  for (const cat of ['clinvar_only', 'plof_only', 'both'] as SourceCategory[]) {
+  for (const cat of ["clinvar_only", "plof_only", "both"] as SourceCategory[]) {
     const groupVariants = groups[cat];
     if (groupVariants.length === 0) continue;
 
@@ -69,13 +79,19 @@ export function computeSourceBreakdown(
       let ac: number;
       let an: number;
 
-      const jointPop = variant.joint?.populations?.find(p => p.id === populationCode);
+      const jointPop = variant.joint?.populations?.find(
+        (p) => p.id === populationCode,
+      );
       if (jointPop) {
         ac = jointPop.ac;
         an = jointPop.an;
       } else {
-        const exomePop = variant.exome?.populations?.find(p => p.id === populationCode);
-        const genomePop = variant.genome?.populations?.find(p => p.id === populationCode);
+        const exomePop = variant.exome?.populations?.find(
+          (p) => p.id === populationCode,
+        );
+        const genomePop = variant.genome?.populations?.find(
+          (p) => p.id === populationCode,
+        );
         ac = (exomePop?.ac ?? 0) + (genomePop?.ac ?? 0);
         an = (exomePop?.an ?? 0) + (genomePop?.an ?? 0);
       }

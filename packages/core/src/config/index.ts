@@ -82,7 +82,9 @@ export function getAvailableVersions(): GnomadVersion[] {
 }
 
 // Helper: Get flat list of all subcontinental subpopulations for a version
-export function getSubpopulations(version?: GnomadVersion): SubpopulationConfig[] {
+export function getSubpopulations(
+  version?: GnomadVersion,
+): SubpopulationConfig[] {
   const pops = getGnomadVersion(version).populations;
   return pops.flatMap((p) => p.subpopulations ?? []);
 }

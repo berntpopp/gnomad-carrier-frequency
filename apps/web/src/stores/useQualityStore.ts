@@ -1,5 +1,8 @@
 import { defineStore } from "pinia";
-import type { QualitySettings, QualityExclusionConfig } from "@gnomad-cf/core/types";
+import type {
+  QualitySettings,
+  QualityExclusionConfig,
+} from "@gnomad-cf/core/types";
 import {
   FACTORY_QUALITY_DEFAULTS,
   FACTORY_EXCLUSION_DEFAULTS,

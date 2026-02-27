@@ -3,7 +3,9 @@
   <div
     v-if="loading"
     class="mt-4 pt-3"
-    style="border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))"
+    style="
+      border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+    "
     data-testid="orphanet-section"
   >
     <v-skeleton-loader type="text" width="55%" />
@@ -13,24 +15,30 @@
   <div
     v-else-if="primaryDisease"
     class="mt-4 pt-3"
-    style="border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity))"
+    style="
+      border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+    "
     data-testid="orphanet-section"
   >
     <!-- Primary disease row -->
     <div class="d-flex align-center flex-wrap ga-1">
-      <span class="text-caption text-medium-emphasis mr-1">Orphanet Prevalence</span>
+      <span class="text-caption text-medium-emphasis mr-1"
+        >Orphanet Prevalence</span
+      >
 
       <a
         :href="primaryDisease.orphanetUrl"
         target="_blank"
         rel="noopener noreferrer"
         class="text-body-2"
-      >{{ primaryDisease.name }}</a>
+        >{{ primaryDisease.name }}</a
+      >
 
       <span
         v-if="primaryDisease.isAutosomalRecessive"
         class="text-caption text-medium-emphasis"
-      >[AR]</span>
+        >[AR]</span
+      >
 
       <span
         v-if="primaryDisease.bestPrevalence"
@@ -50,7 +58,7 @@
         class="ml-1"
         @click="expanded = !expanded"
       >
-        {{ expanded ? 'show less' : `+${additionalDiseases.length} more` }}
+        {{ expanded ? "show less" : `+${additionalDiseases.length} more` }}
       </v-chip>
     </div>
 
@@ -67,12 +75,14 @@
             target="_blank"
             rel="noopener noreferrer"
             class="text-body-2"
-          >{{ disease.name }}</a>
+            >{{ disease.name }}</a
+          >
 
           <span
             v-if="disease.isAutosomalRecessive"
             class="text-caption text-medium-emphasis"
-          >[AR]</span>
+            >[AR]</span
+          >
 
           <span
             v-if="disease.bestPrevalence"
@@ -89,7 +99,8 @@
 
     <!-- Disclaimer -->
     <div class="text-caption text-medium-emphasis mt-1">
-      Orphanet reports clinical prevalence (diagnosed cases), not genetic carrier prevalence.
+      Orphanet reports clinical prevalence (diagnosed cases), not genetic
+      carrier prevalence.
     </div>
   </div>
 

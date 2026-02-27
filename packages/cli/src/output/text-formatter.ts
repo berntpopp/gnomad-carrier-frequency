@@ -109,18 +109,20 @@ function formatPopulationBlock(
  * Returns empty string when no diseases are provided.
  */
 function formatOrphanetSection(diseases: OrphanetDisease[]): string {
-  if (diseases.length === 0) return '';
-  const lines: string[] = ['', '--- Orphanet Prevalence ---'];
+  if (diseases.length === 0) return "";
+  const lines: string[] = ["", "--- Orphanet Prevalence ---"];
   for (const d of diseases) {
     const prev = d.bestPrevalence
       ? `${d.bestPrevalence.prevalenceClass} (${d.bestPrevalence.geographic})`
-      : 'Unknown';
-    const ar = d.isAutosomalRecessive ? ' [AR]' : '';
+      : "Unknown";
+    const ar = d.isAutosomalRecessive ? " [AR]" : "";
     lines.push(labelLine(`${d.name}${ar}:`, prev));
     lines.push(`    ${d.orphanetUrl}`);
   }
-  lines.push('  Note: Orphanet reports clinical prevalence, not genetic carrier prevalence.');
-  return lines.join('\n');
+  lines.push(
+    "  Note: Orphanet reports clinical prevalence, not genetic carrier prevalence.",
+  );
+  return lines.join("\n");
 }
 
 /**

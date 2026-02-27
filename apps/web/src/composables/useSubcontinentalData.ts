@@ -118,9 +118,12 @@ function isRetryableStatus(status: number): boolean {
  * @returns Array of combined populations for this variant, or null if the variant
  *   was not found in gnomAD v2 (e.g. v4-only variant).
  */
-async function fetchSingleVariant(
-  variantId: string,
-): Promise<Array<{ id: string; ac: number; an: number; ac_hom: number }> | null> {
+async function fetchSingleVariant(variantId: string): Promise<Array<{
+  id: string;
+  ac: number;
+  an: number;
+  ac_hom: number;
+}> | null> {
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -153,7 +156,9 @@ async function fetchSingleVariant(
 
     if (!response.ok) {
       if (isRetryableStatus(response.status) && attempt < MAX_RETRIES) {
-        lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
+        lastError = new Error(
+          `HTTP ${response.status}: ${response.statusText}`,
+        );
         continue;
       }
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -366,7 +371,9 @@ export function useSubcontinentalData(): UseSubcontinentalDataReturn {
 
         // Fetch all variants in this batch in parallel
         const results = await Promise.allSettled(
-          batch.map((id) => fetchSingleVariant(id).then((pops) => ({ id, pops }))),
+          batch.map((id) =>
+            fetchSingleVariant(id).then((pops) => ({ id, pops })),
+          ),
         );
 
         let batchAllFailed = true;

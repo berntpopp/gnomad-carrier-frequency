@@ -404,7 +404,9 @@
                 label="Exclude High AF"
                 :density="smAndDown ? 'default' : 'compact'"
                 hide-details
-                @update:model-value="updateQualityExclusion('excludeHighAf', $event as boolean)"
+                @update:model-value="
+                  updateQualityExclusion('excludeHighAf', $event as boolean)
+                "
               />
             </v-col>
 
@@ -415,7 +417,9 @@
                 label="Exclude High Hom"
                 :density="smAndDown ? 'default' : 'compact'"
                 hide-details
-                @update:model-value="updateQualityExclusion('excludeHighHom', $event as boolean)"
+                @update:model-value="
+                  updateQualityExclusion('excludeHighHom', $event as boolean)
+                "
               />
             </v-col>
 
@@ -426,7 +430,12 @@
                 label="Exclude gnomAD Filtered"
                 :density="smAndDown ? 'default' : 'compact'"
                 hide-details
-                @update:model-value="updateQualityExclusion('excludeGnomadFiltered', $event as boolean)"
+                @update:model-value="
+                  updateQualityExclusion(
+                    'excludeGnomadFiltered',
+                    $event as boolean,
+                  )
+                "
               />
             </v-col>
 
@@ -437,13 +446,19 @@
                 label="Exclude Genomes Only"
                 :density="smAndDown ? 'default' : 'compact'"
                 hide-details
-                @update:model-value="updateQualityExclusion('excludeGenomesOnly', $event as boolean)"
+                @update:model-value="
+                  updateQualityExclusion(
+                    'excludeGenomesOnly',
+                    $event as boolean,
+                  )
+                "
               />
             </v-col>
 
             <v-col v-if="qualityExcludedDisplay > 0" cols="12">
               <v-alert type="info" variant="tonal" density="compact">
-                Excluding {{ qualityExcludedDisplay }} variant(s) by quality flags.
+                Excluding {{ qualityExcludedDisplay }} variant(s) by quality
+                flags.
               </v-alert>
             </v-col>
           </template>
@@ -500,7 +515,11 @@ import { ref, computed } from "vue";
 import { useDisplay } from "vuetify";
 import FilterChips from "./FilterChips.vue";
 import GeneConfigSubmitDialog from "./GeneConfigSubmitDialog.vue";
-import type { FilterConfig, CalcConfig, QualityExclusionConfig } from "@gnomad-cf/core/types";
+import type {
+  FilterConfig,
+  CalcConfig,
+  QualityExclusionConfig,
+} from "@gnomad-cf/core/types";
 import { useGeneConfig } from "@/composables/useGeneConfig";
 import { useGeneSearch } from "@/composables/useGeneSearch";
 

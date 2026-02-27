@@ -2,7 +2,11 @@
 // SRC-01: Classifies included variants by their evidence source
 // SRC-05: Does NOT modify shouldIncludeVariantConfigurable or the filter pipeline
 
-import type { GnomadVariant, ClinVarVariant, FilterConfig } from "../types/index.js";
+import type {
+  GnomadVariant,
+  ClinVarVariant,
+  FilterConfig,
+} from "../types/index.js";
 import {
   isHighConfidenceLoF,
   isPathogenicClinVarWithThreshold,
@@ -50,7 +54,10 @@ export function classifyVariantSource(
   // Check standard P/LP ClinVar evidence (non-conflicting, meets star threshold)
   const hasStandardClinvar =
     clinvarMatch !== undefined &&
-    isPathogenicClinVarWithThreshold(clinvarMatch, filterConfig.clinvarStarThreshold);
+    isPathogenicClinVarWithThreshold(
+      clinvarMatch,
+      filterConfig.clinvarStarThreshold,
+    );
 
   // Check conflicting classification ClinVar evidence
   // Accept variant as ClinVar source if:

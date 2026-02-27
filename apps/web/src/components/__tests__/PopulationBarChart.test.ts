@@ -25,8 +25,7 @@ vi.mock("@/composables/useDisplayFormat", () => ({
     setFormat: vi.fn(),
     formatFrequency: (f: number | null) =>
       f !== null ? (f * 100).toFixed(2) + "%" : "N/A",
-    formatRatio: (f: number | null) =>
-      f ? "1:" + Math.round(1 / f) : "-",
+    formatRatio: (f: number | null) => (f ? "1:" + Math.round(1 / f) : "-"),
   }),
 }));
 
@@ -139,7 +138,7 @@ describe("PopulationBarChart", () => {
     });
 
     // A dashed reference line should be rendered inside the SVG
-    const dashLine = wrapper.find('line[stroke-dasharray]');
+    const dashLine = wrapper.find("line[stroke-dasharray]");
     expect(dashLine.exists()).toBe(true);
     expect(dashLine.attributes("stroke-dasharray")).toBe("4,3");
   });
@@ -150,14 +149,15 @@ describe("PopulationBarChart", () => {
     });
 
     // No dashed reference line should exist
-    const dashLine = wrapper.find('line[stroke-dasharray]');
+    const dashLine = wrapper.find("line[stroke-dasharray]");
     expect(dashLine.exists()).toBe(false);
   });
 
   it("shows empty state when all populations have zero frequency", () => {
-    const zeroPopulations: PopulationFrequency[] = mockPopulations.map(
-      (p) => ({ ...p, carrierFrequency: 0 }),
-    );
+    const zeroPopulations: PopulationFrequency[] = mockPopulations.map((p) => ({
+      ...p,
+      carrierFrequency: 0,
+    }));
 
     const wrapper = mountWithPlugins(PopulationBarChart, {
       props: { ...defaultProps, populations: zeroPopulations },
@@ -225,6 +225,8 @@ describe("PopulationBarChart", () => {
       props: defaultProps,
     });
 
-    expect(wrapper.find('[data-testid="population-chart"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="population-chart"]').exists()).toBe(
+      true,
+    );
   });
 });

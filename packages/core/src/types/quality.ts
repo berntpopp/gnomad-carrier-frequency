@@ -3,7 +3,11 @@
 /**
  * Types of quality flags that can be raised for a variant
  */
-export type QualityFlagType = "high_af" | "high_hom" | "gnomad_filtered" | "genomes_only";
+export type QualityFlagType =
+  | "high_af"
+  | "high_hom"
+  | "gnomad_filtered"
+  | "genomes_only";
 
 /**
  * A quality flag raised for a variant, with label, explanation, and severity

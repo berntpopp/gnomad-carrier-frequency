@@ -109,7 +109,9 @@ export function useOrphanetData(): UseOrphanetDataReturn {
       // fetchOrphanetData handles its own errors and returns a result with
       // error string, so this catch handles truly unexpected exceptions only.
       const message =
-        err instanceof Error ? err.message : "Unexpected error fetching Orphanet data";
+        err instanceof Error
+          ? err.message
+          : "Unexpected error fetching Orphanet data";
       error.value = message;
       loading.value = false;
     } finally {

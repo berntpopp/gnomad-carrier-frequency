@@ -83,7 +83,12 @@
                   @click="insertVariable(variable.name)"
                 >
                   <template #prepend>
-                    <v-chip size="x-small" color="secondary" variant="flat" class="mr-2">
+                    <v-chip
+                      size="x-small"
+                      color="secondary"
+                      variant="flat"
+                      class="mr-2"
+                    >
                       {{ variable.name }}
                     </v-chip>
                   </template>
@@ -153,7 +158,9 @@
           </template>
           <template v-else>
             <template v-for="(segment, idx) in parsedTemplate" :key="idx">
-              <span v-if="segment.type === 'text'" class="text-body-2">{{ segment.content }}</span>
+              <span v-if="segment.type === 'text'" class="text-body-2">{{
+                segment.content
+              }}</span>
               <v-chip
                 v-else
                 size="small"

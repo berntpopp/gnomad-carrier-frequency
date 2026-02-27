@@ -91,9 +91,7 @@ export function generateSvgChart(
 
   // Compute chart dimensions
   const chartHeight =
-    TOP_PADDING +
-    visiblePops.length * (BAR_HEIGHT + BAR_GAP) +
-    BOTTOM_PADDING;
+    TOP_PADDING + visiblePops.length * (BAR_HEIGHT + BAR_GAP) + BOTTOM_PADDING;
 
   const metaTopSpace = includeMetadata ? 30 : 0;
   const metaBottomSpace = includeMetadata ? 20 : 0;

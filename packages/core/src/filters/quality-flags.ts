@@ -19,11 +19,9 @@ import type {
 export function isHighAF(variant: GnomadVariant, threshold: number): boolean {
   // Compute global AF using joint-first pattern
   const ac =
-    variant.joint?.ac ??
-    (variant.exome?.ac ?? 0) + (variant.genome?.ac ?? 0);
+    variant.joint?.ac ?? (variant.exome?.ac ?? 0) + (variant.genome?.ac ?? 0);
   const an =
-    variant.joint?.an ??
-    (variant.exome?.an ?? 0) + (variant.genome?.an ?? 0);
+    variant.joint?.an ?? (variant.exome?.an ?? 0) + (variant.genome?.an ?? 0);
 
   if (an > 0) {
     const globalAF = ac / an;
@@ -34,7 +32,9 @@ export function isHighAF(variant: GnomadVariant, threshold: number): boolean {
   // Prefer joint populations, fall back to exome + genome
   const populations =
     variant.joint?.populations ??
-    (variant.exome?.populations ?? variant.genome?.populations ?? []);
+    variant.exome?.populations ??
+    variant.genome?.populations ??
+    [];
 
   for (const pop of populations) {
     if (pop.an > 0) {
@@ -59,11 +59,9 @@ export function isHighHom(
   settings: QualitySettings,
 ): boolean {
   const ac =
-    variant.joint?.ac ??
-    (variant.exome?.ac ?? 0) + (variant.genome?.ac ?? 0);
+    variant.joint?.ac ?? (variant.exome?.ac ?? 0) + (variant.genome?.ac ?? 0);
   const an =
-    variant.joint?.an ??
-    (variant.exome?.an ?? 0) + (variant.genome?.an ?? 0);
+    variant.joint?.an ?? (variant.exome?.an ?? 0) + (variant.genome?.an ?? 0);
   const acHom =
     variant.joint?.homozygote_count ??
     (variant.exome?.ac_hom ?? 0) + (variant.genome?.ac_hom ?? 0);
@@ -135,11 +133,9 @@ export function computeQualityFlags(
 
   // Compute joint-first aggregate values for use in explanations
   const ac =
-    variant.joint?.ac ??
-    (variant.exome?.ac ?? 0) + (variant.genome?.ac ?? 0);
+    variant.joint?.ac ?? (variant.exome?.ac ?? 0) + (variant.genome?.ac ?? 0);
   const an =
-    variant.joint?.an ??
-    (variant.exome?.an ?? 0) + (variant.genome?.an ?? 0);
+    variant.joint?.an ?? (variant.exome?.an ?? 0) + (variant.genome?.an ?? 0);
   const acHom =
     variant.joint?.homozygote_count ??
     (variant.exome?.ac_hom ?? 0) + (variant.genome?.ac_hom ?? 0);
@@ -180,7 +176,11 @@ export function computeQualityFlags(
     // Collect the actual failing filter names for the explanation
     const filterNames: string[] = [];
     const collectFailingFilters = (filters: string[] | undefined): void => {
-      if (filters && filters.length > 0 && !filters.every((f) => f === "PASS")) {
+      if (
+        filters &&
+        filters.length > 0 &&
+        !filters.every((f) => f === "PASS")
+      ) {
         for (const f of filters) {
           if (f !== "PASS" && !filterNames.includes(f)) {
             filterNames.push(f);

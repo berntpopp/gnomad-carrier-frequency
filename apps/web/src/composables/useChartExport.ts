@@ -97,10 +97,7 @@ function addPublicationMetadata(
   const newHeight = vbHeight + TITLE_SPACE + FOOTER_SPACE;
 
   // Update viewBox to new height
-  svgEl.setAttribute(
-    "viewBox",
-    `${vbX} ${vbY} ${vbWidth} ${newHeight}`,
-  );
+  svgEl.setAttribute("viewBox", `${vbX} ${vbY} ${vbWidth} ${newHeight}`);
 
   // Wrap all existing content in a group shifted down by TITLE_SPACE
   const contentGroup = document.createElementNS(

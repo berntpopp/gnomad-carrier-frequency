@@ -78,7 +78,9 @@
               @click="activeSection = section.id"
             >
               <v-list-item-title>{{ section.title }}</v-list-item-title>
-              <v-list-item-subtitle>{{ section.subtitle }}</v-list-item-subtitle>
+              <v-list-item-subtitle>{{
+                section.subtitle
+              }}</v-list-item-subtitle>
             </v-list-item>
           </v-list>
         </div>
@@ -283,10 +285,17 @@
                   </v-card-text>
                   <v-card-actions>
                     <v-spacer />
-                    <v-btn variant="text" @click="showClearHistoryDialog = false">
+                    <v-btn
+                      variant="text"
+                      @click="showClearHistoryDialog = false"
+                    >
                       Cancel
                     </v-btn>
-                    <v-btn color="error" variant="flat" @click="clearAllHistory">
+                    <v-btn
+                      color="error"
+                      variant="flat"
+                      @click="clearAllHistory"
+                    >
                       Clear All
                     </v-btn>
                   </v-card-actions>
@@ -302,8 +311,9 @@
 
                 <v-card-text>
                   <p class="text-body-2 text-medium-emphasis mb-3">
-                    Choose the default display format when starting a new analysis.
-                    You can switch formats at any time in the results view.
+                    Choose the default display format when starting a new
+                    analysis. You can switch formats at any time in the results
+                    view.
                   </p>
                   <v-btn-toggle
                     v-model="formatStore.defaultFormat"
@@ -365,8 +375,8 @@
                   </v-btn>
 
                   <div class="text-caption text-medium-emphasis mt-3">
-                    Clearing cache will remove offline gene data. Fresh data will
-                    be fetched on next use.
+                    Clearing cache will remove offline gene data. Fresh data
+                    will be fetched on next use.
                   </div>
                 </v-card-text>
               </v-card>
@@ -394,8 +404,8 @@
                   <!-- Can install (browser supports) -->
                   <template v-else-if="canInstall">
                     <div class="text-body-2 mb-3">
-                      Install gCFCalc on your device for quick access and offline
-                      use.
+                      Install gCFCalc on your device for quick access and
+                      offline use.
                     </div>
                     <v-btn
                       color="primary"
@@ -409,7 +419,9 @@
                   <!-- iOS device -->
                   <template v-else-if="isIos">
                     <div class="d-flex align-start">
-                      <v-icon color="grey" class="mr-2 mt-1"> mdi-apple </v-icon>
+                      <v-icon color="grey" class="mr-2 mt-1">
+                        mdi-apple
+                      </v-icon>
                       <div>
                         <div class="text-body-2 mb-2">To install on iOS:</div>
                         <ol class="text-caption text-medium-emphasis pl-4 mb-0">
@@ -433,8 +445,8 @@
 
             <v-window-item value="filters">
               <p class="text-body-2 text-medium-emphasis mb-4">
-                Configure the default filter settings for new calculations. These
-                defaults can be overridden per calculation.
+                Configure the default filter settings for new calculations.
+                These defaults can be overridden per calculation.
               </p>
 
               <v-switch
@@ -561,14 +573,16 @@
 
             <v-window-item value="quality">
               <p class="text-body-2 text-medium-emphasis mb-4">
-                Flag variants that may need review. Flagged variants can be excluded
-                per-analysis in the filter panel.
+                Flag variants that may need review. Flagged variants can be
+                excluded per-analysis in the filter panel.
               </p>
 
               <!-- Card 1: High AF (BA1) -->
               <v-card variant="outlined" class="mb-4">
                 <v-card-title class="text-subtitle-1">
-                  <v-icon start size="small" color="error">mdi-alert-circle</v-icon>
+                  <v-icon start size="small" color="error"
+                    >mdi-alert-circle</v-icon
+                  >
                   High Allele Frequency (BA1)
                 </v-card-title>
                 <v-card-text>
@@ -596,8 +610,9 @@
                     </template>
                   </v-slider>
                   <div class="text-caption text-medium-emphasis">
-                    ACMG BA1: Variants with allele frequency above this threshold
-                    in any population may be too common for a rare recessive disease.
+                    ACMG BA1: Variants with allele frequency above this
+                    threshold in any population may be too common for a rare
+                    recessive disease.
                   </div>
                 </v-card-text>
               </v-card>
@@ -626,13 +641,17 @@
                     variant="outlined"
                     class="mb-3"
                   >
-                    <v-btn value="hwe_relative" size="small">HWE-Relative</v-btn>
+                    <v-btn value="hwe_relative" size="small"
+                      >HWE-Relative</v-btn
+                    >
                     <v-btn value="absolute" size="small">Absolute</v-btn>
                   </v-btn-toggle>
 
                   <!-- HWE-relative multiplier -->
                   <v-slider
-                    v-if="qualityStore.defaults.highHomMethod === 'hwe_relative'"
+                    v-if="
+                      qualityStore.defaults.highHomMethod === 'hwe_relative'
+                    "
                     v-model="qualityStore.defaults.highHomHWEMultiplier"
                     :disabled="!qualityStore.defaults.highHomEnabled"
                     :min="2"
@@ -644,7 +663,9 @@
                     density="compact"
                   >
                     <template #append>
-                      <span class="text-body-2">{{ qualityStore.defaults.highHomHWEMultiplier }}x</span>
+                      <span class="text-body-2"
+                        >{{ qualityStore.defaults.highHomHWEMultiplier }}x</span
+                      >
                     </template>
                   </v-slider>
 
@@ -662,13 +683,16 @@
                     density="compact"
                   >
                     <template #append>
-                      <span class="text-body-2">{{ qualityStore.defaults.highHomAbsoluteThreshold }}</span>
+                      <span class="text-body-2">{{
+                        qualityStore.defaults.highHomAbsoluteThreshold
+                      }}</span>
                     </template>
                   </v-slider>
 
                   <div class="text-caption text-medium-emphasis">
                     Flag when observed homozygotes exceed expected count.
-                    HWE-Relative flags if observed > multiplier x HWE-expected (AF^2 x AN).
+                    HWE-Relative flags if observed > multiplier x HWE-expected
+                    (AF^2 x AN).
                   </div>
                 </v-card-text>
               </v-card>
@@ -676,7 +700,9 @@
               <!-- Card 3: gnomAD Filtered -->
               <v-card variant="outlined" class="mb-4">
                 <v-card-title class="text-subtitle-1">
-                  <v-icon start size="small" color="amber">mdi-filter-remove</v-icon>
+                  <v-icon start size="small" color="amber"
+                    >mdi-filter-remove</v-icon
+                  >
                   gnomAD Quality Filters
                 </v-card-title>
                 <v-card-text>
@@ -688,8 +714,9 @@
                     hide-details
                   />
                   <div class="text-caption text-medium-emphasis mt-2">
-                    Variants flagged by gnomAD's internal quality filters (e.g., random forest,
-                    allele balance, inbreeding coefficient) may have lower reliability.
+                    Variants flagged by gnomAD's internal quality filters (e.g.,
+                    random forest, allele balance, inbreeding coefficient) may
+                    have lower reliability.
                   </div>
                 </v-card-text>
               </v-card>
@@ -709,8 +736,8 @@
                     hide-details
                   />
                   <div class="text-caption text-medium-emphasis mt-2">
-                    Variants without exome coverage may have different quality characteristics
-                    compared to exome-sequenced variants.
+                    Variants without exome coverage may have different quality
+                    characteristics compared to exome-sequenced variants.
                   </div>
                 </v-card-text>
               </v-card>
@@ -779,7 +806,8 @@ const sections: SettingsSection[] = [
     title: "General",
     icon: "mdi-cog-outline",
     subtitle: "Disclaimer, cache, logging, history",
-    keywords: "disclaimer clingen cache logging history install app format frequency pwa",
+    keywords:
+      "disclaimer clingen cache logging history install app format frequency pwa",
   },
   {
     id: "filters",
@@ -800,7 +828,8 @@ const sections: SettingsSection[] = [
     title: "Quality",
     icon: "mdi-shield-check-outline",
     subtitle: "Quality flag thresholds",
-    keywords: "quality flag allele frequency homozygote gnomad filtered genomes ba1",
+    keywords:
+      "quality flag allele frequency homozygote gnomad filtered genomes ba1",
   },
 ];
 
@@ -831,7 +860,10 @@ const filteredSections = computed(() => {
 
 // Auto-select first match when search narrows results
 watch(filteredSections, (filtered) => {
-  if (filtered.length > 0 && !filtered.some((s) => s.id === activeSection.value)) {
+  if (
+    filtered.length > 0 &&
+    !filtered.some((s) => s.id === activeSection.value)
+  ) {
     const first = filtered[0];
     if (first !== undefined) activeSection.value = first.id;
   }

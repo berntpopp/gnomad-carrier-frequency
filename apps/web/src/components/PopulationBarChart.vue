@@ -1,5 +1,9 @@
 <template>
-  <div class="chart-container" style="position: relative" data-testid="population-chart">
+  <div
+    class="chart-container"
+    style="position: relative"
+    data-testid="population-chart"
+  >
     <!-- Empty state -->
     <div
       v-if="visiblePops.length === 0"
@@ -109,8 +113,10 @@
       class="chart-tooltip elevation-4"
       :style="{ left: tooltipX + 'px', top: tooltipY + 'px' }"
     >
-      <strong>{{ tooltipPop.label }}</strong><br />
-      Carrier frequency: {{ formatFrequency(tooltipPop.carrierFrequency) }}<br />
+      <strong>{{ tooltipPop.label }}</strong
+      ><br />
+      Carrier frequency: {{ formatFrequency(tooltipPop.carrierFrequency)
+      }}<br />
       AC: {{ tooltipPop.alleleCount }} / AN:
       {{ tooltipPop.alleleNumber?.toLocaleString() ?? "-" }}<br />
       <em v-if="tooltipPop.isFounderEffect" class="text-warning"
@@ -229,10 +235,7 @@ const tooltipX = ref(0);
 const tooltipY = ref(0);
 let touchTimeout: ReturnType<typeof setTimeout> | null = null;
 
-function showTooltip(
-  pop: PopulationFrequency,
-  event: MouseEvent | TouchEvent,
-) {
+function showTooltip(pop: PopulationFrequency, event: MouseEvent | TouchEvent) {
   tooltipPop.value = pop;
   tooltipVisible.value = true;
 

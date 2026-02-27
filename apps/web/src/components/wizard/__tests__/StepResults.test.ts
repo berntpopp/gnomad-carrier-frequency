@@ -163,7 +163,9 @@ const stubComponents = {
   VariantModal: { template: "<div />" },
   TextOutput: { template: '<div data-testid="text-output-stub" />' },
   ClingenWarning: { template: "<div />" },
-  PopulationBarChart: { template: '<div data-testid="population-bar-chart-stub" />' },
+  PopulationBarChart: {
+    template: '<div data-testid="population-bar-chart-stub" />',
+  },
 };
 
 // Minimal valid CarrierFrequencyResult for seeding tests

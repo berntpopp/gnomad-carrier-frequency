@@ -289,7 +289,9 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   const qualityExcludedCount = computed(() => qualityExcludedIds.value.size);
 
   // Total pathogenic count = all variants passing pathogenicity filters (before any exclusions)
-  const totalPathogenicCount = computed(() => filteredByPathogenicity.value.length);
+  const totalPathogenicCount = computed(
+    () => filteredByPathogenicity.value.length,
+  );
 
   // Filter to pathogenic variants using configurable filters (FILT-01 through FILT-09)
   // Then filter out BOTH manually excluded AND quality-excluded variants (EXCL-04, QUAL-07)
