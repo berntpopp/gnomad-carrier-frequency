@@ -247,15 +247,16 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     processingStatus.value = `Fetching variants for ${gene}...`;
 
     try {
+      // Spread reactive objects into plain objects for structured clone (postMessage)
       const result = await processGene({
         geneSymbol: gene,
         dataset: getDatasetId(version.value),
         referenceGenome: getReferenceGenome(version.value),
         apiEndpoint: getApiEndpoint(version.value),
-        filterConfig: filterConfig.value,
-        qualitySettings: qualityStore.defaults,
-        qualityExclusionConfig: qualityExclusionConfig.value,
-        calcConfig: calcStore.defaults,
+        filterConfig: { ...filterConfig.value },
+        qualitySettings: { ...qualityStore.defaults },
+        qualityExclusionConfig: { ...qualityExclusionConfig.value },
+        calcConfig: { ...calcStore.defaults },
         excludedIds: Array.from(debouncedExcluded.value),
         submissions: Array.from(submissions.value.entries()),
         forceRefresh,
@@ -281,11 +282,12 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     processingStatus.value = "Refiltering...";
 
     try {
+      // Spread reactive objects into plain objects for structured clone (postMessage)
       const result = await refilter({
-        filterConfig: filterConfig.value,
-        qualitySettings: qualityStore.defaults,
-        qualityExclusionConfig: qualityExclusionConfig.value,
-        calcConfig: calcStore.defaults,
+        filterConfig: { ...filterConfig.value },
+        qualitySettings: { ...qualityStore.defaults },
+        qualityExclusionConfig: { ...qualityExclusionConfig.value },
+        calcConfig: { ...calcStore.defaults },
         excludedIds: Array.from(debouncedExcluded.value),
         submissions: Array.from(submissions.value.entries()),
         requestId,
