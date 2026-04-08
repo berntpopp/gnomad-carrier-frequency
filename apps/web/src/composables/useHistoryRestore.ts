@@ -5,6 +5,7 @@ import { useWizard } from "./useWizard";
 import { useCarrierFrequency } from "./useCarrierFrequency";
 import { useExclusionState } from "./useExclusionState";
 import { useGeneSearch } from "./useGeneSearch";
+import { useLogger } from "./useLogger";
 
 /**
  * Composable for restoring calculation state from history entries.
@@ -24,6 +25,7 @@ export function useHistoryRestore() {
   const { setGeneSymbol, setFilterConfig } = useCarrierFrequency();
   const { setExclusions, resetForGene } = useExclusionState();
   const geneSearch = useGeneSearch();
+  const logger = useLogger("history");
 
   const isRestoring = ref(false);
 
@@ -36,7 +38,7 @@ export function useHistoryRestore() {
   async function restoreFromHistory(entryId: string): Promise<boolean> {
     const entry = historyStore.getEntry(entryId);
     if (!entry) {
-      console.warn("History entry not found:", entryId);
+      logger.warn("History entry not found", { entryId });
       return false;
     }
 
@@ -88,7 +90,7 @@ export function useHistoryRestore() {
 
       return true;
     } catch (error) {
-      console.error("Failed to restore from history:", error);
+      logger.error("Failed to restore from history", { error });
       return false;
     } finally {
       isRestoring.value = false;

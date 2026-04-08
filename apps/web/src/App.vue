@@ -113,7 +113,10 @@ import {
   usePwaUpdate,
   useHistoryAutoSave,
   useHistoryRestore,
+  useLogger,
 } from "@/composables";
+
+const logger = useLogger("app");
 
 const showSettings = ref(false);
 const showLogViewer = ref(false);
@@ -161,7 +164,7 @@ async function handleHistoryRestore(id: string) {
   const success = await restoreFromHistory(id);
   if (!success) {
     // Entry may have been deleted or corrupted - silent fail is acceptable
-    console.warn("Failed to restore history entry:", id);
+    logger.warn("Failed to restore history entry", { id });
   }
 }
 

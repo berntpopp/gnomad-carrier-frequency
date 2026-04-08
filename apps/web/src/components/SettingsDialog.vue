@@ -816,11 +816,13 @@ import {
   usePwaInstall,
   useConfirmDialog,
   useCarrierFrequency,
+  useLogger,
 } from "@/composables";
 import TemplateEditor from "@/components/TemplateEditor.vue";
 
 // Responsive breakpoint detection
 const { smAndDown } = useDisplay();
+const logger = useLogger("settings");
 
 const modelValue = defineModel<boolean>();
 
@@ -986,7 +988,7 @@ async function clearGeneDataCache(): Promise<void> {
       }, 3000);
     }
   } catch (error) {
-    console.error("Failed to clear cache:", error);
+    logger.error("Failed to clear cache", { error });
   } finally {
     cacheClearing.value = false;
   }

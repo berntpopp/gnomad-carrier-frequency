@@ -1,5 +1,6 @@
 import { ref, computed, type Ref, type ComputedRef } from "vue";
 import { useClingenStore } from "@/stores/useClingenStore";
+import { useLogger } from "./useLogger";
 import type {
   ClingenEntry,
   ClingenValidityResult,
@@ -93,6 +94,7 @@ function parseClingenCSV(csvText: string): ClingenEntry[] {
 
 export function useClingenValidity(): UseClingenValidityReturn {
   const store = useClingenStore();
+  const logger = useLogger("clingen");
   const isLoading = ref(false);
 
   const fetchData = async (): Promise<void> => {
@@ -118,7 +120,7 @@ export function useClingenValidity(): UseClingenValidityReturn {
         }
       } catch {
         // Fallback to external URL (works in dev with Vite proxy or when CORS is available)
-        console.log("[ClinGen] Local file not available, trying external URL");
+        logger.debug("Local file not available, trying external URL");
         response = await fetch(CLINGEN_CSV_EXTERNAL);
         usedUrl = CLINGEN_CSV_EXTERNAL;
       }
@@ -134,12 +136,12 @@ export function useClingenValidity(): UseClingenValidityReturn {
         throw new Error("No valid entries parsed from ClinGen CSV");
       }
 
-      console.log(`[ClinGen] Loaded ${entries.length} entries from ${usedUrl}`);
+      logger.info(`Loaded ${entries.length} entries`, { source: usedUrl });
       store.setData(entries);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to fetch ClinGen data";
-      console.error("[ClinGen] Fetch error:", message);
+      logger.error("Fetch error", { message });
       store.setError(message);
     } finally {
       isLoading.value = false;

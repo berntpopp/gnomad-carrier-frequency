@@ -66,10 +66,7 @@ export async function loadGeneConfig(
         registry.set(upperSymbol, result.data);
         return result.data;
       } else {
-        console.warn(
-          `[gene-config] Invalid config for gene "${symbol}":`,
-          result.error.issues.map((i) => i.message).join(", "),
-        );
+        // Invalid config — return null silently; callers handle logging
         return null;
       }
     } catch {

@@ -2,6 +2,7 @@ import { computed, ref, shallowRef, watch, type Ref } from "vue";
 import { watchDebounced } from "@vueuse/core";
 import { useClinvarSubmissions } from "./useClinvarSubmissions";
 import { useExclusionState } from "./useExclusionState";
+import { useLogger } from "./useLogger";
 import { getConflictingVariantIds } from "@gnomad-cf/core/filters";
 import type { SourceCategory } from "@gnomad-cf/core/filters";
 import {
@@ -130,6 +131,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   // Return cached instance if already created (singleton pattern)
   if (instance) return instance;
 
+  const logger = useLogger("carrier-frequency");
   const geneSymbol = ref<string | null>(null);
   const { version } = useGnomadVersion();
   const filterStore = useFilterStore();
@@ -297,7 +299,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
       if (requestId !== latestRequestId) return;
       // Refilter errors are non-fatal — keep existing data
       processingStatus.value = null;
-      console.warn("Refilter failed:", err);
+      logger.warn("Refilter failed", { error: err });
     }
   }
 

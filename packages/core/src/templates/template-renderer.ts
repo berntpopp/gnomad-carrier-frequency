@@ -23,7 +23,8 @@ export function renderTemplate(
   return template.replace(/\{\{(\w+)\}\}/g, (_match, key) => {
     const value = context[key as keyof TemplateContext];
     if (value === undefined || value === null) {
-      console.warn(`Template variable "${key}" is undefined`);
+      // Missing variable — return empty string silently.
+      // Callers handle logging if needed.
       return "";
     }
     return String(value);
