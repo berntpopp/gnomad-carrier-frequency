@@ -171,6 +171,38 @@
                 </v-card-text>
               </v-card>
 
+              <!-- Variant Cache Management Section -->
+              <v-card variant="outlined" class="mb-4">
+                <v-card-title class="text-subtitle-1">
+                  <v-icon start size="small"> mdi-database-outline </v-icon>
+                  Variant Data Cache
+                </v-card-title>
+
+                <v-card-text>
+                  <div class="text-body-2 mb-3">
+                    Variant data fetched from gnomAD is cached locally for faster
+                    repeat access. Cache is keyed by gene, dataset, and genome
+                    build.
+                  </div>
+
+                  <div class="d-flex align-center justify-space-between">
+                    <div class="text-body-2">
+                      <span>{{ variantCacheSize }} gene{{ variantCacheSize === 1 ? '' : 's' }} cached</span>
+                    </div>
+
+                    <v-btn
+                      variant="text"
+                      size="small"
+                      :disabled="variantCacheSize === 0"
+                      @click="handleClearVariantCache"
+                    >
+                      <v-icon start size="small">mdi-delete-outline</v-icon>
+                      Clear Cache
+                    </v-btn>
+                  </div>
+                </v-card-text>
+              </v-card>
+
               <!-- Logging Configuration Section -->
               <v-card variant="outlined" class="mb-4">
                 <v-card-title class="text-subtitle-1">
@@ -783,6 +815,7 @@ import {
   useClingenValidity,
   usePwaInstall,
   useConfirmDialog,
+  useCarrierFrequency,
 } from "@/composables";
 import TemplateEditor from "@/components/TemplateEditor.vue";
 
@@ -807,7 +840,7 @@ const sections: SettingsSection[] = [
     icon: "mdi-cog-outline",
     subtitle: "Disclaimer, cache, logging, history",
     keywords:
-      "disclaimer clingen cache logging history install app format frequency pwa",
+      "disclaimer clingen cache logging history install app format frequency pwa variant",
   },
   {
     id: "filters",
@@ -995,6 +1028,23 @@ const highAfPercent = computed({
   set: (v: number) => qualityStore.setDefaults({ highAfThreshold: v / 100 }),
 });
 
+const { clearVariantCache, getVariantCacheSize } = useCarrierFrequency();
+
+const variantCacheSize = ref(0);
+
+async function loadVariantCacheSize() {
+  try {
+    variantCacheSize.value = await getVariantCacheSize();
+  } catch {
+    variantCacheSize.value = 0;
+  }
+}
+
+async function handleClearVariantCache() {
+  await clearVariantCache();
+  variantCacheSize.value = 0;
+}
+
 const { activate, deactivate } = useFocusTrap(dialogCard, {
   immediate: false,
   allowOutsideClick: true,
@@ -1005,6 +1055,7 @@ const { activate, deactivate } = useFocusTrap(dialogCard, {
 async function onDialogOpen() {
   await nextTick();
   activate();
+  loadVariantCacheSize();
 }
 
 function close() {
