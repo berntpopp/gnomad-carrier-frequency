@@ -48,14 +48,39 @@
       <v-card-title
         class="d-flex align-center justify-space-between flex-wrap pb-0"
       >
-        <span class="text-h6">
-          <em>{{ result.gene }}</em>
-          <span
-            v-if="canonicalTranscript"
-            class="text-body-2 text-medium-emphasis font-weight-regular"
-          >
-            ({{ canonicalTranscript }})
+        <span class="d-flex align-center">
+          <span class="text-h6">
+            <em>{{ result.gene }}</em>
+            <span
+              v-if="canonicalTranscript"
+              class="text-body-2 text-medium-emphasis font-weight-regular"
+            >
+              ({{ canonicalTranscript }})
+            </span>
           </span>
+
+          <!-- Per-gene refresh button -->
+          <v-btn
+            icon
+            variant="text"
+            size="x-small"
+            :loading="isLoading"
+            title="Re-fetch variant data from gnomAD"
+            @click="refetch"
+          >
+            <v-icon size="small">mdi-refresh</v-icon>
+          </v-btn>
+
+          <!-- Cache status badge -->
+          <v-chip
+            v-if="cacheStatus === 'hit'"
+            size="x-small"
+            variant="tonal"
+            color="blue-grey"
+            class="ml-2"
+          >
+            Cached
+          </v-chip>
         </span>
         <div class="d-flex align-center ga-2">
           <v-chip :color="sourceChipColor" size="small">
@@ -73,6 +98,11 @@
       </v-card-title>
 
       <v-card-text class="pt-4">
+        <!-- Processing status -->
+        <div v-if="processingStatus" class="text-body-2 text-medium-emphasis mt-1">
+          {{ processingStatus }}
+        </div>
+
         <!-- All-excluded warning -->
         <v-alert
           v-if="qualifyingVariantCount === 0 && excludedCount > 0"
@@ -900,6 +930,9 @@ const {
   flaggedVariantCount,
   qualifyingVariantCount,
   qualifyingVariants,
+  cacheStatus,
+  processingStatus,
+  refetch,
 } = useCarrierFrequency();
 
 // Quality props forwarded to FilterPanel via v-bind spread
