@@ -105,7 +105,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useDisplay } from "vuetify";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import VariantTable from "./VariantTable.vue";
 import type { DisplayVariant } from "@gnomad-cf/core/types";
 import { buildExportVariants, generateFilename } from "@/utils/export-utils";
@@ -177,7 +177,7 @@ function downloadBlob(blob: Blob, filename: string): void {
 /**
  * Export variants handler for JSON or Excel format
  */
-function handleVariantExport(format: "json" | "xlsx") {
+async function handleVariantExport(format: "json" | "xlsx") {
   if (!props.variants.length) return;
 
   // Build export variants with exclusion data
@@ -204,10 +204,24 @@ function handleVariantExport(format: "json" | "xlsx") {
     downloadBlob(blob, filename + ".json");
   } else {
     // Excel export with single Variants sheet
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(exportVariants);
-    XLSX.utils.book_append_sheet(wb, ws, "Variants");
-    XLSX.writeFile(wb, filename + ".xlsx");
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet("Variants");
+    const firstVariant = exportVariants[0];
+    if (exportVariants.length > 0 && firstVariant) {
+      const columns = Object.keys(firstVariant).map((key) => ({
+        header: key,
+        key,
+      }));
+      ws.columns = columns;
+      for (const row of exportVariants) {
+        ws.addRow(row);
+      }
+    }
+    const buffer = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    downloadBlob(blob, filename + ".xlsx");
   }
 }
 </script>

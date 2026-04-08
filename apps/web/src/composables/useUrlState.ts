@@ -21,6 +21,7 @@ import { useGeneSearch } from "./useGeneSearch";
 import { useExclusionState } from "./useExclusionState";
 import { encodeExclusions, decodeExclusions } from "@gnomad-cf/core/utils";
 import { useGnomadVersion } from "@/api";
+import { useLogger } from "./useLogger";
 
 // Module-level singleton state
 const isInitialized = ref(false);
@@ -63,6 +64,7 @@ export function useUrlState(): UseUrlStateReturn {
   const geneSearch = useGeneSearch();
   const { excluded, setExclusions, excludedCount } = useExclusionState();
   const { version, setVersion } = useGnomadVersion();
+  const logger = useLogger("url-state");
 
   /**
    * Restore application state from URL parameters
@@ -113,7 +115,9 @@ export function useUrlState(): UseUrlStateReturn {
             setTimeout(checkResults, 100);
           } else {
             // Give up after max attempts
-            console.warn("[URL State] Could not find gene:", urlState.gene);
+            logger.warn("Could not find gene from URL", {
+              gene: urlState.gene,
+            });
             resolve();
           }
         };
@@ -177,8 +181,8 @@ export function useUrlState(): UseUrlStateReturn {
 
       // Show warning if exclusions were truncated
       if (urlState.exclWarn === "1") {
-        console.warn(
-          "[URL State] Some exclusions were not included in the shared URL due to length limits",
+        logger.warn(
+          "Some exclusions were not included in the shared URL due to length limits",
         );
       }
 

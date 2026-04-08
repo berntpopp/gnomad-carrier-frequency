@@ -87,10 +87,8 @@ export function parseUrlState(params: Record<string, unknown>): UrlState {
   const result = UrlStateSchema.safeParse(params);
 
   if (!result.success) {
-    console.warn(
-      "[URL State] Validation failed, using defaults:",
-      result.error.format(),
-    );
+    // Validation failed — silently fall back to defaults.
+    // Callers (web app) handle user-facing logging.
     return UrlStateSchema.parse({});
   }
 

@@ -3,7 +3,9 @@
   "version": "1.6.0",
   "type": "module",
   "private": true,
-  "bin": { "gnomad-cf": "dist/cli.mjs" },
+  "bin": {
+    "gnomad-cf": "dist/cli.mjs"
+  },
   "scripts": {
     "build": "tsdown",
     "dev": "bun run src/cli.ts",

@@ -15,6 +15,10 @@ const activeProfile: Ref<ConditionProfile | null> = ref(null);
 const configLoaded: Ref<boolean> = ref(false);
 const configLoading: Ref<boolean> = ref(false);
 
+// Guard to ensure the selectedGene watcher is only registered once,
+// even when multiple components call useGeneConfig().
+let watcherInitialized = false;
+
 export interface UseGeneConfigReturn {
   activeGeneConfig: Ref<GeneConfig | null>;
   activeProfile: Ref<ConditionProfile | null>;
@@ -51,45 +55,49 @@ export function useGeneConfig(): UseGeneConfigReturn {
     }
   }
 
-  // Watch selectedGene and load/apply gene config automatically
-  watch(
-    selectedGene,
-    async (gene) => {
-      // No gene selected — reset everything to factory defaults
-      if (gene == null) {
-        activeGeneConfig.value = null;
-        activeProfile.value = null;
-        configLoaded.value = false;
+  // Watch selectedGene and load/apply gene config automatically.
+  // Guard ensures only one watcher is registered across all callers.
+  if (!watcherInitialized) {
+    watcherInitialized = true;
+    watch(
+      selectedGene,
+      async (gene) => {
+        // No gene selected — reset everything to factory defaults
+        if (gene == null) {
+          activeGeneConfig.value = null;
+          activeProfile.value = null;
+          configLoaded.value = false;
+          configLoading.value = false;
+          filterStore.resetToFactoryDefaults();
+          calcStore.resetToFactoryDefaults();
+          return;
+        }
+
+        configLoading.value = true;
+        const config = await loadGeneConfig(gene.symbol);
         configLoading.value = false;
-        filterStore.resetToFactoryDefaults();
-        calcStore.resetToFactoryDefaults();
-        return;
-      }
 
-      configLoading.value = true;
-      const config = await loadGeneConfig(gene.symbol);
-      configLoading.value = false;
+        // Gene has no config — reset to factory defaults to prevent state bleed
+        if (config === null) {
+          activeGeneConfig.value = null;
+          activeProfile.value = null;
+          configLoaded.value = false;
+          filterStore.resetToFactoryDefaults();
+          calcStore.resetToFactoryDefaults();
+          return;
+        }
 
-      // Gene has no config — reset to factory defaults to prevent state bleed
-      if (config === null) {
-        activeGeneConfig.value = null;
-        activeProfile.value = null;
-        configLoaded.value = false;
-        filterStore.resetToFactoryDefaults();
-        calcStore.resetToFactoryDefaults();
-        return;
-      }
+        // Config found — set state and apply default profile
+        activeGeneConfig.value = config;
+        const defaultProfile = config.profiles.find((p) => p.isDefault)!;
+        activeProfile.value = defaultProfile;
+        configLoaded.value = true;
 
-      // Config found — set state and apply default profile
-      activeGeneConfig.value = config;
-      const defaultProfile = config.profiles.find((p) => p.isDefault)!;
-      activeProfile.value = defaultProfile;
-      configLoaded.value = true;
-
-      applyProfile(defaultProfile);
-    },
-    { immediate: true },
-  );
+        applyProfile(defaultProfile);
+      },
+      { immediate: true },
+    );
+  }
 
   /**
    * Switch to a different condition profile.

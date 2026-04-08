@@ -1,27 +1,22 @@
-import { computed, ref, watch, type Ref } from "vue";
+import { computed, ref, shallowRef, watch, type Ref } from "vue";
 import { watchDebounced } from "@vueuse/core";
-import { useGeneVariants } from "./useGeneVariants";
 import { useClinvarSubmissions } from "./useClinvarSubmissions";
 import { useExclusionState } from "./useExclusionState";
+import { useLogger } from "./useLogger";
+import { getConflictingVariantIds } from "@gnomad-cf/core/filters";
+import type { SourceCategory } from "@gnomad-cf/core/filters";
 import {
-  filterPathogenicVariantsConfigurable,
-  getConflictingVariantIds,
-  computeQualityFlags,
-  shouldExcludeByQuality,
-} from "@gnomad-cf/core/filters";
-import {
-  aggregatePopulationFrequenciesWithConfig,
   buildPopulationFrequencies,
-  calculateVCR,
-  calculateGCR,
-  calculateHWECarrierFrequency,
-  calculateSimplifiedCarrierFrequency,
-  calculateGeneticPrevalence,
-  calculateBayesianPrevalence,
   formatCarrierFrequency,
   formatPrevalence,
 } from "@gnomad-cf/core/calculations";
-import { config, type GnomadVersion } from "@gnomad-cf/core/config";
+import {
+  config,
+  getDatasetId,
+  getReferenceGenome,
+  getApiEndpoint,
+  type GnomadVersion,
+} from "@gnomad-cf/core/config";
 import { useGnomadVersion } from "@/api";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useCalcStore } from "@/stores/useCalcStore";
@@ -37,9 +32,19 @@ import type {
   QualityFlag,
   QualityExclusionConfig,
 } from "@gnomad-cf/core/types";
+import {
+  processGene,
+  refilter,
+  clearCache,
+  getCacheSize,
+} from "@/workers/variant-worker-api";
+import type { WorkerResult, AggregatedPopEntry } from "@/workers/types";
 
 // Default fallback from config - NO MAGIC NUMBERS
 const { defaultCarrierFrequency } = config.settings;
+
+// Module-level request ID counter for stale-result detection
+let latestRequestId = 0;
 
 export interface UseCarrierFrequencyReturn {
   // Input
@@ -110,6 +115,13 @@ export interface UseCarrierFrequencyReturn {
 
   // Actions
   refetch: () => Promise<void>;
+
+  // New worker-specific properties
+  processingStatus: Ref<string | null>;
+  cacheStatus: Ref<WorkerResult["cacheStatus"] | null>;
+  sourceCategoryMap: Ref<Map<string, SourceCategory>>;
+  clearVariantCache: (geneSymbol?: string) => Promise<void>;
+  getVariantCacheSize: () => Promise<number>;
 }
 
 // Singleton instance for shared state across all callers
@@ -119,6 +131,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   // Return cached instance if already created (singleton pattern)
   if (instance) return instance;
 
+  const logger = useLogger("carrier-frequency");
   const geneSymbol = ref<string | null>(null);
   const { version } = useGnomadVersion();
   const filterStore = useFilterStore();
@@ -181,49 +194,168 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     clearSubmissions,
   } = useClinvarSubmissions();
 
-  // Fetch variants (uses config for dataset/referenceGenome)
-  const {
-    variants,
-    clinvarVariants,
-    isLoading,
-    hasError,
-    errorMessage,
-    refetch,
-    hasData,
-    currentVersion,
-  } = useGeneVariants(geneSymbol);
+  // Worker result state (shallowRef for large arrays)
+  const filteredByPathogenicity = shallowRef<GnomadVariant[]>([]);
+  const qualifyingVariants = shallowRef<GnomadVariant[]>([]);
+  const clinvarVariantsRef = shallowRef<ClinVarVariant[]>([]);
+  const qualityFlagsMap = shallowRef<Map<string, QualityFlag[]>>(new Map());
+  const qualityExcludedIds = shallowRef<Set<string>>(new Set());
+  const sourceCategoryMap = shallowRef<Map<string, SourceCategory>>(new Map());
+  const aggregatedPops = shallowRef<AggregatedPopEntry[] | null>(null);
+  const workerGlobalStats = shallowRef<WorkerResult["globalStats"] | null>(
+    null,
+  );
 
-  // Convert API types to internal types for filtering
-  // Types are structurally compatible but use different names
-  const normalizedVariants = computed((): GnomadVariant[] => {
-    return variants.value.map((v) => ({
-      variant_id: v.variant_id,
-      pos: v.pos,
-      ref: v.ref,
-      alt: v.alt,
-      exome: v.exome ?? undefined,
-      genome: v.genome ?? undefined,
-      joint: v.joint ?? undefined,
-      transcript_consequence: v.transcript_consequence,
-    }));
+  // Loading/error state
+  const isLoading = ref(false);
+  const hasError = ref(false);
+  const errorMessage = ref<string | null>(null);
+  const hasData = ref(false);
+  const processingStatus = ref<string | null>(null);
+  const cacheStatus = ref<WorkerResult["cacheStatus"] | null>(null);
+
+  // currentVersion alias
+  const currentVersion = version;
+
+  // Apply worker result, guarded by requestId stale check
+  function applyResult(result: WorkerResult): void {
+    if (result.requestId !== latestRequestId) return;
+
+    filteredByPathogenicity.value = result.filteredByPathogenicity;
+    qualifyingVariants.value = result.qualifyingVariants;
+    clinvarVariantsRef.value = result.clinvarVariants;
+    qualityFlagsMap.value = new Map(result.qualityFlagsMap);
+    qualityExcludedIds.value = new Set(result.qualityExcludedIds);
+    sourceCategoryMap.value = new Map(result.sourceCategoryMap);
+    aggregatedPops.value = result.aggregatedPops;
+    workerGlobalStats.value = result.globalStats;
+    cacheStatus.value = result.cacheStatus;
+
+    hasData.value = true;
+    isLoading.value = false;
+    processingStatus.value = null;
+  }
+
+  async function dispatchProcessGene(forceRefresh = false): Promise<void> {
+    const gene = geneSymbol.value;
+    if (!gene) return;
+
+    latestRequestId++;
+    const requestId = latestRequestId;
+
+    isLoading.value = true;
+    hasError.value = false;
+    errorMessage.value = null;
+    processingStatus.value = `Fetching variants for ${gene}...`;
+
+    try {
+      // Spread reactive objects into plain objects for structured clone (postMessage)
+      const result = await processGene({
+        geneSymbol: gene,
+        dataset: getDatasetId(version.value),
+        referenceGenome: getReferenceGenome(version.value),
+        apiEndpoint: getApiEndpoint(version.value),
+        filterConfig: { ...filterConfig.value },
+        qualitySettings: { ...qualityStore.defaults },
+        qualityExclusionConfig: { ...qualityExclusionConfig.value },
+        calcConfig: { ...calcStore.defaults },
+        excludedIds: Array.from(debouncedExcluded.value),
+        submissions: Array.from(submissions.value.entries()),
+        forceRefresh,
+        requestId,
+      });
+      applyResult(result);
+    } catch (err) {
+      if (requestId !== latestRequestId) return;
+      hasError.value = true;
+      errorMessage.value =
+        err instanceof Error ? err.message : "Failed to load variant data.";
+      isLoading.value = false;
+      processingStatus.value = null;
+    }
+  }
+
+  async function dispatchRefilter(): Promise<void> {
+    // Don't refilter while a full processGene fetch is in flight —
+    // it would increment latestRequestId and discard the fetch result.
+    if (!hasData.value || isLoading.value) return;
+
+    latestRequestId++;
+    const requestId = latestRequestId;
+
+    processingStatus.value = "Refiltering...";
+
+    try {
+      // Spread reactive objects into plain objects for structured clone (postMessage)
+      const result = await refilter({
+        filterConfig: { ...filterConfig.value },
+        qualitySettings: { ...qualityStore.defaults },
+        qualityExclusionConfig: { ...qualityExclusionConfig.value },
+        calcConfig: { ...calcStore.defaults },
+        excludedIds: Array.from(debouncedExcluded.value),
+        submissions: Array.from(submissions.value.entries()),
+        requestId,
+      });
+      applyResult(result);
+    } catch (err) {
+      if (requestId !== latestRequestId) return;
+      // Refilter errors are non-fatal — keep existing data
+      processingStatus.value = null;
+      logger.warn("Refilter failed", { error: err });
+    }
+  }
+
+  // Watch gene/version changes → full processGene
+  watch([geneSymbol, version], ([gene]) => {
+    // Reset state when gene changes
+    if (!gene) {
+      hasData.value = false;
+      filteredByPathogenicity.value = [];
+      qualifyingVariants.value = [];
+      clinvarVariantsRef.value = [];
+      qualityFlagsMap.value = new Map();
+      qualityExcludedIds.value = new Set();
+      sourceCategoryMap.value = new Map();
+      aggregatedPops.value = null;
+      workerGlobalStats.value = null;
+      cacheStatus.value = null;
+      isLoading.value = false;
+      hasError.value = false;
+      errorMessage.value = null;
+      processingStatus.value = null;
+      return;
+    }
+    dispatchProcessGene();
   });
 
-  const normalizedClinvar = computed((): ClinVarVariant[] => {
-    return clinvarVariants.value.map((cv) => ({
-      variant_id: cv.variant_id,
-      clinvar_variation_id: cv.clinvar_variation_id,
-      clinical_significance: cv.clinical_significance,
-      gold_stars: cv.gold_stars,
-      review_status: cv.review_status,
-      pos: cv.pos,
-      ref: cv.ref,
-      alt: cv.alt,
-    }));
+  // Debounced watch on filter/quality/calc config changes → refilter (300ms)
+  watchDebounced(
+    [filterConfig, qualityExclusionConfig, () => calcStore.defaults],
+    () => {
+      dispatchRefilter();
+    },
+    { debounce: 300 },
+  );
+
+  // Watch manual exclusions → refilter (already debounced by debouncedExcluded at 500ms)
+  watch(debouncedExcluded, () => {
+    dispatchRefilter();
   });
+
+  // Watch submissions (deep) → refilter when hasData
+  watch(
+    submissions,
+    () => {
+      if (hasData.value) {
+        dispatchRefilter();
+      }
+    },
+    { deep: true },
+  );
 
   // Identify conflicting variant IDs for submissions fetching
   const conflictingVariantIds = computed(() =>
-    getConflictingVariantIds(normalizedClinvar.value),
+    getConflictingVariantIds(clinvarVariantsRef.value),
   );
 
   // Auto-fetch submissions when conflicting filter is enabled and we have conflicting variants
@@ -247,275 +379,46 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     qualityExclusionConfig.value = { ...qualityStore.exclusionDefaults };
   });
 
-  // Variants that pass pathogenicity filters (before any manual/quality exclusions)
-  // This is the single source for pathogenicity-filtered variants used by all downstream computeds
-  const filteredByPathogenicity = computed((): GnomadVariant[] => {
-    if (!normalizedVariants.value.length) return [];
-    return filterPathogenicVariantsConfigurable(
-      normalizedVariants.value,
-      normalizedClinvar.value,
-      filterConfig.value,
-      submissions.value,
-    );
-  });
-
-  // Compute quality flags for all pathogenicity-filtered variants
-  const qualityFlagsMap = computed((): Map<string, QualityFlag[]> => {
-    const map = new Map<string, QualityFlag[]>();
-    for (const variant of filteredByPathogenicity.value) {
-      const flags = computeQualityFlags(variant, qualityStore.defaults);
-      if (flags.length > 0) {
-        map.set(variant.variant_id, flags);
-      }
-    }
-    return map;
-  });
-
-  // Count of flagged variants (QUAL-06: summary count)
-  const flaggedVariantCount = computed(() => qualityFlagsMap.value.size);
-
-  // Variant IDs excluded by quality flags based on current exclusion config
-  const qualityExcludedIds = computed((): Set<string> => {
-    const excluded = new Set<string>();
-    for (const [variantId, flags] of qualityFlagsMap.value) {
-      if (shouldExcludeByQuality(flags, qualityExclusionConfig.value)) {
-        excluded.add(variantId);
-      }
-    }
-    return excluded;
-  });
-
-  // Count of quality-excluded variants (tracked separately from manual exclusions — Pitfall 4)
+  // Derived counts
   const qualityExcludedCount = computed(() => qualityExcludedIds.value.size);
-
-  // Total pathogenic count = all variants passing pathogenicity filters (before any exclusions)
+  const flaggedVariantCount = computed(() => qualityFlagsMap.value.size);
   const totalPathogenicCount = computed(
     () => filteredByPathogenicity.value.length,
   );
-
-  // Filter to pathogenic variants using configurable filters (FILT-01 through FILT-09)
-  // Then filter out BOTH manually excluded AND quality-excluded variants (EXCL-04, QUAL-07)
-  const pathogenicVariants = computed(() => {
-    return filteredByPathogenicity.value.filter(
-      (v) =>
-        !debouncedExcluded.value.has(v.variant_id) &&
-        !qualityExcludedIds.value.has(v.variant_id),
-    );
-  });
-
   const qualifyingVariantCount = computed(
-    () => pathogenicVariants.value.length,
+    () => qualifyingVariants.value.length,
   );
 
-  // Check if using default (no qualifying variants from filters) - threshold from config
-  // Uses totalPathogenicCount (before manual exclusions) so that manually excluding
-  // all variants yields zero, not the fallback default frequency.
+  // Check if using default (no qualifying variants from filters)
   const usingDefault = computed(
     () => hasData.value && totalPathogenicCount.value === 0,
   );
 
-  // Aggregate population frequencies using CalcConfig
-  // Reactivity: Vue computed automatically tracks calcStore.defaults
-  const aggregatedPops = computed(() => {
-    if (usingDefault.value) return null;
-    if (!pathogenicVariants.value.length) return null;
-    return aggregatePopulationFrequenciesWithConfig(
-      pathogenicVariants.value,
-      version.value,
-      calcStore.defaults,
-    );
+  // Global carrier frequency from worker stats
+  const globalCarrierFrequency = computed((): number | null => {
+    if (usingDefault.value) return defaultCarrierFrequency;
+    return workerGlobalStats.value?.carrierFrequency ?? null;
   });
 
-  // Calculate global statistics: carrier frequency, total AC, representative AN, and prevalence.
-  //
-  // Always compute:
-  //   sumAF = sum of per-variant combined allele frequencies
-  //   geneticPrevalence = q^2 where q = sumAF (NEVER from carrier frequency)
-  //   bayesianPrevalence = geneticPrevalence * penetrance
-  //
-  // Carrier frequency formula chosen by CalcConfig:
-  //   useHomExclusion=true:  VCR per variant then GCR aggregation
-  //   useHomExclusion=false + useHWEFormula=true:  2pq (HWE)
-  //   useHomExclusion=false + useHWEFormula=false: 2 * sumAF (simplified)
-  //
-  const globalStats = computed(
-    (): {
-      carrierFrequency: number | null;
-      totalAC: number;
-      maxAN: number;
-      geneticPrevalence: number | null;
-      bayesianPrevalence: number | null;
-      formula: "hwe" | "simplified";
-      homExclusionActive: boolean;
-    } => {
-      const defaultResult = {
-        carrierFrequency: null as number | null,
-        totalAC: 0,
-        maxAN: 0,
-        geneticPrevalence: null as number | null,
-        bayesianPrevalence: null as number | null,
-        formula: calcStore.defaults.useHWEFormula
-          ? "hwe"
-          : ("simplified" as "hwe" | "simplified"),
-        homExclusionActive: calcStore.defaults.useHomExclusion,
-      };
-
-      if (usingDefault.value) {
-        return { ...defaultResult, carrierFrequency: defaultCarrierFrequency };
-      }
-      if (!pathogenicVariants.value.length) {
-        return defaultResult;
-      }
-
-      // Sum allele frequencies across all pathogenic variants
-      // Prefer joint data (gnomAD v4) when available, fall back to exome+genome
-      let sumAF = 0;
-      let totalAC = 0;
-      let maxAN = 0;
-
-      for (const variant of pathogenicVariants.value) {
-        let combinedAC: number;
-        let combinedAN: number;
-
-        if (variant.joint) {
-          // Prefer joint data — properly combines exome+genome using coverage
-          combinedAC = variant.joint.ac;
-          combinedAN = variant.joint.an;
-        } else {
-          const exomeAC =
-            variant.exome !== null && variant.exome !== undefined
-              ? variant.exome.ac
-              : 0;
-          const genomeAC =
-            variant.genome !== null && variant.genome !== undefined
-              ? variant.genome.ac
-              : 0;
-          const exomeAN =
-            variant.exome !== null && variant.exome !== undefined
-              ? variant.exome.an
-              : 0;
-          const genomeAN =
-            variant.genome !== null && variant.genome !== undefined
-              ? variant.genome.an
-              : 0;
-          combinedAC = exomeAC + genomeAC;
-          combinedAN = exomeAN + genomeAN;
-        }
-
-        totalAC += combinedAC;
-        maxAN = Math.max(maxAN, combinedAN);
-
-        if (combinedAN > 0) {
-          sumAF += combinedAC / combinedAN;
-        }
-      }
-
-      // Genetic prevalence always from raw q = sumAF (never from carrier frequency)
-      const geneticPrevalence =
-        sumAF > 0 ? calculateGeneticPrevalence([sumAF]) : null;
-      const bayesianPrevalence =
-        geneticPrevalence !== null
-          ? calculateBayesianPrevalence(
-              geneticPrevalence,
-              calcStore.defaults.penetrance,
-            )
-          : null;
-
-      let carrierFrequency: number | null = null;
-      const homExclusionActive = calcStore.defaults.useHomExclusion;
-      let formula: "hwe" | "simplified" = calcStore.defaults.useHWEFormula
-        ? "hwe"
-        : "simplified";
-
-      if (sumAF > 0) {
-        if (homExclusionActive) {
-          // VCR/GCR path — compute VCR for each variant then aggregate via GCR
-          const vcrs: number[] = [];
-          for (const variant of pathogenicVariants.value) {
-            let combinedAC: number;
-            let combinedAN: number;
-            let combinedAcHom: number;
-
-            if (variant.joint) {
-              combinedAC = variant.joint.ac;
-              combinedAN = variant.joint.an;
-              combinedAcHom = variant.joint.homozygote_count;
-            } else {
-              const exomeAC =
-                variant.exome !== null && variant.exome !== undefined
-                  ? variant.exome.ac
-                  : 0;
-              const genomeAC =
-                variant.genome !== null && variant.genome !== undefined
-                  ? variant.genome.ac
-                  : 0;
-              const exomeAN =
-                variant.exome !== null && variant.exome !== undefined
-                  ? variant.exome.an
-                  : 0;
-              const genomeAN =
-                variant.genome !== null && variant.genome !== undefined
-                  ? variant.genome.an
-                  : 0;
-              const exomeAcHom =
-                variant.exome !== null && variant.exome !== undefined
-                  ? variant.exome.ac_hom
-                  : 0;
-              const genomeAcHom =
-                variant.genome !== null && variant.genome !== undefined
-                  ? variant.genome.ac_hom
-                  : 0;
-              combinedAC = exomeAC + genomeAC;
-              combinedAN = exomeAN + genomeAN;
-              combinedAcHom = exomeAcHom + genomeAcHom;
-            }
-
-            if (combinedAN > 0) {
-              vcrs.push(calculateVCR(combinedAC, combinedAN, combinedAcHom));
-            }
-          }
-          const gcr = calculateGCR(vcrs);
-          carrierFrequency = gcr > 0 ? gcr : null;
-          // formula label: when hom exclusion is ON, we report based on HWE toggle setting
-          // but the actual calculation used VCR/GCR (which is more accurate)
-          formula = calcStore.defaults.useHWEFormula ? "hwe" : "simplified";
-        } else if (calcStore.defaults.useHWEFormula) {
-          // HWE 2pq formula
-          const cf = calculateHWECarrierFrequency([sumAF]);
-          carrierFrequency = cf > 0 ? cf : null;
-          formula = "hwe";
-        } else {
-          // Simplified 2 * sumAF
-          const cf = calculateSimplifiedCarrierFrequency([sumAF]);
-          carrierFrequency = cf > 0 ? cf : null;
-          formula = "simplified";
-        }
-      }
-
-      return {
-        carrierFrequency,
-        totalAC,
-        maxAN,
-        geneticPrevalence,
-        bayesianPrevalence,
-        formula,
-        homExclusionActive,
-      };
-    },
-  );
-
-  // Expose individual computed values for convenience
-  const globalCarrierFrequency = computed(
-    () => globalStats.value.carrierFrequency,
-  );
-
   // Build population frequency array (uses config for labels/thresholds)
-  // aggregatedPops already has pre-computed carrierFrequency via CalcConfig
+  // Reconstructs Map from AggregatedPopEntry[] for buildPopulationFrequencies
   const populations = computed((): PopulationFrequency[] => {
     if (!aggregatedPops.value || globalCarrierFrequency.value === null)
       return [];
+    const aggMap = new Map(
+      aggregatedPops.value.map((e) => [
+        e.code,
+        {
+          carrierFrequency: e.carrierFrequency,
+          sumAF: e.sumAF,
+          totalAC: e.totalAC,
+          maxAN: e.maxAN,
+          geneticPrevalence: e.geneticPrevalence,
+        },
+      ]),
+    );
     return buildPopulationFrequencies(
-      aggregatedPops.value,
+      aggMap,
       globalCarrierFrequency.value,
       version.value,
     );
@@ -534,21 +437,18 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
 
   // Format prevalence values for display
   const geneticPrevalenceFormatted = computed(() => {
-    const gp = globalStats.value.geneticPrevalence;
+    const gp = workerGlobalStats.value?.geneticPrevalence ?? null;
     if (gp === null) return null;
     return formatPrevalence(gp);
   });
 
   const bayesianPrevalenceFormatted = computed(() => {
-    const bp = globalStats.value.bayesianPrevalence;
+    const bp = workerGlobalStats.value?.bayesianPrevalence ?? null;
     if (bp === null) return null;
     return formatPrevalence(bp);
   });
 
   // Build full result object
-  // Result is non-null whenever we have a gene and fetched data, even if all
-  // variants were manually excluded (carrier frequency will be 0 in that case).
-  // This keeps the summary card, population table, and variant table accessible.
   const result = computed((): CarrierFrequencyResult | null => {
     if (!geneSymbol.value || !hasData.value) return null;
 
@@ -556,21 +456,23 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
       .map((p) => p.carrierFrequency)
       .filter((f): f is number => f !== null);
 
+    const stats = workerGlobalStats.value;
+
     return {
       gene: geneSymbol.value,
       version: version.value,
       globalCarrierFrequency: globalCarrierFrequency.value,
-      globalAlleleCount: globalStats.value.totalAC,
-      globalAlleleNumber: globalStats.value.maxAN,
+      globalAlleleCount: stats?.totalAC ?? 0,
+      globalAlleleNumber: stats?.maxAN ?? 0,
       populations: populations.value,
       qualifyingVariantCount: qualifyingVariantCount.value,
       minFrequency: freqs.length ? Math.min(...freqs) : null,
       maxFrequency: freqs.length ? Math.max(...freqs) : null,
       hasFounderEffect: hasFounderEffect.value,
-      geneticPrevalence: globalStats.value.geneticPrevalence,
-      bayesianPrevalence: globalStats.value.bayesianPrevalence,
-      formula: globalStats.value.formula,
-      homExclusionActive: globalStats.value.homExclusionActive,
+      geneticPrevalence: stats?.geneticPrevalence ?? null,
+      bayesianPrevalence: stats?.bayesianPrevalence ?? null,
+      formula: stats?.formula ?? "hwe",
+      homExclusionActive: stats?.homExclusionActive ?? false,
     };
   });
 
@@ -588,6 +490,20 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     };
   };
 
+  // Cache management actions
+  const clearVariantCache = async (gene?: string): Promise<void> => {
+    await clearCache(gene);
+  };
+
+  const getVariantCacheSize = async (): Promise<number> => {
+    return getCacheSize();
+  };
+
+  // refetch forces a full processGene with cache bypass
+  const refetch = async (): Promise<void> => {
+    await dispatchProcessGene(true);
+  };
+
   // Cache and return the singleton instance
   instance = {
     geneSymbol,
@@ -603,8 +519,8 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     usingDefault,
     geneticPrevalenceFormatted,
     bayesianPrevalenceFormatted,
-    variants: normalizedVariants,
-    clinvarVariants: normalizedClinvar,
+    variants: filteredByPathogenicity, // alias for backward compat
+    clinvarVariants: clinvarVariantsRef,
     filterConfig,
     setFilterConfig,
     submissions,
@@ -622,9 +538,14 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     qualityExcludedCount,
     flaggedVariantCount,
     filteredByPathogenicity,
-    qualifyingVariants: pathogenicVariants,
+    qualifyingVariants,
     calculateRisk,
     refetch,
+    processingStatus,
+    cacheStatus,
+    sourceCategoryMap,
+    clearVariantCache,
+    getVariantCacheSize,
   };
 
   return instance;

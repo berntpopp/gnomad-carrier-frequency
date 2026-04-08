@@ -345,7 +345,6 @@ import type { QualityFlag, QualityFlagType } from "@gnomad-cf/core/types";
 import {
   getClinvarColor,
   formatAlleleFrequency,
-  classifyVariantSource,
   sourceCategoryLabel,
   sourceCategoryColor,
 } from "@gnomad-cf/core/filters";
@@ -367,31 +366,7 @@ const { excludeAll, includeVariant, toggleVariant, isExcluded } =
   useExclusionState();
 
 // Access quality/source data from the singleton composable (same pattern as useExclusionState)
-const {
-  qualityFlagsMap,
-  filteredByPathogenicity,
-  clinvarVariants,
-  filterConfig,
-  submissions,
-} = useCarrierFrequency();
-
-// Compute source category map from pathogenicity-filtered variants
-// Uses the singleton's filteredByPathogenicity to avoid re-running filter logic
-const sourceCategoryMap = computed((): Map<string, SourceCategory> => {
-  const map = new Map<string, SourceCategory>();
-  for (const variant of filteredByPathogenicity.value) {
-    map.set(
-      variant.variant_id,
-      classifyVariantSource(
-        variant,
-        clinvarVariants.value,
-        filterConfig.value,
-        submissions.value,
-      ),
-    );
-  }
-  return map;
-});
+const { qualityFlagsMap, sourceCategoryMap } = useCarrierFrequency();
 
 // All variants are included (none excluded)
 const allIncluded = computed(() => {

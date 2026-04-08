@@ -1,6 +1,6 @@
 // Composable for exporting calculation results as JSON or Excel
 
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import type { ExportData, LogEntry, LogStats } from "@gnomad-cf/core/types";
 import {
   generateFilename,
@@ -23,9 +23,34 @@ function downloadBlob(blob: Blob, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
+/**
+ * Add rows from an array of objects to an ExcelJS worksheet,
+ * with a header row derived from object keys.
+ */
+function addJsonToSheet(
+  ws: ExcelJS.Worksheet,
+  rows: Record<string, unknown>[],
+): void {
+  if (rows.length === 0) return;
+  const firstRow = rows[0];
+  if (!firstRow) return;
+  const columns = Object.keys(firstRow).map((key) => ({
+    header: key,
+    key,
+  }));
+  ws.columns = columns;
+  for (const row of rows) {
+    ws.addRow(row);
+  }
+}
+
 export interface UseExportReturn {
   exportToJson: (data: ExportData, gene: string, population?: string) => void;
-  exportToExcel: (data: ExportData, gene: string, population?: string) => void;
+  exportToExcel: (
+    data: ExportData,
+    gene: string,
+    population?: string,
+  ) => Promise<void>;
   exportLogsToJson: (entries: LogEntry[], stats: LogStats) => void;
   exportPopulationsTsv: (data: ExportData, gene: string) => void;
   exportVariantsTsv: (data: ExportData, gene: string) => void;
@@ -52,27 +77,36 @@ export function useExport(): UseExportReturn {
   /**
    * Export data as Excel file with multiple sheets
    */
-  function exportToExcel(
+  async function exportToExcel(
     data: ExportData,
     gene: string,
     population?: string,
-  ): void {
-    const wb = XLSX.utils.book_new();
+  ): Promise<void> {
+    const wb = new ExcelJS.Workbook();
 
     // Summary sheet (single row)
-    const summaryWs = XLSX.utils.json_to_sheet([data.summary]);
-    XLSX.utils.book_append_sheet(wb, summaryWs, "Summary");
+    const summaryWs = wb.addWorksheet("Summary");
+    addJsonToSheet(summaryWs, [data.summary] as unknown as Record<
+      string,
+      unknown
+    >[]);
 
     // Populations sheet
     if (data.populations.length > 0) {
-      const populationsWs = XLSX.utils.json_to_sheet(data.populations);
-      XLSX.utils.book_append_sheet(wb, populationsWs, "Populations");
+      const populationsWs = wb.addWorksheet("Populations");
+      addJsonToSheet(
+        populationsWs,
+        data.populations as unknown as Record<string, unknown>[],
+      );
     }
 
     // Variants sheet
     if (data.variants.length > 0) {
-      const variantsWs = XLSX.utils.json_to_sheet(data.variants);
-      XLSX.utils.book_append_sheet(wb, variantsWs, "Variants");
+      const variantsWs = wb.addWorksheet("Variants");
+      addJsonToSheet(
+        variantsWs,
+        data.variants as unknown as Record<string, unknown>[],
+      );
     }
 
     // Metadata sheet (flatten for readability)
@@ -110,12 +144,16 @@ export function useExport(): UseExportReturn {
         value: String(data.metadata.calcConfig.penetrance),
       },
     ];
-    const metadataWs = XLSX.utils.json_to_sheet(metadataRows);
-    XLSX.utils.book_append_sheet(wb, metadataWs, "Metadata");
+    const metadataWs = wb.addWorksheet("Metadata");
+    addJsonToSheet(metadataWs, metadataRows);
 
     // Generate and download file
     const filename = generateFilename(gene, population) + ".xlsx";
-    XLSX.writeFile(wb, filename);
+    const buffer = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    downloadBlob(blob, filename);
   }
 
   /**

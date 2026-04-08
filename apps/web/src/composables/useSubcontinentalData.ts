@@ -12,6 +12,7 @@ import {
   type VariantSubcontinentalResponse,
 } from "@gnomad-cf/core/queries";
 import { useSubcontinentalStore } from "@/stores/useSubcontinentalStore";
+import { useLogger } from "./useLogger";
 
 /**
  * Aggregated subcontinental carrier frequency data for a single subpopulation.
@@ -334,6 +335,7 @@ function computeAggregatedFrequencies(
  */
 export function useSubcontinentalData(): UseSubcontinentalDataReturn {
   const store = useSubcontinentalStore();
+  const logger = useLogger("subcontinental");
 
   const isLoading = ref<boolean>(false);
   const progress = ref<number>(0);
@@ -398,10 +400,9 @@ export function useSubcontinentalData(): UseSubcontinentalDataReturn {
             // Individual variant fetch failed — log and continue
             const batchIndex = results.indexOf(result);
             const failedId = batch[batchIndex];
-            console.warn(
-              `[useSubcontinentalData] Failed to fetch variant ${failedId}:`,
-              result.reason,
-            );
+            logger.warn(`Failed to fetch variant ${failedId}`, {
+              reason: result.reason,
+            });
             batchFailures++;
           }
         }

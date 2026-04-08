@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import { registerSW } from "virtual:pwa-register";
+import { useLogger } from "./useLogger";
 
 /**
  * Composable for managing PWA service worker updates.
@@ -27,6 +28,7 @@ export interface UsePwaUpdateReturn {
 }
 
 export function usePwaUpdate(): UsePwaUpdateReturn {
+  const logger = useLogger("pwa");
   const needRefresh = ref(false);
   const offlineReady = ref(false);
 
@@ -41,7 +43,7 @@ export function usePwaUpdate(): UsePwaUpdateReturn {
     onRegisteredSW(swUrl, registration) {
       // Service worker registered successfully
       // The swUrl and registration are available if needed for debugging
-      console.debug("[PWA] Service worker registered:", swUrl);
+      logger.debug("Service worker registered", { swUrl });
 
       // Check for updates periodically (every hour)
       if (registration) {
@@ -54,7 +56,7 @@ export function usePwaUpdate(): UsePwaUpdateReturn {
       }
     },
     onRegisterError(error) {
-      console.error("[PWA] Service worker registration failed:", error);
+      logger.error("Service worker registration failed", { error });
     },
   });
 

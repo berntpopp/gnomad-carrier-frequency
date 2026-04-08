@@ -91,29 +91,18 @@ export function useHistoryAutoSave() {
   function saveCurrentCalculation() {
     // Must have valid gene and result
     if (!wizardState.gene || !result.value) {
-      console.log("[HistoryAutoSave] Skip: no gene or result", {
-        gene: wizardState.gene,
-        result: result.value,
-      });
       return;
     }
 
     // Must have valid carrier frequency
     if (result.value.globalCarrierFrequency === null) {
-      console.log("[HistoryAutoSave] Skip: globalCarrierFrequency is null");
       return;
     }
 
     // Skip if we already saved this gene in current session
     if (lastSavedGene === wizardState.gene.symbol) {
-      console.log("[HistoryAutoSave] Skip: already saved", lastSavedGene);
       return;
     }
-
-    console.log(
-      "[HistoryAutoSave] Attempting save for",
-      wizardState.gene.symbol,
-    );
 
     // Check for duplicate (same gene within 30 seconds)
     const mostRecent = historyStore.mostRecent;
@@ -151,7 +140,6 @@ export function useHistoryAutoSave() {
 
     // Track the entry ID for subsequent updates
     currentEntryId = historyStore.mostRecent?.id ?? null;
-    console.log("[HistoryAutoSave] Saved entry", currentEntryId);
   }
 
   /**
@@ -167,12 +155,6 @@ export function useHistoryAutoSave() {
     if (result.value.globalCarrierFrequency === null) {
       return;
     }
-
-    console.log(
-      "[HistoryAutoSave] Updating entry",
-      currentEntryId,
-      "with filter/exclusion changes",
-    );
 
     historyStore.updateEntry(currentEntryId, {
       filterConfig: { ...toRaw(filterConfig.value) },
