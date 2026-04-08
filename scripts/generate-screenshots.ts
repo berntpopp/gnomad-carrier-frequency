@@ -259,8 +259,8 @@ async function captureWizardFlow(page: Page): Promise<void> {
   console.log('\n[8/14] variant-table (variant modal)');
   await page.locator('[data-testid="step-results"]').scrollIntoViewIfNeeded();
   await page.waitForTimeout(300);
-  // The button text includes the variant count, use partial match
-  const variantBtn = page.locator('[data-testid="step-results"] button', { hasText: /[Vv]iew all variants/ });
+  // The button text is "Variants (N)" where N is the qualifying variant count
+  const variantBtn = page.locator('[data-testid="step-results"] button', { hasText: /[Vv]ariants\s*\(/ });
   await variantBtn.scrollIntoViewIfNeeded();
   await variantBtn.click();
   await page.locator('[data-testid="variant-modal"]').waitFor({ timeout: 10000 });
