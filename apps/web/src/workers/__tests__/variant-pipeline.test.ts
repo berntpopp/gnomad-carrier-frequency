@@ -112,7 +112,7 @@ describe("processVariants", () => {
 
     expect(result.filteredByPathogenicity).toHaveLength(2);
     expect(result.qualifyingVariants).toHaveLength(1);
-    expect(result.qualifyingVariants[0].variant_id).toBe("1-200-C-G");
+    expect(result.qualifyingVariants[0]!.variant_id).toBe("1-200-C-G");
   });
 
   it("returns empty results when no variants pass filters", () => {

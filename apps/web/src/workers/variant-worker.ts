@@ -29,6 +29,7 @@ import {
   getCachedResponse,
   putCachedResponse,
   clearAllCache,
+  clearCacheByGene,
   getCacheSize,
 } from "./cache";
 
@@ -264,9 +265,13 @@ const workerApi = {
     return { ...output, cacheStatus: "hit", requestId };
   },
 
-  /** Remove all IndexedDB cached entries. */
-  async clearCache(): Promise<void> {
-    await clearAllCache();
+  /** Remove cached entries. If geneSymbol is provided, removes only that gene's entries. */
+  async clearCache(geneSymbol?: string): Promise<void> {
+    if (geneSymbol) {
+      await clearCacheByGene(geneSymbol);
+    } else {
+      await clearAllCache();
+    }
   },
 
   /** Return the number of entries currently stored in the cache. */
