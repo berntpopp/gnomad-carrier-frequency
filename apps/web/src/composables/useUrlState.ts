@@ -115,7 +115,9 @@ export function useUrlState(): UseUrlStateReturn {
             setTimeout(checkResults, 100);
           } else {
             // Give up after max attempts
-            logger.warn("Could not find gene from URL", { gene: urlState.gene });
+            logger.warn("Could not find gene from URL", {
+              gene: urlState.gene,
+            });
             resolve();
           }
         };

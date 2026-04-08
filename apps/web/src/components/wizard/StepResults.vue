@@ -99,7 +99,10 @@
 
       <v-card-text class="pt-4">
         <!-- Processing status -->
-        <div v-if="processingStatus" class="text-body-2 text-medium-emphasis mt-1">
+        <div
+          v-if="processingStatus"
+          class="text-body-2 text-medium-emphasis mt-1"
+        >
           {{ processingStatus }}
         </div>
 

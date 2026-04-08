@@ -366,10 +366,7 @@ const { excludeAll, includeVariant, toggleVariant, isExcluded } =
   useExclusionState();
 
 // Access quality/source data from the singleton composable (same pattern as useExclusionState)
-const {
-  qualityFlagsMap,
-  sourceCategoryMap,
-} = useCarrierFrequency();
+const { qualityFlagsMap, sourceCategoryMap } = useCarrierFrequency();
 
 // All variants are included (none excluded)
 const allIncluded = computed(() => {

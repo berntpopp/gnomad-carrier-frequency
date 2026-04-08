@@ -83,12 +83,12 @@ function normalizeClinvar(cv: GeneClinvarVariant): ClinVarVariant {
 
 /**
  * Infer GnomadVersion from a dataset string.
- *   gnomad_r4* / exac → v4
- *   gnomad_r3*        → v3
- *   anything else     → v2
+ *   gnomad_r4*             → v4
+ *   gnomad_r3*             → v3
+ *   exac* / anything else  → v2
  */
 function datasetToVersion(dataset: string): GnomadVersion {
-  if (dataset.includes("r4") || dataset.startsWith("exac")) return "v4";
+  if (dataset.includes("r4")) return "v4";
   if (dataset.includes("r3")) return "v3";
   return "v2";
 }

@@ -75,10 +75,16 @@ describe("cache", () => {
         makeCachedResponse({ key: "TTN:gnomad_r4:GRCh38", geneSymbol: "TTN" }),
       );
       await putCachedResponse(
-        makeCachedResponse({ key: "TTN:gnomad_r2_1:GRCh37", geneSymbol: "TTN" }),
+        makeCachedResponse({
+          key: "TTN:gnomad_r2_1:GRCh37",
+          geneSymbol: "TTN",
+        }),
       );
       await putCachedResponse(
-        makeCachedResponse({ key: "BRCA1:gnomad_r4:GRCh38", geneSymbol: "BRCA1" }),
+        makeCachedResponse({
+          key: "BRCA1:gnomad_r4:GRCh38",
+          geneSymbol: "BRCA1",
+        }),
       );
       await clearCacheByGene("TTN");
       expect(await getCacheSize()).toBe(1);

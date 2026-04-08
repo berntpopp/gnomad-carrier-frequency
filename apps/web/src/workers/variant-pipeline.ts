@@ -39,10 +39,7 @@ import type { GnomadVersion } from "@gnomad-cf/core/config";
 import type { SourceCategory } from "@gnomad-cf/core/filters";
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 
-import type {
-  WorkerGlobalStats,
-  AggregatedPopEntry,
-} from "./types";
+import type { WorkerGlobalStats, AggregatedPopEntry } from "./types";
 
 // ---------------------------------------------------------------------------
 // Public input / output types

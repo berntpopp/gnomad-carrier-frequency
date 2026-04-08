@@ -2,7 +2,10 @@ import { describe, it, expect } from "vitest";
 import { processVariants } from "../variant-pipeline";
 import type { GnomadVariant, ClinVarVariant } from "@gnomad-cf/core/types";
 import { FACTORY_FILTER_DEFAULTS } from "@gnomad-cf/core/types";
-import { FACTORY_QUALITY_DEFAULTS, FACTORY_EXCLUSION_DEFAULTS } from "@gnomad-cf/core/types";
+import {
+  FACTORY_QUALITY_DEFAULTS,
+  FACTORY_EXCLUSION_DEFAULTS,
+} from "@gnomad-cf/core/types";
 import { FACTORY_CALC_DEFAULTS } from "@gnomad-cf/core/types";
 
 // Minimal variant that passes LoF HC filter

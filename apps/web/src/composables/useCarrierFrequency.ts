@@ -276,7 +276,9 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   }
 
   async function dispatchRefilter(): Promise<void> {
-    if (!hasData.value) return;
+    // Don't refilter while a full processGene fetch is in flight —
+    // it would increment latestRequestId and discard the fetch result.
+    if (!hasData.value || isLoading.value) return;
 
     latestRequestId++;
     const requestId = latestRequestId;

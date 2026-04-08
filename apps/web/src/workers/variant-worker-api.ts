@@ -8,10 +8,9 @@ let api: Comlink.Remote<VariantWorkerAPI> | null = null;
 function getWorkerAPI(): Comlink.Remote<VariantWorkerAPI> {
   if (api) return api;
 
-  worker = new Worker(
-    new URL("./variant-worker.ts", import.meta.url),
-    { type: "module" },
-  );
+  worker = new Worker(new URL("./variant-worker.ts", import.meta.url), {
+    type: "module",
+  });
 
   api = Comlink.wrap<VariantWorkerAPI>(worker);
   return api;
@@ -23,9 +22,7 @@ export async function processGene(
   return getWorkerAPI().processGene(params);
 }
 
-export async function refilter(
-  params: RefilterParams,
-): Promise<WorkerResult> {
+export async function refilter(params: RefilterParams): Promise<WorkerResult> {
   return getWorkerAPI().refilter(params);
 }
 

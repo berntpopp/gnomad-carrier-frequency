@@ -180,14 +180,19 @@
 
                 <v-card-text>
                   <div class="text-body-2 mb-3">
-                    Variant data fetched from gnomAD is cached locally for faster
-                    repeat access. Cache is keyed by gene, dataset, and genome
-                    build.
+                    Variant data fetched from gnomAD is cached locally for
+                    faster repeat access. Cache is keyed by gene, dataset, and
+                    genome build.
                   </div>
 
                   <div class="d-flex align-center justify-space-between">
                     <div class="text-body-2">
-                      <span>{{ variantCacheSize }} gene{{ variantCacheSize === 1 ? '' : 's' }} cached</span>
+                      <span
+                        >{{ variantCacheSize }} gene{{
+                          variantCacheSize === 1 ? "" : "s"
+                        }}
+                        cached</span
+                      >
                     </div>
 
                     <v-btn
@@ -1043,8 +1048,12 @@ async function loadVariantCacheSize() {
 }
 
 async function handleClearVariantCache() {
-  await clearVariantCache();
-  variantCacheSize.value = 0;
+  try {
+    await clearVariantCache();
+    variantCacheSize.value = 0;
+  } catch (err) {
+    logger.error("Failed to clear variant cache", err);
+  }
 }
 
 const { activate, deactivate } = useFocusTrap(dialogCard, {
