@@ -1,22 +1,13 @@
-import { computed, type Ref } from "vue";
-import { useQuery } from "villus";
-import { GENE_VARIANTS_QUERY } from "@gnomad-cf/core/queries";
-import type {
-  GeneVariantsResponse,
-  GeneVariant,
-  GeneClinvarVariant,
-} from "@gnomad-cf/core/queries";
-import {
-  getDatasetId,
-  getReferenceGenome,
-  type GnomadVersion,
-} from "@gnomad-cf/core/config";
+import { computed, ref, watch, type Ref } from "vue";
+import type { GeneVariantsResponse } from "@gnomad-cf/core/queries";
+import type { GnomadVariant, ClinVarVariant } from "@gnomad-cf/core/types";
+import type { GnomadVersion } from "@gnomad-cf/core/config";
 import { useGnomadVersion } from "@/api";
 
 export interface UseGeneVariantsReturn {
   gene: Ref<GeneVariantsResponse["gene"]>;
-  variants: Ref<GeneVariant[]>;
-  clinvarVariants: Ref<GeneClinvarVariant[]>;
+  variants: Ref<GnomadVariant[]>;
+  clinvarVariants: Ref<ClinVarVariant[]>;
   isLoading: Ref<boolean>;
   hasError: Ref<boolean>;
   errorMessage: Ref<string | null>;
@@ -30,63 +21,33 @@ export function useGeneVariants(
 ): UseGeneVariantsReturn {
   const { version } = useGnomadVersion();
 
-  // Variables use dataset and referenceGenome from config
-  const variables = computed(() => ({
-    geneSymbol: geneSymbol.value?.toUpperCase() ?? "",
-    dataset: getDatasetId(version.value), // From config: 'gnomad_r4', etc.
-    referenceGenome: getReferenceGenome(version.value), // From config: 'GRCh38', etc.
-  }));
+  const variants = ref<GnomadVariant[]>([]);
+  const clinvarVariants = ref<ClinVarVariant[]>([]);
+  const isLoading = ref(false);
+  const errorMessage = ref<string | null>(null);
+  const hasData = ref(false);
 
-  const { data, isFetching, error, execute } = useQuery<GeneVariantsResponse>({
-    query: GENE_VARIANTS_QUERY,
-    variables,
-    skip: () => !geneSymbol.value,
-    cachePolicy: "cache-first",
-  });
-
-  const gene = computed(() => data.value?.gene ?? null);
-  const variants = computed(() => gene.value?.variants ?? []);
-  const clinvarVariants = computed(() => gene.value?.clinvar_variants ?? []);
-  const hasData = computed(() => gene.value !== null);
-
-  const hasError = computed(
-    () =>
-      !!error.value ||
-      (geneSymbol.value !== null &&
-        data.value !== undefined &&
-        gene.value === null &&
-        !isFetching.value),
+  const gene = computed(() =>
+    hasData.value ? ({} as GeneVariantsResponse["gene"]) : null,
   );
+  const hasError = computed(() => errorMessage.value !== null);
 
-  const errorMessage = computed(() => {
-    if (error.value) {
-      const msg = error.value.message;
-      // GENE-03: Invalid gene shows clear error message
-      if (msg.includes("not found") || msg.includes("does not exist")) {
-        return `Gene "${geneSymbol.value}" not found in gnomAD. Please check the gene symbol.`;
-      }
-      // API-02: Handle API errors gracefully
-      if (msg.includes("timeout") || msg.includes("network")) {
-        return "Network error. Please check your connection and try again.";
-      }
-      return "Failed to load variant data. Please try again.";
-    }
-    // Gene exists in search but has no data
-    if (data.value !== undefined && gene.value === null && geneSymbol.value) {
-      return `Gene "${geneSymbol.value}" not found in gnomAD database.`;
-    }
-    return null;
+  watch(geneSymbol, () => {
+    variants.value = [];
+    clinvarVariants.value = [];
+    hasData.value = false;
+    errorMessage.value = null;
   });
 
   const refetch = async () => {
-    await execute();
+    // No-op — refetch is triggered via worker in useCarrierFrequency
   };
 
   return {
     gene,
     variants,
     clinvarVariants,
-    isLoading: isFetching,
+    isLoading,
     hasError,
     errorMessage,
     refetch,
