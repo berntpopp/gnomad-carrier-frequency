@@ -85,7 +85,8 @@ describe("processVariants", () => {
 
     expect(result.filteredByPathogenicity).toHaveLength(2);
     expect(result.qualifyingVariants).toHaveLength(2);
-    expect(result.qualityFlagsMap.length).toBe(2);
+    // Test variants have low AF — no quality flags expected
+    expect(result.qualityFlagsMap.length).toBe(0);
     expect(result.sourceCategoryMap.length).toBe(2);
     expect(result.globalStats.carrierFrequency).not.toBeNull();
     expect(result.globalStats.totalAC).toBe(15);

@@ -102,17 +102,6 @@ export interface WorkerResult {
 }
 
 /**
- * Status updates posted by the worker during processing.
- */
-export type WorkerStatus =
-  | { type: "fetching"; requestId: number }
-  | { type: "parsing"; totalVariants: number; requestId: number }
-  | { type: "filtering"; requestId: number }
-  | { type: "complete"; result: WorkerResult }
-  | { type: "error"; message: string; requestId: number }
-  | { type: "cache-hit"; geneSymbol: string; requestId: number };
-
-/**
  * Cached gnomAD response stored in IndexedDB.
  */
 export interface CachedResponse {

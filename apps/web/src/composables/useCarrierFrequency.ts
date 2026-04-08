@@ -335,14 +335,10 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     { debounce: 300 },
   );
 
-  // Debounced watch on manual exclusions → refilter (100ms)
-  watchDebounced(
-    debouncedExcluded,
-    () => {
-      dispatchRefilter();
-    },
-    { debounce: 100 },
-  );
+  // Watch manual exclusions → refilter (already debounced by debouncedExcluded at 500ms)
+  watch(debouncedExcluded, () => {
+    dispatchRefilter();
+  });
 
   // Watch submissions (deep) → refilter when hasData
   watch(

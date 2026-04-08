@@ -125,9 +125,11 @@ export function processVariants(
 
   for (const variant of filteredByPathogenicity) {
     const flags = computeQualityFlags(variant, qualitySettings);
-    qualityFlagsMapRaw.set(variant.variant_id, flags);
-    if (shouldExcludeByQuality(flags, qualityExclusionConfig)) {
-      qualityExcludedSet.add(variant.variant_id);
+    if (flags.length > 0) {
+      qualityFlagsMapRaw.set(variant.variant_id, flags);
+      if (shouldExcludeByQuality(flags, qualityExclusionConfig)) {
+        qualityExcludedSet.add(variant.variant_id);
+      }
     }
   }
 

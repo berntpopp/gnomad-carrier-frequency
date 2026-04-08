@@ -182,7 +182,15 @@ const workerApi = {
       );
     }
 
-    const json = (await fetchResponse.json()) as { data: GeneVariantsResponse };
+    const json = (await fetchResponse.json()) as {
+      data?: GeneVariantsResponse;
+      errors?: Array<{ message: string }>;
+    };
+
+    if (json.errors?.length) {
+      throw new Error(json.errors![0]!.message);
+    }
+
     const geneData = json.data?.gene;
 
     if (!geneData) {
