@@ -56,6 +56,11 @@ export async function loadGeneConfig(
   if (platformLoader !== null) {
     try {
       const raw = await platformLoader(symbol);
+      // null/undefined means the gene has no config — this is the normal case
+      // for most genes (e.g. GitHub raw returns 404). Not an error.
+      if (raw == null) {
+        return null;
+      }
       const result = GeneConfigSchema.safeParse(raw);
       if (result.success) {
         registry.set(upperSymbol, result.data);
@@ -67,11 +72,10 @@ export async function loadGeneConfig(
         );
         return null;
       }
-    } catch (err) {
-      console.warn(
-        `[gene-config] Platform loader failed for gene "${symbol}":`,
-        err,
-      );
+    } catch {
+      // Platform loader failure (network error, timeout, etc.) for a gene
+      // config is not critical — the app works fine without gene-specific
+      // configs. Silently return null to avoid noisy console warnings.
       return null;
     }
   }
