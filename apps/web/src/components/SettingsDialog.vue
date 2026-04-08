@@ -1058,6 +1058,14 @@ async function onDialogOpen() {
   loadVariantCacheSize();
 }
 
+// Also watch modelValue directly — @update:model-value on v-dialog
+// only fires on close, not when the parent opens the dialog.
+watch(modelValue, (val) => {
+  if (val) {
+    loadVariantCacheSize();
+  }
+});
+
 function close() {
   deactivate();
   modelValue.value = false;
