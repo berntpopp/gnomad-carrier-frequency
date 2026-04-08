@@ -18,7 +18,7 @@ Three independent optimization layers:
 2. **IndexedDB Cache** — Version-keyed caching of gnomAD responses to eliminate repeat fetches
 3. **Reactivity Optimization** — `shallowRef` for large arrays, debounced config changes, eliminated computed chains
 
-The main thread never touches raw variant arrays. It receives only processed results from the worker.
+The main thread never processes the full raw gnomAD response through heavy computed chains. It receives already-normalized, already-filtered worker outputs — which are still arrays of variant objects that the table, exports, and subcontinental follow-up code consume directly.
 
 ## Architecture
 
@@ -82,12 +82,35 @@ interface VariantWorkerAPI {
 
 ### Worker result shape
 
+The current app exposes both pre-exclusion (`filteredByPathogenicity`) and post-exclusion (`qualifyingVariants`) sets, and downstream code depends on that split (e.g., `VariantTable` source classification uses `filteredByPathogenicity`, while `StepResults` subcontinental lookup uses `qualifyingVariants`). The worker result preserves this contract explicitly.
+
 ```typescript
 interface WorkerResult {
-  filteredVariants: GnomadVariant[];
+  // Pre-exclusion: variants passing pathogenicity filters only.
+  // Used by VariantTable display, source classification, and quality flag UI.
+  filteredByPathogenicity: GnomadVariant[];
+
+  // Post-exclusion: variants passing pathogenicity + manual + quality exclusions.
+  // Used by frequency calculations, population table, exports, subcontinental follow-up.
+  qualifyingVariants: GnomadVariant[];
+
+  // ClinVar variants (unchanged from API response, normalized)
   clinvarVariants: ClinVarVariant[];
+
+  // Quality flags for all filteredByPathogenicity variants
   qualityFlagsMap: [string, QualityFlag[]][];
+
+  // IDs excluded by quality config (subset of filteredByPathogenicity)
+  qualityExcludedIds: string[];
+
+  // Source classification for each variant in filteredByPathogenicity.
+  // Pre-computed in worker to avoid recomputing on main thread.
+  sourceCategoryMap: [string, SourceCategory][];
+
+  // Pre-computed population aggregation from qualifyingVariants
   aggregatedPops: AggregatedPopulations | null;
+
+  // Pre-computed global statistics from qualifyingVariants
   globalStats: {
     totalAC: number;
     maxAN: number;
@@ -99,8 +122,15 @@ interface WorkerResult {
     formula: 'hwe' | 'simplified';
     homExclusionActive: boolean;
   };
+
+  // Total raw variant count before any filtering
   totalVariantCount: number;
+
   cacheStatus: 'hit' | 'miss' | 'stored' | 'unavailable';
+
+  // Monotonically increasing counter — main thread ignores results
+  // whose requestId doesn't match the latest dispatched request.
+  requestId: number;
 }
 ```
 
@@ -108,19 +138,66 @@ interface WorkerResult {
 
 ```typescript
 type WorkerStatus =
-  | { type: 'fetching' }
-  | { type: 'parsing'; totalVariants: number }
-  | { type: 'filtering' }
+  | { type: 'fetching'; requestId: number }
+  | { type: 'parsing'; totalVariants: number; requestId: number }
+  | { type: 'filtering'; requestId: number }
   | { type: 'complete'; result: WorkerResult }
-  | { type: 'error'; message: string }
-  | { type: 'cache-hit'; geneSymbol: string }
+  | { type: 'error'; message: string; requestId: number }
+  | { type: 'cache-hit'; geneSymbol: string; requestId: number }
 ```
+
+### Stale result / race policy
+
+When users change gene, version, or settings rapidly, multiple `processGene()` and `refilter()` calls can overlap. A generation counter prevents stale results from overwriting fresh ones.
+
+**Mechanism:**
+1. The main thread maintains a monotonically increasing `latestRequestId: number` counter.
+2. Before each `processGene()` or `refilter()` call, the counter increments and the new value is passed to the worker as `requestId`.
+3. The worker includes this `requestId` in all status messages and in the final `WorkerResult`.
+4. When the main thread receives a `WorkerResult` or status update, it checks `result.requestId === latestRequestId`. If they don't match, the result is silently discarded.
+
+**Edge cases:**
+- Gene change mid-flight: new `processGene()` gets a new `requestId`. The in-flight worker call completes but its result is discarded. The worker's in-memory cached raw variants are replaced by the new gene's data.
+- Rapid filter toggles: debouncing (300-500ms) coalesces most rapid changes into a single `refilter()` call. If two refilter calls do overlap, only the latest `requestId` wins.
+- Worker does not abort in-flight work (no `AbortController` complexity). Stale results are simply ignored on arrival. This is acceptable because filter/aggregate operations complete in <100ms even for TTN-sized sets.
 
 ### Key design decisions
 
 - **`refilter` method:** After initial fetch+process, filter/exclusion changes don't re-fetch. The worker holds raw variants in memory and refilters from them. This makes filter interactions instant.
 - **Worker makes the fetch:** The worker calls `fetch()` directly (not villus — workers can't use Vue plugins). The GraphQL query string is imported from `@gnomad-cf/core/queries`.
 - **Core package unchanged:** All filter/calculation functions from `@gnomad-cf/core` are pure TypeScript and import directly into the worker.
+
+### ClinVar conflicting submissions path
+
+The current pathogenicity filter depends on asynchronously fetched ClinVar submissions when `clinvarIncludeConflicting` is enabled (`useCarrierFrequency.ts:224-242`). These submissions are fetched per-variant from a separate ClinVar API endpoint.
+
+**Decision: Submissions stay on the main thread, passed into the worker as input.**
+
+Rationale:
+- Submissions are fetched incrementally (one per conflicting variant) with progress tracking — this interactive, incremental UX doesn't fit a single worker call.
+- `useClinvarSubmissions` manages its own async state, retry logic, and progress reporting that's tightly coupled to UI feedback.
+- The submission data is small (only conflicting variants, typically 0-5 per gene).
+
+**Flow:**
+1. Worker runs initial `processGene()` with `submissions: Map<string, ClinVarSubmission[]>` (empty on first call if conflicting filter is off).
+2. Main thread detects conflicting variant IDs from worker result's `clinvarVariants`.
+3. Main thread fetches submissions via existing `useClinvarSubmissions` (unchanged).
+4. When submissions arrive, main thread calls `worker.refilter({ ..., submissions })` with the updated submissions map.
+5. Worker re-runs pathogenicity filter with the new submissions data and returns updated results.
+
+Both `processGene` and `refilter` accept a `submissions` parameter:
+
+```typescript
+processGene(params: {
+  // ... existing params ...
+  submissions: [string, ClinVarSubmission[]][];  // serializable Map entries
+}): Promise<WorkerResult>;
+
+refilter(params: {
+  // ... existing params ...
+  submissions: [string, ClinVarSubmission[]][];
+}): Promise<WorkerResult>;
+```
 
 ## Layer 2: IndexedDB Cache
 
@@ -149,8 +226,9 @@ interface CachedResponse {
 
 - **Version-keyed:** Cache key includes dataset and reference genome. Switching gnomAD version automatically uses a different key — old data is not matched.
 - **No TTL:** gnomAD data changes only with major releases (~annually). No time-based expiration.
-- **Per-gene refresh:** `processGene({ ..., forceRefresh: true })` skips cache read.
-- **Global clear:** `clearCache()` drops the entire object store.
+- **Per-gene refresh:** `processGene({ ..., forceRefresh: true })` skips cache read and overwrites the existing entry for that key after fetching.
+- **Per-gene clear:** `clearCache(geneSymbol)` deletes all entries matching that gene symbol across all dataset/version combinations (iterates the store, deletes keys starting with `{geneSymbol}:`).
+- **Global clear:** `clearCache()` (no argument) drops the entire `variant-responses` object store contents.
 
 ### Graceful degradation
 
@@ -165,9 +243,12 @@ If IndexedDB is unavailable (private browsing, quota exceeded), the worker silen
 ### `shallowRef` for large arrays
 
 ```typescript
-const filteredVariants = shallowRef<GnomadVariant[]>([]);
+const filteredByPathogenicity = shallowRef<GnomadVariant[]>([]);
+const qualifyingVariants = shallowRef<GnomadVariant[]>([]);
 const clinvarVariants = shallowRef<ClinVarVariant[]>([]);
 const qualityFlagsMap = shallowRef<Map<string, QualityFlag[]>>(new Map());
+const qualityExcludedIds = shallowRef<Set<string>>(new Set());
+const sourceCategoryMap = shallowRef<Map<string, SourceCategory>>(new Map());
 ```
 
 Vue tracks only reference changes, not deep object properties. When the worker posts new results, the entire ref is replaced.
@@ -192,8 +273,9 @@ All config changes debounced before sending to worker:
 | `filteredByPathogenicity` | Worker (`refilter`) |
 | `qualityFlagsMap` | Worker (during filter) |
 | `qualityExcludedIds` | Worker (applied during filter) |
-| `pathogenicVariants` | Worker (final output) |
-| `aggregatedPops` | Worker (during aggregate) |
+| `pathogenicVariants` / `qualifyingVariants` | Worker (final output, post-exclusion) |
+| `sourceCategoryMap` | Worker (during filter, per `filteredByPathogenicity` variant) |
+| `aggregatedPops` | Worker (during aggregate, from `qualifyingVariants`) |
 | `globalStats` | Main thread (lightweight math on worker-provided values) |
 | `populations` | Main thread (lightweight formatting) |
 | `result` | Main thread (assembles final object) |
@@ -258,6 +340,7 @@ Small refresh icon button next to gene name in `StepResults.vue`. Triggers `proc
 | `apps/web/src/composables/useGeneVariants.ts` | Retained as a thin wrapper that delegates to the worker API instead of villus. Keeps the same public interface (`UseGeneVariantsReturn`) so other components don't break. The villus `useQuery` call is replaced by a call to the worker's `processGene`. |
 | `apps/web/src/components/SettingsDialog.vue` | Add "Cache" section |
 | `apps/web/src/components/wizard/StepResults.vue` | Per-gene refresh icon, cache badge, processing status |
+| `apps/web/src/components/VariantTable.vue` | Remove `sourceCategoryMap` computed; read pre-computed source categories from worker result via `useCarrierFrequency` ref |
 | `apps/web/package.json` | Add `idb` and `comlink` dependencies |
 
 ### Unchanged
@@ -265,7 +348,6 @@ Small refresh icon button next to gene name in `StepResults.vue`. Triggers `proc
 | Area | Why |
 |------|-----|
 | `packages/core/*` | Pure functions — imported by worker as-is |
-| `apps/web/src/components/VariantTable.vue` | Receives small filtered sets from worker |
 | All other components | Consume same reactive interface |
 | Pinia stores | Same stores, same persistence |
 
