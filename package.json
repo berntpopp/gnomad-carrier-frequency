@@ -29,7 +29,7 @@
     "@playwright/test": "^1.58.2",
     "tsdown": "0.20.3",
     "typescript": "~5.9.3",
-    "vitest": "^3.0.0"
+    "vitest": "^4.1.8"
   },
   "overrides": {
     "flatted": ">=3.4.0",
