@@ -1,6 +1,6 @@
 # gnomAD Carrier Frequency Calculator - Development Commands
 
-.PHONY: dev dev-host build preview install clean test test-ui typecheck typecheck-watch lint lighthouse ci docs docs-dev docs-preview screenshots help
+.PHONY: dev dev-host build preview install clean test test-ui typecheck typecheck-watch lint ci docs docs-dev docs-preview screenshots help
 
 # Default target
 help:
@@ -19,8 +19,7 @@ help:
 	@echo "  make lint           - Run ESLint"
 	@echo "  make typecheck      - Run TypeScript type checking"
 	@echo "  make typecheck-watch - Run TypeScript type checking in watch mode"
-	@echo "  make lighthouse     - Run Lighthouse CI locally"
-	@echo "  make ci             - Run full CI pipeline locally (lint, typecheck, build, lighthouse)"
+	@echo "  make ci             - Run full CI pipeline locally (lint, typecheck, build, docs)"
 	@echo ""
 	@echo "Testing:"
 	@echo "  make test           - Run Playwright E2E tests"
@@ -37,68 +36,64 @@ help:
 
 # Install dependencies
 install:
-	npm install
+	bun install
 
 # Start development server with HMR (WSL2 polling enabled in vite.config.ts)
 dev:
-	npm run dev
+	bun run dev
 
 # Start dev server accessible on local network
 dev-host:
-	npm run dev -- --host
+	bun run dev -- --host
 
 # Build for production
 build:
-	npm run build
+	bun run build
 
 # Preview production build
 preview:
-	npm run preview
+	bun run preview
 
 # TypeScript type checking (single run)
 typecheck:
-	npx vue-tsc --noEmit
+	bun run typecheck
 
 # TypeScript type checking in watch mode
 typecheck-watch:
-	npx vue-tsc --noEmit --watch
+	bunx vue-tsc --noEmit --watch
 
 # Run ESLint
 lint:
-	npm run lint
-
-# Run Lighthouse CI locally (requires build first)
-lighthouse: build
-	npm run lighthouse
+	bun run lint
 
 # Run full CI pipeline locally (matches GitHub Actions)
 ci:
-	npm run ci
+	bun run ci
 
 # Run Playwright E2E tests (headless)
 test:
-	npx playwright test
+	bunx playwright test
 
 # Run Playwright tests with UI
 test-ui:
-	npx playwright test --ui
+	bunx playwright test --ui
 
 # Build VitePress documentation site
 docs:
-	npm run docs:build
+	bun run docs:build
 
 # Start docs dev server
 docs-dev:
-	npm run docs:dev
+	bun run docs:dev
 
 # Preview docs production build
 docs-preview:
-	npm run docs:preview
+	bun run docs:preview
 
 # Generate documentation screenshots
 screenshots:
 	@echo "Generating documentation screenshots..."
-	@npx tsx scripts/generate-screenshots.ts
+	@bunx tsx scripts/generate-screenshots.ts
 	@echo "Screenshots saved to docs/public/screenshots/"
 
 # Clean build artifacts

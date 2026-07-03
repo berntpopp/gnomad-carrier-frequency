@@ -14,12 +14,12 @@
   "dependencies": {
     "@gnomad-cf/core": "workspace:*",
     "commander": "^14.0.3",
-    "@clack/prompts": "^1.0.1",
+    "@clack/prompts": "^1.6.0",
     "p-limit": "^7.3.0"
   },
   "devDependencies": {
-    "tsdown": "0.20.3",
+    "tsdown": "0.22.3",
     "typescript": "~5.9.3",
-    "vitest": "^3.2.0"
+    "vitest": "^4.1.9"
   }
 }

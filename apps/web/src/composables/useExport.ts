@@ -1,6 +1,5 @@
 // Composable for exporting calculation results as JSON or Excel
 
-import ExcelJS from "exceljs";
 import type { ExportData, LogEntry, LogStats } from "@gnomad-cf/core/types";
 import {
   generateFilename,
@@ -8,6 +7,7 @@ import {
   buildPopulationsTsv,
   buildVariantsTsv,
 } from "@/utils/export-utils";
+import { buildXlsxBlob } from "@/utils/xlsx-export";
 
 /**
  * Download a blob as a file
@@ -21,27 +21,6 @@ function downloadBlob(blob: Blob, filename: string): void {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
-}
-
-/**
- * Add rows from an array of objects to an ExcelJS worksheet,
- * with a header row derived from object keys.
- */
-function addJsonToSheet(
-  ws: ExcelJS.Worksheet,
-  rows: Record<string, unknown>[],
-): void {
-  if (rows.length === 0) return;
-  const firstRow = rows[0];
-  if (!firstRow) return;
-  const columns = Object.keys(firstRow).map((key) => ({
-    header: key,
-    key,
-  }));
-  ws.columns = columns;
-  for (const row of rows) {
-    ws.addRow(row);
-  }
 }
 
 export interface UseExportReturn {
@@ -82,34 +61,6 @@ export function useExport(): UseExportReturn {
     gene: string,
     population?: string,
   ): Promise<void> {
-    const wb = new ExcelJS.Workbook();
-
-    // Summary sheet (single row)
-    const summaryWs = wb.addWorksheet("Summary");
-    addJsonToSheet(summaryWs, [data.summary] as unknown as Record<
-      string,
-      unknown
-    >[]);
-
-    // Populations sheet
-    if (data.populations.length > 0) {
-      const populationsWs = wb.addWorksheet("Populations");
-      addJsonToSheet(
-        populationsWs,
-        data.populations as unknown as Record<string, unknown>[],
-      );
-    }
-
-    // Variants sheet
-    if (data.variants.length > 0) {
-      const variantsWs = wb.addWorksheet("Variants");
-      addJsonToSheet(
-        variantsWs,
-        data.variants as unknown as Record<string, unknown>[],
-      );
-    }
-
-    // Metadata sheet (flatten for readability)
     const metadataRows = [
       { field: "Export Date", value: data.metadata.exportDate },
       { field: "gnomAD Version", value: data.metadata.gnomadVersion },
@@ -144,15 +95,28 @@ export function useExport(): UseExportReturn {
         value: String(data.metadata.calcConfig.penetrance),
       },
     ];
-    const metadataWs = wb.addWorksheet("Metadata");
-    addJsonToSheet(metadataWs, metadataRows);
 
-    // Generate and download file
+    const sheets = [
+      {
+        name: "Summary",
+        rows: [data.summary] as unknown as Record<string, unknown>[],
+      },
+      {
+        name: "Populations",
+        rows: data.populations as unknown as Record<string, unknown>[],
+      },
+      {
+        name: "Variants",
+        rows: data.variants as unknown as Record<string, unknown>[],
+      },
+      {
+        name: "Metadata",
+        rows: metadataRows,
+      },
+    ];
+
     const filename = generateFilename(gene, population) + ".xlsx";
-    const buffer = await wb.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
+    const blob = await buildXlsxBlob(sheets);
     downloadBlob(blob, filename);
   }
 
