@@ -13,7 +13,7 @@
     },
     "apps/web": {
       "name": "gnomad-cf-web",
-      "version": "1.7.0",
+      "version": "1.7.1",
       "dependencies": {
         "@gnomad-cf/core": "workspace:*",
         "@mdi/font": "^7.4.47",
@@ -61,7 +61,7 @@
     },
     "packages/cli": {
       "name": "@gnomad-cf/cli",
-      "version": "1.7.0",
+      "version": "1.7.1",
       "bin": {
         "gnomad-cf": "dist/cli.mjs",
       },
@@ -79,7 +79,7 @@
     },
     "packages/core": {
       "name": "@gnomad-cf/core",
-      "version": "1.7.0",
+      "version": "1.7.1",
       "dependencies": {
         "lz-string": "^1.5.0",
         "zod": "^4.3.5",
