@@ -5,7 +5,7 @@ Thank you for your interest in contributing to the gnomAD Carrier Frequency Calc
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 18 or later
-- [Bun](https://bun.sh/) package manager (recommended) or npm
+- [Bun](https://bun.sh/) package manager
 - Git
 
 ## Development Setup

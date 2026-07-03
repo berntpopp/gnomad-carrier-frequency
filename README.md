@@ -30,7 +30,7 @@ Calculate carrier frequencies for autosomal recessive conditions using gnomAD po
 
 ## Quick Start
 
-Requires [Node.js](https://nodejs.org/) 18+ or [Bun](https://bun.sh/).
+Requires [Node.js](https://nodejs.org/) 18+ and [Bun](https://bun.sh/).
 
 ```bash
 # Clone the repository
@@ -39,11 +39,9 @@ cd gnomad-carrier-frequency
 
 # Install dependencies
 bun install
-# or: npm install
 
 # Start development server
 bun run dev
-# or: npm run dev
 ```
 
 The app opens at `http://localhost:5173/gnomad-carrier-frequency/`
