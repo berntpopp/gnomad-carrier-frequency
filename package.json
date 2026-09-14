@@ -19,6 +19,7 @@
     "lint": "bun run --filter gnomad-cf-web lint",
     "typecheck": "bun run --filter @gnomad-cf/core build && tsc --build packages/cli && bun run --filter gnomad-cf-web typecheck",
     "check:loc": "bun run scripts/check-file-size.ts",
+    "bench": "bun run --filter gnomad-cf-web bench",
     "check:docs-assets": "bun run scripts/check-docs-assets.ts",
     "docs:dev": "bun run --filter gnomad-cf-web docs:dev",
     "docs:build": "bun run --filter gnomad-cf-web docs:build",

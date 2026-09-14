@@ -12,6 +12,7 @@
     "test:coverage": "vitest run --coverage --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
     "typecheck": "vue-tsc --noEmit",
+    "bench": "vitest bench",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"

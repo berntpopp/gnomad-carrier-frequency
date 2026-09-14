@@ -1,4 +1,3 @@
-import writeXlsxFile from "write-excel-file/universal";
 import type { Cell, SheetData } from "write-excel-file/universal";
 
 export interface XlsxSheetDefinition {
@@ -58,6 +57,7 @@ function buildColumnWidths(data: SheetData): { width: number }[] {
 export async function buildXlsxBlob(
   sheets: XlsxSheetDefinition[],
 ): Promise<Blob> {
+  const { default: writeXlsxFile } = await import("write-excel-file/universal");
   const workbookSheets = sheets
     .map((sheet, index) => {
       const data = rowsToSheetData(sheet.rows);
