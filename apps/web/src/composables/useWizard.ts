@@ -8,6 +8,7 @@ import type {
   FrequencySource,
 } from "@gnomad-cf/core/types";
 import { useFormatStore } from "@/stores/useFormatStore";
+import { isRestoring } from "./useAnalysisContext";
 
 /**
  * Safe wrapper around useFormatStore().resetToDefault().
@@ -30,11 +31,21 @@ const state = reactive<WizardState>({
   literaturePmid: null,
 });
 
+export function resetWizardState(): void {
+  state.currentStep = 1;
+  state.gene = null;
+  state.indexStatus = "heterozygous";
+  state.frequencySource = "gnomad";
+  state.literatureFrequency = null;
+  state.literaturePmid = null;
+}
+
 // Downstream reset watcher - runs once at module load
 // When gene changes and we're past step 1, reset downstream state
 watch(
   () => state.gene,
   (_newGene, oldGene) => {
+    if (isRestoring.value) return;
     if (oldGene !== null && state.currentStep > 1) {
       state.currentStep = 1;
       state.indexStatus = "heterozygous";
