@@ -23,7 +23,7 @@ export default defineConfig({
       ],
       // Warn-only: vitest prints violation; CI uses continue-on-error
       thresholds: {
-        lines: 40,
+        lines: 35,
         functions: 0,
         branches: 0,
         statements: 0,

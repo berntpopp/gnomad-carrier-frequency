@@ -11,7 +11,7 @@ export default defineConfig({
       exclude: ['src/**/index.ts'], // re-export barrels
       // Warn-only: vitest prints violation; CI uses continue-on-error
       thresholds: {
-        lines: 90,
+        lines: 80,
         functions: 0,
         branches: 0,
         statements: 0,

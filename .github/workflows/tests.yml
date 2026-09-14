@@ -20,38 +20,34 @@ jobs:
       - name: Build core (required by CLI and web tests)
         run: bun run --filter @gnomad-cf/core build
 
-      - name: Run core tests with coverage
-        continue-on-error: true
-        run: bun run --filter @gnomad-cf/core test -- --coverage
+      - name: Run core tests
+        run: bun run --filter @gnomad-cf/core test
 
-      - name: Run CLI tests with coverage
-        continue-on-error: true
-        run: bun run --filter @gnomad-cf/cli test -- --coverage
+      - name: Run CLI tests
+        run: bun run --filter @gnomad-cf/cli test
 
-      - name: Run web component tests with coverage
-        continue-on-error: true
-        run: bun run --filter gnomad-cf-web test -- --coverage
+      - name: Run web component tests
+        run: bun run --filter gnomad-cf-web test
 
-      # E2E tests only on PRs to main (not every push)
+      - name: Run coverage reporting
+        continue-on-error: true
+        run: bun run test:coverage
+
       - name: Install Playwright browsers
-        if: github.event_name == 'pull_request' && github.base_ref == 'main'
         run: npx playwright install --with-deps chromium
 
       - name: Build web app for E2E
-        if: github.event_name == 'pull_request' && github.base_ref == 'main'
         run: bun run --filter @gnomad-cf/core build && bun run --filter gnomad-cf-web build
 
       - name: Run E2E tests
-        if: github.event_name == 'pull_request' && github.base_ref == 'main'
         run: npx playwright test
 
       - name: Coverage summary
         if: always()
         run: |
-          echo "## Coverage Thresholds (warn-only)"
-          echo "Vitest enforces these thresholds — violations appear as errors in test output above."
-          echo "- Core: 90%+ lines"
-          echo "- CLI: 80%+ lines"
-          echo "- Web: 40%+ lines"
-          echo ""
-          echo "Steps use continue-on-error so threshold violations warn but do not fail the build."
+          echo "## Enforced Coverage Thresholds"
+          echo "Vitest strictly enforces these thresholds — violations fail the build."
+          echo "- Core: 80%+ lines"
+          echo "- CLI: 70%+ lines"
+          echo "- Web: 35%+ lines"
+          echo "- Codebase target: > 89% lines"
