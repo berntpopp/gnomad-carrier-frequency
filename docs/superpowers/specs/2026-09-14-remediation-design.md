@@ -1,7 +1,7 @@
-# Remediation Specification & Architecture Design (Revised)
+# Remediation Specification & Architecture Design (Revision 3.0)
 
 **Document ID:** `SPEC-2026-09-14-REMEDIATION`  
-**Revision:** 2.0 (Post-Astra Spec Review Resolution)  
+**Revision:** 3.0 (Post-Astra Spec Re-Review Resolution)  
 **Date:** 2026-09-14  
 **Author:** Lead Engineer (`gnomad-carrier-frequency`)  
 **Status:** Ready for Plan Review  
@@ -14,7 +14,7 @@
 
 The September 14, 2026 codebase review identified critical calculation discrepancies, state-coordination race conditions, data-loss failure modes during history restore, unverified asset updates, accessibility barriers, and continuous-integration enforcement bypasses in `gnomad-carrier-frequency`.
 
-This revised specification incorporates all resolutions from the independent Astra specification review (SPEC-01 through SPEC-16), providing complete mathematical, clinical, state, security, and toolchain contracts.
+This specification provides exhaustive, mathematically and clinically validated contracts resolving all defects and incorporates all findings from the adversarial Astra specification reviews.
 
 ---
 
@@ -22,7 +22,7 @@ This revised specification incorporates all resolutions from the independent Ast
 
 ### 2.1 Explicit Analysis Context & Serialization Contract (SPEC-01)
 
-To eliminate distributed, desynchronized state and ensure complete export/reproducibility fidelity, all calculations, exports, and UI components reference a single authoritative `AnalysisContext`:
+All calculations, worker messages, persistent history entries, URL parameters, and exports reference a single, strictly typed `AnalysisContext` schema representing all influential settings without loss:
 
 ```typescript
 export interface AnalysisContext {
@@ -35,14 +35,14 @@ export interface AnalysisContext {
     readonly geneId: string;
     readonly dataset: GnomadDatasetId; // 'v4' | 'v3' | 'v2'
     readonly referenceGenome: ReferenceGenome; // 'GRCh38' | 'GRCh37'
-    readonly subcontinentalEnabled: boolean; // applicable only to v2
+    readonly subcontinentalEnabled: boolean; // applicable to v2
   };
 
   /** Clinical Index Assumptions */
   readonly clinical: {
-    readonly indexStatus: IndexGenotypeStatus;
-    // 'heterozygous' | 'homozygous' | 'compound_het_confirmed' | 'compound_het_assumed' | 'unknown'
-    readonly frequencySource: FrequencySource; // 'gnomad' | 'literature'
+    readonly indexStatus: IndexPatientStatus;
+    // 'heterozygous' | 'homozygous' | 'compound_het_confirmed' | 'compound_het_assumed'
+    readonly frequencySource: FrequencySource; // 'gnomad' | 'literature' | 'default'
     readonly literatureCarrierFrequency: number | null;
     readonly literaturePmid: string | null;
     readonly penetrance: number; // default 1.0, range [0.0, 1.0]
@@ -56,26 +56,28 @@ export interface AnalysisContext {
     readonly includeClinvarPathogenic: boolean;
     readonly clinvarReviewStarsMin: number;
     readonly includeConflictingClinvar: boolean;
+    readonly clinvarConflictingThreshold: number; // e.g. 0.8 (80%)
     readonly conflictingReviewStarsMin: number;
   };
 
   /** Quality Filter Parameters */
   readonly quality: {
     readonly excludeQualityFailures: boolean;
-    readonly enabledFlags: QualityFlagId[]; // Serialized as Array, converted to Set in memory
-    readonly minAlleleNumber: number;
-    readonly maxHomozygotes: number;
+    readonly enabledFlags: QualityFlagId[]; // Array for JSON compatibility
+    readonly excludeHighAF: boolean;
     readonly highAfThreshold: number; // e.g. 0.05
-    readonly homozygoteMultiplier: number; // e.g. 2.0
+    readonly excludeHighHomozygotes: boolean;
+    readonly highHomMethod: 'absolute' | 'hwe_relative';
+    readonly highHomAbsoluteThreshold: number; // e.g. 10
+    readonly highHomHWEMultiplier: number; // e.g. 2.0
+    readonly excludeLowAN: boolean;
+    readonly minAlleleNumber: number;
   };
 
   /** Independent Exclusions */
   readonly exclusions: {
-    /** Manually excluded by user in UI */
     readonly manualExcludedVariantIds: string[];
-    /** Excluded automatically by active quality filters */
     readonly qualityExcludedVariantIds: string[];
-    /** Structured exclusion reasons mapping variantId -> reason string */
     readonly exclusionReasons: Record<string, string>;
   };
 
@@ -83,12 +85,12 @@ export interface AnalysisContext {
   readonly calculation: {
     readonly formula: CarrierFormula; // 'hwe' | 'simplified'
     readonly useHomozygoteExclusion: boolean;
-    readonly useBayesianPrevalence: boolean;
+    readonly useBayesianPrevalence: boolean; // penetrance-adjusted prevalence
   };
 
   /** Provenance Metadata */
   readonly provenance: {
-    readonly isDefaultFallback: boolean; // True if labelled prior fallback (1%) used
+    readonly isDefaultFallback: boolean;
     readonly cacheTimestamp: number | null;
     readonly clinvarSubmissionBatchId: string | null;
     readonly appVersion: string;
@@ -96,40 +98,43 @@ export interface AnalysisContext {
 }
 ```
 
-#### Serialization Invariants:
-1. **JSON Compatibility:** All sets (e.g. `enabledFlags`, `manualExcludedVariantIds`) are defined and serialized as standard arrays in storage, URL state, worker messages, and export payloads. Runtime helper wrappers convert arrays to `Set<string>` internally for $O(1)$ membership checks.
-2. **Dual-Exclusion Tracking:** If a variant is both manually excluded and quality-excluded, it appears in both arrays, and `exclusionReasons[variantId]` records composite provenance (e.g. `"Manual: user excluded; Quality: High homozygote count"`).
-3. **Immutability:** Every update produces a new frozen object with an incremented `revision`.
+#### Serialization Contract:
+- Arrays are used for all collections (`enabledFlags`, `manualExcludedVariantIds`, `qualityExcludedVariantIds`) to ensure transparent JSON round-tripping (`JSON.stringify` / `JSON.parse`).
+- Memory representations use `Set<string>` internally via typed converter utilities (`toAnalysisContext` / `serializeAnalysisContext`).
+- Dual exclusion provenance: variants excluded both manually and by quality appear in both arrays, with composite entries in `exclusionReasons`.
 
 ---
 
 ### 2.2 Mathematical, Genetic, and Clinical Calculation Contracts (SPEC-02, SPEC-03, SPEC-04, SPEC-05)
 
 #### 2.2.1 Exhaustive Recurrence Risk Transmission Contract (SPEC-02)
-Recurrence risk is the probability that a future pregnancy of the index individual/couple results in an affected child under autosomal recessive Mendelian inheritance:
-- **Heterozygous Carrier Index Parent:**
+Recurrence risk is the probability that a future pregnancy of the index couple results in an affected child under autosomal recessive Mendelian inheritance:
+- **Heterozygous Carrier Index Parent (`'heterozygous'`):**
   Transmits pathogenic allele with probability $1/2$. A general population partner with carrier frequency $CF$ transmits with probability $CF/2$.
   $$\text{Recurrence Risk} = \frac{1}{2} \times \frac{CF}{2} \times \text{Penetrance} = \frac{CF}{4} \times \text{Penetrance}$$
-- **Affected Index Parent (`homozygous`, `compound_het_confirmed`, `compound_het_assumed`):**
+- **Affected Index Parent (`'homozygous'`, `'compound_het_confirmed'`, `'compound_het_assumed'`):**
   Transmits a pathogenic allele with probability $1.0$. The population partner transmits with probability $CF/2$.
   $$\text{Recurrence Risk} = 1.0 \times \frac{CF}{2} \times \text{Penetrance} = \frac{CF}{2} \times \text{Penetrance}$$
-- **Unknown Status (`unknown`):**
-  When index genotype status is unknown or unspecified, the index individual is treated as a member of the general population ($CF$). The prior risk that both partners are carriers and both transmit is:
-  $$\text{Recurrence Risk} = \frac{CF \times CF}{4} \times \text{Penetrance} = \frac{CF^2}{4} \times \text{Penetrance}$$
-  (Or displays "N/A — Index status unknown" depending on clinical mode).
+- **Unknown / Unspecified Index Status:**
+  Recurrence risk calculation requires a known index genotype. If `indexStatus` is missing or not a valid `IndexPatientStatus`, recurrence risk is `null`, and UI displays `"N/A — Index status required"`. Fictitious risks ($CF^2/4$) are not computed.
+- **Penetrance Range:**
+  $0.0 \le \text{penetrance} \le 1.0$. If penetrance is 0, recurrence risk is 0.0. CLI `--penetrance` validator accepts range `[0, 1]`.
+
+**Authoritative Sources:**
+- MedlinePlus Genetics: *Inheritance Patterns and Risk Assessment* (NLM/NIH).
+- GeneReviews: *Cystic Fibrosis*, Risk to Family Members (NCBI Bookshelf).
 
 **Implementation in `@gnomad-cf/core/calculations/recurrence-risk.ts`:**
 ```typescript
-export type IndexGenotypeStatus =
+export type IndexPatientStatus =
   | 'heterozygous'
   | 'homozygous'
   | 'compound_het_confirmed'
-  | 'compound_het_assumed'
-  | 'unknown';
+  | 'compound_het_assumed';
 
 export function calculateRecurrenceRisk(
   carrierFrequency: number | null,
-  indexStatus: IndexGenotypeStatus,
+  indexStatus: IndexPatientStatus,
   penetrance: number = 1.0
 ): number | null {
   if (carrierFrequency === null || !Number.isFinite(carrierFrequency)) return null;
@@ -143,114 +148,112 @@ export function calculateRecurrenceRisk(
       return carrierFrequency * 0.5 * penetrance;
     case 'heterozygous':
       return carrierFrequency * 0.25 * penetrance;
-    case 'unknown':
-      return (carrierFrequency * carrierFrequency * 0.25) * penetrance;
     default:
       return null;
   }
 }
 ```
 
-#### 2.2.2 Narrative Text Consistency (SPEC-02)
-- English templates (`en.json`) and German templates (`de.json`) shall be updated so that conditional disease probability descriptions dynamically interpolate the effective risk factor (e.g. 50% conditional on partner carrier status for affected index parent, 25% for carrier parent).
-- When penetrance $< 1.0$, narrative text explicitly notes: `"assuming a clinical penetrance of {{penetrancePercent}}% (reduced penetrance model)"`.
+#### 2.2.2 Narrative Text & Template Alignment (SPEC-02)
+- English templates (`en.json`) and German templates (`de.json`) shall dynamically interpolate the conditional transmission factor:
+  - For affected index parents: 50% conditional probability given partner carrier status.
+  - For heterozygous carrier index parents: 25% conditional probability.
+- When penetrance $< 1.0$, narrative reports: `"assuming a clinical penetrance of {{penetrancePercent}}% (reduced penetrance model)"`.
+- Update `UrlStateSchema` in `packages/core/src/types/url-state.ts` to validate all four supported statuses:
+  `status: z.enum(['heterozygous', 'homozygous', 'compound_het_confirmed', 'compound_het_assumed']).optional()`.
 
-#### 2.2.3 Clinical Interpretation & Applicability Boundaries (SPEC-03)
-The application estimates carrier frequencies under standard population genetics assumptions:
-1. **Autosomal Recessive Diploid Model:** Assumes bi-allelic loss of function or pathogenicity causes disease.
-2. **Linkage & Phase Disclaimer:** The Gene Carrier Rate formula ($GCR = 1 - \prod (1 - VCR_i)$) assumes variants are unlinked and independent in the population. It does NOT distinguish cis (same allele) from trans (compound heterozygote) co-occurrence.
-3. **Partner Assumptions:** Assumes non-consanguineous mating with a partner representative of the chosen gnomAD population without known family history.
-4. **Bayesian Prevalence:** When enabled, Bayesian prevalence incorporates Orphanet/literature disease prevalence as an empirical prior to modulate the population genetic prevalence ($q^2$).
-*Requirement:* Generated clinical letters and exports must include standard research-use and clinical genetics modeling disclaimers citing these boundaries.
+#### 2.2.3 Clinical Interpretation, Prevalence & Applicability Boundaries (SPEC-03)
+1. **Autosomal Recessive Diploid Model:** Bi-allelic pathogenicity causes disease.
+2. **Linkage & Phase Disclaimer:** The Gene Carrier Rate formula ($GCR = 1 - \prod (1 - VCR_i)$) assumes variants are independent and unlinked. It does NOT infer phase or separate cis from trans co-occurrence.
+3. **Partner Assumptions:** Non-consanguineous mating with a partner representative of the gnomAD reference population without family history.
+4. **Prevalence Clarification:**
+   - **Genetic Prevalence:** Computed directly from allele frequencies: $q^2 = (\sum q_i)^2$.
+   - **Penetrance-Adjusted Prevalence:** Computed as $q^2 \times \text{penetrance}$.
+   - **Orphanet Prevalence:** Displayed purely as external clinical contextual reference; it is NOT multiplied or bayesian-updated into the gnomAD calculation.
 
 #### 2.2.4 Fallback Count Pooling Contract (SPEC-04)
-When joint calling counts (`joint_ac`, `joint_an`, `joint_hom`) are absent or incomplete:
-- Exome and genome counts are pooled across called sites:
+When joint counts are absent:
+- Pool available exome and genome counts:
   $$AC = (AC_{\text{exome}} \lor 0) + (AC_{\text{genome}} \lor 0)$$
   $$AN = (AN_{\text{exome}} \lor 0) + (AN_{\text{genome}} \lor 0)$$
   $$Hom = (Hom_{\text{exome}} \lor 0) + (Hom_{\text{genome}} \lor 0)$$
-- An exome-only or genome-only fallback is used ONLY when the other source has $AN = 0$ or is completely uncalled. Available counts are never silently discarded.
+- An exome-only or genome-only value is used ONLY if the other source has $AN = 0$. Counts are never discarded.
 
-#### 2.2.5 Truth Table for Zero vs Missing Semantics (SPEC-05)
+#### 2.2.5 Truth Table for Zero, Missing, and Fallback Semantics (SPEC-05)
 
-| Case | Condition | Raw CF | Fallback CF (if enabled) | Prevalence | UI Display | Export Flags |
+| Precedence | Condition | Raw CF | Fallback CF (if enabled) | Genetic Prevalence ($q^2$) | UI Display | Export Metadata Flags |
 |---|---|---|---|---|---|---|
-| **A: Observed Zero** | Qualifying variants exist; all have $AC = 0, AN > 0$ | `0.0` | `0.0` | `0.0` | `0% (0 / N)` | `isDefaultFallback: false, observedZero: true` |
-| **B: Missing Data** | All sites in gene have $AN = 0$ (uncalled) | `null` | `null` | `null` | `"No data"` | `isDefaultFallback: false, missingData: true` |
-| **C: No Qualifying Variants** | No variants meet pathogenicity filters | `null` | `0.01` (1.0%) | $0.01^2 / 4$ | `"1% (Default assumption)"` | `isDefaultFallback: true, rawCarrierFrequency: null` |
-| **D: All Variants Excluded** | Variants exist but all excluded manually/quality | `null` | `0.01` (1.0%) | $0.01^2 / 4$ | `"1% (Default assumption)"` | `isDefaultFallback: true, allExcluded: true` |
-| **E: All-Homozygote Site** | $AC_i = 2 \cdot Hom_i$ | $VCR_i = 0$ | N/A | $VCR_i = 0$ | Contributes 0 to GCR | `variantHomozygoteOnly: true` |
+| **1. Missing Data** | All sites in gene have $AN = 0$ | `null` | `null` | `null` | `"No data"` | `missingData: true, rawCarrierFrequency: null` |
+| **2. No Pathogenic Variants** | Zero variants meet pathogenicity filters | `null` | `0.01` (1.0%) | If fallback: $0.01^2 \times \text{penetrance}$; else `null` | `"1% (Default assumption)"` or `"Not detected"` | `isDefaultFallback: true/false, noQualifyingVariants: true` |
+| **3. All Excluded** | Pathogenic variants exist, all excluded manually/quality | `null` | `0.01` (1.0%) | If fallback: $0.01^2 \times \text{penetrance}$; else `null` | `"1% (Default assumption)"` or `"Not detected"` | `isDefaultFallback: true/false, allExcluded: true` |
+| **4. All-Homozygote Sites Only** | For all variants $AC_i = 2 \cdot Hom_i$ | If HomExcl: $0.0$; else $2q(1-q)$ | N/A (variants exist) | $q^2 = (\sum q_i)^2 > 0$ | If HomExcl: `"0% (Homozygotes only)"` | `variantHomozygoteOnly: true, rawCarrierFrequency: 0.0` |
+| **5. Observed Zero** | $AC_i = 0, AN_i > 0$ for all variants | `0.0` | N/A | `0.0` | `"0% (0 / N)"` | `observedZero: true, rawCarrierFrequency: 0.0` |
+| **6. Normal Calculation** | Qualifying variants included | Computed $GCR$ | N/A | $q^2 \times \text{penetrance}$ | Formatted % and 1:N ratio | `isDefaultFallback: false, rawCarrierFrequency: GCR` |
 
 ---
 
-### 2.3 Worker Coordination, Lifecycle & State Synchronization (SPEC-06, SPEC-07)
+### 2.3 Worker Coordination, Concurrency & Lifecycle Architecture (SPEC-06, SPEC-07)
 
-#### 2.3.1 Complete Worker Lifecycle State Machine (SPEC-06)
-`useCarrierFrequency.ts` shall manage worker execution with complete handling of success, failure, cancellation, and pending re-dispatch:
-
-```
-                  ┌──────────────┐
-                  │     IDLE     │◄───────────────────┐
-                  └──────┬───────┘                    │
-                         │ dispatchRequest            │
-                         ▼                            │
-                  ┌──────────────┐                    │
-                  │  CALCULATING │                    │
-                  └──┬────────┬──┘                    │
-                     │        │                       │
-      new mutation   │        │ worker response       │
-      arrives        │        │                       │
-         ▼           │        ▼                       │
-   set pendingState  │   revision matches?            │
-   keep calculating  │   ├── YES: commit result ──────┤
-                     │   └── NO:  discard stale ──────┤
-                     │                                │
-                     │ worker error/reject            │
-                     ▼                                │
-                 handle error                         │
-                 has pendingState?                    │
-                 ├── YES: dispatch pending ───────────┘
-                 └── NO:  set IDLE / error state ─────┘
-```
-
-- **Cancellation on Gene Change:** When the user switches genes ($A \to B$), an active fetch for $A$ is immediately aborted via `AbortController`, its session ID is invalidated, and the worker message queue is cleared.
-- **Session Identity:** Every worker calculation packet includes a unique `sessionId: string` tied to the active gene and dataset version. Any message received from the worker with a mismatched `sessionId` or older `revision` is dropped silently.
-- **Worker Termination & Reset:** On composable unmount or explicit `reset()`, any active worker task is terminated, and state reverts to default.
+#### 2.3.1 Worker State Machine with Infallible Pending Dispatch (SPEC-06)
+In `useCarrierFrequency.ts`:
+1. Every dispatch assigns a unique `sessionId: string` (tied to `gene:datasetVersion`) and a monotonically increasing `revision: number`.
+2. When the worker responds (either `onmessage` success or `onerror` failure):
+   - If `response.sessionId !== activeSessionId || response.revision < activeRevision`: discard stale result.
+   - If `response.revision === activeRevision` and success: commit result to store.
+   - If `response.revision === activeRevision` and failure: record error state.
+   - **Crucial Invariant:** Regardless of whether the in-flight calculation succeeded or failed, check `hasPendingChanges`. If `hasPendingChanges === true`:
+     - Clear `hasPendingChanges`.
+     - Dispatch latest `AnalysisContext` snapshot to worker immediately!
+   - If no pending changes: set state to `IDLE`.
+3. In `variant-worker.ts`:
+   - All cached raw datasets (`variants`, `clinvarVariants`, `subcontinentalData`) are stored in a map keyed by `sessionId`.
+   - Switching genes purges the previous session's raw data to prevent cross-gene data corruption.
 
 #### 2.3.2 Atomic Transactional History & URL Restoration (SPEC-07)
-To prevent asynchronous profile loading, URL watchers, or autosave hooks from overwriting restored settings:
-1. **Restoration Mutex:** Restoration sets `isRestoring = true` with a unique transaction token `restoreToken`.
-2. **Suppression:** While `isRestoring === true`:
-   - `useHistoryAutoSave` ignores step and result changes.
-   - `useUrlState` stops updating the browser location bar.
-   - Downstream wizard step reset watchers are disabled.
-3. **Gene Config Synchronization:** When `loadGeneConfig(entry.gene)` runs during restore:
-   - The restore transaction explicitly flags `skipDefaultProfileApply = true`.
-   - The saved profile overrides from the history entry (or explicit saved filter config) take precedence over the gene's factory default profile.
-4. **Legacy History Schema Migration:**
-   - If `entry.results.gnomadVersion` exists, map to `datasetVersion`.
-   - If `entry.filterConfig` exists, map legacy fields (`lof`, `missense`, `clinvar`) to the current `filters` schema.
-   - If `entry.excludedVariantIds` exists, populate `manualExcludedVariantIds`.
-   - If calculation parameters are absent, default to `formula: 'hwe'`, `useHomExclusion: true`, `penetrance: 1.0`.
+In `useHistoryRestore.ts`:
+1. Generate unique `restoreToken = Symbol()`. Set `isRestoring = true` and `activeRestoreToken = restoreToken`.
+2. **Autosave Suppression:** In `useHistoryAutoSave.ts`, cancel active debounced autosaves (`saveDebounced.cancel()`) and suppress autosaving while `isRestoring === true`.
+3. **Profile Synchronization:** `loadGeneConfig(entry.gene)` checks `isRestoring`: if active, it loads disease metadata but skips applying factory default profile overrides. Restored filter settings take precedence.
+4. **Legacy History Migration:**
+   ```typescript
+   function migrateHistoryEntry(raw: any): RestoredSettings {
+     return {
+       dataset: raw.target?.dataset ?? raw.results?.gnomadVersion ?? 'v4',
+       filters: {
+         includeLof: raw.filters?.includeLof ?? raw.filterConfig?.lofHcEnabled ?? true,
+         includeMissense: raw.filters?.includeMissense ?? raw.filterConfig?.missenseEnabled ?? false,
+         includeClinvarPathogenic: raw.filters?.includeClinvarPathogenic ?? raw.filterConfig?.clinvarEnabled ?? true,
+         clinvarReviewStarsMin: raw.filters?.clinvarReviewStarsMin ?? raw.filterConfig?.clinvarStars ?? 1,
+         includeConflictingClinvar: raw.filters?.includeConflictingClinvar ?? raw.filterConfig?.conflictingEnabled ?? false,
+         clinvarConflictingThreshold: raw.filters?.clinvarConflictingThreshold ?? raw.filterConfig?.conflictingThreshold ?? 0.8,
+         conflictingReviewStarsMin: raw.filters?.conflictingReviewStarsMin ?? 1
+       },
+       manualExclusions: raw.exclusions?.manualExcludedVariantIds ?? raw.excludedVariantIds ?? [],
+       penetrance: raw.clinical?.penetrance ?? raw.penetrance ?? 1.0,
+       calculation: raw.calculation ?? { formula: 'hwe', useHomozygoteExclusion: true, useBayesianPrevalence: true }
+     };
+   }
+   ```
+5. On completion, verify `activeRestoreToken === restoreToken`. Synchronize URL state and release `isRestoring = false`.
 
 ---
 
 ### 2.4 Security, External Queries & Freshness (SPEC-08, SPEC-09, SPEC-11)
 
 #### 2.4.1 gnomAD GraphQL ClinVar Submissions Query Schema (SPEC-08)
-gnomAD's official GraphQL schema exposes singular queries per variant:
-`clinvar_variant(variant_id: String!, reference_genome: ReferenceGenomeId!)`.
+gnomAD's GraphQL schema defines singular `clinvar_variant(variant_id: String!, reference_genome: ReferenceGenomeId!)` with `submitter_name` (NOT `submission_names`).
 
-We parameterize singular aliased queries using standard GraphQL variables:
+**Parameterized Implementation in `packages/core/src/queries/clinvar-submissions.ts`:**
 ```typescript
 export function buildSubmissionsQuery(
   variantIds: string[],
   referenceGenome: ReferenceGenome // 'GRCh38' | 'GRCh37'
-): { query: string; variables: Record<string, string> } {
-  // Validate variant ID format strictly
+): { query: string; variables: Record<string, string> } | null {
+  if (!variantIds || variantIds.length === 0) return null;
+
   for (const id of variantIds) {
     if (!/^(?:chr)?(?:\d+|X|Y)-[0-9]+-[ACGT]+-[ACGT]+$/i.test(id)) {
-      throw new Error(`Invalid variant ID for ClinVar query: ${id}`);
+      throw new Error(`Invalid variant ID format: ${id}`);
     }
   }
 
@@ -271,7 +274,7 @@ export function buildSubmissionsQuery(
           clinical_significance
           review_status
           last_evaluated
-          submission_names
+          submitter_name
         }
       }
     `;
@@ -291,18 +294,19 @@ export function buildSubmissionsQuery(
   return { query, variables };
 }
 ```
+Client transport passes `{ query, variables }` over HTTPS POST.
 
-#### 2.4.2 ClinGen Updater Validation & Path Alignment (SPEC-09)
+#### 2.4.2 ClinGen Updater Validation & Canonical Headers (SPEC-09)
 In `.github/workflows/update-clingen-data.yml`:
-- Download target: `apps/web/public/data/clingen-gene-validity.csv`.
-- Validation script `scripts/validate-clingen-csv.ts` asserts:
-  - Header row contains: `GENE SYMBOL`, `DISEASE LABEL`, `DISEASE ID`, `MOI`, `CLASSIFICATION`, `ONLINE REPORT`, `CLASSIFICATION DATE`.
-  - Record count $\ge 1,000$.
-  - First 5 rows parse into valid ClinGen classification records.
-- Publication: If validation passes and file has changed, stage changes, commit with `chore(data): update clingen gene validity [skip ci]`, and push to `main` (or PR if branch protection requires).
+- Download destination: `apps/web/public/data/clingen-gene-validity.csv`.
+- Validator `scripts/validate-clingen-csv.ts`:
+  - Ignores leading `#` comment lines.
+  - Matches canonical headers: `GENE SYMBOL`, `HGNC ID`, `DISEASE LABEL`, `DISEASE ID (MONDO)`, `MOI`, `SOP`, `CLASSIFICATION`, `ONLINE REPORT`, `CLASSIFICATION DATE`, `GCEP`.
+  - Asserts $\ge 1,000$ valid records.
+  - If valid and content differs from shipped asset, stages to `apps/web/public/data/clingen-gene-validity.csv` and commits.
 
-#### 2.4.3 Template Store Zod Schema Alignment (SPEC-11)
-`useTemplateStore.ts` import validation shall strictly match the actual exported structure:
+#### 2.4.3 Template Store Zod Schema Alignment (SPEC-11, SPEC-11-D1)
+In `useTemplateStore.ts`, import validation is strictly typed on both outer and inner objects:
 ```typescript
 export const TemplateImportSchema = z.object({
   version: z.string().regex(/^\d+\.\d+(\.\d+)?$/),
@@ -313,7 +317,7 @@ export const TemplateImportSchema = z.object({
     affected: z.array(z.string()),
     carrier: z.array(z.string()),
     familyMember: z.array(z.string())
-  })
+  }).strict()
 }).strict();
 ```
 
@@ -321,86 +325,103 @@ export const TemplateImportSchema = z.object({
 
 ### 2.5 CLI Distribution, Build & Resource Resolution (SPEC-10)
 
-1. **Distribution Model:** The CLI is supported as an executable Node.js package in the workspace and runnable directly via `bun gnomad-cf` or `node packages/cli/dist/cli.mjs`.
+1. **Distribution Model:** The CLI is supported as an executable Node.js package in the workspace, run via `bun gnomad-cf` or `node packages/cli/dist/cli.mjs`.
 2. **Dependency Manifest:**
-   - In `packages/cli/package.json`, declare `"zod": "^4.3.5"` matching the monorepo catalog.
-   - Inject application version during build via tsdown define (`__CLI_VERSION__`) to guarantee `--version` outputs current manifest version (`1.7.2`).
+   - In `packages/cli/package.json`, declare `"zod": "^4.3.5"` matching root catalog.
+   - Inject application version during build via tsdown define (`__CLI_VERSION__`) to guarantee `--version` prints manifest version (`1.7.2`).
 3. **Template Resolution (NEW-09):**
-   - In `packages/core/tsdown.config.ts`, bundle or copy `src/config/templates/*.json` into `dist/templates/`.
-   - Update `packages/core/src/templates/load-templates.ts` to locate templates relative to `new URL('./templates', import.meta.url)` in ESM or fallback to embedded templates if file reading is unavailable.
-4. **Test Discovery:** Ensure `packages/cli/vitest.config.ts` includes `src/**/__tests__/*.ts` and `tests/**/*.ts`.
+   - In `packages/core/tsdown.config.ts`, bundle template JSON files into `dist/templates/`.
+   - Update `packages/core/src/templates/load-templates.ts` to locate templates relative to `new URL('./templates', import.meta.url)` in ESM.
+4. **Test Discovery:** `packages/cli/vitest.config.ts` includes `src/**/__tests__/*.ts` and `tests/**/*.ts`.
 
 ---
 
 ### 2.6 CI/CD Enforcement & Deployment Gating (SPEC-12)
 
-#### Unified Workflow Architecture:
-In `.github/workflows/tests.yml` and `.github/workflows/deploy.yml`:
-1. **Tests Workflow (`tests.yml`):**
-   - Runs on `push` to `main` and `pull_request`.
-   - Executes `bun run lint`, `bun run typecheck`, `bun run test --run`, `bun run test:coverage`, and `bun run test:e2e` (both push and PR).
-   - Removes all `continue-on-error: true` flags.
-2. **Deployment Workflow (`deploy.yml`):**
-   - Triggers on `workflow_run` of `Tests` workflow on branch `main` with `conclusion: success`.
-   - Does not run if tests fail or are cancelled.
-   - Uses the verified commit SHA from the triggering test run to build and publish GitHub Pages.
+#### 2.6.1 Working Package Scripts
+In root `package.json`, define working scripts:
+- `"test:coverage": "vitest run --coverage"`
+- `"test:e2e": "CI=1 playwright test"`
+
+#### 2.6.2 Non-Tolerated CI Tests (`tests.yml`)
+- Trigger: `push` on `main`, `pull_request` on `main`.
+- Jobs:
+  - `lint-and-typecheck`: `bun run lint && bun run typecheck`
+  - `unit-tests`: `bun run test --run`
+  - `e2e-tests`: `bun run test:e2e` (runs on both PR and main push)
+- All steps must succeed with exit code 0 (`continue-on-error` removed).
+
+#### 2.6.3 Gated Deployment (`deploy.yml`)
+```yaml
+name: Deploy
+on:
+  workflow_run:
+    workflows: ["Tests"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.repository == 'berntpopp/gnomad-carrier-frequency' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - uses: actions/deploy-pages@v4
+```
 
 ---
 
-### 2.7 Accessibility & Error Recovery (SPEC-15)
+### 2.7 Accessibility, Interaction & Error Recovery (SPEC-15)
 
-1. **Keyboard Accessibility for Population Table (A11Y-1):**
-   - Table rows include an accessible button in the Action column:
-     `<v-btn icon aria-label="View variants for {populationName}" @click="openDrilldown(item)">`
-   - Focused row displays high-contrast outline; pressing `Enter` or `Space` activates drilldown.
+1. **Population Table Keyboard Navigation (A11Y-1):**
+   - Action column includes button: `<v-btn icon aria-label="View variants for {name}" @click="openDrilldown(item)">`.
+   - Table rows support `tabindex="0"`, high-contrast outline on `:focus-visible`, and `Enter`/`Space` activation.
 2. **Accessible SVG Bar Chart (A11Y-2):**
-   - Each population `<g>` in `PopulationBarChart.vue` receives `tabindex="0"`, `role="button"`, and `aria-label="{populationName} carrier frequency {value}"`.
-   - Visual focus ring SVG element renders on `:focus-visible`.
+   - Each population `<g>` has `tabindex="0"`, `role="button"`, and `@keydown.enter.prevent="openDrilldown(item)"` + `@keydown.space.prevent="openDrilldown(item)"`.
+   - On modal dismiss, focus programmatically returns to activating table row or SVG bar.
 3. **Touch Drilldown Resolution (NEW-12):**
-   - Remove `touchstart.prevent` which stops click events on mobile Chromium/WebKit.
-   - Implement tap detection allowing modal opening on mobile while preserving vertical touch scrolling.
-4. **Wizard Focus Transition (A11Y-3):**
-   - On step transition, programmatic focus moves to the step heading element (`<h2 tabindex="-1">`) via `ref.value?.focus()`, ensuring screen readers announce step content immediately.
+   - Remove `touchstart.prevent` in `PopulationBarChart.vue` so tap triggers click and opens modal on mobile devices.
+4. **Wizard Focus Management (A11Y-3):**
+   - Programmatically focus `<h2 tabindex="-1">` on step change.
 5. **Global Error Boundary (A11Y-4):**
-   - Implement `ErrorBoundary.vue` with `onErrorCaptured`.
-   - Intercepts render and component errors, displays recoverable alert card, logs error to `useLogStore`, and provides "Reset Application State" action.
+   - `ErrorBoundary.vue` wraps `<router-view>` in `App.vue`. Catches render exceptions, displays alert card, logs error, and provides "Reset Application State" button.
 
 ---
 
 ### 2.8 Performance Budgets & Benchmark Methodology (SPEC-13)
 
-1. **Separation of Measurement Modes:**
-   - **Navigation Audit (Lighthouse):** Evaluates cold-load initial page load at root `/` with mock service worker inactive.
-     - Budgets: Performance Score $\ge 90$, LCP $\le 1.8\text{s}$, CLS $\le 0.05$, TBT $\le 100\text{ms}$.
-   - **Interaction Performance (Playwright Timespan):** Measures time from Step 1 gene submission to Step 4 calculation render for CFTR (large variant set).
-     - Budget: Total calculation and render duration $\le 500\text{ms}$ on standard desktop profile.
-2. **Bundle Optimization Targets:**
-   - Lazy-load `write-excel-file` via dynamic `import('../utils/xlsx-export')` when user clicks Excel export.
-   - Verify initial main JS bundle remains $\le 350\text{kB}$ gzip (baseline $322.8\text{kB}$).
+1. **Methodology:**
+   - Harness: `scripts/benchmark-lighthouse.ts`.
+   - Pinned profile: headless Chromium, unthrottled desktop, port 4173 (`bun run preview`).
+   - 5 cold navigation runs and 5 warm cache runs, recording median and IQR.
+2. **Budgets:**
+   - Navigation Audit: Performance $\ge 90$, LCP $\le 1.8\text{s}$, CLS $\le 0.05$, TBT $\le 100\text{ms}$.
+   - Interaction Duration: Step 1 to Step 4 render for CFTR $\le 500\text{ms}$.
+   - Bundle Footprint: Main JS gzip $\le 350\text{kB}$ (dynamically importing `write-excel-file` on export click).
 
 ---
 
-### 2.9 Rollback Dependency Groups & DAG (SPEC-16)
-
-To prevent cascading breakage during potential rollbacks, changes are grouped into explicit dependency clusters:
+### 2.9 Rollback Dependency Groups (SPEC-16)
 
 ```
 [Group A: Lane 1 - Core Math & Types]
            │
            ▼
-[Group B: Lane 2 - Worker & Composable State]
+[Group B: Lane 2 - Worker & State Coordination]
            │
            ▼
 [Group C: Lane 3 - Export & CLI Consistency]
            │
      ┌─────┴────────────────┐
      ▼                      ▼
-[Group D: Lane 4 - CI]  [Group E: Lane 5 - A11y & UI]
+[Group D: Lane 4 - CI/Tooling]  [Group E: Lane 5 - Accessibility/UI]
      └─────┬────────────────┘
            ▼
-[Group F: Lane 6 - Performance & Budgets]
+[Group F: Lane 6 - Performance]
 ```
-
-- **Rollback Invariants:**
-  - If Group B is rolled back, Group C must also be rolled back.
-  - Group D (CI/Workflows) and Group E (UI/A11y) are decoupled from each other and can be rolled back independently once Groups A, B, and C are stable.
+Rollbacks must be executed in reverse topological order (Group F $\to$ Group D/E $\to$ Group C $\to$ Group B $\to$ Group A).
