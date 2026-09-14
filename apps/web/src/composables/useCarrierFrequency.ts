@@ -264,8 +264,6 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     }
 
     const reqRevision = activeContextRevision.value;
-    inFlightSession = sessionKey;
-    inFlightRevision = reqRevision;
     isCalculating.value = true;
     isLoading.value = true;
     hasError.value = false;
@@ -336,8 +334,6 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     } finally {
       // Clear execution ownership prior to potential re-dispatch
       isCalculating.value = false;
-      inFlightSession = null;
-      inFlightRevision = null;
 
       const currentSession = getSessionKey();
       const hasPendingChanges =
