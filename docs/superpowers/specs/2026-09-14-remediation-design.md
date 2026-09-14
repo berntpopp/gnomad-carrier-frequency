@@ -1,10 +1,10 @@
-# Remediation Specification & Architecture Design (Revision 5.0)
+# Remediation Specification & Architecture Design (Revision 6.0)
 
 **Document ID:** `SPEC-2026-09-14-REMEDIATION`  
-**Revision:** 5.0 (Astra Spec Review Resolution Round 4)  
+**Revision:** 6.0 (Astra Spec Review Resolution Round 5)  
 **Date:** 2026-09-14  
 **Author:** Lead Engineer (`gnomad-carrier-frequency`)  
-**Status:** Under Review (Round 5)  
+**Status:** Under Review (Round 6)  
 **Target Repository:** `gnomad-carrier-frequency`  
 **Integration Base SHA:** `083375e` (docs: add evidence-based codebase review for 2026-09-14)
 
@@ -14,13 +14,13 @@
 
 The September 14, 2026 codebase review identified critical calculation discrepancies, state-coordination race conditions, data-loss failure modes during history restore, unverified asset updates, accessibility barriers, and continuous-integration enforcement bypasses in `gnomad-carrier-frequency`.
 
-This revised specification incorporates all resolutions from the adversarial Astra specification reviews (SPEC-01 through SPEC-16 and Rounds 3/4 feedback), establishing verifiable mathematical, genetic, concurrency, and toolchain contracts across all workspaces.
+This revised specification incorporates all resolutions from the adversarial Astra specification reviews (SPEC-01 through SPEC-16 and Rounds 3/4/5 feedback), establishing verifiable mathematical, genetic, concurrency, and toolchain contracts across all workspaces.
 
 ---
 
 ## 2. Architectural Design & Subsystem Specifications
 
-### 2.1 Explicit Analysis Context & Serialization Contract (SPEC-01)
+### 2.1 Explicit Analysis Context & Serialization Contract (SPEC-01, R5-DOC-01)
 
 All calculations, worker messages, persistent history entries, URL parameters, and exports reference a single, strictly typed `AnalysisContext` schema representing all influential settings without loss:
 
@@ -78,7 +78,7 @@ export interface AnalysisContext {
     readonly excludeGnomadFiltered: boolean;
     readonly excludeGenomesOnly: boolean;
 
-    // Optional Allele Number policy
+    // Optional Allele Number policy (proposed extension)
     readonly excludeLowAN: boolean;
     readonly minAlleleNumber: number;
   };
@@ -107,10 +107,10 @@ export interface AnalysisContext {
 }
 ```
 
-#### Serialization Invariants:
-1. **JSON Compatibility:** Arrays are used for all collections (`enabledFlags`, `manualExcludedVariantIds`, `qualityExcludedVariantIds`) to ensure transparent JSON round-tripping (`JSON.stringify` / `JSON.parse`).
+#### Serialization Invariants (R5-DOC-01):
+1. **JSON Compatibility:** Arrays are used for all collections (`manualExcludedVariantIds`, `qualityExcludedVariantIds`) to ensure transparent JSON round-tripping (`JSON.stringify` / `JSON.parse`).
 2. **Dual-Exclusion Tracking:** Variants excluded both manually and by quality appear in both arrays, with composite entries in `exclusionReasons` (e.g. `"Manual exclusion; Quality: High homozygote count"`).
-3. **Lossless Quality Mapping:** Every switch in `QualityExclusionConfig` (`excludeHighAF`, `excludeHighHomozygotes`, `excludeLowAN`, `excludeGnomadFiltered`, `excludeGenomesOnly`) and both homozygote detection methods (`absolute`, `hwe_relative`) are directly serialized.
+3. **Lossless Quality Mapping:** Every switch in `QualitySettings` (`highAfEnabled`, `highAfThreshold`, `highHomEnabled`, `highHomMethod`, `highHomAbsoluteThreshold`, `highHomHWEMultiplier`, `gnomadFilteredEnabled`, `genomesOnlyEnabled`), every policy in `QualityExclusionConfig` (`excludeHighAf`, `excludeHighHom`, `excludeGnomadFiltered`, `excludeGenomesOnly`), and proposed extension policies (`excludeLowAN`, `minAlleleNumber`) are directly serialized.
 
 ---
 
@@ -206,63 +206,79 @@ Let variants for the queried gene be partitioned into well-defined evaluation se
 - $V_{\text{path}} = \{ v \in V_{\text{raw}} \mid \text{matchesPathogenicityFilters}(v) \}$: variants satisfying active consequence and ClinVar criteria.
 - $V_{\text{inc}} = \{ v \in V_{\text{path}} \mid \neg\text{isManuallyExcluded}(v) \land \neg\text{isQualityExcluded}(v) \}$: evaluable variants passing both manual and quality exclusion rules.
 
-The evaluation cases are strictly disjoint and evaluated in mutually exclusive order:
+The evaluation cases are strictly exhaustive and evaluated in mutually exclusive order:
 
 | Case | Disjoint Predicate | Raw CF | Fallback CF (if enabled) | Genetic Prevalence ($q^2$) | Penetrance-Adjusted Prev | UI Display | Export Metadata Flags |
 |---|---|---|---|---|---|---|---|
-| **1. Missing Data** | $\|V_{\text{raw}}\| = 0 \lor \forall v \in V_{\text{raw}}, AN_v = 0$ | `null` | `null` | `null` | `null` | `"No data"` | `missingData: true, rawCarrierFrequency: null` |
-| **2. No Pathogenic Candidates** | $\|V_{\text{raw}}\| > 0 \land (\exists v \in V_{\text{raw}}, AN_v > 0) \land \|V_{\text{path}}\| = 0$ | `null` | `0.01` (1.0%) | If fallback: $(0.01/2)^2 = 0.000025$; else `null` | If fallback: $0.000025 \times \text{penetrance}$; else `null` | If fallback: `"1% (Default assumption)"`; else `"Not detected"` | `isDefaultFallback: boolean, noQualifyingVariants: true` |
-| **3. All Candidates Excluded** | $\|V_{\text{path}}\| > 0 \land \|V_{\text{inc}}\| = 0$ | `null` | `0.01` (1.0%) | If fallback: $(0.01/2)^2 = 0.000025$; else `null` | If fallback: $0.000025 \times \text{penetrance}$; else `null` | If fallback: `"1% (Default assumption)"`; else `"Not detected"` | `isDefaultFallback: boolean, allExcluded: true` |
-| **4. Observed Zero** | $\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AC_v = 0 \land \sum_{v \in V_{\text{inc}}} AN_v > 0$ | `0.0` | N/A | `0.0` | `0.0` | `"0% (0 / N)"` | `observedZero: true, rawCarrierFrequency: 0.0` |
-| **5. Positive Homozygotes-Only Sites** | $\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AC_v > 0 \land \forall v \in V_{\text{inc}}, AC_v = 2 \cdot Hom_v$ | If HomExcl: `0.0`; else computed formula ($GCR$) | N/A | $q^2 = (\sum q_i)^2 > 0$ | $q^2 \times \text{penetrance} > 0$ | If HomExcl: `"0% (Homozygotes only)"`; else formatted % | `variantHomozygoteOnly: true`, `rawCarrierFrequency: 0.0` (if HomExcl) else $GCR$ |
-| **6. Normal Residual Calculation** | $\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AC_v > 0 \land \exists v \in V_{\text{inc}}, AC_v > 2 \cdot Hom_v$ | Computed $GCR = 1 - \prod (1 - VCR_i)$ | N/A | $q^2 = (\sum q_i)^2$ | $q^2 \times \text{penetrance}$ | Formatted % and 1:N ratio | `isDefaultFallback: false, rawCarrierFrequency: GCR` |
+| **1. Missing / Unsampled Data** | $(\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AN_v = 0) \lor (\|V_{\text{inc}}\| = 0 \land (\|V_{\text{raw}}\| = 0 \lor \forall v \in V_{\text{raw}}, AN_v = 0))$ | `null` | `null` | `null` | `null` | `"No data"` | `missingData: true, rawCarrierFrequency: null` |
+| **2. No Pathogenic Candidates** | $\|V_{\text{path}}\| = 0 \land (\exists v \in V_{\text{raw}}, AN_v > 0)$ | `null` | `0.01` (1.0%) | If fallback: $(0.01/2)^2 = 0.000025$; else `null` | If fallback: $0.000025 \times \text{penetrance}$; else `null` | If fallback: `"1% (Default assumption)"`; else `"Not detected"` | `isDefaultFallback: boolean, noQualifyingVariants: true` |
+| **3. All Candidates Excluded** | $\|V_{\text{path}}\| > 0 \land \|V_{\text{inc}}\| = 0 \land (\exists v \in V_{\text{path}}, AN_v > 0)$ | `null` | `0.01` (1.0%) | If fallback: $(0.01/2)^2 = 0.000025$; else `null` | If fallback: $0.000025 \times \text{penetrance}$; else `null` | If fallback: `"1% (Default assumption)"`; else `"Not detected"` | `isDefaultFallback: boolean, allExcluded: true` |
+| **4. Observed Zero** | $\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AN_v > 0 \land \sum_{v \in V_{\text{inc}}} AC_v = 0$ | `0.0` | N/A | `0.0` | `0.0` | `"0% (0 / N)"` | `observedZero: true, rawCarrierFrequency: 0.0` |
+| **5. Positive Homozygotes-Only Sites** | $\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AN_v > 0 \land \sum_{v \in V_{\text{inc}}} AC_v > 0 \land \forall v \in V_{\text{inc}}, AC_v = 2 \cdot Hom_v$ | If HomExcl: `0.0` (via GCR); else active formula: $2q(1-q)$ (HWE) or $2q$ (simplified) | N/A | $q^2 = (\sum q_i)^2 > 0$ | $q^2 \times \text{penetrance}$ ($0.0$ if penetrance is $0.0$, else $> 0$) | If HomExcl: `"0% (Homozygotes only)"`; else formatted % | `variantHomozygoteOnly: true`, `rawCarrierFrequency: 0.0` (if HomExcl) else $CF$ |
+| **6. Normal Residual Calculation** | $\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AN_v > 0 \land \sum_{v \in V_{\text{inc}}} AC_v > 0 \land \exists v \in V_{\text{inc}}, AC_v > 2 \cdot Hom_v$ | If HomExcl: $GCR = 1 - \prod (1 - VCR_i)$; else active formula: $2q(1-q)$ (HWE) or $2q$ (simplified) | N/A | $q^2 = (\sum q_i)^2$ | $q^2 \times \text{penetrance}$ | Formatted % and 1:N ratio | `isDefaultFallback: false, rawCarrierFrequency: CF` |
 
-*Policy on Fallback Prior Inversion:* The user-configured fallback prior is a **carrier frequency** ($CF = 0.01 = 1\%$). Under the standard diploid assumption $CF \approx 2q$, the implied carrier allele frequency is $q = \frac{CF}{2} = 0.005$. Therefore, the implied genetic prevalence is $q^2 = 0.005^2 = 0.000025$ (1 in 40,000), and the penetrance-adjusted disease prevalence is $0.000025 \times \text{penetrance}$. Observed zero (Case 4) and positive homozygote-only sites (Case 5) are strictly distinguished. In Case 5, exported carrier frequency follows the active `useHomozygoteExclusion` setting.
+*Policy on Fallback Prior Inversion:* The user-configured fallback prior is a **carrier frequency** ($CF = 0.01 = 1\%$). Under the standard diploid assumption $CF \approx 2q$, the implied carrier allele frequency is $q = \frac{CF}{2} = 0.005$. Therefore, the implied genetic prevalence is $q^2 = 0.005^2 = 0.000025$ (1 in 40,000), and the penetrance-adjusted disease prevalence is $0.000025 \times \text{penetrance}$. Observed zero (Case 4) and positive homozygote-only sites (Case 5) are strictly distinguished. In Case 5, when homozygote exclusion is disabled, calculation follows the active formula branch ($2q(1-q)$ under HWE, $2q$ under simplified) rather than GCR. When penetrance is 0.0, penetrance-adjusted prevalence is 0.0 in all cases.
 
 ---
 
 ### 2.3 Worker Coordination, Concurrency & Lifecycle Architecture (SPEC-06, SPEC-07)
 
 #### 2.3.1 Worker State Machine, Revision Guard & Session Invalidation (SPEC-06)
-In `useCarrierFrequency.ts`:
-1. Distinguish stable `geneSessionKey = "${geneSymbol}:${datasetVersion}"` from request `dispatchedRevision: number` and `desiredRevision: number`.
-2. When user modifies filters, calculation, quality settings, or exclusions while `isCalculating.value === true`, increment `desiredRevision.value++` and set `hasPendingChanges.value = true`.
-3. Wrap Comlink calls with captured request context and enforce atomic commit guards:
-   ```typescript
-   const currentSessionKey = activeGeneSessionKey.value;
-   const currentRevision = ++dispatchedRevision.value;
-   isCalculating.value = true;
+In `useCarrierFrequency.ts` and `useHistoryAutoSave.ts`:
 
-   try {
-     const result = await workerAdapter.processGene(payload);
-     // Atomic commit guard: commit ONLY if session matches, response matches desired revision,
-     // and no newer settings were requested during the roundtrip
-     const isCurrentAndSettled = (
-       activeGeneSessionKey.value === currentSessionKey &&
-       currentRevision === desiredRevision.value &&
-       !hasPendingChanges.value
-     );
-     if (isCurrentAndSettled) {
-       commitResult(result);
-     } else {
-       // Suppress stale commit to prevent autosave from recording obsolete results alongside new filters
-       logger.debug(`[Worker] Suppressed commit of stale revision ${currentRevision} (desired: ${desiredRevision.value})`);
-     }
-   } catch (error) {
-     if (activeGeneSessionKey.value === currentSessionKey && currentRevision === desiredRevision.value && !hasPendingChanges.value) {
-       handleCalculationError(error);
-     }
-   } finally {
-     // Infallible check for pending changes on BOTH resolve and reject
-     if (hasPendingChanges.value || desiredRevision.value > currentRevision) {
-       hasPendingChanges.value = false;
-       dispatchLatestContext();
-     } else if (desiredRevision.value === currentRevision) {
-       isCalculating.value = false;
-     }
-   }
-   ```
-4. In `variant-worker.ts`, cache raw datasets in a Map keyed by `geneSessionKey`. Switching genes clears the previous session cache to prevent memory leaks and cross-session contamination. If initial fetch failed and no raw data was cached, subsequent pending filter requests cannot succeed without raw data; `dispatchLatestContext()` verifies dataset availability and resets pending flags cleanly on persistent failure.
+1. **Context Revision Counter & Execution State:**
+   - Single authoritative revision ref: `activeContextRevision: Ref<number> = ref(1)`.
+   - Increment `activeContextRevision.value++` whenever any active analysis setting (gene, dataset, filters, calc, quality, exclusions) changes.
+   - Dispatch tracking:
+     - `inFlightSession: string | null = null;`
+     - `inFlightRevision: number | null = null;`
+     - `isCalculating: Ref<boolean> = ref(false);`
+2. **Dispatch & Coalescing Protocol:**
+   - When inputs change, caller invokes `requestCalculation()`:
+     - If `isCalculating.value === true`: Do **not** spawn a parallel worker job. The running job will detect `activeContextRevision.value > inFlightRevision` upon completion and dispatch exactly one coalesced follow-up.
+     - If `isCalculating.value === false`:
+       ```typescript
+       const sessionKey = `${wizardState.gene.symbol}:${selectedVersion.value}`;
+       const reqRevision = activeContextRevision.value;
+       inFlightSession = sessionKey;
+       inFlightRevision = reqRevision;
+       isCalculating.value = true;
+
+       workerAdapter.processGene(buildPayload(activeContext))
+         .then((result) => {
+           // Atomic commit guard: commit ONLY if session matches and revision is current
+           if (inFlightSession === sessionKey && reqRevision === activeContextRevision.value) {
+             commitResult(result);
+           } else {
+             logger.debug(`[Worker] Discarded stale revision ${reqRevision} (current: ${activeContextRevision.value})`);
+           }
+         })
+         .catch((error) => {
+           if (inFlightSession === sessionKey && reqRevision === activeContextRevision.value) {
+             handleCalculationError(error);
+           }
+         })
+         .finally(() => {
+           // Session ownership check: ignore callbacks from discarded sessions
+           if (inFlightSession !== sessionKey) {
+             isCalculating.value = false;
+             return;
+           }
+           // Coalesced replay check: dispatch exactly ONE follow-up if settings changed while in flight
+           if (activeContextRevision.value > reqRevision) {
+             requestCalculation();
+           } else {
+             isCalculating.value = false;
+             inFlightSession = null;
+             inFlightRevision = null;
+           }
+         });
+       ```
+3. **Autosave Synchronization Guard:**
+   - In `useHistoryAutoSave.ts`, filter and exclusion debounce timers must check `if (isCalculating.value) return;` — this strictly prevents saving new filter criteria alongside stale frequencies.
+   - History entry updates occur only when `commitResult` publishes a verified `(AnalysisContext, Result)` pair for the current revision.
+4. **Worker Cache Invalidation:**
+   - In `variant-worker.ts`, cache raw datasets in a Map keyed by `geneSessionKey`. Switching genes clears previous session caches.
 
 #### 2.3.2 Atomic Transactional History & URL Restoration (SPEC-07-MIG, SPEC-07-TXN)
 In `useHistoryRestore.ts`, `useWizard.ts`, `useGeneConfig.ts`, and `useHistoryAutoSave.ts`:
@@ -271,16 +287,29 @@ In `useHistoryRestore.ts`, `useWizard.ts`, `useGeneConfig.ts`, and `useHistoryAu
    - Generate unique token: `const token = Symbol('restore')`.
    - Set lock flags: `activeRestoreToken.value = token`, `isRestoring.value = true`.
    - Cancel any pending debounced autosaves immediately (`saveDebounced.cancel()`). Autosave writes are completely suppressed while `isRestoring.value === true`.
-2. **Dataset & Version Sequencing (Critical for Assembly Scope):**
+2. **Invalidate In-Flight Asynchronous Profile Loads:**
+   - In `useGeneConfig.ts`, maintain module-level `activeConfigToken = Symbol()`.
+   - Restore immediately assigns `activeConfigToken = Symbol()`.
+   - In `useGeneConfig.ts`'s watcher on `selectedGene`:
+     ```typescript
+     const reqToken = Symbol();
+     activeConfigToken = reqToken;
+     const targetSymbol = gene?.symbol;
+
+     const config = await loadGeneConfig(gene.symbol);
+     // Guard: discard if superseded by another gene selection, load, or active restore
+     if (activeConfigToken !== reqToken || wizardState.gene?.symbol !== targetSymbol || isRestoring.value) {
+       return;
+     }
+     ```
+   - This guarantees that a slow, previously initiated configuration fetch cannot resolve after restore and clobber restored filters or calculation settings.
+3. **Dataset & Version Sequencing (Assembly Scope):**
    - Update target gnomAD dataset/version in `versionStore` **before** gene selection or worker fetch:
      `versionStore.setVersion(restored.dataset);`
    - This ensures the reference genome (`GRCh38` vs `GRCh37`) and API endpoints match the restored dataset before any network or worker requests are constructed.
-3. **Gene Selection & Watcher Suppression:**
+4. **Gene Selection & Watcher Suppression:**
    - Update selected gene: `wizardStore.setSelectedGene(restored.gene);`
    - In `useWizard.ts`, the watcher on `selectedGene` checks `if (isRestoring.value) return;` — this strictly suppresses resetting `currentStep`, `indexPatientStatus`, and `frequencySource`.
-4. **Gene Profile Application Suppression at Consumption Site:**
-   - In `useGeneConfig.ts`, the watcher on `selectedGene` checks `if (isRestoring.value)`.
-   - When restoring, it loads gene config metadata without calling `filterStore.resetToFactoryDefaults()` or `calcStore.resetToFactoryDefaults()`, and without invoking `applyProfile(defaultProfile)`. It sets `activeProfile.value` to match the restored profile name (if specified) or leaves it as custom, preserving restored filter settings.
 5. **Exact Legacy History Migration:**
    ```typescript
    function migrateHistoryEntry(raw: any): RestoredSettings {
@@ -418,7 +447,7 @@ export const TemplateImportSchema = z.object({
 
 #### 2.6.1 Working Package Scripts & Coverage Threshold Enforcement (SPEC-12-COV)
 In root `package.json`, define:
-- `"test:coverage": "bun run --filter @gnomad-cf/core test:coverage && bun run --filter @gnomad-cf/cli test:coverage && bun run --filter @gnomad-cf/web test:coverage"`
+- `"test:coverage": "bun run --filter @gnomad-cf/core test:coverage && bun run --filter @gnomad-cf/cli test:coverage && bun run --filter gnomad-cf-web test:coverage"`
 - `"test:e2e": "CI=1 playwright test"`
 
 In each package `package.json`, define:
@@ -427,7 +456,7 @@ In each package `package.json`, define:
 Vitest 4 evaluates coverage thresholds at the root configuration level. Invoking package-level coverage runs loads each package's `vitest.config.ts` as its own root configuration, directly enforcing each package's calibrated thresholds:
 - `@gnomad-cf/core`: `lines: 80` (enforcing core math and filter contracts)
 - `@gnomad-cf/cli`: `lines: 70` (enforcing formatter, commands, and options)
-- `@gnomad-cf/web`: `lines: 35` (enforcing stores, composables, and utils)
+- `gnomad-cf-web` (`apps/web`): `lines: 35` (enforcing stores, composables, and utils)
 
 #### 2.6.2 Tests Workflow (`.github/workflows/tests.yml`)
 - Trigger: `push` on `main`, `pull_request` on `main`.
@@ -472,7 +501,7 @@ jobs:
       - run: bun run build
       - run: bun run docs:build
       - name: Merge built documentation into web distribution
-        run: cp -r docs/.vitepress/dist apps/web/dist/docs
+        run: cp -r apps/web/docs/.vitepress/dist apps/web/dist/docs
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -512,23 +541,31 @@ jobs:
 
 ### 2.8 Performance Budgets & Benchmark Methodology (SPEC-13)
 
-#### 2.8.1 Pinned Environment & Deterministic Replay
+#### 2.8.1 Pinned Environment, Deterministic Replay & Complete Isolation
 - **Browser:** Chromium bundled with `@playwright/test` (exact revision pinned in `bun.lock`).
 - **Profile:** Desktop viewport (1280×800), headless, unthrottled CPU and network.
 - **Server:** `bun run preview` serving production build on `http://127.0.0.1:4173/`.
-- **Deterministic Fixture:** Static mock response for CFTR (`apps/web/e2e/fixtures/cftr-mock.json`).
-- **Network Isolation:** Playwright intercepts `https://gnomad.broadinstitute.org/api*` and `https://search.clinicalgenome.org/*`, serving local fixtures to eliminate upstream latency and network jitter. Harness verifies fixture consumption by asserting expected qualifying variant counts prior to measurement.
+- **Deterministic Fixtures:** Static mock response for CFTR (`apps/web/e2e/fixtures/cftr-mock.json`) and Orphanet prevalence (`apps/web/e2e/fixtures/orphanet-mock.json`).
+- **Strict Network Isolation:** Playwright intercepts:
+  - `https://gnomad.broadinstitute.org/api*`
+  - `https://search.clinicalgenome.org/*`
+  - `https://api.orphadata.com/*`
+  Any unmocked external network request triggers immediate test assertion failure. Harness verifies fixture consumption by asserting expected qualifying variant counts prior to measurement.
 
 #### 2.8.2 Cold Navigation & Warm Interaction Protocols
 1. **Cold Navigation Suite (5 measured repetitions):**
    - Before each run, invoke Chrome DevTools Protocol (CDP) `Storage.clearDataForOrigin` clearing all origins, IndexedDB, Service Workers, Cache Storage, and Web Storage.
    - Navigate to `http://127.0.0.1:4173/?gene=CFTR`.
-   - Measure Navigation Timing: Time to First Byte (TTFB), First Contentful Paint (FCP), Largest Contentful Paint (LCP), and Total Blocking Time (TBT).
+   - **Metric Collection Contract:**
+     - **TTFB:** `performance.getEntriesByType('navigation')[0].responseStart`.
+     - **FCP:** `performance.getEntriesByName('first-contentful-paint')[0].startTime`.
+     - **LCP:** `PerformanceObserver` tracking `largest-contentful-paint` until page `load` + 500ms network-and-CPU idle window.
+     - **TBT:** Total Blocking Time calculated as $\sum (\text{duration} - 50)$ for all `longtask` PerformanceObserver entries occurring between FCP and the 500ms quiet window.
 2. **Warm Interaction Suite (5 measured repetitions):**
    - Perform 1 unmeasured warm-up navigation to seed IndexedDB cache and initialize the worker thread.
    - For each repetition, measure client execution boundaries using `performance.now()`:
      - **Refilter Duration:** Timestamp interval from filter toggle dispatch (e.g. missense consequence toggle) to Pinia store calculation commit event.
-     - **Drilldown Dialog Render:** Timestamp interval from population SVG bar click to Vuetify dialog DOM active state (`.v-dialog--active`).
+     - **Drilldown Dialog Render:** Timestamp interval from population SVG bar click to Vuetify dialog DOM visible state (`page.locator('.v-dialog .v-card').waitFor({ state: 'visible' })`).
 3. **Statistical Reporting:**
    - Record all raw samples across the 5 runs; report median and Interquartile Range (IQR) for navigation and interaction metrics.
 
