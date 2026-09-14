@@ -175,7 +175,7 @@ export function useAnalysisContext() {
         isDefaultFallback: wizardState.frequencySource === "default",
         cacheTimestamp: Date.now(),
         clinvarSubmissionBatchId: null,
-        appVersion: "1.7.2",
+        appVersion: "1.8.0",
       },
     };
   });

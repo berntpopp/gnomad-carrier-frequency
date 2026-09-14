@@ -64,7 +64,7 @@ describe("AnalysisContextSchema", () => {
       isDefaultFallback: false,
       cacheTimestamp: 1726344000000,
       clinvarSubmissionBatchId: "batch-123",
-      appVersion: "1.7.2",
+      appVersion: "1.8.0",
     },
   };
 
