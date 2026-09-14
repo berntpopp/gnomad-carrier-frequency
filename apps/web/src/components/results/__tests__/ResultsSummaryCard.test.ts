@@ -44,7 +44,8 @@ describe("ResultsSummaryCard", () => {
         excludedCount: 0,
         flaggedVariantCount: 0,
         currentFormat: "percent",
-        formatFrequency: (f: number | null) => (f !== null ? `${(f * 100).toFixed(2)}%` : "-"),
+        formatFrequency: (f: number | null) =>
+          f !== null ? `${(f * 100).toFixed(2)}%` : "-",
         orphanetLoading: false,
         orphanetDiseases: [],
         primaryDisease: null,
@@ -53,7 +54,9 @@ describe("ResultsSummaryCard", () => {
       global: { stubs: stubComponents },
     });
 
-    expect(wrapper.find('[data-testid="results-summary-card"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="results-summary-card"]').exists()).toBe(
+      true,
+    );
     expect(wrapper.text()).toContain("CFTR");
     expect(wrapper.text()).toContain("ENST00000003084");
     expect(wrapper.text()).toContain("4.00%");
@@ -78,7 +81,8 @@ describe("ResultsSummaryCard", () => {
         excludedCount: 0,
         flaggedVariantCount: 0,
         currentFormat: "percent",
-        formatFrequency: (f: number | null) => (f !== null ? `${(f * 100).toFixed(2)}%` : "-"),
+        formatFrequency: (f: number | null) =>
+          f !== null ? `${(f * 100).toFixed(2)}%` : "-",
         orphanetLoading: false,
         orphanetDiseases: [],
         primaryDisease: null,
@@ -110,7 +114,8 @@ describe("ResultsSummaryCard", () => {
         excludedCount: 0,
         flaggedVariantCount: 0,
         currentFormat: "percent",
-        formatFrequency: (f: number | null) => (f !== null ? `${(f * 100).toFixed(2)}%` : "-"),
+        formatFrequency: (f: number | null) =>
+          f !== null ? `${(f * 100).toFixed(2)}%` : "-",
         orphanetLoading: false,
         orphanetDiseases: [],
         primaryDisease: null,

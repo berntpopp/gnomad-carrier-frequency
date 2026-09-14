@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mountWithPlugins } from "@/test/helpers";
 import ResultsExportMenu from "../ResultsExportMenu.vue";
-import type { CarrierFrequencyResult, FilterConfig, CalcConfig } from "@gnomad-cf/core/types";
+import type {
+  CarrierFrequencyResult,
+  FilterConfig,
+  CalcConfig,
+} from "@gnomad-cf/core/types";
 
 const mockExportToJson = vi.fn();
 const mockExportToExcel = vi.fn();

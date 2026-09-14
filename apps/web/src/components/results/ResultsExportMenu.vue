@@ -17,16 +17,10 @@
       </v-tooltip>
     </template>
     <v-list density="compact">
-      <v-list-item
-        prepend-icon="mdi-code-json"
-        @click="handleExport('json')"
-      >
+      <v-list-item prepend-icon="mdi-code-json" @click="handleExport('json')">
         <v-list-item-title>Export as JSON</v-list-item-title>
       </v-list-item>
-      <v-list-item
-        prepend-icon="mdi-file-excel"
-        @click="handleExport('xlsx')"
-      >
+      <v-list-item prepend-icon="mdi-file-excel" @click="handleExport('xlsx')">
         <v-list-item-title>Export as Excel</v-list-item-title>
       </v-list-item>
       <v-list-item
@@ -52,6 +46,7 @@ import type {
   ClinVarVariant,
   FilterConfig,
   CalcConfig,
+  ExclusionReason,
 } from "@gnomad-cf/core/types";
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 import { useExport } from "@/composables";
@@ -69,7 +64,7 @@ const props = defineProps<{
   calcConfig: CalcConfig;
   submissions: Map<string, ClinVarSubmission[]>;
   excludedSet: Set<string>;
-  reasons: Map<string, string>;
+  reasons: Map<string, ExclusionReason>;
 }>();
 
 const { exportToJson, exportToExcel, exportPopulationsTsv, exportVariantsTsv } =

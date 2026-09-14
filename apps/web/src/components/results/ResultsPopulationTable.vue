@@ -4,7 +4,9 @@
     <ResultsTableToolbar
       :result="result"
       :current-format="currentFormat"
-      :qualifying-variants-count="qualifyingVariantCount ?? qualifyingVariants?.length ?? 0"
+      :qualifying-variants-count="
+        qualifyingVariantCount ?? qualifyingVariants?.length ?? 0
+      "
       :variants="variants"
       :clinvar-variants="clinvarVariants"
       :filter-config="filterConfig"
@@ -60,7 +62,10 @@
           >
             <template #item="{ item }">
               <tr
-                :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
+                :class="[
+                  getRowClass(item),
+                  { 'population-row': !item.isGlobal },
+                ]"
                 @click="!item.isGlobal && emit('openModal', item.code)"
               >
                 <td>
@@ -289,6 +294,7 @@ import type {
   ClinVarVariant,
   FilterConfig,
   CalcConfig,
+  ExclusionReason,
 } from "@gnomad-cf/core/types";
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 import {
@@ -330,7 +336,7 @@ const props = defineProps<{
   calcConfig: CalcConfig;
   submissions: Map<string, ClinVarSubmission[]>;
   excludedSet: Set<string>;
-  reasons: Map<string, string>;
+  reasons: Map<string, ExclusionReason>;
   isLoading: boolean;
   currentFormat: DisplayFormat;
   formatFrequency: (freq: number | null) => string;

@@ -71,8 +71,8 @@
         class="mb-4"
       >
         All {{ excludedCount }} qualifying variant(s) have been manually
-        excluded. Carrier frequency cannot be calculated. Open the variant
-        table to restore variants.
+        excluded. Carrier frequency cannot be calculated. Open the variant table
+        to restore variants.
         <template #append>
           <v-btn
             variant="text"
@@ -153,9 +153,9 @@
               </template>
               <span class="tooltip-text">
                 <strong>Genetic Prevalence (q&sup2;)</strong><br />
-                Expected frequency of affected individuals under
-                Hardy-Weinberg Equilibrium. This is the theoretical disease
-                frequency before accounting for penetrance.
+                Expected frequency of affected individuals under Hardy-Weinberg
+                Equilibrium. This is the theoretical disease frequency before
+                accounting for penetrance.
               </span>
             </v-tooltip>
             <div class="stat-value">
@@ -244,6 +244,7 @@ import type {
   IndexPatientStatus,
 } from "@gnomad-cf/core/types";
 import { config } from "@gnomad-cf/core/config";
+import type { OrphanetDisease } from "@gnomad-cf/core/orphanet";
 import {
   calculateRecurrenceRisk,
   frequencyToPercent,
@@ -262,7 +263,7 @@ const props = defineProps<{
   useHWEFormula: boolean;
   sourceAttribution: string;
   sourceChipColor: string;
-  cacheStatus: "idle" | "hit" | "miss";
+  cacheStatus: "hit" | "miss" | "stored" | "unavailable" | "idle" | null;
   processingStatus: string | null;
   isLoading: boolean;
   qualifyingVariantCount: number;
@@ -271,9 +272,9 @@ const props = defineProps<{
   currentFormat: DisplayFormat;
   formatFrequency: (freq: number | null) => string;
   orphanetLoading: boolean;
-  orphanetDiseases: unknown[];
-  primaryDisease: unknown;
-  additionalDiseases: unknown[];
+  orphanetDiseases: OrphanetDisease[];
+  primaryDisease: OrphanetDisease | undefined;
+  additionalDiseases: OrphanetDisease[];
 }>();
 
 defineEmits<{

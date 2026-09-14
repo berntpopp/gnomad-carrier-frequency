@@ -164,7 +164,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useDisplay } from "vuetify";
-import { config, getGnomadVersion, getPopulationLabel } from "@gnomad-cf/core/config";
+import {
+  config,
+  getGnomadVersion,
+  getPopulationLabel,
+} from "@gnomad-cf/core/config";
 import type {
   CarrierFrequencyResult,
   IndexPatientStatus,
