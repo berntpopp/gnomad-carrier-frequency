@@ -9,6 +9,7 @@ import {
   buildPopulationFrequencies,
   formatCarrierFrequency,
   formatPrevalence,
+  calculateRecurrenceRisk,
 } from "@gnomad-cf/core/calculations";
 import {
   config,
@@ -21,6 +22,7 @@ import { useGnomadVersion } from "@/api";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useCalcStore } from "@/stores/useCalcStore";
 import { useQualityStore } from "@/stores/useQualityStore";
+import { activeContextRevision, incrementRevision } from "./useAnalysisContext";
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 import type {
   CarrierFrequencyResult,
@@ -53,6 +55,7 @@ export interface UseCarrierFrequencyReturn {
 
   // Loading/Error
   isLoading: Ref<boolean>;
+  isCalculating: Ref<boolean>;
   hasError: Ref<boolean>;
   errorMessage: Ref<string | null>;
 
@@ -127,6 +130,10 @@ export interface UseCarrierFrequencyReturn {
 // Singleton instance for shared state across all callers
 let instance: UseCarrierFrequencyReturn | null = null;
 
+export function disposeCarrierFrequencyInstance(): void {
+  instance = null;
+}
+
 export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   // Return cached instance if already created (singleton pattern)
   if (instance) return instance;
@@ -140,6 +147,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
 
   const setGeneSymbol = (symbol: string | null) => {
     geneSymbol.value = symbol?.toUpperCase() ?? null;
+    incrementRevision();
   };
 
   // Reactive filter configuration - initialized from store defaults
@@ -155,6 +163,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
 
   const setFilterConfig = (config: FilterConfig) => {
     filterConfig.value = { ...config };
+    incrementRevision();
   };
 
   // Per-analysis quality exclusion config — local state, initialized from store defaults
@@ -165,6 +174,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
 
   const setQualityExclusionConfig = (config: QualityExclusionConfig) => {
     qualityExclusionConfig.value = { ...config };
+    incrementRevision();
   };
 
   // Get exclusion state (singleton)
@@ -208,19 +218,26 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
 
   // Loading/error state
   const isLoading = ref(false);
+  const isCalculating = ref(false);
   const hasError = ref(false);
   const errorMessage = ref<string | null>(null);
   const hasData = ref(false);
   const processingStatus = ref<string | null>(null);
   const cacheStatus = ref<WorkerResult["cacheStatus"] | null>(null);
 
+  // Session and revision tracking for worker concurrency
+  let inFlightSession: string | null = null;
+  let inFlightRevision: number | null = null;
+  let lastFetchedSession: string | null = null;
+
+  const getSessionKey = () =>
+    geneSymbol.value ? `${geneSymbol.value}:${version.value}` : null;
+
   // currentVersion alias
   const currentVersion = version;
 
-  // Apply worker result, guarded by requestId stale check
+  // Apply worker result
   function applyResult(result: WorkerResult): void {
-    if (result.requestId !== latestRequestId) return;
-
     filteredByPathogenicity.value = result.filteredByPathogenicity;
     qualifyingVariants.value = result.qualifyingVariants;
     clinvarVariantsRef.value = result.clinvarVariants;
@@ -233,75 +250,106 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
 
     hasData.value = true;
     isLoading.value = false;
+    isCalculating.value = false;
     processingStatus.value = null;
   }
 
-  async function dispatchProcessGene(forceRefresh = false): Promise<void> {
+  async function requestCalculation(forceRefresh = false): Promise<void> {
     const gene = geneSymbol.value;
     if (!gene) return;
 
-    latestRequestId++;
-    const requestId = latestRequestId;
+    const sessionKey = getSessionKey();
+    if (!sessionKey) return;
 
+    if (isCalculating.value) {
+      return;
+    }
+
+    const reqRevision = activeContextRevision.value;
+    inFlightSession = sessionKey;
+    inFlightRevision = reqRevision;
+    isCalculating.value = true;
     isLoading.value = true;
     hasError.value = false;
     errorMessage.value = null;
-    processingStatus.value = `Fetching variants for ${gene}...`;
+
+    const needsFullFetch =
+      !hasData.value || forceRefresh || lastFetchedSession !== sessionKey;
+
+    processingStatus.value = needsFullFetch
+      ? `Fetching variants for ${gene}...`
+      : "Refiltering...";
 
     try {
-      // Spread reactive objects into plain objects for structured clone (postMessage)
-      const result = await processGene({
-        geneSymbol: gene,
-        dataset: getDatasetId(version.value),
-        referenceGenome: getReferenceGenome(version.value),
-        apiEndpoint: getApiEndpoint(version.value),
-        filterConfig: { ...filterConfig.value },
-        qualitySettings: { ...qualityStore.defaults },
-        qualityExclusionConfig: { ...qualityExclusionConfig.value },
-        calcConfig: { ...calcStore.defaults },
-        excludedIds: Array.from(debouncedExcluded.value),
-        submissions: Array.from(submissions.value.entries()),
-        forceRefresh,
-        requestId,
-      });
-      applyResult(result);
+      let workerResult: WorkerResult;
+      latestRequestId++;
+      const requestId = latestRequestId;
+
+      if (needsFullFetch) {
+        workerResult = await processGene({
+          geneSymbol: gene,
+          dataset: getDatasetId(version.value),
+          referenceGenome: getReferenceGenome(version.value),
+          apiEndpoint: getApiEndpoint(version.value),
+          filterConfig: { ...filterConfig.value },
+          qualitySettings: { ...qualityStore.defaults },
+          qualityExclusionConfig: { ...qualityExclusionConfig.value },
+          calcConfig: { ...calcStore.defaults },
+          excludedIds: Array.from(debouncedExcluded.value),
+          submissions: Array.from(submissions.value.entries()),
+          forceRefresh,
+          requestId,
+        });
+        lastFetchedSession = sessionKey;
+      } else {
+        workerResult = await refilter({
+          filterConfig: { ...filterConfig.value },
+          qualitySettings: { ...qualityStore.defaults },
+          qualityExclusionConfig: { ...qualityExclusionConfig.value },
+          calcConfig: { ...calcStore.defaults },
+          excludedIds: Array.from(debouncedExcluded.value),
+          submissions: Array.from(submissions.value.entries()),
+          requestId,
+        });
+      }
+
+      const isCurrentSession = getSessionKey() === sessionKey;
+      const isCurrentRevision = reqRevision === activeContextRevision.value;
+
+      if (isCurrentSession && isCurrentRevision) {
+        applyResult(workerResult);
+      } else {
+        logger.debug(
+          `[Worker] Discarded stale result (session: ${sessionKey} vs ${getSessionKey()}, rev: ${reqRevision} vs ${activeContextRevision.value})`,
+        );
+      }
     } catch (err) {
-      if (requestId !== latestRequestId) return;
-      hasError.value = true;
-      errorMessage.value =
-        err instanceof Error ? err.message : "Failed to load variant data.";
-      isLoading.value = false;
-      processingStatus.value = null;
-    }
-  }
+      const isCurrentSession = getSessionKey() === sessionKey;
+      const isCurrentRevision = reqRevision === activeContextRevision.value;
 
-  async function dispatchRefilter(): Promise<void> {
-    // Don't refilter while a full processGene fetch is in flight —
-    // it would increment latestRequestId and discard the fetch result.
-    if (!hasData.value || isLoading.value) return;
+      if (isCurrentSession && isCurrentRevision) {
+        hasError.value = true;
+        errorMessage.value =
+          err instanceof Error ? err.message : "Failed to load variant data.";
+        isLoading.value = false;
+        isCalculating.value = false;
+        processingStatus.value = null;
+      }
+    } finally {
+      // Clear execution ownership prior to potential re-dispatch
+      isCalculating.value = false;
+      inFlightSession = null;
+      inFlightRevision = null;
 
-    latestRequestId++;
-    const requestId = latestRequestId;
+      const currentSession = getSessionKey();
+      const hasPendingChanges =
+        currentSession !== null &&
+        (currentSession !== sessionKey ||
+          activeContextRevision.value > reqRevision);
 
-    processingStatus.value = "Refiltering...";
-
-    try {
-      // Spread reactive objects into plain objects for structured clone (postMessage)
-      const result = await refilter({
-        filterConfig: { ...filterConfig.value },
-        qualitySettings: { ...qualityStore.defaults },
-        qualityExclusionConfig: { ...qualityExclusionConfig.value },
-        calcConfig: { ...calcStore.defaults },
-        excludedIds: Array.from(debouncedExcluded.value),
-        submissions: Array.from(submissions.value.entries()),
-        requestId,
-      });
-      applyResult(result);
-    } catch (err) {
-      if (requestId !== latestRequestId) return;
-      // Refilter errors are non-fatal — keep existing data
-      processingStatus.value = null;
-      logger.warn("Refilter failed", { error: err });
+      if (hasPendingChanges) {
+        requestCalculation();
+      }
     }
   }
 
@@ -309,6 +357,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   watch([geneSymbol, version], ([gene]) => {
     // Reset state when gene changes
     if (!gene) {
+      lastFetchedSession = null;
       hasData.value = false;
       filteredByPathogenicity.value = [];
       qualifyingVariants.value = [];
@@ -320,26 +369,27 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
       workerGlobalStats.value = null;
       cacheStatus.value = null;
       isLoading.value = false;
+      isCalculating.value = false;
       hasError.value = false;
       errorMessage.value = null;
       processingStatus.value = null;
       return;
     }
-    dispatchProcessGene();
+    requestCalculation();
   });
 
   // Debounced watch on filter/quality/calc config changes → refilter (300ms)
   watchDebounced(
     [filterConfig, qualityExclusionConfig, () => calcStore.defaults],
     () => {
-      dispatchRefilter();
+      requestCalculation();
     },
     { debounce: 300 },
   );
 
   // Watch manual exclusions → refilter (already debounced by debouncedExcluded at 500ms)
   watch(debouncedExcluded, () => {
-    dispatchRefilter();
+    requestCalculation();
   });
 
   // Watch submissions (deep) → refilter when hasData
@@ -347,7 +397,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     submissions,
     () => {
       if (hasData.value) {
-        dispatchRefilter();
+        requestCalculation();
       }
     },
     { deep: true },
@@ -479,10 +529,13 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   // Recurrence risk calculation (CALC-02, CALC-03)
   const calculateRisk = (status: IndexPatientStatus) => {
     if (globalCarrierFrequency.value === null) return null;
-    // CALC-02: Heterozygous carrier: carrier_freq / 4
-    // CALC-03: Compound het/homozygous: carrier_freq / 2
-    const divisor = status === "heterozygous" ? 4 : 2;
-    const risk = globalCarrierFrequency.value / divisor;
+    const penetrance = calcStore.defaults.penetrance ?? 1.0;
+    const risk = calculateRecurrenceRisk(
+      globalCarrierFrequency.value,
+      status,
+      penetrance,
+    );
+    if (risk === null) return null;
     return {
       risk,
       percent: `${(risk * 100).toFixed(2)}%`,
@@ -501,7 +554,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
 
   // refetch forces a full processGene with cache bypass
   const refetch = async (): Promise<void> => {
-    await dispatchProcessGene(true);
+    await requestCalculation(true);
   };
 
   // Cache and return the singleton instance
@@ -509,6 +562,7 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
     geneSymbol,
     setGeneSymbol,
     isLoading,
+    isCalculating,
     hasError,
     errorMessage,
     result,

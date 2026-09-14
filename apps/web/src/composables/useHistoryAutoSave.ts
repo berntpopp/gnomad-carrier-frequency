@@ -4,6 +4,7 @@ import { useHistoryStore } from "@/stores/useHistoryStore";
 import { useWizard } from "./useWizard";
 import { useCarrierFrequency } from "./useCarrierFrequency";
 import { useExclusionState } from "./useExclusionState";
+import { isRestoring } from "./useAnalysisContext";
 
 // Track if already initialized (singleton pattern)
 let isInitialized = false;
@@ -25,7 +26,8 @@ let currentEntryId: string | null = null;
 export function useHistoryAutoSave() {
   const historyStore = useHistoryStore();
   const { state: wizardState } = useWizard();
-  const { result, filterConfig, currentVersion } = useCarrierFrequency();
+  const { result, filterConfig, currentVersion, isCalculating } =
+    useCarrierFrequency();
   const { excluded } = useExclusionState();
 
   function initialize() {
@@ -68,6 +70,7 @@ export function useHistoryAutoSave() {
     watchDebounced(
       () => ({ ...filterConfig.value }),
       () => {
+        if (isRestoring.value || isCalculating.value) return;
         if (wizardState.currentStep === 4 && currentEntryId) {
           updateCurrentEntry();
         }
@@ -80,6 +83,7 @@ export function useHistoryAutoSave() {
     watchDebounced(
       () => [...excluded.value],
       () => {
+        if (isRestoring.value || isCalculating.value) return;
         if (wizardState.currentStep === 4 && currentEntryId) {
           updateCurrentEntry();
         }
@@ -89,6 +93,10 @@ export function useHistoryAutoSave() {
   }
 
   function saveCurrentCalculation() {
+    if (isRestoring.value || isCalculating.value) {
+      return;
+    }
+
     // Must have valid gene and result
     if (!wizardState.gene || !result.value) {
       return;
@@ -147,6 +155,10 @@ export function useHistoryAutoSave() {
    * Called when filters or exclusions change while on step 4.
    */
   function updateCurrentEntry() {
+    if (isRestoring.value || isCalculating.value) {
+      return;
+    }
+
     if (!currentEntryId || !result.value) {
       return;
     }
