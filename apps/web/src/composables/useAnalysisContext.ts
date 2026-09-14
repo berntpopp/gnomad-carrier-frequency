@@ -2,12 +2,12 @@ import { ref, computed, watch, type ComputedRef, type Ref } from "vue";
 import type { AnalysisContext } from "@gnomad-cf/core/types";
 import { useWizard } from "./useWizard";
 import { useGnomadVersion } from "@/api";
-import { useSubcontinentalStore } from "@/stores/useSubcontinentalStore";
 import { useCalcStore } from "@/stores/useCalcStore";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useQualityStore } from "@/stores/useQualityStore";
 import { useExclusionState } from "./useExclusionState";
 import { useGeneConfig } from "./useGeneConfig";
+import { useUrlState } from "./useUrlState";
 
 // Module-level singleton state
 export const isRestoring: Ref<boolean> = ref(false);
@@ -24,7 +24,7 @@ let initialized = false;
 export function useAnalysisContext() {
   const { state: wizardState } = useWizard();
   const { version, versionConfig } = useGnomadVersion();
-  const subcontinentalStore = useSubcontinentalStore();
+  const { subcontinentalEnabled } = useUrlState();
   const calcStore = useCalcStore();
   const filterStore = useFilterStore();
   const qualityStore = useQualityStore();
@@ -49,7 +49,7 @@ export function useAnalysisContext() {
 
     // Version & subcontinental toggle
     watch(
-      () => [version.value, subcontinentalStore.enabled],
+      () => [version.value, subcontinentalEnabled.value],
       () => incrementRevision(),
     );
 
@@ -122,7 +122,7 @@ export function useAnalysisContext() {
         geneId: wizardState.gene?.ensembl_id ?? "",
         dataset: currentDataset,
         referenceGenome: versionConfig.value.referenceGenome,
-        subcontinentalEnabled: subcontinentalStore.enabled,
+        subcontinentalEnabled: subcontinentalEnabled.value,
       },
       clinical: {
         indexStatus: wizardState.indexStatus,
@@ -132,7 +132,7 @@ export function useAnalysisContext() {
         penetrance: calcStore.defaults.penetrance ?? 1.0,
       },
       filters: {
-        selectedProfileName: activeProfile.value?.name ?? null,
+        selectedProfileName: activeProfile.value?.displayName ?? null,
         includeLof: filterStore.defaults.lofHcEnabled,
         includeMissense: filterStore.defaults.missenseEnabled,
         includeClinvarPathogenic: filterStore.defaults.clinvarEnabled,
