@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   calculateGeneticPrevalence,
   calculateBayesianPrevalence,
+  deriveFallbackGeneticPrevalence,
   formatPrevalence,
 } from '../src/calculations/prevalence.js'
 
@@ -76,6 +77,28 @@ describe('calculateBayesianPrevalence', () => {
     expect(calculateBayesianPrevalence(0.001, 0.5)).toBeCloseTo(0.0005, 6)
   })
 })
+
+describe('deriveFallbackGeneticPrevalence', () => {
+  it('returns (0.01/2)^2 = 0.000025 for default 0.01 (1%) carrier frequency fallback', () => {
+    expect(deriveFallbackGeneticPrevalence(0.01)).toBeCloseTo(0.000025, 8)
+  })
+
+  it('uses 0.01 as default parameter', () => {
+    expect(deriveFallbackGeneticPrevalence()).toBeCloseTo(0.000025, 8)
+  })
+
+  it('derives correct genetic prevalence for custom fallback CF (0.02 -> 0.0001)', () => {
+    // q = 0.02 / 2 = 0.01, q^2 = 0.0001
+    expect(deriveFallbackGeneticPrevalence(0.02)).toBeCloseTo(0.0001, 8)
+  })
+
+  it('returns 0 for invalid or out-of-range fallback values', () => {
+    expect(deriveFallbackGeneticPrevalence(-0.01)).toBe(0)
+    expect(deriveFallbackGeneticPrevalence(1.5)).toBe(0)
+    expect(deriveFallbackGeneticPrevalence(NaN)).toBe(0)
+  })
+})
+
 
 describe('formatPrevalence', () => {
   it('returns "Not detected" strings for null', () => {

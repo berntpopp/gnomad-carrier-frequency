@@ -3,6 +3,10 @@ import {
   getClinvarColor,
   formatAlleleFrequency,
   getConsequenceLabel,
+  toDisplayVariant,
+  toDisplayVariants,
+  getPopulationVariants,
+  filterVariantsByPopulation,
 } from "../src/filters/index.js";
 
 // ---------------------------------------------------------------------------
@@ -114,5 +118,80 @@ describe("getConsequenceLabel", () => {
     expect(getConsequenceLabel(["stop_gained", "splice_donor_variant"])).toBe(
       "stop gained",
     );
+  });
+});
+
+describe("toDisplayVariant & toDisplayVariants", () => {
+  const gnomadVar = {
+    variant_id: "1-1000-A-T",
+    pos: 1000,
+    ref: "A",
+    alt: "T",
+    joint: {
+      ac: 10,
+      an: 1000,
+      homozygote_count: 0,
+      hemizygote_count: 0,
+      populations: [{ id: "nfe", ac: 6, an: 500, homozygote_count: 0 }],
+    },
+    transcript_consequence: {
+      gene_symbol: "TEST",
+      transcript_id: "ENST1",
+      canonical: true,
+      consequence_terms: ["stop_gained"],
+      lof: "HC",
+      lof_filter: null,
+      lof_flags: null,
+      hgvsc: "c.100A>T",
+      hgvsp: "p.Lys34Ter",
+    },
+  };
+
+  const clinvarVar = {
+    variant_id: "1-1000-A-T",
+    clinvar_variation_id: "999",
+    clinical_significance: "Pathogenic",
+    gold_stars: 2,
+    review_status: "criteria provided",
+    pos: 1000,
+    ref: "A",
+    alt: "T",
+  };
+
+  it("transforms gnomAD variant with global counts", () => {
+    const disp = toDisplayVariant(gnomadVar, [clinvarVar]);
+    expect(disp.variant_id).toBe("1-1000-A-T");
+    expect(disp.consequence).toBe("stop gained");
+    expect(disp.alleleCount).toBe(10);
+    expect(disp.alleleNumber).toBe(1000);
+    expect(disp.alleleFrequency).toBe(0.01);
+    expect(disp.clinvarStatus).toBe("Pathogenic");
+    expect(disp.isLoF).toBe(true);
+    expect(disp.isClinvarPathogenic).toBe(true);
+  });
+
+  it("transforms with population-specific counts when populationCode provided", () => {
+    const disp = toDisplayVariant(gnomadVar, [clinvarVar], "nfe");
+    expect(disp.alleleCount).toBe(6);
+    expect(disp.alleleNumber).toBe(500);
+    expect(disp.alleleFrequency).toBe(6 / 500);
+  });
+
+  it("transforms array of variants via toDisplayVariants", () => {
+    const arr = toDisplayVariants([gnomadVar], [clinvarVar]);
+    expect(arr.length).toBe(1);
+    expect(arr[0].variant_id).toBe("1-1000-A-T");
+  });
+
+  it("retrieves population variants via getPopulationVariants", () => {
+    const popVars = getPopulationVariants([gnomadVar], "nfe");
+    expect(popVars.length).toBe(1);
+    expect(popVars[0].populationCode).toBe("nfe");
+    expect(popVars[0].alleleCount).toBe(6);
+  });
+
+  it("filters variants by population presence via filterVariantsByPopulation", () => {
+    expect(filterVariantsByPopulation([gnomadVar], "nfe").length).toBe(1);
+    expect(filterVariantsByPopulation([gnomadVar], "afr").length).toBe(0);
   });
 });

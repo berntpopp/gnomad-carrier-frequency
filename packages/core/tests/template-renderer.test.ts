@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import type { TemplateContext } from '../src/types/index.js'
 import { renderTemplate } from '../src/templates/index.js'
 import { parseTemplate, segmentsToTemplate, isValidVariable } from '../src/templates/index.js'
+import { getVariablesByCategory, getVariableByName } from '../src/config/template-variables.js'
 
 // ---------------------------------------------------------------------------
 // Minimal valid TemplateContext for reuse in tests
@@ -277,4 +278,18 @@ describe('isValidVariable', () => {
     expect(isValidVariable('')).toBe(false)
     expect(isValidVariable('Gene')).toBe(false) // case-sensitive
   })
+
+  it('retrieves variables by category', () => {
+    const geneVars = getVariablesByCategory('gene')
+    expect(geneVars.length).toBeGreaterThan(0)
+    expect(geneVars.every((v) => v.category === 'gene')).toBe(true)
+  })
+
+  it('retrieves variable by name', () => {
+    const v = getVariableByName('carrierFrequency')
+    expect(v).toBeDefined()
+    expect(v?.name).toBe('carrierFrequency')
+    expect(getVariableByName('nonExistentVar')).toBeUndefined()
+  })
 })
+

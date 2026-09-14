@@ -4,3 +4,5 @@ export * from "./carrier-frequency.js";
 export * from "./homozygote-exclusion.js";
 export * from "./prevalence.js";
 export * from "./source-frequency.js";
+export * from "./recurrence-risk.js";
+export * from "./decision-matrix.js";
