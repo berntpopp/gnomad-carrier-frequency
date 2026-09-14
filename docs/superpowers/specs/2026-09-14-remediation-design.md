@@ -1,10 +1,10 @@
-# Remediation Specification & Architecture Design (Revision 7.0)
+# Remediation Specification & Architecture Design (Revision 8.0)
 
 **Document ID:** `SPEC-2026-09-14-REMEDIATION`  
-**Revision:** 7.0 (Astra Spec Review Resolution Round 6)  
+**Revision:** 8.0 (Astra Spec Review Resolution Round 7)  
 **Date:** 2026-09-14  
 **Author:** Lead Engineer (`gnomad-carrier-frequency`)  
-**Status:** Approved / Plan Ready  
+**Status:** Under Review (Round 8)  
 **Target Repository:** `gnomad-carrier-frequency`  
 **Integration Base SHA:** `083375e` (docs: add evidence-based codebase review for 2026-09-14)
 
@@ -296,20 +296,65 @@ In `useHistoryRestore.ts`, `useWizard.ts`, `useGeneConfig.ts`, and `useHistoryAu
      const wasStartedDuringRestore = isRestoring.value;
      const reqToken = Symbol();
      activeConfigToken = reqToken;
-     const targetSymbol = gene?.symbol;
+     const targetSymbol = gene?.symbol ?? null;
 
-     const config = await loadGeneConfig(gene.symbol);
-     // Guard: discard if started during restore, superseded by another gene selection, or restore active
-     if (wasStartedDuringRestore || activeConfigToken !== reqToken || wizardState.gene?.symbol !== targetSymbol || isRestoring.value) {
-       if (wasStartedDuringRestore && config && wizardState.gene?.symbol === targetSymbol) {
-         // Populate active config for metadata display only; strictly suppress applyProfile and store resets
-         activeGeneConfig.value = config;
-         configLoaded.value = true;
+     if (targetSymbol == null) {
+       if (activeConfigToken !== reqToken) return;
+       activeGeneConfig.value = null;
+       activeProfile.value = null;
+       configLoaded.value = false;
+       configLoading.value = false;
+       if (!wasStartedDuringRestore && !isRestoring.value) {
+         filterStore.resetToFactoryDefaults();
+         calcStore.resetToFactoryDefaults();
        }
        return;
      }
+
+     configLoading.value = true;
+     const config = await loadGeneConfig(targetSymbol);
+
+     // Atomic token & symbol guard: reject superseded tokens and mismatched targets BEFORE ANY MUTATION
+     if (activeConfigToken !== reqToken || wizardState.gene?.symbol !== targetSymbol) {
+       return;
+     }
+
+     configLoading.value = false;
+
+     // Settlement branch during restore: populate metadata only, clear obsolete profiles on null, never mutate stores
+     if (wasStartedDuringRestore || isRestoring.value) {
+       if (config !== null) {
+         activeGeneConfig.value = config;
+         activeProfile.value = null; // Suppress default profile activation
+         configLoaded.value = true;
+       } else {
+         // Unconfigured gene: clear obsolete previous gene profiles without resetting stores
+         activeGeneConfig.value = null;
+         activeProfile.value = null;
+         configLoaded.value = false;
+       }
+       return;
+     }
+
+     // Normal navigation settlement branch:
+     if (config === null) {
+       activeGeneConfig.value = null;
+       activeProfile.value = null;
+       configLoaded.value = false;
+       filterStore.resetToFactoryDefaults();
+       calcStore.resetToFactoryDefaults();
+       return;
+     }
+
+     activeGeneConfig.value = config;
+     const defaultProfile = config.profiles.find((p) => p.isDefault) ?? config.profiles[0] ?? null;
+     activeProfile.value = defaultProfile;
+     configLoaded.value = true;
+     if (defaultProfile) {
+       applyProfile(defaultProfile);
+     }
      ```
-   - This guarantees that a slow, previously initiated configuration fetch cannot resolve after restore and clobber restored filters or calculation settings. While restore is active or if the gene load was initiated during a restore transaction, default profile application (`applyProfile`) and factory store resets are strictly suppressed; only metadata is populated for display.
+   - This guarantees that a slow or superseded configuration fetch cannot mutate metadata or stores. While restore is active or if the gene load was initiated during a restore transaction, default profile application (`applyProfile`) and factory store resets are strictly suppressed; unconfigured genes clear obsolete profiles without store resets; only metadata is populated for display.
 3. **Dataset & Version Sequencing (Assembly Scope):**
    - Update target gnomAD dataset/version in `versionStore` **before** gene selection or worker fetch:
      `versionStore.setVersion(restored.dataset);`
@@ -554,7 +599,7 @@ jobs:
 - **Server:** `bun run preview` serving production build on `http://127.0.0.1:4173/`.
 - **Deterministic Fixtures:** Static mock response for CFTR (`apps/web/e2e/fixtures/cftr-mock.json`) and Orphanet prevalence (`apps/web/e2e/fixtures/orphanet-mock.json`).
 - **Strict Network Isolation:** Playwright intercepts:
-  - `https://gnomad.broadinstitute.org/api/**`
+  - `https://gnomad.broadinstitute.org/api` (the exact configured GraphQL endpoint across all dataset versions in `packages/core/src/config/gnomad.json`) as well as subpaths `https://gnomad.broadinstitute.org/api/**`
   - `https://search.clinicalgenome.org/**`
   - `https://api.orphadata.com/**`
   - `**/data/clingen-gene-validity.csv` (served locally from `apps/web/public/data/clingen-gene-validity.csv` on the preview server)
