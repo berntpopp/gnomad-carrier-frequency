@@ -78,33 +78,33 @@
 
 | Original April Phase & Action | Ledger ID | Current Disposition & Status |
 |---|---|---|
-| Phase 1: GraphQL query interpolation | **CRIT-1** | Hardened query builder with GraphQL variables; URL route refuted. |
-| Phase 1: Test failure tolerance in CI | **CRIT-2** | Converted to required non-tolerated check gating deployment. |
-| Phase 1: VueUse version alignment | **CRIT-3** | Verified single 14.3.0 runtime in app bundle; closed. |
-| Phase 1: CLI Zod dependency missing | **CRIT-4** | Zod added to CLI package dependencies; closed. |
-| Phase 1: Remove duplicate npm lockfile | **BUILD-1** | Resolved in repository history; closed. |
-| Phase 2: Template import validation schema | **SEC-1** | Strict Zod validation added to template import before state mutation. |
-| Phase 2: ExcelJS / SheetJS replacement | **SEC-2** | write-excel-file 4.1.1 in use; closed. |
-| Phase 2: Evaluate CSP meta | **SEC-3** | Restrictive CSP meta tag evaluated and tested with workers/PWA. |
-| Phase 2: Core calculation unit test suites | **TEST-2** | Comprehensive test suites added for frequency-calc and source-frequency. |
-| Phase 2: Unit tests for top composables | **TEST-1** | Dedicated test suites added for core composables. |
-| Phase 2: Broaden ESLint to all workspaces | **TEST-3** | Root lint command updated to cover core and CLI. |
-| Phase 2: Git pre-commit hooks | **DX-1** | Added lightweight git hook configuration. |
-| Phase 3: Split StepResults.vue | **ARCH-1** | Modularized StepResults into focused sub-components. |
-| Phase 3: Extract global carrier aggregation | **ARCH-3** | Centralized aggregation functions in `@gnomad-cf/core`. |
-| Phase 3: Core color mapping separation | **ARCH-2** | Semantic tokens in core; Vuetify mapping in web. |
-| Phase 3: Shared recurrence risk helper | **ARCH-5 / NEW-01** | Unified `calculateRecurrenceRisk` in core, fixing 50% TSV risk error. |
-| Phase 3: Vuetify tree shaking / auto-import | **PERF-1** | Optimized Vuetify imports and measured bundle delta. |
-| Phase 3: Lazy-load Excel export writer | **PERF-2** | Dynamic import for write-excel-file on export click. |
-| Phase 3: Vendor code-splitting chunks | **PERF-4** | Configured vendor chunks; measured cold-load impact. |
-| Phase 3: Global error boundary | **A11Y-4** | Global error boundary with recoverable user flow. |
-| Phase 4: Keyboard accessible population rows & SVG bars | **A11Y-1 / A11Y-2** | Native button/link affordances with keyboard navigation and focus rings. |
-| Phase 4: Wizard focus management | **A11Y-3** | Programmatic focus to step heading on transition. |
-| Phase 4: Console.log cleanup | **DX-2** | Cleaned up; verified via source audit; closed. |
-| Phase 4: Clinical source text version attribution | **DX-4** | Dynamic dataset version in German/English letters. |
-| Phase 4: Submissions config endpoint | **DX-5 / NEW-05** | Configured endpoints used and assembly properly scoped. |
-| Phase 4: Vitest version alignment | **BUILD-2** | Aligned to 4.1.11; closed. |
-| Phase 4: Enable unused locals/params in core | **BUILD-5** | Enabled in core tsconfig. |
-| Phase 4: Remove unused jsdom | **DX-9** | Removed unused package. |
-| Phase 4: Workbox opaque caching cleanup | **BUILD-3** | Cleaned up outdated runtime caching rules. |
-| Phase 4: CI dependency caching | **DX-8 / NEW-11** | Caching with valid `bun.lock` key in workflows. |
+| Phase 1: GraphQL query interpolation | **CRIT-1** | Planned: Harden query builder with variables and validate variant IDs (Lane 2, Pending). URL route refuted in review. |
+| Phase 1: Test failure tolerance in CI | **CRIT-2** | Planned: Convert to required non-tolerated check and gate deployment (Lane 4, Pending). |
+| Phase 1: VueUse version alignment | **CRIT-3** | Resolved prior to remediation: Verified single 14.3.0 runtime in app bundle. |
+| Phase 1: CLI Zod dependency missing | **CRIT-4** | Planned: Declare Zod in CLI dependencies and verify execution (Lane 3, Pending). |
+| Phase 1: Remove duplicate npm lockfile | **BUILD-1** | Resolved prior to remediation: Verified only bun.lock is tracked. |
+| Phase 2: Template import validation schema | **SEC-1** | Planned: Add strict Zod validation matching export schema before state mutation (Lane 2, Pending). |
+| Phase 2: ExcelJS / SheetJS replacement | **SEC-2** | Resolved prior to remediation: write-excel-file 4.1.1 in use; SheetJS absent. |
+| Phase 2: Evaluate CSP meta | **SEC-3** | Planned: Evaluate and test CSP meta tag with web workers and APIs (Lane 4, Pending). |
+| Phase 2: Core calculation unit test suites | **TEST-2** | Planned: Add comprehensive test suites for frequency-calc and source-frequency (Lane 1, Pending). |
+| Phase 2: Unit tests for top composables | **TEST-1** | Planned: Add dedicated unit test suites for core composables (Lane 2, Pending). |
+| Phase 2: Broaden ESLint to all workspaces | **TEST-3** | Planned: Extend root lint command across core, cli, and web (Lane 4, Pending). |
+| Phase 2: Git pre-commit hooks | **DX-1** | Planned: Add lightweight git hook configuration (Lane 4, Pending). |
+| Phase 3: Split StepResults.vue | **ARCH-1** | Planned: Decompose StepResults into bounded sub-components (Lane 5, Pending). |
+| Phase 3: Extract global carrier aggregation | **ARCH-3** | Planned: Centralize shared aggregation in @gnomad-cf/core (Lane 1, Pending). |
+| Phase 3: Core color mapping separation | **ARCH-2** | Planned: Return semantic tokens in core and map in web (Lane 1 & 5, Pending). |
+| Phase 3: Shared recurrence risk helper | **ARCH-5 / NEW-01** | Planned: Provide single calculateRecurrenceRisk helper in core, fixing 50% TSV risk error (Lane 1 & 3, Pending). |
+| Phase 3: Vuetify tree shaking / auto-import | **PERF-1** | Planned: Optimize Vuetify imports and measure bundle delta (Lane 6, Pending). |
+| Phase 3: Lazy-load Excel export writer | **PERF-2** | Planned: Dynamic import for write-excel-file on export click (Lane 6, Pending). |
+| Phase 3: Vendor code-splitting chunks | **PERF-4** | Planned: Configure vendor chunks and measure cold-load impact (Lane 6, Pending). |
+| Phase 3: Global error boundary | **A11Y-4** | Planned: Global error boundary with recoverable user flow (Lane 5, Pending). |
+| Phase 4: Keyboard accessible population rows & SVG bars | **A11Y-1 / A11Y-2** | Planned: Native button/link affordances with keyboard navigation and focus rings (Lane 5, Pending). |
+| Phase 4: Wizard focus management | **A11Y-3** | Planned: Programmatic focus to step heading on transition (Lane 5, Pending). |
+| Phase 4: Console.log cleanup | **DX-2** | Resolved prior to remediation: Cleaned up in historical commits. |
+| Phase 4: Clinical source text version attribution | **DX-4** | Planned: Dynamic dataset version in German/English letters (Lane 3, Pending). |
+| Phase 4: Submissions config endpoint | **DX-5 / NEW-05** | Planned: Use configured endpoints and scope assembly correctly (Lane 2, Pending). |
+| Phase 4: Vitest version alignment | **BUILD-2** | Resolved prior to remediation: Aligned to Vitest 4.1.11. |
+| Phase 4: Enable unused locals/params in core | **BUILD-5** | Planned: Enable in core tsconfig (Lane 4, Pending). |
+| Phase 4: Remove unused jsdom | **DX-9** | Planned: Remove unused jsdom from web dependencies (Lane 4, Pending). |
+| Phase 4: Workbox opaque caching cleanup | **BUILD-3** | Planned: Clean up outdated runtime caching rules (Lane 6, Pending). |
+| Phase 4: CI dependency caching | **DX-8 / NEW-11** | Planned: Add caching with valid bun.lock key in workflows (Lane 4, Pending). |
