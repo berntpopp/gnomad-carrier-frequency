@@ -163,7 +163,7 @@ export function useHistoryRestore() {
       saveCurrentCalculation();
 
       // Step 2: Migrate raw history entry to authoritative normalized settings
-      const restored = migrateHistoryEntry(entry);
+      const restored = migrateHistoryEntry(entry as unknown as Record<string, unknown>);
 
       // Step 3: Sequence dataset version in versionStore BEFORE gene selection
       setVersion(restored.dataset);
@@ -216,7 +216,7 @@ export function useHistoryRestore() {
         activeRestoreToken.value = null;
 
         // Dispatch calculation only after unlock
-        const restored = migrateHistoryEntry(entry);
+        const restored = migrateHistoryEntry(entry as unknown as Record<string, unknown>);
         setGeneSymbol(restored.gene.symbol);
       }
     }

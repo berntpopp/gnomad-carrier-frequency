@@ -244,6 +244,7 @@ import type {
   IndexPatientStatus,
 } from "@gnomad-cf/core/types";
 import { config } from "@gnomad-cf/core/config";
+import type { OrphanetDisease } from "@gnomad-cf/core/orphanet";
 import {
   calculateRecurrenceRisk,
   frequencyToPercent,
@@ -262,7 +263,7 @@ const props = defineProps<{
   useHWEFormula: boolean;
   sourceAttribution: string;
   sourceChipColor: string;
-  cacheStatus: "idle" | "hit" | "miss";
+  cacheStatus: "hit" | "miss" | "stored" | "unavailable" | "idle" | null;
   processingStatus: string | null;
   isLoading: boolean;
   qualifyingVariantCount: number;
@@ -271,9 +272,9 @@ const props = defineProps<{
   currentFormat: DisplayFormat;
   formatFrequency: (freq: number | null) => string;
   orphanetLoading: boolean;
-  orphanetDiseases: unknown[];
-  primaryDisease: unknown;
-  additionalDiseases: unknown[];
+  orphanetDiseases: OrphanetDisease[];
+  primaryDisease: OrphanetDisease | undefined;
+  additionalDiseases: OrphanetDisease[];
 }>();
 
 defineEmits<{

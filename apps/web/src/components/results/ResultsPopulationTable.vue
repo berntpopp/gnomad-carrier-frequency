@@ -289,6 +289,7 @@ import type {
   ClinVarVariant,
   FilterConfig,
   CalcConfig,
+  ExclusionReason,
 } from "@gnomad-cf/core/types";
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 import {
@@ -330,7 +331,7 @@ const props = defineProps<{
   calcConfig: CalcConfig;
   submissions: Map<string, ClinVarSubmission[]>;
   excludedSet: Set<string>;
-  reasons: Map<string, string>;
+  reasons: Map<string, ExclusionReason>;
   isLoading: boolean;
   currentFormat: DisplayFormat;
   formatFrequency: (freq: number | null) => string;

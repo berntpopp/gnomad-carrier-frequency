@@ -108,6 +108,7 @@ import type {
   ClinVarVariant,
   FilterConfig,
   CalcConfig,
+  ExclusionReason,
 } from "@gnomad-cf/core/types";
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 import type { DisplayFormat } from "@gnomad-cf/core/calculations";
@@ -123,7 +124,7 @@ defineProps<{
   calcConfig: CalcConfig;
   submissions: Map<string, ClinVarSubmission[]>;
   excludedSet: Set<string>;
-  reasons: Map<string, string>;
+  reasons: Map<string, ExclusionReason>;
   isV2: boolean;
   showSubcontinental: boolean;
   isLoading: boolean;

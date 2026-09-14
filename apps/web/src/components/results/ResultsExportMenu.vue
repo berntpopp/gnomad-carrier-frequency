@@ -52,6 +52,7 @@ import type {
   ClinVarVariant,
   FilterConfig,
   CalcConfig,
+  ExclusionReason,
 } from "@gnomad-cf/core/types";
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
 import { useExport } from "@/composables";
@@ -69,7 +70,7 @@ const props = defineProps<{
   calcConfig: CalcConfig;
   submissions: Map<string, ClinVarSubmission[]>;
   excludedSet: Set<string>;
-  reasons: Map<string, string>;
+  reasons: Map<string, ExclusionReason>;
 }>();
 
 const { exportToJson, exportToExcel, exportPopulationsTsv, exportVariantsTsv } =

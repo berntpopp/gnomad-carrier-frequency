@@ -159,6 +159,24 @@ export default defineConfig({
       // but rollup still resolves the module. Marking node:* as external prevents the
       // browser bundle error without requiring architectural changes to core.
       external: [/^node:/],
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('vuetify')) {
+              return 'vendor-vuetify'
+            }
+            if (id.includes('write-excel-file')) {
+              return 'vendor-xlsx'
+            }
+            if (id.includes('pinia') || id.includes('vue-router') || id.includes('/vue/') || id.includes('@vue/runtime-core') || id.includes('@vue/reactivity')) {
+              return 'vendor-vue'
+            }
+            if (id.includes('@vueuse')) {
+              return 'vendor-vueuse'
+            }
+          }
+        },
+      },
     },
   },
   server: {
