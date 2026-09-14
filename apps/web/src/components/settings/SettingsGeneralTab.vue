@@ -134,8 +134,8 @@
           class="mb-2"
         />
         <div class="text-caption text-medium-emphasis mb-3">
-          Maximum number of log entries to keep. Older entries are
-          automatically removed.
+          Maximum number of log entries to keep. Older entries are automatically
+          removed.
         </div>
 
         <v-switch

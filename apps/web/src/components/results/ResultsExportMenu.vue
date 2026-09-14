@@ -17,16 +17,10 @@
       </v-tooltip>
     </template>
     <v-list density="compact">
-      <v-list-item
-        prepend-icon="mdi-code-json"
-        @click="handleExport('json')"
-      >
+      <v-list-item prepend-icon="mdi-code-json" @click="handleExport('json')">
         <v-list-item-title>Export as JSON</v-list-item-title>
       </v-list-item>
-      <v-list-item
-        prepend-icon="mdi-file-excel"
-        @click="handleExport('xlsx')"
-      >
+      <v-list-item prepend-icon="mdi-file-excel" @click="handleExport('xlsx')">
         <v-list-item-title>Export as Excel</v-list-item-title>
       </v-list-item>
       <v-list-item

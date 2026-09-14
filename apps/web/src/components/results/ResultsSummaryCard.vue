@@ -71,8 +71,8 @@
         class="mb-4"
       >
         All {{ excludedCount }} qualifying variant(s) have been manually
-        excluded. Carrier frequency cannot be calculated. Open the variant
-        table to restore variants.
+        excluded. Carrier frequency cannot be calculated. Open the variant table
+        to restore variants.
         <template #append>
           <v-btn
             variant="text"
@@ -153,9 +153,9 @@
               </template>
               <span class="tooltip-text">
                 <strong>Genetic Prevalence (q&sup2;)</strong><br />
-                Expected frequency of affected individuals under
-                Hardy-Weinberg Equilibrium. This is the theoretical disease
-                frequency before accounting for penetrance.
+                Expected frequency of affected individuals under Hardy-Weinberg
+                Equilibrium. This is the theoretical disease frequency before
+                accounting for penetrance.
               </span>
             </v-tooltip>
             <div class="stat-value">

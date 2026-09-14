@@ -95,8 +95,8 @@
           Sub (v2 only)
         </v-chip>
       </template>
-      Subcontinental population breakdowns are only available for gnomAD
-      v2.1.1 queries.
+      Subcontinental population breakdowns are only available for gnomAD v2.1.1
+      queries.
     </v-tooltip>
   </div>
 </template>

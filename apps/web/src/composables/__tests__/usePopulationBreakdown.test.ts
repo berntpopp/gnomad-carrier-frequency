@@ -1,7 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
 import { ref } from "vue";
 import { usePopulationBreakdown } from "../usePopulationBreakdown";
-import type { CarrierFrequencyResult, FilterConfig, CalcConfig } from "@gnomad-cf/core/types";
+import type {
+  CarrierFrequencyResult,
+  FilterConfig,
+  CalcConfig,
+} from "@gnomad-cf/core/types";
 
 vi.mock("@/composables", () => ({
   useSubcontinentalData: () => ({
@@ -24,7 +28,17 @@ describe("usePopulationBreakdown", () => {
     globalCarrierFrequency: 0.04,
     globalAlleleCount: 10,
     globalAlleleNumber: 250,
-    populations: [{ code: "nfe", label: "Non-Finnish European", carrierFrequency: 0.04, alleleCount: 10, alleleNumber: 250, geneticPrevalence: 0.0016, isFounderEffect: false }],
+    populations: [
+      {
+        code: "nfe",
+        label: "Non-Finnish European",
+        carrierFrequency: 0.04,
+        alleleCount: 10,
+        alleleNumber: 250,
+        geneticPrevalence: 0.0016,
+        isFounderEffect: false,
+      },
+    ],
     qualifyingVariantCount: 1,
     minFrequency: 0.04,
     maxFrequency: 0.04,

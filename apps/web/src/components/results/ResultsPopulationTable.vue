@@ -4,7 +4,9 @@
     <ResultsTableToolbar
       :result="result"
       :current-format="currentFormat"
-      :qualifying-variants-count="qualifyingVariantCount ?? qualifyingVariants?.length ?? 0"
+      :qualifying-variants-count="
+        qualifyingVariantCount ?? qualifyingVariants?.length ?? 0
+      "
       :variants="variants"
       :clinvar-variants="clinvarVariants"
       :filter-config="filterConfig"
@@ -60,7 +62,10 @@
           >
             <template #item="{ item }">
               <tr
-                :class="[getRowClass(item), { 'population-row': !item.isGlobal }]"
+                :class="[
+                  getRowClass(item),
+                  { 'population-row': !item.isGlobal },
+                ]"
                 @click="!item.isGlobal && emit('openModal', item.code)"
               >
                 <td>

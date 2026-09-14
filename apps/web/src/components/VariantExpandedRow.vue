@@ -21,9 +21,7 @@
         <div class="text-caption font-weight-bold text-grey-darken-2">
           Ref / Alt
         </div>
-        <div class="text-body-2 text-mono">
-          {{ item.ref }} / {{ item.alt }}
-        </div>
+        <div class="text-body-2 text-mono">{{ item.ref }} / {{ item.alt }}</div>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <div class="text-caption font-weight-bold text-grey-darken-2">
@@ -38,12 +36,7 @@
 
     <!-- Flags row -->
     <div class="d-flex flex-wrap ga-2 mt-2">
-      <v-chip
-        v-if="item.isLoF"
-        color="error"
-        size="small"
-        variant="tonal"
-      >
+      <v-chip v-if="item.isLoF" color="error" size="small" variant="tonal">
         <v-icon start size="x-small"> mdi-alert-circle </v-icon>
         LoF HC
       </v-chip>
