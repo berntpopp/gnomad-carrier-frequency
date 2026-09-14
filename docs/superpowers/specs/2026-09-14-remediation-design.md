@@ -1,10 +1,10 @@
-# Remediation Specification & Architecture Design (Revision 6.0)
+# Remediation Specification & Architecture Design (Revision 7.0)
 
 **Document ID:** `SPEC-2026-09-14-REMEDIATION`  
-**Revision:** 6.0 (Astra Spec Review Resolution Round 5)  
+**Revision:** 7.0 (Astra Spec Review Resolution Round 6)  
 **Date:** 2026-09-14  
 **Author:** Lead Engineer (`gnomad-carrier-frequency`)  
-**Status:** Under Review (Round 6)  
+**Status:** Approved / Plan Ready  
 **Target Repository:** `gnomad-carrier-frequency`  
 **Integration Base SHA:** `083375e` (docs: add evidence-based codebase review for 2026-09-14)
 
@@ -210,14 +210,14 @@ The evaluation cases are strictly exhaustive and evaluated in mutually exclusive
 
 | Case | Disjoint Predicate | Raw CF | Fallback CF (if enabled) | Genetic Prevalence ($q^2$) | Penetrance-Adjusted Prev | UI Display | Export Metadata Flags |
 |---|---|---|---|---|---|---|---|
-| **1. Missing / Unsampled Data** | $(\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AN_v = 0) \lor (\|V_{\text{inc}}\| = 0 \land (\|V_{\text{raw}}\| = 0 \lor \forall v \in V_{\text{raw}}, AN_v = 0))$ | `null` | `null` | `null` | `null` | `"No data"` | `missingData: true, rawCarrierFrequency: null` |
+| **1. Missing / Unsampled Data** | $(\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AN_v = 0) \lor (\|V_{\text{inc}}\| = 0 \land \|V_{\text{path}}\| > 0 \land \sum_{v \in V_{\text{path}}} AN_v = 0) \lor (\|V_{\text{path}}\| = 0 \land (\|V_{\text{raw}}\| = 0 \lor \forall v \in V_{\text{raw}}, AN_v = 0))$ | `null` | `null` | `null` | `null` | `"No data"` | `missingData: true, rawCarrierFrequency: null` |
 | **2. No Pathogenic Candidates** | $\|V_{\text{path}}\| = 0 \land (\exists v \in V_{\text{raw}}, AN_v > 0)$ | `null` | `0.01` (1.0%) | If fallback: $(0.01/2)^2 = 0.000025$; else `null` | If fallback: $0.000025 \times \text{penetrance}$; else `null` | If fallback: `"1% (Default assumption)"`; else `"Not detected"` | `isDefaultFallback: boolean, noQualifyingVariants: true` |
-| **3. All Candidates Excluded** | $\|V_{\text{path}}\| > 0 \land \|V_{\text{inc}}\| = 0 \land (\exists v \in V_{\text{path}}, AN_v > 0)$ | `null` | `0.01` (1.0%) | If fallback: $(0.01/2)^2 = 0.000025$; else `null` | If fallback: $0.000025 \times \text{penetrance}$; else `null` | If fallback: `"1% (Default assumption)"`; else `"Not detected"` | `isDefaultFallback: boolean, allExcluded: true` |
+| **3. All Candidates Excluded** | $\|V_{\text{path}}\| > 0 \land \|V_{\text{inc}}\| = 0 \land \sum_{v \in V_{\text{path}}} AN_v > 0$ | `null` | `0.01` (1.0%) | If fallback: $(0.01/2)^2 = 0.000025$; else `null` | If fallback: $0.000025 \times \text{penetrance}$; else `null` | If fallback: `"1% (Default assumption)"`; else `"Not detected"` | `isDefaultFallback: boolean, allExcluded: true` |
 | **4. Observed Zero** | $\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AN_v > 0 \land \sum_{v \in V_{\text{inc}}} AC_v = 0$ | `0.0` | N/A | `0.0` | `0.0` | `"0% (0 / N)"` | `observedZero: true, rawCarrierFrequency: 0.0` |
 | **5. Positive Homozygotes-Only Sites** | $\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AN_v > 0 \land \sum_{v \in V_{\text{inc}}} AC_v > 0 \land \forall v \in V_{\text{inc}}, AC_v = 2 \cdot Hom_v$ | If HomExcl: `0.0` (via GCR); else active formula: $2q(1-q)$ (HWE) or $2q$ (simplified) | N/A | $q^2 = (\sum q_i)^2 > 0$ | $q^2 \times \text{penetrance}$ ($0.0$ if penetrance is $0.0$, else $> 0$) | If HomExcl: `"0% (Homozygotes only)"`; else formatted % | `variantHomozygoteOnly: true`, `rawCarrierFrequency: 0.0` (if HomExcl) else $CF$ |
 | **6. Normal Residual Calculation** | $\|V_{\text{inc}}\| > 0 \land \sum_{v \in V_{\text{inc}}} AN_v > 0 \land \sum_{v \in V_{\text{inc}}} AC_v > 0 \land \exists v \in V_{\text{inc}}, AC_v > 2 \cdot Hom_v$ | If HomExcl: $GCR = 1 - \prod (1 - VCR_i)$; else active formula: $2q(1-q)$ (HWE) or $2q$ (simplified) | N/A | $q^2 = (\sum q_i)^2$ | $q^2 \times \text{penetrance}$ | Formatted % and 1:N ratio | `isDefaultFallback: false, rawCarrierFrequency: CF` |
 
-*Policy on Fallback Prior Inversion:* The user-configured fallback prior is a **carrier frequency** ($CF = 0.01 = 1\%$). Under the standard diploid assumption $CF \approx 2q$, the implied carrier allele frequency is $q = \frac{CF}{2} = 0.005$. Therefore, the implied genetic prevalence is $q^2 = 0.005^2 = 0.000025$ (1 in 40,000), and the penetrance-adjusted disease prevalence is $0.000025 \times \text{penetrance}$. Observed zero (Case 4) and positive homozygote-only sites (Case 5) are strictly distinguished. In Case 5, when homozygote exclusion is disabled, calculation follows the active formula branch ($2q(1-q)$ under HWE, $2q$ under simplified) rather than GCR. When penetrance is 0.0, penetrance-adjusted prevalence is 0.0 in all cases.
+*Policy on Fallback Prior Inversion:* The user-configured fallback prior is a **carrier frequency** ($CF = 0.01 = 1\%$). Under the standard diploid assumption $CF \approx 2q$, the implied carrier allele frequency is $q = \frac{CF}{2} = 0.005$. Therefore, the implied genetic prevalence is $q^2 = 0.005^2 = 0.000025$ (1 in 40,000), and the penetrance-adjusted disease prevalence is $0.000025 \times \text{penetrance}$. Observed zero (Case 4) and positive homozygote-only sites (Case 5) are strictly distinguished. In Case 5, when homozygote exclusion is disabled, calculation follows the active formula branch ($2q(1-q)$ under HWE, $2q$ under simplified) rather than GCR. When penetrance is 0.0, penetrance-adjusted prevalence is 0.0 for all cases with an available prevalence estimate (Cases 2–6 if fallback active or qualifying variants exist; remains `null` when data is missing in Case 1).
 
 ---
 
@@ -258,21 +258,22 @@ In `useCarrierFrequency.ts` and `useHistoryAutoSave.ts`:
              handleCalculationError(error);
            }
          })
-         .finally(() => {
-           // Session ownership check: ignore callbacks from discarded sessions
-           if (inFlightSession !== sessionKey) {
-             isCalculating.value = false;
-             return;
-           }
-           // Coalesced replay check: dispatch exactly ONE follow-up if settings changed while in flight
-           if (activeContextRevision.value > reqRevision) {
-             requestCalculation();
-           } else {
-             isCalculating.value = false;
-             inFlightSession = null;
-             inFlightRevision = null;
-           }
-         });
+          .finally(() => {
+            // Session ownership check: ignore callbacks from discarded sessions
+            if (inFlightSession !== sessionKey) {
+              return;
+            }
+            const hasPendingEdits = activeContextRevision.value > reqRevision;
+            // Clear execution ownership prior to potential re-dispatch
+            isCalculating.value = false;
+            inFlightSession = null;
+            inFlightRevision = null;
+
+            // Coalesced replay check: dispatch exactly ONE follow-up if settings changed while in flight
+            if (hasPendingEdits) {
+              requestCalculation();
+            }
+          });
        ```
 3. **Autosave Synchronization Guard:**
    - In `useHistoryAutoSave.ts`, filter and exclusion debounce timers must check `if (isCalculating.value) return;` — this strictly prevents saving new filter criteria alongside stale frequencies.
@@ -292,17 +293,23 @@ In `useHistoryRestore.ts`, `useWizard.ts`, `useGeneConfig.ts`, and `useHistoryAu
    - Restore immediately assigns `activeConfigToken = Symbol()`.
    - In `useGeneConfig.ts`'s watcher on `selectedGene`:
      ```typescript
+     const wasStartedDuringRestore = isRestoring.value;
      const reqToken = Symbol();
      activeConfigToken = reqToken;
      const targetSymbol = gene?.symbol;
 
      const config = await loadGeneConfig(gene.symbol);
-     // Guard: discard if superseded by another gene selection, load, or active restore
-     if (activeConfigToken !== reqToken || wizardState.gene?.symbol !== targetSymbol || isRestoring.value) {
+     // Guard: discard if started during restore, superseded by another gene selection, or restore active
+     if (wasStartedDuringRestore || activeConfigToken !== reqToken || wizardState.gene?.symbol !== targetSymbol || isRestoring.value) {
+       if (wasStartedDuringRestore && config && wizardState.gene?.symbol === targetSymbol) {
+         // Populate active config for metadata display only; strictly suppress applyProfile and store resets
+         activeGeneConfig.value = config;
+         configLoaded.value = true;
+       }
        return;
      }
      ```
-   - This guarantees that a slow, previously initiated configuration fetch cannot resolve after restore and clobber restored filters or calculation settings.
+   - This guarantees that a slow, previously initiated configuration fetch cannot resolve after restore and clobber restored filters or calculation settings. While restore is active or if the gene load was initiated during a restore transaction, default profile application (`applyProfile`) and factory store resets are strictly suppressed; only metadata is populated for display.
 3. **Dataset & Version Sequencing (Assembly Scope):**
    - Update target gnomAD dataset/version in `versionStore` **before** gene selection or worker fetch:
      `versionStore.setVersion(restored.dataset);`
@@ -547,9 +554,10 @@ jobs:
 - **Server:** `bun run preview` serving production build on `http://127.0.0.1:4173/`.
 - **Deterministic Fixtures:** Static mock response for CFTR (`apps/web/e2e/fixtures/cftr-mock.json`) and Orphanet prevalence (`apps/web/e2e/fixtures/orphanet-mock.json`).
 - **Strict Network Isolation:** Playwright intercepts:
-  - `https://gnomad.broadinstitute.org/api*`
-  - `https://search.clinicalgenome.org/*`
-  - `https://api.orphadata.com/*`
+  - `https://gnomad.broadinstitute.org/api/**`
+  - `https://search.clinicalgenome.org/**`
+  - `https://api.orphadata.com/**`
+  - `**/data/clingen-gene-validity.csv` (served locally from `apps/web/public/data/clingen-gene-validity.csv` on the preview server)
   Any unmocked external network request triggers immediate test assertion failure. Harness verifies fixture consumption by asserting expected qualifying variant counts prior to measurement.
 
 #### 2.8.2 Cold Navigation & Warm Interaction Protocols
