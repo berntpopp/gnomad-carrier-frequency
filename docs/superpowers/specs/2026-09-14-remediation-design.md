@@ -4,7 +4,7 @@
 **Revision:** 8.0 (Astra Spec Review Resolution Round 7)  
 **Date:** 2026-09-14  
 **Author:** Lead Engineer (`gnomad-carrier-frequency`)  
-**Status:** Under Review (Round 8)  
+**Status:** Approved / Plan Ready  
 **Target Repository:** `gnomad-carrier-frequency`  
 **Integration Base SHA:** `083375e` (docs: add evidence-based codebase review for 2026-09-14)
 
