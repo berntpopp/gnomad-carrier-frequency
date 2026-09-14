@@ -31,6 +31,10 @@ export interface ExportSummary {
   minFrequency: number | null;
   maxFrequency: number | null;
   hasFounderEffect: boolean;
+  geneticPrevalence?: number | null;
+  bayesianPrevalence?: number | null;
+  formula?: "hwe" | "simplified";
+  homExclusionActive?: boolean;
 }
 
 /**
@@ -45,6 +49,8 @@ export interface ExportPopulation {
   alleleCount: number;
   alleleNumber: number;
   isFounderEffect: boolean;
+  recurrenceRisk?: number | null;
+  geneticPrevalence?: number | null;
 }
 
 /**
@@ -57,14 +63,20 @@ export interface ExportVariant {
   alleleFrequencyPercent: string;
   alleleCount: number;
   alleleNumber: number;
+  homozygoteCount?: number;
   hgvsC: string | null;
   hgvsP: string | null;
   clinvarStatus: string | null;
+  goldStars?: number | null;
   isLoF: boolean;
   isClinvarPathogenic: boolean;
   // Exclusion fields (EXCL-06)
   excluded: boolean;
   exclusionReason: string | null;
+  exclusionProvenance?: {
+    type?: string;
+    customText?: string;
+  } | null;
 }
 
 /**

@@ -35,8 +35,9 @@ export function toDisplayVariant(
   const transcriptId = tc?.transcript_id ?? null;
   const lof = tc?.lof ?? null;
 
-  let totalAc: number;
-  let totalAn: number;
+  let totalAc = 0;
+  let totalAn = 0;
+  let totalAcHom = 0;
   let alleleFrequency: number | null;
 
   if (populationCode) {
@@ -48,6 +49,7 @@ export function toDisplayVariant(
     if (jointPop) {
       totalAc = jointPop.ac;
       totalAn = jointPop.an;
+      totalAcHom = jointPop.homozygote_count ?? 0;
     } else {
       const exomePop = variant.exome?.populations?.find(
         (p) => p.id === populationCode,
@@ -57,6 +59,7 @@ export function toDisplayVariant(
       );
       totalAc = (exomePop?.ac ?? 0) + (genomePop?.ac ?? 0);
       totalAn = (exomePop?.an ?? 0) + (genomePop?.an ?? 0);
+      totalAcHom = (exomePop?.ac_hom ?? 0) + (genomePop?.ac_hom ?? 0);
     }
     alleleFrequency = totalAn > 0 ? totalAc / totalAn : null;
   } else {
@@ -64,9 +67,11 @@ export function toDisplayVariant(
     if (variant.joint) {
       totalAc = variant.joint.ac;
       totalAn = variant.joint.an;
+      totalAcHom = variant.joint.homozygote_count ?? 0;
     } else {
       totalAc = (variant.exome?.ac ?? 0) + (variant.genome?.ac ?? 0);
       totalAn = (variant.exome?.an ?? 0) + (variant.genome?.an ?? 0);
+      totalAcHom = (variant.exome?.ac_hom ?? 0) + (variant.genome?.ac_hom ?? 0);
     }
     alleleFrequency = totalAn > 0 ? totalAc / totalAn : null;
   }
@@ -97,6 +102,7 @@ export function toDisplayVariant(
     alleleFrequency,
     alleleCount: totalAc,
     alleleNumber: totalAn,
+    homozygoteCount: totalAcHom,
     clinvarStatus,
     clinvarVariationId,
     goldStars,

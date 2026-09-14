@@ -21,6 +21,8 @@ export interface DisplayVariant {
   alleleCount: number;
   /** Total allele number */
   alleleNumber: number;
+  /** Total homozygote count */
+  homozygoteCount?: number;
   /** ClinVar clinical significance classification or null */
   clinvarStatus: string | null;
   /** ClinVar variation ID for direct linking */

@@ -20,5 +20,6 @@ export default defineConfig({
   exports: true,
   clean: true,
   platform: 'neutral',
+  copy: ['src/config/templates'],
   external: ['node:fs/promises', 'node:path', 'node:url'],
 })

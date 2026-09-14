@@ -150,14 +150,20 @@ import type {
 // Responsive breakpoint detection
 const { smAndDown } = useDisplay();
 
-const props = defineProps<{
-  result: CarrierFrequencyResult | null;
-  frequencySource: FrequencySource;
-  indexStatus: IndexPatientStatus;
-  literatureFrequency: number | null;
-  literaturePmid: string | null;
-  usingDefault: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    result: CarrierFrequencyResult | null;
+    frequencySource: FrequencySource;
+    indexStatus: IndexPatientStatus;
+    literatureFrequency: number | null;
+    literaturePmid: string | null;
+    usingDefault: boolean;
+    penetrance?: number;
+  }>(),
+  {
+    penetrance: 1.0,
+  },
+);
 
 const selectedPerspective = ref<Perspective>("affected");
 
@@ -179,6 +185,7 @@ const {
   literatureFrequency: props.literatureFrequency,
   literaturePmid: props.literaturePmid,
   usingDefault: props.usingDefault,
+  penetrance: props.penetrance,
 }));
 
 // Two-way binding models for Vuetify components
