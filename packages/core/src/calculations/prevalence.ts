@@ -48,6 +48,28 @@ export function calculateBayesianPrevalence(
 }
 
 /**
+ * Derive implied genetic disease prevalence from a carrier frequency fallback prior.
+ *
+ * Clinical logic:
+ * The fallback prior is configured as a carrier frequency (e.g. CF = 0.01 = 1%).
+ * Under diploid Mendelian genetics, CF ≈ 2q, so the implied mutant allele frequency is q = CF / 2.
+ * The implied genetic prevalence is q^2 = (CF / 2)^2.
+ * E.g., for CF = 0.01: q = 0.005, q^2 = 0.000025 (1 in 40,000).
+ *
+ * @param fallbackCF - Carrier frequency prior in [0, 1], default 0.01
+ * @returns Implied genetic prevalence (q^2)
+ */
+export function deriveFallbackGeneticPrevalence(
+  fallbackCF: number = 0.01,
+): number {
+  if (!Number.isFinite(fallbackCF) || fallbackCF < 0 || fallbackCF > 1) {
+    return 0;
+  }
+  const q = fallbackCF / 2;
+  return q * q;
+}
+
+/**
  * Format a prevalence value as a ratio and percentage string.
  *
  * @param prevalence - Prevalence fraction, or null/0 if not detected

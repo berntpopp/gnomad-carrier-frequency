@@ -93,3 +93,6 @@ export {
   FACTORY_QUALITY_DEFAULTS,
   FACTORY_EXCLUSION_DEFAULTS,
 } from "./quality";
+
+export type { AnalysisContext } from "./context";
+export { AnalysisContextSchema } from "./context";

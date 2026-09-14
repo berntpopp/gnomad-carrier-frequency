@@ -7,10 +7,7 @@ import {
   getPopulationCodes,
   type GnomadVersion,
 } from "../config/index.js";
-import type {
-  IndexPatientStatus,
-  PopulationFrequency,
-} from "../types/index.js";
+import type { PopulationFrequency } from "../types/index.js";
 import type { VariantFrequencyData } from "../types/variant.js";
 import type { CalcConfig } from "../types/calculations.js";
 import {
@@ -44,19 +41,7 @@ export function calculateCarrierFrequency(pathogenicAFs: number[]): number {
   return 2 * sumAF;
 }
 
-/**
- * Calculate recurrence risk based on carrier frequency and index patient status
- * CALC-02: Heterozygous carrier: carrier_freq / 4
- * CALC-03: Compound het/homozygous: carrier_freq / 2
- */
-export function calculateRecurrenceRisk(
-  carrierFrequency: number,
-  indexStatus: IndexPatientStatus,
-): number {
-  return indexStatus === "heterozygous"
-    ? carrierFrequency / 4
-    : carrierFrequency / 2;
-}
+export { calculateRecurrenceRisk } from "./recurrence-risk.js";
 
 /**
  * Aggregate population frequencies from multiple variants, respecting CalcConfig.

@@ -18,7 +18,12 @@ export const UrlStateSchema = z.object({
 
   /** Index patient status */
   status: z
-    .enum(["heterozygous", "homozygous"])
+    .enum([
+      "heterozygous",
+      "homozygous",
+      "compound_het_confirmed",
+      "compound_het_assumed",
+    ])
     .optional()
     .default("heterozygous"),
 
@@ -62,7 +67,7 @@ export const UrlStateSchema = z.object({
   homExclusion: z.enum(["0", "1"]).optional(),
 
   /** Penetrance fraction 0.0-1.0 (default 1.0) */
-  penetrance: z.coerce.number().min(0).max(1).optional(),
+  penetrance: z.coerce.number().min(0).max(1).optional().default(1.0),
 
   /** gnomAD version: 'v2' or 'v4' (default v4) */
   ver: z.enum(["v2", "v4"]).optional(),
