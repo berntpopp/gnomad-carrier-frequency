@@ -5,7 +5,7 @@ import {
   type ClinVarSubmission,
   type ClinVarVariantWithSubmissions,
 } from "@gnomad-cf/core/queries";
-import { getReferenceGenome } from "@gnomad-cf/core/config";
+import { useGnomadVersion } from "@/api";
 
 /** Batch size for fetching submissions (to avoid query size limits) */
 const BATCH_SIZE = 50;
@@ -44,6 +44,8 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+let activeAssemblyToken = 0;
+
 /**
  * Composable for fetching ClinVar submissions data
  * Used to resolve "conflicting classifications" by analyzing individual submissions
@@ -51,6 +53,7 @@ function delay(ms: number): Promise<void> {
  * Fetches submissions in batches with exponential backoff retry
  */
 export function useClinvarSubmissions(): UseClinvarSubmissionsReturn {
+  const { versionConfig } = useGnomadVersion();
   const submissions = ref<Map<string, ClinVarSubmission[]>>(new Map());
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -75,14 +78,20 @@ export function useClinvarSubmissions(): UseClinvarSubmissionsReturn {
           await delay(backoffMs);
         }
 
-        const query = buildSubmissionsQuery(variantIds, referenceGenome);
+        const queryObj = buildSubmissionsQuery(variantIds, referenceGenome);
+        if (!queryObj) {
+          return new Map();
+        }
 
         const response = await fetch(GNOMAD_API_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ query }),
+          body: JSON.stringify({
+            query: queryObj.query,
+            variables: queryObj.variables,
+          }),
         });
 
         if (!response.ok) {
@@ -123,22 +132,41 @@ export function useClinvarSubmissions(): UseClinvarSubmissionsReturn {
       return;
     }
 
+    const currentAssembly = versionConfig.value.referenceGenome;
+    const token = ++activeAssemblyToken;
+
     isLoading.value = true;
     error.value = null;
     progress.value = 0;
     failedVariantIds = [];
 
-    const referenceGenome = getReferenceGenome();
+    const referenceGenome = currentAssembly;
     const totalBatches = Math.ceil(variantIds.length / BATCH_SIZE);
     let processedBatches = 0;
     let batchErrors = 0;
 
     // Process in batches
     for (let i = 0; i < variantIds.length; i += BATCH_SIZE) {
+      if (
+        activeAssemblyToken !== token ||
+        versionConfig.value.referenceGenome !== currentAssembly
+      ) {
+        isLoading.value = false;
+        return;
+      }
+
       const batch = variantIds.slice(i, i + BATCH_SIZE);
 
       try {
         const batchResult = await fetchBatchWithRetry(batch, referenceGenome);
+
+        if (
+          activeAssemblyToken !== token ||
+          versionConfig.value.referenceGenome !== currentAssembly
+        ) {
+          isLoading.value = false;
+          return;
+        }
 
         // Merge results into main map
         for (const [key, value] of batchResult) {
@@ -157,6 +185,14 @@ export function useClinvarSubmissions(): UseClinvarSubmissionsReturn {
       if (i + BATCH_SIZE < variantIds.length) {
         await delay(BATCH_DELAY_MS);
       }
+    }
+
+    if (
+      activeAssemblyToken !== token ||
+      versionConfig.value.referenceGenome !== currentAssembly
+    ) {
+      isLoading.value = false;
+      return;
     }
 
     if (batchErrors > 0) {
@@ -179,6 +215,7 @@ export function useClinvarSubmissions(): UseClinvarSubmissionsReturn {
    * Clear cached submissions
    */
   function clearSubmissions(): void {
+    activeAssemblyToken++;
     submissions.value = new Map();
     error.value = null;
     progress.value = 0;

@@ -6,6 +6,7 @@ import type { GeneConfig, ConditionProfile } from "@gnomad-cf/core/gene-config";
 import { useGeneSearch } from "./useGeneSearch";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useCalcStore } from "@/stores/useCalcStore";
+import { isRestoring, incrementRevision } from "./useAnalysisContext";
 
 // Module-level state — singleton pattern, matches useGeneSearch.
 // Active config is intentionally NOT persisted: it should re-apply from the
@@ -14,6 +15,20 @@ const activeGeneConfig: Ref<GeneConfig | null> = ref(null);
 const activeProfile: Ref<ConditionProfile | null> = ref(null);
 const configLoaded: Ref<boolean> = ref(false);
 const configLoading: Ref<boolean> = ref(false);
+
+let activeConfigToken: symbol = Symbol("configToken");
+
+export function resetGeneConfigState(): void {
+  activeGeneConfig.value = null;
+  activeProfile.value = null;
+  configLoaded.value = false;
+  configLoading.value = false;
+  activeConfigToken = Symbol("configToken");
+}
+
+export function invalidateActiveConfigToken(): void {
+  activeConfigToken = Symbol("configToken");
+}
 
 // Guard to ensure the selectedGene watcher is only registered once,
 // even when multiple components call useGeneConfig().
@@ -62,22 +77,54 @@ export function useGeneConfig(): UseGeneConfigReturn {
     watch(
       selectedGene,
       async (gene) => {
+        const wasStartedDuringRestore = isRestoring.value;
+        const reqToken = Symbol("reqToken");
+        activeConfigToken = reqToken;
+        const targetSymbol = gene?.symbol ?? null;
+
         // No gene selected — reset everything to factory defaults
-        if (gene == null) {
+        if (targetSymbol == null) {
+          if (activeConfigToken !== reqToken) return;
           activeGeneConfig.value = null;
           activeProfile.value = null;
           configLoaded.value = false;
           configLoading.value = false;
-          filterStore.resetToFactoryDefaults();
-          calcStore.resetToFactoryDefaults();
+          if (!wasStartedDuringRestore && !isRestoring.value) {
+            filterStore.resetToFactoryDefaults();
+            calcStore.resetToFactoryDefaults();
+          }
           return;
         }
 
         configLoading.value = true;
-        const config = await loadGeneConfig(gene.symbol);
+        const config = await loadGeneConfig(targetSymbol);
+
+        // Atomic token & symbol guard: reject superseded tokens and mismatched targets BEFORE ANY MUTATION
+        if (
+          activeConfigToken !== reqToken ||
+          selectedGene.value?.symbol !== targetSymbol
+        ) {
+          return;
+        }
+
         configLoading.value = false;
 
-        // Gene has no config — reset to factory defaults to prevent state bleed
+        // Settlement branch during restore: populate metadata only, clear obsolete profiles on null, never mutate stores
+        if (wasStartedDuringRestore || isRestoring.value) {
+          if (config !== null) {
+            activeGeneConfig.value = config;
+            activeProfile.value = null; // Suppress default profile activation
+            configLoaded.value = true;
+          } else {
+            // Unconfigured gene: clear obsolete previous gene profiles without resetting stores
+            activeGeneConfig.value = null;
+            activeProfile.value = null;
+            configLoaded.value = false;
+          }
+          return;
+        }
+
+        // Normal navigation settlement branch:
         if (config === null) {
           activeGeneConfig.value = null;
           activeProfile.value = null;
@@ -89,11 +136,16 @@ export function useGeneConfig(): UseGeneConfigReturn {
 
         // Config found — set state and apply default profile
         activeGeneConfig.value = config;
-        const defaultProfile = config.profiles.find((p) => p.isDefault)!;
+        const defaultProfile =
+          config.profiles.find((p) => p.isDefault) ??
+          config.profiles[0] ??
+          null;
         activeProfile.value = defaultProfile;
         configLoaded.value = true;
 
-        applyProfile(defaultProfile);
+        if (defaultProfile) {
+          applyProfile(defaultProfile);
+        }
       },
       { immediate: true },
     );
@@ -113,6 +165,7 @@ export function useGeneConfig(): UseGeneConfigReturn {
 
     activeProfile.value = profile;
     applyProfile(profile);
+    incrementRevision();
   }
 
   /**
@@ -125,6 +178,7 @@ export function useGeneConfig(): UseGeneConfigReturn {
     activeGeneConfig.value = null;
     activeProfile.value = null;
     configLoaded.value = false;
+    incrementRevision();
   }
 
   const availableProfiles = computed<ConditionProfile[]>(

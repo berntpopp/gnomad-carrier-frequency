@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { z } from "zod";
 import type {
   Perspective,
   GenderStyle,
@@ -11,6 +12,22 @@ import defaultEn from "@gnomad-cf/core/config/templates/en.json";
 // Type assertion for imported JSON
 const templateDe = defaultDe as TemplateConfig;
 const templateEn = defaultEn as TemplateConfig;
+
+export const TemplateImportSchema = z
+  .object({
+    version: z.string().regex(/^\d+\.\d+(\.\d+)?$/),
+    language: z.enum(["de", "en"]),
+    exportDate: z.string().optional(),
+    customSections: z.record(z.string(), z.string()).optional().default({}),
+    enabledSections: z
+      .object({
+        affected: z.array(z.string()),
+        carrier: z.array(z.string()),
+        familyMember: z.array(z.string()),
+      })
+      .strict(),
+  })
+  .strict();
 
 interface TemplateStoreState {
   language: "de" | "en";
@@ -175,37 +192,23 @@ export const useTemplateStore = defineStore("templates", {
      * Returns true if successful, false if invalid format
      */
     importTemplates(data: unknown): boolean {
-      // Validate structure
-      if (!data || typeof data !== "object") return false;
-      const exported = data as TemplateExport;
-
-      if (!exported.version || !exported.language) return false;
-      if (
-        !exported.customSections ||
-        typeof exported.customSections !== "object"
-      )
+      const parsed = TemplateImportSchema.safeParse(data);
+      if (!parsed.success) {
         return false;
-      if (
-        !exported.enabledSections ||
-        typeof exported.enabledSections !== "object"
-      )
-        return false;
+      }
 
-      // Apply customizations
+      const exported = parsed.data;
       this.language = exported.language;
       this.customSections = { ...exported.customSections };
 
-      // Merge enabled sections (preserve structure for all perspectives)
       for (const perspective of [
         "affected",
         "carrier",
         "familyMember",
       ] as Perspective[]) {
-        if (exported.enabledSections[perspective]) {
-          this.enabledSections[perspective] = [
-            ...exported.enabledSections[perspective],
-          ];
-        }
+        this.enabledSections[perspective] = [
+          ...exported.enabledSections[perspective],
+        ];
       }
 
       return true;

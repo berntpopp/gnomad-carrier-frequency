@@ -17,12 +17,9 @@ import {
 import {
   aggregatePopulationFrequenciesWithConfig,
   calculateVCR,
-  calculateGCR,
-  calculateHWECarrierFrequency,
-  calculateSimplifiedCarrierFrequency,
-  calculateGeneticPrevalence,
-  calculateBayesianPrevalence,
+  evaluateDecisionMatrix,
 } from "@gnomad-cf/core/calculations";
+import type { DecisionMatrixVariant } from "@gnomad-cf/core/calculations";
 
 import type {
   GnomadVariant,
@@ -167,7 +164,12 @@ export function processVariants(
   }
 
   // ---- 6. Global stats --------------------------------------------------------
-  const globalStats = computeGlobalStats(qualifyingVariants, calcConfig);
+  const globalStats = computeGlobalStats(
+    variants,
+    filteredByPathogenicity,
+    qualifyingVariants,
+    calcConfig,
+  );
 
   return {
     filteredByPathogenicity,
@@ -183,17 +185,47 @@ export function processVariants(
 }
 
 // ---------------------------------------------------------------------------
+// Helper: Map GnomadVariant to DecisionMatrixVariant
+// ---------------------------------------------------------------------------
+
+function toDecisionMatrixVariant(v: GnomadVariant): DecisionMatrixVariant {
+  if (v.joint) {
+    return {
+      ac: v.joint.ac,
+      an: v.joint.an,
+      hom: v.joint.homozygote_count,
+    };
+  }
+  const exomeAC = v.exome?.ac ?? 0;
+  const genomeAC = v.genome?.ac ?? 0;
+  const exomeAN = v.exome?.an ?? 0;
+  const genomeAN = v.genome?.an ?? 0;
+  const exomeAcHom = v.exome?.ac_hom ?? 0;
+  const genomeAcHom = v.genome?.ac_hom ?? 0;
+
+  return {
+    ac: exomeAC + genomeAC,
+    an: exomeAN + genomeAN,
+    hom: exomeAcHom + genomeAcHom,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Global stats computation (mirrors useCarrierFrequency globalStats computed)
 // ---------------------------------------------------------------------------
 
 /**
  * Compute global carrier frequency, prevalence, and related statistics from
- * the set of qualifying variants.
+ * the set of variants using the clinical 6-case decision matrix.
  *
+ * @param rawVariants - Total variants returned from gnomAD
+ * @param pathogenicVariants - Variants passing pathogenicity criteria
  * @param qualifyingVariants - Variants after all exclusions (used for frequency calc)
  * @param calcConfig - Calculation configuration
  */
 function computeGlobalStats(
+  rawVariants: GnomadVariant[],
+  pathogenicVariants: GnomadVariant[],
   qualifyingVariants: GnomadVariant[],
   calcConfig: CalcConfig,
 ): WorkerGlobalStats {
@@ -201,24 +233,21 @@ function computeGlobalStats(
     ? "hwe"
     : "simplified";
 
-  const emptyResult: WorkerGlobalStats = {
-    carrierFrequency: null,
-    totalAC: 0,
-    maxAN: 0,
-    sumAF: 0,
-    vcrs: [],
-    geneticPrevalence: null,
-    bayesianPrevalence: null,
-    formula: defaultFormula,
-    homExclusionActive: calcConfig.useHomExclusion,
-  };
+  const rawDmVars = rawVariants.map(toDecisionMatrixVariant);
+  const pathDmVars = pathogenicVariants.map(toDecisionMatrixVariant);
+  const qualDmVars = qualifyingVariants.map(toDecisionMatrixVariant);
 
-  if (qualifyingVariants.length === 0) {
-    return emptyResult;
-  }
+  const decisionMatrix = evaluateDecisionMatrix(
+    rawDmVars,
+    pathDmVars,
+    qualDmVars,
+    {
+      formula: defaultFormula,
+      useHomExclusion: calcConfig.useHomExclusion,
+      penetrance: calcConfig.penetrance,
+    },
+  );
 
-  // Aggregate AC, AN, sumAF across qualifying variants
-  // Prefer joint data (gnomAD v4); fall back to exome + genome sum
   let sumAF = 0;
   let totalAC = 0;
   let maxAN = 0;
@@ -234,30 +263,12 @@ function computeGlobalStats(
       combinedAN = variant.joint.an;
       combinedAcHom = variant.joint.homozygote_count;
     } else {
-      const exomeAC =
-        variant.exome !== null && variant.exome !== undefined
-          ? variant.exome.ac
-          : 0;
-      const genomeAC =
-        variant.genome !== null && variant.genome !== undefined
-          ? variant.genome.ac
-          : 0;
-      const exomeAN =
-        variant.exome !== null && variant.exome !== undefined
-          ? variant.exome.an
-          : 0;
-      const genomeAN =
-        variant.genome !== null && variant.genome !== undefined
-          ? variant.genome.an
-          : 0;
-      const exomeAcHom =
-        variant.exome !== null && variant.exome !== undefined
-          ? variant.exome.ac_hom
-          : 0;
-      const genomeAcHom =
-        variant.genome !== null && variant.genome !== undefined
-          ? variant.genome.ac_hom
-          : 0;
+      const exomeAC = variant.exome?.ac ?? 0;
+      const genomeAC = variant.genome?.ac ?? 0;
+      const exomeAN = variant.exome?.an ?? 0;
+      const genomeAN = variant.genome?.an ?? 0;
+      const exomeAcHom = variant.exome?.ac_hom ?? 0;
+      const genomeAcHom = variant.genome?.ac_hom ?? 0;
 
       combinedAC = exomeAC + genomeAC;
       combinedAN = exomeAN + genomeAN;
@@ -276,45 +287,16 @@ function computeGlobalStats(
     }
   }
 
-  // Prevalence always from raw q = sumAF (never from carrier frequency)
-  const geneticPrevalence =
-    sumAF > 0 ? calculateGeneticPrevalence([sumAF]) : null;
-  const bayesianPrevalence =
-    geneticPrevalence !== null
-      ? calculateBayesianPrevalence(geneticPrevalence, calcConfig.penetrance)
-      : null;
-
-  // Carrier frequency formula selection
-  let carrierFrequency: number | null = null;
-  let formula: "hwe" | "simplified" = defaultFormula;
-
-  if (sumAF > 0) {
-    if (calcConfig.useHomExclusion) {
-      // VCR/GCR path
-      const gcr = calculateGCR(vcrs);
-      carrierFrequency = gcr > 0 ? gcr : null;
-      // formula label follows HWE toggle setting (actual math uses VCR/GCR)
-      formula = calcConfig.useHWEFormula ? "hwe" : "simplified";
-    } else if (calcConfig.useHWEFormula) {
-      const cf = calculateHWECarrierFrequency([sumAF]);
-      carrierFrequency = cf > 0 ? cf : null;
-      formula = "hwe";
-    } else {
-      const cf = calculateSimplifiedCarrierFrequency([sumAF]);
-      carrierFrequency = cf > 0 ? cf : null;
-      formula = "simplified";
-    }
-  }
-
   return {
-    carrierFrequency,
+    carrierFrequency: decisionMatrix.carrierFrequency,
     totalAC,
     maxAN,
     sumAF,
     vcrs,
-    geneticPrevalence,
-    bayesianPrevalence,
-    formula,
+    geneticPrevalence: decisionMatrix.geneticPrevalence,
+    bayesianPrevalence: decisionMatrix.bayesianPrevalence,
+    formula: defaultFormula,
     homExclusionActive: calcConfig.useHomExclusion,
+    decisionMatrix,
   };
 }

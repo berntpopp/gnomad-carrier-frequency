@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref, type Ref, nextTick } from "vue";
 import { useHistoryStore } from "@/stores/useHistoryStore";
 import { useHistoryAutoSave } from "./useHistoryAutoSave";
 import { useWizard } from "./useWizard";
@@ -6,17 +6,134 @@ import { useCarrierFrequency } from "./useCarrierFrequency";
 import { useExclusionState } from "./useExclusionState";
 import { useGeneSearch } from "./useGeneSearch";
 import { useLogger } from "./useLogger";
+import { useGnomadVersion } from "@/api";
+import { useCalcStore } from "@/stores/useCalcStore";
+import { isRestoring } from "./useAnalysisContext";
+import { invalidateActiveConfigToken } from "./useGeneConfig";
+import type {
+  IndexPatientStatus,
+  FrequencySource,
+} from "@gnomad-cf/core/types";
+import type { GnomadVersion } from "@gnomad-cf/core/config";
+
+const activeRestoreToken: Ref<symbol | null> = ref(null);
+
+export interface RestoredSettings {
+  gene: { symbol: string; ensembl_id: string };
+  dataset: GnomadVersion;
+  filters: {
+    includeLof: boolean;
+    includeMissense: boolean;
+    includeClinvarPathogenic: boolean;
+    clinvarReviewStarsMin: number;
+    includeConflictingClinvar: boolean;
+    clinvarConflictingThreshold: number;
+    conflictingReviewStarsMin: number;
+  };
+  manualExclusions: string[];
+  clinical: {
+    indexStatus: IndexPatientStatus;
+    frequencySource: FrequencySource;
+    literatureCarrierFrequency: number | null;
+    literaturePmid: string | null;
+    penetrance: number;
+  };
+  calculation: {
+    formula: "hwe" | "simplified";
+    useHomozygoteExclusion: boolean;
+    useBayesianPrevalence: boolean;
+  };
+}
+
+export function migrateHistoryEntry(
+  rawInput: Record<string, unknown> | null | undefined,
+): RestoredSettings {
+  const raw = rawInput ?? {};
+  const filterCfg = (raw.filterConfig ?? {}) as Record<string, unknown>;
+  const rawGene = (raw.gene ?? {}) as Record<string, unknown>;
+  const rawTarget = (raw.target ?? {}) as Record<string, unknown>;
+  const rawResults = (raw.results ?? {}) as Record<string, unknown>;
+  const rawFilters = (raw.filters ?? {}) as Record<string, unknown>;
+  const rawExclusions = (raw.exclusions ?? {}) as Record<string, unknown>;
+  const rawClinical = (raw.clinical ?? {}) as Record<string, unknown>;
+  const rawCalc = (raw.calculation ?? {}) as Record<string, unknown>;
+
+  return {
+    gene: {
+      symbol: (rawGene.symbol as string) ?? "",
+      ensembl_id: (rawGene.ensembl_id as string) ?? "",
+    },
+    dataset: ((rawTarget.dataset as string) ??
+      (rawResults.gnomadVersion as string) ??
+      "v4") as GnomadVersion,
+    filters: {
+      includeLof:
+        (rawFilters.includeLof as boolean) ??
+        (filterCfg.lofHcEnabled as boolean) ??
+        true,
+      includeMissense:
+        (rawFilters.includeMissense as boolean) ??
+        (filterCfg.missenseEnabled as boolean) ??
+        false,
+      includeClinvarPathogenic:
+        (rawFilters.includeClinvarPathogenic as boolean) ??
+        (filterCfg.clinvarEnabled as boolean) ??
+        true,
+      clinvarReviewStarsMin:
+        (rawFilters.clinvarReviewStarsMin as number) ??
+        (filterCfg.clinvarStarThreshold as number) ??
+        1,
+      includeConflictingClinvar:
+        (rawFilters.includeConflictingClinvar as boolean) ??
+        (filterCfg.clinvarIncludeConflicting as boolean) ??
+        false,
+      clinvarConflictingThreshold:
+        (rawFilters.clinvarConflictingThreshold as number) ??
+        (filterCfg.clinvarConflictingThreshold as number) ??
+        80,
+      conflictingReviewStarsMin:
+        (rawFilters.conflictingReviewStarsMin as number) ?? 1,
+    },
+    manualExclusions:
+      (rawExclusions.manualExcludedVariantIds as string[]) ??
+      (raw.excludedVariantIds as string[]) ??
+      [],
+    clinical: {
+      indexStatus: ((rawClinical.indexStatus as string) ??
+        (raw.patientStatus as string) ??
+        (raw.indexStatus as string) ??
+        "heterozygous") as IndexPatientStatus,
+      frequencySource: ((rawClinical.frequencySource as string) ??
+        (raw.frequencySource as string) ??
+        (raw.source as string) ??
+        "gnomad") as FrequencySource,
+      literatureCarrierFrequency:
+        (rawClinical.literatureCarrierFrequency as number | null) ??
+        (raw.literatureFrequency as number | null) ??
+        null,
+      literaturePmid:
+        (rawClinical.literaturePmid as string | null) ??
+        (raw.literaturePmid as string | null) ??
+        null,
+      penetrance:
+        (rawClinical.penetrance as number) ?? (raw.penetrance as number) ?? 1.0,
+    },
+    calculation: {
+      formula: ((rawCalc.formula as string) ??
+        (filterCfg.useHWEFormula === false ? "simplified" : "hwe")) as
+        | "hwe"
+        | "simplified",
+      useHomozygoteExclusion:
+        (rawCalc.useHomozygoteExclusion as boolean) ??
+        (filterCfg.useHomExclusion as boolean) ??
+        true,
+      useBayesianPrevalence: (rawCalc.useBayesianPrevalence as boolean) ?? true,
+    },
+  };
+}
 
 /**
- * Composable for restoring calculation state from history entries.
- *
- * Restoration process:
- * 1. Auto-save current state (if valid) to prevent data loss
- * 2. Restore wizard state (gene, index status, frequency source)
- * 3. Trigger gene data fetch
- * 4. Restore filter configuration
- * 5. Restore exclusions
- * 6. Navigate to results step
+ * Composable for transactional restoration of calculation state from history entries.
  */
 export function useHistoryRestore() {
   const historyStore = useHistoryStore();
@@ -25,16 +142,10 @@ export function useHistoryRestore() {
   const { setGeneSymbol, setFilterConfig } = useCarrierFrequency();
   const { setExclusions, resetForGene } = useExclusionState();
   const geneSearch = useGeneSearch();
+  const { setVersion } = useGnomadVersion();
+  const calcStore = useCalcStore();
   const logger = useLogger("history");
 
-  const isRestoring = ref(false);
-
-  /**
-   * Restore full application state from a history entry.
-   *
-   * @param entryId - UUID of the history entry to restore
-   * @returns true if restoration succeeded, false if entry not found
-   */
   async function restoreFromHistory(entryId: string): Promise<boolean> {
     const entry = historyStore.getEntry(entryId);
     if (!entry) {
@@ -42,58 +153,76 @@ export function useHistoryRestore() {
       return false;
     }
 
+    const token = Symbol("restore");
+    activeRestoreToken.value = token;
     isRestoring.value = true;
+    invalidateActiveConfigToken();
 
     try {
-      // Step 1: Auto-save current state before restoring (per CONTEXT.md)
-      // This prevents accidental data loss when browsing history
+      // Step 1: Auto-save current state before restoring
       saveCurrentCalculation();
 
-      // Step 2: Clear gene first to avoid triggering the downstream reset watcher
-      // The watcher only resets if oldGene !== null AND currentStep > 1
-      // By clearing the gene first, we ensure a clean state transition
-      wizardState.gene = null;
+      // Step 2: Migrate raw history entry to authoritative normalized settings
+      const restored = migrateHistoryEntry(
+        entry as unknown as Record<string, unknown>,
+      );
 
-      // Step 3: Restore wizard state BEFORE setting gene
-      // This prevents the gene watcher from overwriting these values
-      wizardState.indexStatus = entry.indexStatus;
-      wizardState.frequencySource = entry.frequencySource;
-      wizardState.literatureFrequency = entry.literatureFrequency;
-      wizardState.literaturePmid = entry.literaturePmid;
+      // Step 3: Sequence dataset version in versionStore BEFORE gene selection
+      setVersion(restored.dataset);
 
-      // Step 4: Restore filter configuration
-      // This updates the session filter config, not the saved defaults
-      setFilterConfig({ ...entry.filterConfig });
+      // Step 4: Hydrate calculation & clinical parameters
+      calcStore.setPenetrance(restored.clinical.penetrance);
+      calcStore.setUseHWEFormula(restored.calculation.formula === "hwe");
+      calcStore.setUseHomExclusion(restored.calculation.useHomozygoteExclusion);
 
-      // Step 5: Restore exclusions
-      resetForGene(entry.gene.symbol);
-      if (entry.excludedVariantIds.length > 0) {
-        setExclusions(entry.excludedVariantIds);
+      wizardState.indexStatus = restored.clinical.indexStatus;
+      wizardState.frequencySource = restored.clinical.frequencySource;
+      wizardState.literatureFrequency =
+        restored.clinical.literatureCarrierFrequency;
+      wizardState.literaturePmid = restored.clinical.literaturePmid;
+
+      // Step 5: Restore filter configuration
+      setFilterConfig({
+        lofHcEnabled: restored.filters.includeLof,
+        missenseEnabled: restored.filters.includeMissense,
+        clinvarEnabled: restored.filters.includeClinvarPathogenic,
+        clinvarStarThreshold: restored.filters.clinvarReviewStarsMin,
+        clinvarIncludeConflicting: restored.filters.includeConflictingClinvar,
+        clinvarConflictingThreshold:
+          restored.filters.clinvarConflictingThreshold,
+      });
+
+      // Step 6: Restore exclusions
+      resetForGene(restored.gene.symbol);
+      if (restored.manualExclusions.length > 0) {
+        setExclusions(restored.manualExclusions);
       }
 
-      // Step 6: Navigate to results step BEFORE setting gene
-      // This way when we set gene, the watcher won't reset (currentStep check passes)
+      // Step 7: Navigate to results step
       wizardState.currentStep = 4;
 
-      // Step 7: Now set the gene - the watcher won't reset because we're on step 4
-      // and setting from null doesn't trigger the reset (oldGene check)
-      wizardState.gene = {
-        ensembl_id: entry.gene.ensembl_id,
-        symbol: entry.gene.symbol,
-      };
-
-      // Trigger gene search/selection which fetches variant data
+      // Step 8: Set restored gene
+      wizardState.gene = { ...restored.gene };
       geneSearch.selectGene(wizardState.gene);
 
-      // Set gene symbol in carrier frequency composable (triggers data fetch)
-      setGeneSymbol(entry.gene.symbol);
+      // Step 9: Await Vue microtasks settlement across watchers
+      await nextTick();
 
       return true;
     } catch (error) {
       logger.error("Failed to restore from history", { error });
       return false;
     } finally {
-      isRestoring.value = false;
+      if (activeRestoreToken.value === token) {
+        isRestoring.value = false;
+        activeRestoreToken.value = null;
+
+        // Dispatch calculation only after unlock
+        const restored = migrateHistoryEntry(
+          entry as unknown as Record<string, unknown>,
+        );
+        setGeneSymbol(restored.gene.symbol);
+      }
     }
   }
 

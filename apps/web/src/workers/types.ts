@@ -11,6 +11,7 @@ import type {
 } from "@gnomad-cf/core/types";
 import type { SourceCategory } from "@gnomad-cf/core/filters";
 import type { ClinVarSubmission } from "@gnomad-cf/core/queries";
+import type { DecisionMatrixResult } from "@gnomad-cf/core/calculations";
 
 /**
  * Parameters for processGene worker call.
@@ -58,6 +59,7 @@ export interface WorkerGlobalStats {
   bayesianPrevalence: number | null;
   formula: "hwe" | "simplified";
   homExclusionActive: boolean;
+  decisionMatrix?: DecisionMatrixResult;
 }
 
 /**

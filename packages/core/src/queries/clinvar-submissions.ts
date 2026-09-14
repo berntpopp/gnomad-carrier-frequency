@@ -6,6 +6,9 @@
  */
 export interface ClinVarSubmission {
   clinical_significance: string;
+  submitter_name?: string;
+  review_status?: string;
+  last_evaluated?: string;
 }
 
 /**
@@ -13,36 +16,65 @@ export interface ClinVarSubmission {
  */
 export interface ClinVarVariantWithSubmissions {
   variant_id: string;
+  clinical_significance?: string;
+  review_status?: string;
+  last_evaluated?: string;
   submissions: ClinVarSubmission[];
 }
 
 /**
  * Build a batched GraphQL query to fetch submissions for multiple variants
- * Uses aliased queries to fetch multiple variants in a single request
+ * Uses aliased queries and parameterized GraphQL variables.
  *
  * @param variantIds - Array of variant IDs to fetch
  * @param referenceGenome - Reference genome (GRCh38 or GRCh37)
- * @returns GraphQL query string
+ * @returns Object with query string and variables map, or null if variantIds is empty
  */
 export function buildSubmissionsQuery(
   variantIds: string[],
   referenceGenome: "GRCh38" | "GRCh37",
-): string {
-  const variantQueries = variantIds
+): { query: string; variables: Record<string, string> } | null {
+  if (!variantIds || variantIds.length === 0) return null;
+
+  for (const id of variantIds) {
+    if (!/^(?:chr)?(?:\d+|X|Y)-[0-9]+-[ACGT]+-[ACGT]+$/i.test(id)) {
+      throw new Error(`Invalid variant ID format: ${id}`);
+    }
+  }
+
+  const variables: Record<string, string> = {
+    refGenome: referenceGenome,
+  };
+
+  const fields = variantIds
     .map((id, index) => {
-      // Use index as alias since variant IDs contain special characters
-      return `v${index}: clinvar_variant(variant_id: "${id}", reference_genome: ${referenceGenome}) {
+      const varName = `var${index}`;
+      variables[varName] = id;
+      return `v${index}: clinvar_variant(variant_id: $${varName}, reference_genome: $refGenome) {
         variant_id
+        clinical_significance
+        review_status
+        last_evaluated
         submissions {
           clinical_significance
+          review_status
+          last_evaluated
+          submitter_name
         }
       }`;
     })
     .join("\n      ");
 
-  return `query ClinVarSubmissions {
-      ${variantQueries}
+  const varDeclarations = Object.keys(variables)
+    .filter((k) => k !== "refGenome")
+    .map((k) => `$${k}: String!`)
+    .join(", ");
+
+  const query = `query GetClinvarSubmissions($refGenome: ReferenceGenomeId!, ${varDeclarations}) {
+      ${fields}
     }`;
+
+  return { query, variables };
 }
 
 /**

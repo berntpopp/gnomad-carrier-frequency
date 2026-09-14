@@ -22,6 +22,8 @@ import { useExclusionState } from "./useExclusionState";
 import { encodeExclusions, decodeExclusions } from "@gnomad-cf/core/utils";
 import { useGnomadVersion } from "@/api";
 import { useLogger } from "./useLogger";
+import { isRestoring } from "./useAnalysisContext";
+import { invalidateActiveConfigToken } from "./useGeneConfig";
 
 // Module-level singleton state
 const isInitialized = ref(false);
@@ -71,136 +73,152 @@ export function useUrlState(): UseUrlStateReturn {
    * Called on mount if URL contains state parameters
    */
   async function restoreFromUrl(): Promise<void> {
-    // Parse and validate URL parameters
-    const urlState: UrlState = parseUrlState(params as Record<string, unknown>);
+    isRestoringFromUrl.value = true;
+    isRestoring.value = true;
+    invalidateActiveConfigToken();
 
-    // Restore gnomAD version before gene (affects which API dataset is used)
-    if (urlState.ver) {
-      setVersion(urlState.ver as GnomadVersion);
-    }
+    try {
+      // Parse and validate URL parameters
+      const urlState: UrlState = parseUrlState(
+        params as Record<string, unknown>,
+      );
 
-    // Restore gene if present in URL
-    if (urlState.gene) {
-      // Trigger gene search
-      geneSearch.setSearchTerm(urlState.gene);
+      // Restore gnomAD version before gene (affects which API dataset is used)
+      if (urlState.ver) {
+        setVersion(urlState.ver as GnomadVersion);
+      }
 
-      // Wait for search results to populate
-      await nextTick();
+      // Restore gene if present in URL
+      if (urlState.gene) {
+        // Trigger gene search
+        geneSearch.setSearchTerm(urlState.gene);
 
-      // Wait a bit for the debounced search to execute and results to arrive
-      await new Promise<void>((resolve) => {
-        const maxAttempts = 50; // 5 seconds max
-        let attempts = 0;
+        // Wait for search results to populate
+        await nextTick();
 
-        const checkResults = () => {
-          attempts++;
+        // Wait a bit for the debounced search to execute and results to arrive
+        await new Promise<void>((resolve) => {
+          const maxAttempts = 50; // 5 seconds max
+          let attempts = 0;
 
-          // Check if we have results
-          if (geneSearch.results.value.length > 0) {
-            // Find matching gene (exact match on symbol)
-            const matchingGene = geneSearch.results.value.find(
-              (g) => g.symbol.toUpperCase() === urlState.gene?.toUpperCase(),
-            );
+          const checkResults = () => {
+            attempts++;
 
-            if (matchingGene) {
-              geneSearch.selectGene(matchingGene);
-              wizardState.gene = matchingGene;
+            // Check if we have results
+            if (geneSearch.results.value.length > 0) {
+              // Find matching gene (exact match on symbol)
+              const matchingGene = geneSearch.results.value.find(
+                (g) => g.symbol.toUpperCase() === urlState.gene?.toUpperCase(),
+              );
+
+              if (matchingGene) {
+                geneSearch.selectGene(matchingGene);
+                wizardState.gene = matchingGene;
+              }
+              resolve();
+            } else if (geneSearch.isLoading.value) {
+              // Still loading, wait and try again
+              setTimeout(checkResults, 100);
+            } else if (attempts < maxAttempts) {
+              // Not loading but no results yet, wait
+              setTimeout(checkResults, 100);
+            } else {
+              // Give up after max attempts
+              logger.warn("Could not find gene from URL", {
+                gene: urlState.gene,
+              });
+              resolve();
             }
-            resolve();
-          } else if (geneSearch.isLoading.value) {
-            // Still loading, wait and try again
-            setTimeout(checkResults, 100);
-          } else if (attempts < maxAttempts) {
-            // Not loading but no results yet, wait
-            setTimeout(checkResults, 100);
-          } else {
-            // Give up after max attempts
-            logger.warn("Could not find gene from URL", {
-              gene: urlState.gene,
-            });
-            resolve();
+          };
+
+          checkResults();
+        });
+      }
+
+      // Restore wizard state (only if gene was found or no gene in URL)
+      if (wizardState.gene || !urlState.gene) {
+        // Restore index status
+        wizardState.indexStatus = urlState.status;
+
+        // Restore frequency source
+        wizardState.frequencySource = urlState.source;
+
+        // Restore literature frequency if source is literature
+        if (urlState.source === "literature") {
+          if (urlState.litFreq !== undefined) {
+            wizardState.literatureFrequency = urlState.litFreq;
           }
-        };
-
-        checkResults();
-      });
-    }
-
-    // Restore wizard state (only if gene was found or no gene in URL)
-    if (wizardState.gene || !urlState.gene) {
-      // Restore index status
-      wizardState.indexStatus = urlState.status;
-
-      // Restore frequency source
-      wizardState.frequencySource = urlState.source;
-
-      // Restore literature frequency if source is literature
-      if (urlState.source === "literature") {
-        if (urlState.litFreq !== undefined) {
-          wizardState.literatureFrequency = urlState.litFreq;
+          if (urlState.litPmid !== undefined) {
+            wizardState.literaturePmid = urlState.litPmid;
+          }
         }
-        if (urlState.litPmid !== undefined) {
-          wizardState.literaturePmid = urlState.litPmid;
+
+        // Restore filter settings if present
+        if (urlState.filters !== undefined) {
+          const decodedFilters = decodeFilterFlags(urlState.filters);
+          filterStore.setDefaults(decodedFilters);
+        }
+
+        // Restore ClinVar star threshold if present
+        if (urlState.clinvarStars !== undefined) {
+          filterStore.setClinvarStarThreshold(urlState.clinvarStars);
+        }
+
+        // Restore conflicting classifications setting
+        if (urlState.conflicting !== undefined) {
+          filterStore.setClinvarIncludeConflicting(
+            urlState.conflicting === "1",
+          );
+        }
+
+        // Restore conflicting threshold if present
+        if (urlState.conflictThreshold !== undefined) {
+          filterStore.setClinvarConflictingThreshold(
+            urlState.conflictThreshold,
+          );
+        }
+
+        // Restore step last (after all other state is set)
+        // Only go to step if we have the prerequisites
+        if (urlState.step > 1 && wizardState.gene) {
+          wizardState.currentStep = urlState.step as 1 | 2 | 3 | 4;
+        }
+
+        // Restore exclusions if present in URL
+        if (urlState.excl) {
+          const decodedExclusions = decodeExclusions(urlState.excl);
+          if (decodedExclusions.length > 0) {
+            setExclusions(decodedExclusions);
+          }
+        }
+
+        // Show warning if exclusions were truncated
+        if (urlState.exclWarn === "1") {
+          logger.warn(
+            "Some exclusions were not included in the shared URL due to length limits",
+          );
+        }
+
+        // Restore subcontinental toggle if present
+        if (urlState.sub === "1") {
+          subcontinentalEnabled.value = true;
+        }
+
+        // Restore calc settings if present in URL
+        if (urlState.hweFormula !== undefined) {
+          calcStore.setUseHWEFormula(urlState.hweFormula === "1");
+        }
+        if (urlState.homExclusion !== undefined) {
+          calcStore.setUseHomExclusion(urlState.homExclusion === "1");
+        }
+        if (urlState.penetrance !== undefined) {
+          calcStore.setPenetrance(urlState.penetrance);
         }
       }
-
-      // Restore filter settings if present
-      if (urlState.filters !== undefined) {
-        const decodedFilters = decodeFilterFlags(urlState.filters);
-        filterStore.setDefaults(decodedFilters);
-      }
-
-      // Restore ClinVar star threshold if present
-      if (urlState.clinvarStars !== undefined) {
-        filterStore.setClinvarStarThreshold(urlState.clinvarStars);
-      }
-
-      // Restore conflicting classifications setting
-      if (urlState.conflicting !== undefined) {
-        filterStore.setClinvarIncludeConflicting(urlState.conflicting === "1");
-      }
-
-      // Restore conflicting threshold if present
-      if (urlState.conflictThreshold !== undefined) {
-        filterStore.setClinvarConflictingThreshold(urlState.conflictThreshold);
-      }
-
-      // Restore step last (after all other state is set)
-      // Only go to step if we have the prerequisites
-      if (urlState.step > 1 && wizardState.gene) {
-        wizardState.currentStep = urlState.step as 1 | 2 | 3 | 4;
-      }
-
-      // Restore exclusions if present in URL
-      if (urlState.excl) {
-        const decodedExclusions = decodeExclusions(urlState.excl);
-        if (decodedExclusions.length > 0) {
-          setExclusions(decodedExclusions);
-        }
-      }
-
-      // Show warning if exclusions were truncated
-      if (urlState.exclWarn === "1") {
-        logger.warn(
-          "Some exclusions were not included in the shared URL due to length limits",
-        );
-      }
-
-      // Restore subcontinental toggle if present
-      if (urlState.sub === "1") {
-        subcontinentalEnabled.value = true;
-      }
-
-      // Restore calc settings if present in URL
-      if (urlState.hweFormula !== undefined) {
-        calcStore.setUseHWEFormula(urlState.hweFormula === "1");
-      }
-      if (urlState.homExclusion !== undefined) {
-        calcStore.setUseHomExclusion(urlState.homExclusion === "1");
-      }
-      if (urlState.penetrance !== undefined) {
-        calcStore.setPenetrance(urlState.penetrance);
-      }
+      await nextTick();
+    } finally {
+      isRestoringFromUrl.value = false;
+      isRestoring.value = false;
     }
   }
 

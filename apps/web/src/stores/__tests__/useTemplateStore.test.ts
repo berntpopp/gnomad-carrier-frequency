@@ -180,4 +180,71 @@ describe("useTemplateStore", () => {
       expect(store.genderSuffix).toBe(":innen");
     });
   });
+
+  describe("exportTemplates & importTemplates (SPEC-11)", () => {
+    it("exports current template customizations and imports them back", () => {
+      const store = useTemplateStore();
+      store.setLanguage("en");
+      store.setCustomSection("affected.geneIntro", "Custom EN text");
+      const exported = store.exportTemplates();
+
+      expect(exported.version).toBe("1.0");
+      expect(exported.language).toBe("en");
+      expect(exported.customSections["affected.geneIntro"]).toBe(
+        "Custom EN text",
+      );
+
+      store.setLanguage("de");
+      store.resetAllCustomizations();
+      expect(store.language).toBe("de");
+
+      const success = store.importTemplates(exported);
+      expect(success).toBe(true);
+      expect(store.language).toBe("en");
+      expect(store.customSections["affected.geneIntro"]).toBe("Custom EN text");
+    });
+
+    it("rejects malformed template imports with invalid version", () => {
+      const store = useTemplateStore();
+      const invalid = {
+        version: "not-a-version",
+        language: "de",
+        enabledSections: {
+          affected: ["geneIntro"],
+          carrier: ["geneIntro"],
+          familyMember: ["geneIntro"],
+        },
+      };
+      expect(store.importTemplates(invalid)).toBe(false);
+    });
+
+    it("rejects template imports with unsupported language", () => {
+      const store = useTemplateStore();
+      const invalid = {
+        version: "1.0",
+        language: "fr",
+        enabledSections: {
+          affected: ["geneIntro"],
+          carrier: ["geneIntro"],
+          familyMember: ["geneIntro"],
+        },
+      };
+      expect(store.importTemplates(invalid)).toBe(false);
+    });
+
+    it("rejects template imports with extra unknown keys due to strict schema", () => {
+      const store = useTemplateStore();
+      const invalid = {
+        version: "1.0",
+        language: "en",
+        unexpectedProperty: "malicious",
+        enabledSections: {
+          affected: ["geneIntro"],
+          carrier: ["geneIntro"],
+          familyMember: ["geneIntro"],
+        },
+      };
+      expect(store.importTemplates(invalid)).toBe(false);
+    });
+  });
 });

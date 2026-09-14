@@ -1,7 +1,10 @@
 export { useGeneSearch } from "./useGeneSearch";
 export type { UseGeneSearchReturn } from "./useGeneSearch";
 
-export { useCarrierFrequency } from "./useCarrierFrequency";
+export {
+  useCarrierFrequency,
+  disposeCarrierFrequencyInstance,
+} from "./useCarrierFrequency";
 export type { UseCarrierFrequencyReturn } from "./useCarrierFrequency";
 
 export { useWizard } from "./useWizard";
@@ -66,3 +69,10 @@ export type {
   UseSubcontinentalDataReturn,
   SubcontinentalPopulationFrequency,
 } from "./useSubcontinentalData";
+
+export {
+  useAnalysisContext,
+  isRestoring,
+  activeContextRevision,
+  incrementRevision,
+} from "./useAnalysisContext";

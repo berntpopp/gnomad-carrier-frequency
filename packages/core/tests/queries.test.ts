@@ -15,12 +15,16 @@ import { GENE_VARIANTS_QUERY } from "../src/queries/gene-variants.js";
 describe("queries module", () => {
   describe("clinvar submissions query helpers", () => {
     it("builds batched submissions query string", () => {
-      const q = buildSubmissionsQuery(["1-100-A-G", "2-200-C-T"], "GRCh38");
-      expect(q).toContain("query ClinVarSubmissions");
-      expect(q).toContain("v0: clinvar_variant");
-      expect(q).toContain("v1: clinvar_variant");
-      expect(q).toContain("1-100-A-G");
-      expect(q).toContain("GRCh38");
+      const { query, variables } = buildSubmissionsQuery(
+        ["1-100-A-G", "2-200-C-T"],
+        "GRCh38",
+      );
+      expect(query).toContain("query GetClinvarSubmissions");
+      expect(query).toContain("v0: clinvar_variant");
+      expect(query).toContain("v1: clinvar_variant");
+      expect(variables.var0).toBe("1-100-A-G");
+      expect(variables.var1).toBe("2-200-C-T");
+      expect(variables.refGenome).toBe("GRCh38");
     });
 
     it("parses submissions response correctly", () => {
