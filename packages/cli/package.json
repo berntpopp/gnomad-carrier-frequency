@@ -9,11 +9,13 @@
   "scripts": {
     "build": "tsdown",
     "dev": "bun run src/cli.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@gnomad-cf/core": "workspace:*",
     "commander": "^14.0.3",
+    "zod": "^4.3.5",
     "@clack/prompts": "^1.6.0",
     "p-limit": "^7.3.0"
   },

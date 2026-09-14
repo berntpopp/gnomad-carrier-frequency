@@ -15,33 +15,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download ClinGen Gene Validity CSV
-        run: |
-          mkdir -p public/data
-          curl -sL "https://search.clinicalgenome.org/kb/gene-validity/download" \
-            -o public/data/clingen-gene-validity.csv
+      - uses: oven-sh/setup-bun@v2
 
-          # Verify the file was downloaded and has content
-          if [ ! -s public/data/clingen-gene-validity.csv ]; then
-            echo "Error: Downloaded file is empty"
-            exit 1
-          fi
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
-          # Show file info
-          echo "Downloaded ClinGen data:"
-          wc -l public/data/clingen-gene-validity.csv
-          head -10 public/data/clingen-gene-validity.csv
+      - name: Download & Validate ClinGen Gene Validity Data
+        run: bun run scripts/update-clingen-gene-validity.ts
+
+      - name: Run ClinGen validation test suite
+        run: bun test scripts/__tests__/update-clingen.test.ts
 
       - name: Check for changes
         id: check_changes
         run: |
-          git diff --quiet public/data/clingen-gene-validity.csv && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+          git diff --quiet apps/web/public/data/clingen-gene-validity.csv && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: Commit and push if changed
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add public/data/clingen-gene-validity.csv
+          git add apps/web/public/data/clingen-gene-validity.csv
           git commit -m "chore: update ClinGen gene validity data [skip ci]"
           git push
