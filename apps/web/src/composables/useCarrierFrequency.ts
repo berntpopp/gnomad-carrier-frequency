@@ -226,8 +226,6 @@ export function useCarrierFrequency(): UseCarrierFrequencyReturn {
   const cacheStatus = ref<WorkerResult["cacheStatus"] | null>(null);
 
   // Session and revision tracking for worker concurrency
-  let inFlightSession: string | null = null;
-  let inFlightRevision: number | null = null;
   let lastFetchedSession: string | null = null;
 
   const getSessionKey = () =>

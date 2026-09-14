@@ -8,7 +8,6 @@ import {
   disposeCarrierFrequencyInstance,
 } from "../useCarrierFrequency";
 import { useGnomadVersion } from "@/api";
-import { useCalcStore } from "@/stores/useCalcStore";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { isRestoring } from "../useAnalysisContext";
 
@@ -142,7 +141,6 @@ describe("useHistoryRestore (SPEC-07-TXN, SPEC-07-MIG)", () => {
       const historyStore = useHistoryStore();
       const { version } = useGnomadVersion();
       const { state: wizardState } = useWizard();
-      const calcStore = useCalcStore();
       const filterStore = useFilterStore();
       const { restoreFromHistory } = useHistoryRestore();
 

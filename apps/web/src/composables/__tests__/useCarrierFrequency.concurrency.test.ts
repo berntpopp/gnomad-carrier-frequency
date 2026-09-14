@@ -58,8 +58,8 @@ const dummyVariant = {
 
 function createFakeWorkerResult(cf: number, requestId = 1): WorkerResult {
   return {
-    filteredByPathogenicity: [dummyVariant as any],
-    qualifyingVariants: [dummyVariant as any],
+    filteredByPathogenicity: [dummyVariant as unknown as GnomadVariant],
+    qualifyingVariants: [dummyVariant as unknown as GnomadVariant],
     clinvarVariants: [],
     qualityFlagsMap: [],
     qualityExcludedIds: [],

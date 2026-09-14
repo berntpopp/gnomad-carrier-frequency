@@ -7,18 +7,14 @@ import {
   afterEach,
   type MockInstance,
 } from "vitest";
+import { setActivePinia, createPinia } from "pinia";
 import { useClinvarSubmissions } from "../useClinvarSubmissions";
-
-// Mock getReferenceGenome — always return GRCh38
-vi.mock("@gnomad-cf/core/config", () => ({
-  getReferenceGenome: () => "GRCh38" as const,
-}));
+import { useGnomadVersion } from "@/api";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Create a successful fetch Response with gnomAD-shaped submission data */
 function makeSubmissionsResponse(variantIds: string[]): Record<
   string,
   {
@@ -63,24 +59,17 @@ function graphqlErrorResponse(message: string): Response {
   });
 }
 
-/**
- * Start an async operation and flush all fake timers so backoff delays resolve.
- * Returns the settled promise.
- */
 async function runWithTimers<T>(fn: () => Promise<T>): Promise<T> {
   const promise = fn();
   await vi.runAllTimersAsync();
   return promise;
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
 describe("useClinvarSubmissions", () => {
   let fetchSpy: MockInstance;
 
   beforeEach(() => {
+    setActivePinia(createPinia());
     fetchSpy = vi.spyOn(globalThis, "fetch");
     vi.useFakeTimers();
   });
@@ -90,8 +79,8 @@ describe("useClinvarSubmissions", () => {
     vi.useRealTimers();
   });
 
-  it("fetches submissions and populates the map", async () => {
-    const ids = ["var-1", "var-2"];
+  it("fetches submissions with { query, variables } POST body and populates the map", async () => {
+    const ids = ["1-10001-A-T", "1-10002-C-G"];
     fetchSpy.mockResolvedValueOnce(okResponse(ids));
 
     const { fetchSubmissions, submissions, isLoading, error, progress } =
@@ -103,8 +92,18 @@ describe("useClinvarSubmissions", () => {
     expect(isLoading.value).toBe(false);
     expect(progress.value).toBe(100);
     expect(submissions.value.size).toBe(2);
-    expect(submissions.value.has("var-1")).toBe(true);
-    expect(submissions.value.has("var-2")).toBe(true);
+    expect(submissions.value.has("1-10001-A-T")).toBe(true);
+    expect(submissions.value.has("1-10002-C-G")).toBe(true);
+
+    // Verify POST body format
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "https://gnomad.broadinstitute.org/api",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: expect.stringMatching(/"variables":\{"refGenome":"GRCh38"/),
+      }),
+    );
   });
 
   it("does nothing for empty variant list", async () => {
@@ -114,7 +113,7 @@ describe("useClinvarSubmissions", () => {
   });
 
   it("clears state on clearSubmissions", async () => {
-    const ids = ["var-1"];
+    const ids = ["1-10001-A-T"];
     fetchSpy.mockResolvedValueOnce(okResponse(ids));
 
     const { fetchSubmissions, clearSubmissions, submissions, progress, error } =
@@ -130,8 +129,7 @@ describe("useClinvarSubmissions", () => {
   });
 
   it("retries on server error (500) with exponential backoff", async () => {
-    const ids = ["var-1"];
-    // Fail twice with 500, then succeed on attempt 2
+    const ids = ["1-10001-A-T"];
     fetchSpy
       .mockResolvedValueOnce(errorResponse(500, "Internal Server Error"))
       .mockResolvedValueOnce(errorResponse(500, "Internal Server Error"))
@@ -142,24 +140,22 @@ describe("useClinvarSubmissions", () => {
 
     expect(error.value).toBeNull();
     expect(submissions.value.size).toBe(1);
-    // attempt 0 (500), attempt 1 (500), attempt 2 (200) = 3 calls
     expect(fetchSpy).toHaveBeenCalledTimes(3);
   });
 
   it("does not retry on client error (400)", async () => {
-    const ids = ["var-1"];
+    const ids = ["1-10001-A-T"];
     fetchSpy.mockResolvedValueOnce(errorResponse(400, "Bad Request"));
 
     const { fetchSubmissions, error } = useClinvarSubmissions();
     await runWithTimers(() => fetchSubmissions(ids));
 
-    // Should fail immediately without retrying
     expect(error.value).toContain("failed");
     expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
   it("retries on 429 rate limit", async () => {
-    const ids = ["var-1"];
+    const ids = ["1-10001-A-T"];
     fetchSpy
       .mockResolvedValueOnce(errorResponse(429, "Too Many Requests"))
       .mockResolvedValueOnce(okResponse(ids));
@@ -173,8 +169,7 @@ describe("useClinvarSubmissions", () => {
   });
 
   it("reports error after exhausting all retries", async () => {
-    const ids = ["var-1"];
-    // Fail on all 4 attempts (initial + 3 retries)
+    const ids = ["1-10001-A-T"];
     fetchSpy.mockResolvedValue(errorResponse(500, "Internal Server Error"));
 
     const { fetchSubmissions, error } = useClinvarSubmissions();
@@ -182,42 +177,35 @@ describe("useClinvarSubmissions", () => {
 
     expect(error.value).not.toBeNull();
     expect(error.value).toContain("failed");
-    // initial + MAX_RETRIES (3) = 4 attempts
     expect(fetchSpy).toHaveBeenCalledTimes(4);
   });
 
   it("continues processing remaining batches when one fails", async () => {
-    // Create 60 IDs = 2 batches (batch size is 50)
-    const ids = Array.from({ length: 60 }, (_, i) => `var-${i}`);
+    const ids = Array.from({ length: 60 }, (_, i) => `1-${10000 + i}-A-T`);
     const batch2Ids = ids.slice(50);
 
-    // First batch fails all retries, second batch succeeds
     fetchSpy
-      .mockResolvedValueOnce(errorResponse(500)) // batch 1 attempt 0
-      .mockResolvedValueOnce(errorResponse(500)) // batch 1 attempt 1
-      .mockResolvedValueOnce(errorResponse(500)) // batch 1 attempt 2
-      .mockResolvedValueOnce(errorResponse(500)) // batch 1 attempt 3
-      .mockResolvedValueOnce(okResponse(batch2Ids)); // batch 2 succeeds
+      .mockResolvedValueOnce(errorResponse(500))
+      .mockResolvedValueOnce(errorResponse(500))
+      .mockResolvedValueOnce(errorResponse(500))
+      .mockResolvedValueOnce(errorResponse(500))
+      .mockResolvedValueOnce(okResponse(batch2Ids));
 
     const { fetchSubmissions, submissions, error } = useClinvarSubmissions();
     await runWithTimers(() => fetchSubmissions(ids));
 
-    // Batch 2 should have succeeded despite batch 1 failing
     expect(submissions.value.size).toBe(batch2Ids.length);
     for (const id of batch2Ids) {
       expect(submissions.value.has(id)).toBe(true);
     }
-    // Error should report the failed batch
     expect(error.value).toContain("1 of 2 batch(es) failed");
   });
 
   it("retryFailed re-fetches only previously failed variant IDs", async () => {
-    // Create 60 IDs = 2 batches
-    const ids = Array.from({ length: 60 }, (_, i) => `var-${i}`);
+    const ids = Array.from({ length: 60 }, (_, i) => `1-${10000 + i}-A-T`);
     const batch1Ids = ids.slice(0, 50);
     const batch2Ids = ids.slice(50);
 
-    // First batch fails, second succeeds
     fetchSpy
       .mockResolvedValueOnce(errorResponse(500))
       .mockResolvedValueOnce(errorResponse(500))
@@ -232,7 +220,6 @@ describe("useClinvarSubmissions", () => {
     expect(error.value).toContain("1 of 2");
     const previousSize = submissions.value.size;
 
-    // Now retry — mock success for the failed batch
     fetchSpy.mockResolvedValueOnce(okResponse(batch1Ids));
 
     await runWithTimers(() => retryFailed());
@@ -242,7 +229,7 @@ describe("useClinvarSubmissions", () => {
   });
 
   it("retryFailed is a no-op when nothing has failed", async () => {
-    const ids = ["var-1"];
+    const ids = ["1-10001-A-T"];
     fetchSpy.mockResolvedValueOnce(okResponse(ids));
 
     const { fetchSubmissions, retryFailed } = useClinvarSubmissions();
@@ -251,27 +238,22 @@ describe("useClinvarSubmissions", () => {
     fetchSpy.mockClear();
     await retryFailed();
 
-    // Should not have made any new calls
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
   it("handles GraphQL errors with retries", async () => {
-    const ids = ["var-1"];
-    // GraphQL errors (200 status with errors array) are retried since
-    // the error message doesn't start with "HTTP 4"
+    const ids = ["1-10001-A-T"];
     fetchSpy.mockResolvedValue(graphqlErrorResponse("Query too complex"));
 
     const { fetchSubmissions, error } = useClinvarSubmissions();
     await runWithTimers(() => fetchSubmissions(ids));
 
     expect(error.value).toContain("failed");
-    // Should have retried: initial + 3 retries = 4 attempts
     expect(fetchSpy).toHaveBeenCalledTimes(4);
   });
 
   it("tracks progress across batches", async () => {
-    // 100 IDs = 2 batches
-    const ids = Array.from({ length: 100 }, (_, i) => `var-${i}`);
+    const ids = Array.from({ length: 100 }, (_, i) => `1-${10000 + i}-A-T`);
     const batch1Ids = ids.slice(0, 50);
     const batch2Ids = ids.slice(50);
 
@@ -283,7 +265,34 @@ describe("useClinvarSubmissions", () => {
 
     await runWithTimers(() => fetchSubmissions(ids));
 
-    // After completion, progress should be 100
     expect(progress.value).toBe(100);
+  });
+
+  it("cancels in-flight batches when switching assembly (PLAN-04)", async () => {
+    const { setVersion } = useGnomadVersion();
+    setVersion("v4"); // GRCh38
+
+    const ids = Array.from({ length: 100 }, (_, i) => `1-${10000 + i}-A-T`);
+    const batch1Ids = ids.slice(0, 50);
+
+    let resolveBatch1: (resp: Response) => void = () => {};
+    const batch1Promise = new Promise<Response>((resolve) => {
+      resolveBatch1 = resolve;
+    });
+
+    fetchSpy.mockReturnValueOnce(batch1Promise);
+
+    const { fetchSubmissions, submissions } = useClinvarSubmissions();
+    const fetchPromise = fetchSubmissions(ids);
+
+    // Switch version to v2 (GRCh37) while batch 1 is in flight
+    setVersion("v2");
+
+    // Resolve batch 1
+    resolveBatch1(okResponse(batch1Ids));
+    await runWithTimers(() => fetchPromise);
+
+    // Results from stale assembly should have been discarded
+    expect(submissions.value.size).toBe(0);
   });
 });

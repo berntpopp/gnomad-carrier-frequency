@@ -45,66 +45,89 @@ export interface RestoredSettings {
   };
 }
 
-export function migrateHistoryEntry(raw: any): RestoredSettings {
-  const filterCfg = raw.filterConfig || {};
+export function migrateHistoryEntry(
+  rawInput: Record<string, unknown> | null | undefined,
+): RestoredSettings {
+  const raw = rawInput ?? {};
+  const filterCfg = (raw.filterConfig ?? {}) as Record<string, unknown>;
+  const rawGene = (raw.gene ?? {}) as Record<string, unknown>;
+  const rawTarget = (raw.target ?? {}) as Record<string, unknown>;
+  const rawResults = (raw.results ?? {}) as Record<string, unknown>;
+  const rawFilters = (raw.filters ?? {}) as Record<string, unknown>;
+  const rawExclusions = (raw.exclusions ?? {}) as Record<string, unknown>;
+  const rawClinical = (raw.clinical ?? {}) as Record<string, unknown>;
+  const rawCalc = (raw.calculation ?? {}) as Record<string, unknown>;
+
   return {
     gene: {
-      symbol: raw.gene?.symbol ?? "",
-      ensembl_id: raw.gene?.ensembl_id ?? "",
+      symbol: (rawGene.symbol as string) ?? "",
+      ensembl_id: (rawGene.ensembl_id as string) ?? "",
     },
-    dataset: (raw.target?.dataset ??
-      raw.results?.gnomadVersion ??
+    dataset: ((rawTarget.dataset as string) ??
+      (rawResults.gnomadVersion as string) ??
       "v4") as GnomadVersion,
     filters: {
-      includeLof: raw.filters?.includeLof ?? filterCfg.lofHcEnabled ?? true,
+      includeLof:
+        (rawFilters.includeLof as boolean) ??
+        (filterCfg.lofHcEnabled as boolean) ??
+        true,
       includeMissense:
-        raw.filters?.includeMissense ?? filterCfg.missenseEnabled ?? false,
+        (rawFilters.includeMissense as boolean) ??
+        (filterCfg.missenseEnabled as boolean) ??
+        false,
       includeClinvarPathogenic:
-        raw.filters?.includeClinvarPathogenic ??
-        filterCfg.clinvarEnabled ??
+        (rawFilters.includeClinvarPathogenic as boolean) ??
+        (filterCfg.clinvarEnabled as boolean) ??
         true,
       clinvarReviewStarsMin:
-        raw.filters?.clinvarReviewStarsMin ??
-        filterCfg.clinvarStarThreshold ??
+        (rawFilters.clinvarReviewStarsMin as number) ??
+        (filterCfg.clinvarStarThreshold as number) ??
         1,
       includeConflictingClinvar:
-        raw.filters?.includeConflictingClinvar ??
-        filterCfg.clinvarIncludeConflicting ??
+        (rawFilters.includeConflictingClinvar as boolean) ??
+        (filterCfg.clinvarIncludeConflicting as boolean) ??
         false,
       clinvarConflictingThreshold:
-        raw.filters?.clinvarConflictingThreshold ??
-        filterCfg.clinvarConflictingThreshold ??
+        (rawFilters.clinvarConflictingThreshold as number) ??
+        (filterCfg.clinvarConflictingThreshold as number) ??
         80,
-      conflictingReviewStarsMin: raw.filters?.conflictingReviewStarsMin ?? 1,
+      conflictingReviewStarsMin:
+        (rawFilters.conflictingReviewStarsMin as number) ?? 1,
     },
     manualExclusions:
-      raw.exclusions?.manualExcludedVariantIds ?? raw.excludedVariantIds ?? [],
+      (rawExclusions.manualExcludedVariantIds as string[]) ??
+      (raw.excludedVariantIds as string[]) ??
+      [],
     clinical: {
-      indexStatus: (raw.clinical?.indexStatus ??
-        raw.patientStatus ??
-        raw.indexStatus ??
+      indexStatus: ((rawClinical.indexStatus as string) ??
+        (raw.patientStatus as string) ??
+        (raw.indexStatus as string) ??
         "heterozygous") as IndexPatientStatus,
-      frequencySource: (raw.clinical?.frequencySource ??
-        raw.frequencySource ??
-        raw.source ??
+      frequencySource: ((rawClinical.frequencySource as string) ??
+        (raw.frequencySource as string) ??
+        (raw.source as string) ??
         "gnomad") as FrequencySource,
       literatureCarrierFrequency:
-        raw.clinical?.literatureCarrierFrequency ??
-        raw.literatureFrequency ??
+        (rawClinical.literatureCarrierFrequency as number | null) ??
+        (raw.literatureFrequency as number | null) ??
         null,
       literaturePmid:
-        raw.clinical?.literaturePmid ?? raw.literaturePmid ?? null,
-      penetrance: raw.clinical?.penetrance ?? raw.penetrance ?? 1.0,
+        (rawClinical.literaturePmid as string | null) ??
+        (raw.literaturePmid as string | null) ??
+        null,
+      penetrance:
+        (rawClinical.penetrance as number) ?? (raw.penetrance as number) ?? 1.0,
     },
     calculation: {
-      formula:
-        raw.calculation?.formula ??
-        (raw.filterConfig?.useHWEFormula === false ? "simplified" : "hwe"),
+      formula: ((rawCalc.formula as string) ??
+        (filterCfg.useHWEFormula === false ? "simplified" : "hwe")) as
+        | "hwe"
+        | "simplified",
       useHomozygoteExclusion:
-        raw.calculation?.useHomozygoteExclusion ??
-        raw.filterConfig?.useHomExclusion ??
+        (rawCalc.useHomozygoteExclusion as boolean) ??
+        (filterCfg.useHomExclusion as boolean) ??
         true,
-      useBayesianPrevalence: raw.calculation?.useBayesianPrevalence ?? true,
+      useBayesianPrevalence: (rawCalc.useBayesianPrevalence as boolean) ?? true,
     },
   };
 }

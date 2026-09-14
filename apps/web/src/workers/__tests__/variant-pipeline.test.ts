@@ -119,7 +119,7 @@ describe("processVariants", () => {
     expect(result.qualifyingVariants[0]!.variant_id).toBe("1-200-C-G");
   });
 
-  it("returns empty results when no variants pass filters", () => {
+  it("returns empty results when no variants pass filters and assigns Case 2", () => {
     const variants = [makeNonPathogenicVariant("1-300-T-A")];
 
     const result = processVariants({
@@ -137,6 +137,50 @@ describe("processVariants", () => {
     expect(result.filteredByPathogenicity).toHaveLength(0);
     expect(result.qualifyingVariants).toHaveLength(0);
     expect(result.globalStats.carrierFrequency).toBeNull();
+    expect(result.globalStats.decisionMatrix?.caseIndex).toBe(2);
     expect(result.aggregatedPops).toBeNull();
+  });
+
+  it("evaluates decision matrix Case 3 when all pathogenic variants are excluded", () => {
+    const variants = [makeLoFVariant("1-100-A-T", 10, 100000)];
+
+    const result = processVariants({
+      variants,
+      clinvarVariants,
+      filterConfig: FACTORY_FILTER_DEFAULTS,
+      qualitySettings: FACTORY_QUALITY_DEFAULTS,
+      qualityExclusionConfig: FACTORY_EXCLUSION_DEFAULTS,
+      calcConfig: FACTORY_CALC_DEFAULTS,
+      excludedIds: ["1-100-A-T"],
+      submissions: [],
+      version: "v4",
+    });
+
+    expect(result.filteredByPathogenicity).toHaveLength(1);
+    expect(result.qualifyingVariants).toHaveLength(0);
+    expect(result.globalStats.carrierFrequency).toBeNull();
+    expect(result.globalStats.decisionMatrix?.caseIndex).toBe(3);
+  });
+
+  it("evaluates decision matrix Case 6 for normal residual calculations", () => {
+    const variants = [
+      makeLoFVariant("1-100-A-T", 10, 100000),
+      makeLoFVariant("1-200-C-G", 5, 100000),
+    ];
+
+    const result = processVariants({
+      variants,
+      clinvarVariants,
+      filterConfig: FACTORY_FILTER_DEFAULTS,
+      qualitySettings: FACTORY_QUALITY_DEFAULTS,
+      qualityExclusionConfig: FACTORY_EXCLUSION_DEFAULTS,
+      calcConfig: FACTORY_CALC_DEFAULTS,
+      excludedIds: [],
+      submissions: [],
+      version: "v4",
+    });
+
+    expect(result.globalStats.decisionMatrix?.caseIndex).toBe(6);
+    expect(result.globalStats.carrierFrequency).toBeGreaterThan(0);
   });
 });
