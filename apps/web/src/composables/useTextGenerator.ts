@@ -1,6 +1,7 @@
 import { computed } from "vue";
 import { useTemplateStore } from "@/stores/useTemplateStore";
 import { renderTemplate } from "@gnomad-cf/core/templates";
+import { calculateRecurrenceRisk } from "@gnomad-cf/core/calculations";
 import type {
   Perspective,
   TemplateContext,
@@ -8,7 +9,7 @@ import type {
   IndexPatientStatus,
   CarrierFrequencyResult,
 } from "@gnomad-cf/core/types";
-import { config } from "@gnomad-cf/core/config";
+import { config, getGnomadVersion } from "@gnomad-cf/core/config";
 
 interface TextGeneratorInput {
   result: CarrierFrequencyResult | null;
@@ -17,6 +18,7 @@ interface TextGeneratorInput {
   literatureFrequency: number | null;
   literaturePmid: string | null;
   usingDefault: boolean;
+  penetrance?: number;
 }
 
 export function useTextGenerator(input: () => TextGeneratorInput) {
@@ -30,8 +32,12 @@ export function useTextGenerator(input: () => TextGeneratorInput) {
     const effectiveFrequency = getEffectiveFrequency(data);
     if (effectiveFrequency === null) return null;
 
-    const divisor = data.indexStatus === "heterozygous" ? 4 : 2;
-    const recurrenceRisk = effectiveFrequency / divisor;
+    const recurrenceRisk =
+      calculateRecurrenceRisk(
+        effectiveFrequency,
+        data.indexStatus,
+        data.penetrance ?? 1.0,
+      ) ?? 0;
 
     return {
       gene: data.result.gene,
@@ -192,15 +198,20 @@ function formatSourceAttribution(
   const accessDate = formatAccessDate(lang);
 
   switch (data.frequencySource) {
-    case "gnomad":
+    case "gnomad": {
       if (data.usingDefault) {
         return lang === "de"
           ? "(Standardannahme mangels gnomAD-Daten)"
           : "(default assumption, no gnomAD data)";
       }
+      const versionKey = data.result?.version ?? "v4";
+      const vConfig = getGnomadVersion(versionKey);
+      const displayName = vConfig?.displayName ?? `gnomAD ${versionKey}`;
+      const url = "https://gnomad.broadinstitute.org";
       return lang === "de"
-        ? `(gnomAD v4, https://gnomad.broadinstitute.org, abgerufen am ${accessDate})`
-        : `(gnomAD v4, https://gnomad.broadinstitute.org, accessed ${accessDate})`;
+        ? `(${displayName}, ${url}, abgerufen am ${accessDate})`
+        : `(${displayName}, ${url}, accessed ${accessDate})`;
+    }
 
     case "literature":
       // Format: (Author et al. year, PMID: xxx)

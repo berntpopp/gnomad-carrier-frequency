@@ -19,21 +19,13 @@ export async function loadTemplateContent(
 
   const __dirname = dirname(fileURLToPath(import.meta.url));
 
-  // Try src path first (development: __dirname = packages/core/src/templates)
-  const srcPath = resolve(
-    __dirname,
-    "..",
-    "config",
-    "templates",
-    `${lang}.json`,
-  );
-  try {
-    const raw = await readFile(srcPath, "utf-8");
-    return JSON.parse(raw);
-  } catch {
-    // Fallback: try relative to built dist directory
-    // (built: __dirname = packages/core/dist, src files still in packages/core/src)
-    const distPath = resolve(
+  const candidatePaths = [
+    // Built package output (packages/core/dist/templates/{lang}.json)
+    resolve(__dirname, "templates", `${lang}.json`),
+    // Source development path (packages/core/src/config/templates/{lang}.json)
+    resolve(__dirname, "..", "config", "templates", `${lang}.json`),
+    // Fallback if executed from dist relative to source tree
+    resolve(
       __dirname,
       "..",
       "..",
@@ -41,8 +33,21 @@ export async function loadTemplateContent(
       "config",
       "templates",
       `${lang}.json`,
-    );
-    const raw = await readFile(distPath, "utf-8");
-    return JSON.parse(raw);
+    ),
+    // In case __dirname is packages/core
+    resolve(__dirname, "dist", "templates", `${lang}.json`),
+  ];
+
+  for (const candidate of candidatePaths) {
+    try {
+      const raw = await readFile(candidate, "utf-8");
+      return JSON.parse(raw);
+    } catch {
+      // try next candidate
+    }
   }
+
+  throw new Error(
+    `Failed to load template for language "${lang}". Checked paths: ${candidatePaths.join(", ")}`,
+  );
 }

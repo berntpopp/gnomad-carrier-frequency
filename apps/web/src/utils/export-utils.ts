@@ -12,10 +12,12 @@ import type {
   ExportMetadata,
   ExportData,
   ExclusionReason,
+  IndexPatientStatus,
 } from "@gnomad-cf/core/types";
 import type { GnomadVersion } from "@gnomad-cf/core/config";
 import { getGnomadVersion, EXCLUSION_REASONS } from "@gnomad-cf/core/config";
 import { config } from "@gnomad-cf/core/config";
+import { calculateRecurrenceRisk } from "@gnomad-cf/core/calculations";
 
 /**
  * Sanitize filename by removing/replacing unsafe characters
@@ -100,6 +102,10 @@ export function buildExportSummary(
     minFrequency: result.minFrequency,
     maxFrequency: result.maxFrequency,
     hasFounderEffect: result.hasFounderEffect,
+    geneticPrevalence: result.geneticPrevalence,
+    bayesianPrevalence: result.bayesianPrevalence,
+    formula: result.formula,
+    homExclusionActive: result.homExclusionActive,
   };
 }
 
@@ -108,6 +114,8 @@ export function buildExportSummary(
  */
 export function buildExportPopulations(
   populations: PopulationFrequency[],
+  indexStatus: IndexPatientStatus = "heterozygous",
+  penetrance: number = 1.0,
 ): ExportPopulation[] {
   return populations.map((pop) => ({
     code: pop.code,
@@ -118,6 +126,12 @@ export function buildExportPopulations(
     alleleCount: pop.alleleCount,
     alleleNumber: pop.alleleNumber,
     isFounderEffect: pop.isFounderEffect,
+    recurrenceRisk: calculateRecurrenceRisk(
+      pop.carrierFrequency,
+      indexStatus,
+      penetrance,
+    ),
+    geneticPrevalence: pop.geneticPrevalence,
   }));
 }
 
@@ -140,13 +154,22 @@ export function buildExportVariants(
       alleleFrequencyPercent: formatPercent(v.alleleFrequency),
       alleleCount: v.alleleCount,
       alleleNumber: v.alleleNumber,
+      homozygoteCount: v.homozygoteCount ?? 0,
       hgvsC: v.hgvsc,
       hgvsP: v.hgvsp,
       clinvarStatus: v.clinvarStatus,
+      goldStars: v.goldStars ?? null,
       isLoF: v.isLoF,
       isClinvarPathogenic: v.isClinvarPathogenic,
       excluded: isExcluded,
       exclusionReason: isExcluded ? formatExclusionReason(reason) : null,
+      exclusionProvenance:
+        isExcluded && reason
+          ? {
+              type: reason.type,
+              customText: reason.customText,
+            }
+          : null,
     };
   });
 }
@@ -190,21 +213,34 @@ export function escapeTsv(
 
 /**
  * Build a populations TSV string (no BOM — composable adds it).
- * Columns: Population, Carrier Frequency, Ratio, Recurrence Risk, AC, AN, Notes
+ * Columns: Population, Carrier Frequency, Ratio, Recurrence Risk, AC, AN, Prevalence, Notes
  */
 export function buildPopulationsTsv(data: ExportData): string {
   const header =
-    "Population\tCarrier Frequency\tRatio\tRecurrence Risk\tAC\tAN\tNotes";
+    "Population\tCarrier Frequency\tRatio\tRecurrence Risk\tAC\tAN\tPrevalence\tNotes";
   const rows = data.populations.map((pop) => {
     const recurrenceRisk =
-      pop.carrierFrequency !== null ? pop.carrierFrequency / 4 : null;
+      pop.recurrenceRisk !== undefined && pop.recurrenceRisk !== null
+        ? pop.recurrenceRisk
+        : pop.carrierFrequency !== null
+          ? pop.carrierFrequency / 4
+          : null;
+    const riskStr =
+      recurrenceRisk !== null
+        ? `${(recurrenceRisk * 100).toFixed(config.settings.frequencyDecimalPlaces)}%`
+        : "-";
+    const prevStr =
+      pop.geneticPrevalence !== undefined && pop.geneticPrevalence !== null
+        ? `${(pop.geneticPrevalence * 100).toFixed(config.settings.frequencyDecimalPlaces)}%`
+        : "-";
     return [
       escapeTsv(pop.label),
       escapeTsv(pop.carrierFrequency),
       escapeTsv(pop.carrierFrequencyRatio),
-      escapeTsv(recurrenceRisk),
+      escapeTsv(riskStr),
       escapeTsv(pop.alleleCount),
       escapeTsv(pop.alleleNumber),
+      escapeTsv(prevStr),
       escapeTsv(pop.isFounderEffect ? "Founder effect" : ""),
     ].join("\t");
   });
@@ -213,9 +249,8 @@ export function buildPopulationsTsv(data: ExportData): string {
 
 /**
  * Build a variants TSV string (no BOM — composable adds it).
- * Columns: Variant ID, Consequence, AF, Carrier Frequency, ClinVar Significance,
- *          Stars, HGVS-c, HGVS-p, Source Category, Quality Flags
- * Source Category and Quality Flags are Phase 34 placeholders (empty).
+ * Columns: Variant ID, Consequence, AF, Carrier Frequency, Homozygotes,
+ *          ClinVar Significance, Stars, HGVS-c, HGVS-p, Excluded, Exclusion Reason
  */
 export function buildVariantsTsv(data: ExportData): string {
   const header = [
@@ -223,12 +258,13 @@ export function buildVariantsTsv(data: ExportData): string {
     "Consequence",
     "AF",
     "Carrier Frequency",
+    "Homozygotes",
     "ClinVar Significance",
     "Stars",
     "HGVS-c",
     "HGVS-p",
-    "Source Category",
-    "Quality Flags",
+    "Excluded",
+    "Exclusion Reason",
   ].join("\t");
   const rows = data.variants.map((v) => {
     const carrierFreq =
@@ -238,12 +274,15 @@ export function buildVariantsTsv(data: ExportData): string {
       escapeTsv(v.consequence),
       escapeTsv(v.alleleFrequency),
       escapeTsv(carrierFreq),
+      escapeTsv(v.homozygoteCount ?? 0),
       escapeTsv(v.clinvarStatus ?? ""),
-      escapeTsv(""), // Stars — Phase 34 will add goldStars to ExportVariant
+      escapeTsv(
+        v.goldStars !== null && v.goldStars !== undefined ? v.goldStars : "",
+      ),
       escapeTsv(v.hgvsC ?? ""),
       escapeTsv(v.hgvsP ?? ""),
-      escapeTsv(""), // Source Category — Phase 34 placeholder
-      escapeTsv(""), // Quality Flags — Phase 34 placeholder
+      escapeTsv(v.excluded ? "Yes" : "No"),
+      escapeTsv(v.exclusionReason ?? ""),
     ].join("\t");
   });
   return [header, ...rows].join("\n");
@@ -259,10 +298,16 @@ export function buildExportData(
   calcConfig: CalcConfig,
   excludedIds?: Set<string>,
   reasons?: Map<string, ExclusionReason>,
+  indexStatus?: IndexPatientStatus,
+  penetrance?: number,
 ): ExportData {
   return {
     summary: buildExportSummary(result),
-    populations: buildExportPopulations(result.populations),
+    populations: buildExportPopulations(
+      result.populations,
+      indexStatus,
+      penetrance ?? calcConfig.penetrance,
+    ),
     variants: buildExportVariants(variants, excludedIds, reasons),
     metadata: buildExportMetadata(result.version, filters, calcConfig),
   };
