@@ -35,6 +35,8 @@
     <div class="d-flex justify-end mt-6">
       <v-btn
         color="primary"
+        min-height="44"
+        append-icon="mdi-arrow-right"
         :disabled="!modelValue"
         data-testid="step-gene-next-btn"
         @click="$emit('complete')"

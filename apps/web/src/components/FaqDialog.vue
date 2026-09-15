@@ -14,7 +14,12 @@
         <v-icon start> mdi-help-circle </v-icon>
         {{ faq.title }}
         <v-spacer />
-        <v-btn icon variant="text" @click="dialog = false">
+        <v-btn
+          icon
+          variant="text"
+          aria-label="Close FAQ"
+          @click="dialog = false"
+        >
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>

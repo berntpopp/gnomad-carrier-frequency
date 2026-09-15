@@ -86,14 +86,15 @@
       </v-alert>
 
       <!-- Primary metrics grid -->
-      <v-row dense>
+      <v-row dense class="metric-grid">
         <!-- Carrier Frequency — hero stat -->
         <v-col cols="12" sm="4">
-          <div class="stat-cell">
+          <div class="stat-card stat-card--hero">
             <v-tooltip location="top">
               <template #activator="{ props: tooltipProps }">
                 <div v-bind="tooltipProps" class="stat-label">
                   Carrier Frequency
+                  <span class="formula-badge">2pq</span>
                 </div>
               </template>
               <span class="tooltip-text">
@@ -103,7 +104,7 @@
                 frequencies.
               </span>
             </v-tooltip>
-            <div class="stat-value text-h5">
+            <div class="stat-value text-h5 text-primary">
               {{ summaryPrimary }}
             </div>
             <div class="stat-detail">
@@ -114,23 +115,23 @@
 
         <!-- Recurrence Risk -->
         <v-col cols="6" sm="4">
-          <div class="stat-cell">
+          <div class="stat-card">
             <v-tooltip location="top">
               <template #activator="{ props: tooltipProps }">
                 <div v-bind="tooltipProps" class="stat-label">
                   Recurrence Risk
-                  <span class="text-lowercase"
-                    >({{
-                      indexStatus === "heterozygous" ? "carrier" : "affected"
-                    }})</span
-                  >
+                  <span class="formula-badge">
+                    &times;
+                    {{ indexStatus === "heterozygous" ? "0.25" : "0.5" }}
+                  </span>
                 </div>
               </template>
               <span class="tooltip-text">
                 <strong>Recurrence Risk</strong><br />
                 Carrier: risk offspring inherits both a parental and a
-                population variant (freq / 4).<br />
-                Affected: risk offspring is affected (freq / 2).
+                population variant (freq &times; 0.25 &times; penetrance).<br />
+                Affected: risk offspring is affected (freq &times; 0.5 &times;
+                penetrance).
               </span>
             </v-tooltip>
             <div class="stat-value">
@@ -144,11 +145,12 @@
 
         <!-- Genetic Prevalence -->
         <v-col v-if="geneticPrevalenceFormatted" cols="6" sm="4">
-          <div class="stat-cell">
+          <div class="stat-card">
             <v-tooltip location="top">
               <template #activator="{ props: tooltipProps }">
                 <div v-bind="tooltipProps" class="stat-label">
                   Genetic Prevalence
+                  <span class="formula-badge">q&sup2;</span>
                 </div>
               </template>
               <span class="tooltip-text">
@@ -173,14 +175,14 @@
           cols="6"
           sm="4"
         >
-          <div class="stat-cell">
+          <div class="stat-card">
             <v-tooltip location="top">
               <template #activator="{ props: tooltipProps }">
                 <div v-bind="tooltipProps" class="stat-label">
                   Bayesian Prevalence
-                  <span class="text-lowercase"
-                    >({{ Math.round(penetrance * 100) }}%)</span
-                  >
+                  <span class="formula-badge">
+                    {{ Math.round(penetrance * 100) }}%
+                  </span>
                 </div>
               </template>
               <span class="tooltip-text">
@@ -332,25 +334,57 @@ const bayesianPrevalenceFormatted = computed(() => {
   display: inline-block;
 }
 
-.stat-cell {
-  padding: 8px 0;
+.stat-card {
+  border: 1px solid rgba(var(--v-border-color), 0.12);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: rgba(var(--v-theme-surface-variant), 0.15);
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+  height: 100%;
+}
+
+.stat-card:hover {
+  border-color: rgba(var(--v-border-color), 0.28);
+  background-color: rgba(var(--v-theme-surface-variant), 0.25);
+}
+
+.stat-card--hero {
+  border-left: 3px solid rgb(var(--v-theme-primary));
+  background: rgba(var(--v-theme-primary), 0.04);
 }
 
 .stat-label {
   font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.025em;
-  color: rgba(var(--v-theme-on-surface), 0.6);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(var(--v-theme-on-surface), 0.7);
   text-transform: uppercase;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   cursor: help;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.formula-badge {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: none;
+  background: rgba(var(--v-theme-on-surface), 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: rgba(var(--v-theme-on-surface), 0.85);
 }
 
 .stat-value {
   font-size: 1.25rem;
   font-weight: 700;
   line-height: 1.3;
-  color: rgba(var(--v-theme-on-surface), 0.87);
+  color: rgba(var(--v-theme-on-surface), 0.95);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
 .stat-value.text-h5 {
@@ -359,6 +393,8 @@ const bayesianPrevalenceFormatted = computed(() => {
 
 .stat-detail {
   font-size: 0.8125rem;
-  color: rgba(var(--v-theme-on-surface), 0.5);
+  color: rgba(var(--v-theme-on-surface), 0.6);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 </style>

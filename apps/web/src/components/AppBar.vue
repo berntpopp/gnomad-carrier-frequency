@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar density="compact" :elevation="2">
+  <v-app-bar density="compact" flat class="app-header-bar">
     <div class="app-bar-content">
       <v-tooltip
         v-if="!xs"
@@ -11,7 +11,12 @@
           <v-app-bar-title
             v-bind="tooltipProps"
             class="app-logo text-body-1 font-weight-bold"
+            role="button"
+            tabindex="0"
+            aria-label="gCFCalc — Start new calculation"
             @click="emit('reset')"
+            @keydown.enter="emit('reset')"
+            @keydown.space.prevent="emit('reset')"
           >
             <v-icon size="small" class="mr-1">mdi-home</v-icon>
             gCFCalc
@@ -48,6 +53,7 @@
             title="Search history"
             aria-label="Search history"
             data-testid="footer-history-btn"
+            class="app-bar-btn"
             @click="emit('openHistory')"
           >
             <v-icon>mdi-history</v-icon>
@@ -67,6 +73,8 @@
             variant="text"
             :title="tooltipText"
             aria-label="Toggle theme"
+            data-testid="theme-toggle-btn"
+            class="app-bar-btn"
             @click="toggleTheme()"
           >
             <v-icon>{{ themeIcon }}</v-icon>
@@ -83,6 +91,7 @@
             title="Settings"
             aria-label="Settings"
             data-testid="footer-settings-btn"
+            class="app-bar-btn"
             @click="emit('openSettings')"
           >
             <v-icon>mdi-cog</v-icon>
@@ -130,6 +139,12 @@ const emit = defineEmits<{
 </script>
 
 <style scoped>
+.app-header-bar {
+  border-bottom: 1px solid rgba(var(--v-border-color), 0.12) !important;
+  backdrop-filter: blur(12px) !important;
+  background: rgba(var(--v-theme-surface), 0.88) !important;
+}
+
 .app-bar-content {
   display: flex;
   align-items: center;
@@ -139,27 +154,18 @@ const emit = defineEmits<{
   padding: 0 16px;
 }
 
+.app-bar-btn {
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
 .app-logo {
   cursor: pointer;
-  animation: subtle-pulse 3s ease-in-out infinite;
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
+  transition: color 0.15s ease;
+  user-select: none;
 }
 
 .app-logo:hover {
   color: rgb(var(--v-theme-primary));
-  transform: scale(1.05);
-  animation-play-state: paused;
-}
-
-@keyframes subtle-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.85;
-  }
 }
 </style>

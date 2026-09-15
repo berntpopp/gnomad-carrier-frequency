@@ -24,12 +24,21 @@
       </v-tooltip>
     </p>
 
-    <v-card variant="outlined">
-      <v-tabs v-model="activeTab" bg-color="primary">
-        <v-tab value="gnomad" data-testid="freq-tab-gnomad"> gnomAD </v-tab>
-        <v-tab value="literature"> Literature </v-tab>
-        <v-tab value="default"> Default </v-tab>
+    <v-card variant="outlined" class="frequency-card">
+      <v-tabs v-model="activeTab" color="primary" density="compact">
+        <v-tab
+          value="gnomad"
+          data-testid="freq-tab-gnomad"
+          prepend-icon="mdi-database"
+        >
+          gnomAD
+        </v-tab>
+        <v-tab value="literature" prepend-icon="mdi-book-open-outline">
+          Literature
+        </v-tab>
+        <v-tab value="default" prepend-icon="mdi-chart-line"> Default </v-tab>
       </v-tabs>
+      <v-divider />
 
       <v-card-text>
         <v-window v-model="activeTab">
@@ -117,9 +126,18 @@
     </v-card>
 
     <div class="d-flex justify-space-between mt-6">
-      <v-btn variant="text" @click="$emit('back')"> Back </v-btn>
+      <v-btn
+        variant="tonal"
+        min-height="44"
+        prepend-icon="mdi-arrow-left"
+        @click="$emit('back')"
+      >
+        Back
+      </v-btn>
       <v-btn
         color="primary"
+        min-height="44"
+        append-icon="mdi-arrow-right"
         :disabled="!isCurrentSourceValid"
         data-testid="step-frequency-next-btn"
         @click="$emit('complete')"

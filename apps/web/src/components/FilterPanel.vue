@@ -301,157 +301,21 @@
           </v-col>
 
           <!-- Calculation settings -->
-          <v-col cols="12" md="6">
-            <v-tooltip location="top">
-              <template #activator="{ props: tooltipProps }">
-                <div v-bind="tooltipProps" class="d-flex align-center">
-                  <v-switch
-                    :model-value="calcConfig.useHWEFormula"
-                    color="primary"
-                    label="HWE Formula (2pq)"
-                    :density="smAndDown ? 'default' : 'compact'"
-                    hide-details
-                    @update:model-value="
-                      updateCalcConfig('useHWEFormula', $event)
-                    "
-                  />
-                </div>
-              </template>
-              <span class="tooltip-text">
-                <strong>Hardy-Weinberg Equilibrium</strong>
-                — currently
-                {{ calcConfig.useHWEFormula ? "2pq" : "2×SumAF" }}<br />
-                When enabled, carrier frequency is calculated as 2pq (standard
-                epidemiological approach). When disabled, the simplified formula
-                2×SumAF is used.
-              </span>
-            </v-tooltip>
-          </v-col>
-
-          <v-col cols="12" md="6">
-            <v-tooltip location="top">
-              <template #activator="{ props: tooltipProps }">
-                <div v-bind="tooltipProps" class="d-flex align-center">
-                  <v-switch
-                    :model-value="calcConfig.useHomExclusion"
-                    color="primary"
-                    label="Homozygote Exclusion"
-                    :density="smAndDown ? 'default' : 'compact'"
-                    hide-details
-                    @update:model-value="
-                      updateCalcConfig('useHomExclusion', $event)
-                    "
-                  />
-                </div>
-              </template>
-              <span class="tooltip-text">
-                <strong>Homozygote Exclusion (VCR/GCR)</strong>
-                — currently
-                {{ calcConfig.useHomExclusion ? "enabled" : "disabled" }}<br />
-                When enabled, uses Variant Carrier Rate per variant and Gene
-                Carrier Rate aggregation. This accounts for observed homozygotes
-                and avoids double-counting.
-              </span>
-            </v-tooltip>
-          </v-col>
-
-          <v-col cols="12" md="6">
-            <v-tooltip location="top">
-              <template #activator="{ props: tooltipProps }">
-                <div v-bind="tooltipProps" class="d-flex align-start">
-                  <v-slider
-                    :model-value="penetrancePercent"
-                    :min="0"
-                    :max="100"
-                    :step="1"
-                    :ticks="smAndDown ? undefined : penetranceTickLabels"
-                    :show-ticks="showTickLabels"
-                    tick-size="4"
-                    label="Penetrance %"
-                    :density="smAndDown ? 'default' : 'compact'"
-                    thumb-label
-                    color="primary"
-                    class="flex-grow-1"
-                    @update:model-value="updatePenetrance($event)"
-                  />
-                </div>
-              </template>
-              <span class="tooltip-text">
-                <strong>Penetrance</strong>
-                — currently {{ penetrancePercent }}%<br />
-                Proportion of individuals with the disease genotype who express
-                the phenotype. Most classic AR conditions are 100%. Reducing
-                penetrance scales the Bayesian prevalence accordingly.
-              </span>
-            </v-tooltip>
+          <v-col cols="12">
+            <FilterCalcSection
+              :calc-config="calcConfig"
+              @update-calc-config="updateCalcConfig"
+            />
           </v-col>
 
           <!-- Quality Flag Exclusions (only shown when qualityExclusionConfig prop is provided) -->
           <template v-if="qualityExclusionConfig">
             <v-col cols="12">
-              <v-divider class="mb-3" />
-              <div class="text-subtitle-2 mb-2">Quality Flag Exclusions</div>
-              <div class="text-caption text-medium-emphasis mb-3">
-                Exclude flagged variants from the carrier frequency calculation.
-                {{ flaggedCount }} of {{ variantCount }} variant(s) flagged.
-              </div>
-            </v-col>
-
-            <v-col cols="12" md="6">
-              <v-switch
-                :model-value="qualityExclusionConfig.excludeHighAf"
-                color="error"
-                label="Exclude High AF"
-                :density="smAndDown ? 'default' : 'compact'"
-                hide-details
-                @update:model-value="
-                  updateQualityExclusion('excludeHighAf', $event as boolean)
-                "
-              />
-            </v-col>
-
-            <v-col cols="12" md="6">
-              <v-switch
-                :model-value="qualityExclusionConfig.excludeHighHom"
-                color="orange"
-                label="Exclude High Hom"
-                :density="smAndDown ? 'default' : 'compact'"
-                hide-details
-                @update:model-value="
-                  updateQualityExclusion('excludeHighHom', $event as boolean)
-                "
-              />
-            </v-col>
-
-            <v-col cols="12" md="6">
-              <v-switch
-                :model-value="qualityExclusionConfig.excludeGnomadFiltered"
-                color="amber"
-                label="Exclude gnomAD Filtered"
-                :density="smAndDown ? 'default' : 'compact'"
-                hide-details
-                @update:model-value="
-                  updateQualityExclusion(
-                    'excludeGnomadFiltered',
-                    $event as boolean,
-                  )
-                "
-              />
-            </v-col>
-
-            <v-col cols="12" md="6">
-              <v-switch
-                :model-value="qualityExclusionConfig.excludeGenomesOnly"
-                color="blue-grey"
-                label="Exclude Genomes Only"
-                :density="smAndDown ? 'default' : 'compact'"
-                hide-details
-                @update:model-value="
-                  updateQualityExclusion(
-                    'excludeGenomesOnly',
-                    $event as boolean,
-                  )
-                "
+              <FilterQualitySection
+                :quality-exclusion-config="qualityExclusionConfig"
+                :flagged-count="flaggedCount"
+                :variant-count="variantCount"
+                @update-quality-exclusion="updateQualityExclusion"
               />
             </v-col>
 
@@ -514,6 +378,8 @@
 import { ref, computed } from "vue";
 import { useDisplay } from "vuetify";
 import FilterChips from "./FilterChips.vue";
+import FilterCalcSection from "./FilterCalcSection.vue";
+import FilterQualitySection from "./FilterQualitySection.vue";
 import GeneConfigSubmitDialog from "./GeneConfigSubmitDialog.vue";
 import type {
   FilterConfig,
@@ -580,17 +446,6 @@ const starTickLabels = {
   4: "4",
 };
 
-const penetranceTickLabels = {
-  0: "0%",
-  50: "50%",
-  100: "100%",
-};
-
-// Penetrance displayed as 0-100% integer
-const penetrancePercent = computed(() =>
-  Math.round(props.calcConfig.penetrance * 100),
-);
-
 // Quality exclusion computeds
 const flaggedCount = computed(() => props.flaggedVariantCount ?? 0);
 const qualityExcludedDisplay = computed(() => props.qualityExcludedCount ?? 0);
@@ -605,15 +460,11 @@ function updateFilter<K extends keyof FilterConfig>(
   });
 }
 
-function updateCalcConfig<K extends keyof CalcConfig>(
-  key: K,
-  value: CalcConfig[K],
+function updateCalcConfig(
+  key: keyof CalcConfig,
+  value: CalcConfig[keyof CalcConfig],
 ) {
-  emit("update:calcConfig", { ...props.calcConfig, [key]: value });
-}
-
-function updatePenetrance(percentValue: number) {
-  updateCalcConfig("penetrance", percentValue / 100);
+  emit("update:calcConfig", { ...props.calcConfig, [key]: value as never });
 }
 
 function updateQualityExclusion<K extends keyof QualityExclusionConfig>(
@@ -634,6 +485,11 @@ function updateQualityExclusion<K extends keyof QualityExclusionConfig>(
 }
 
 .settings-panel {
-  border: thin solid currentColor;
+  border: 1px solid rgba(var(--v-border-color), 0.12);
+  transition: border-color 0.15s ease;
+}
+
+.settings-panel:hover {
+  border-color: rgba(var(--v-border-color), 0.24);
 }
 </style>

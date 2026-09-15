@@ -501,8 +501,8 @@ const tableItems = computed((): TableItem[] => {
 });
 
 function getRowClass(item: TableItem): string {
-  if (item.isGlobal) return "bg-grey-lighten-4 font-weight-bold";
-  if (item.isFounderEffect) return "bg-blue-lighten-5";
+  if (item.isGlobal) return "global-table-row font-weight-bold";
+  if (item.isFounderEffect) return "founder-effect-row";
   return "";
 }
 </script>
@@ -533,12 +533,25 @@ function getRowClass(item: TableItem): string {
   pointer-events: none;
 }
 
-:deep(.bg-grey-lighten-4) td:first-child {
-  background: #f5f5f5;
+:deep(.global-table-row) {
+  background-color: rgba(var(--v-theme-surface-variant), 0.4) !important;
 }
 
-:deep(.bg-blue-lighten-5) td:first-child {
-  background: #e3f2fd;
+:deep(.global-table-row) td:first-child {
+  background-color: rgba(var(--v-theme-surface-variant), 0.45) !important;
+}
+
+:deep(.founder-effect-row) {
+  background-color: rgba(var(--v-theme-info), 0.08) !important;
+}
+
+:deep(.founder-effect-row) td:first-child {
+  background-color: rgba(var(--v-theme-info), 0.12) !important;
+}
+
+:deep(.results-table) td.text-right {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
 .population-row {
@@ -566,6 +579,7 @@ function getRowClass(item: TableItem): string {
   font-size: 0.875rem;
   padding-top: 2px !important;
   padding-bottom: 2px !important;
+  font-variant-numeric: tabular-nums;
 }
 
 .source-breakdown-row:hover {
@@ -578,6 +592,7 @@ function getRowClass(item: TableItem): string {
 
 .subcontinental-row td {
   font-size: 0.85em;
+  font-variant-numeric: tabular-nums;
 }
 
 .subcontinental-loading-row td {

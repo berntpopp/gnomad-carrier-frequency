@@ -204,11 +204,10 @@
             v-bind="props"
             icon
             variant="text"
-            size="small"
             aria-label="More options"
-            class="d-sm-none"
+            class="d-sm-none footer-menu-btn"
           >
-            <v-icon size="small"> mdi-dots-horizontal </v-icon>
+            <v-icon> mdi-dots-horizontal </v-icon>
           </v-btn>
         </template>
         <v-list density="compact">
@@ -320,7 +319,12 @@ const reopenDisclaimer = () => {
   /* Hidden on xs, visible on sm+ via Vuetify display classes */
 }
 
-/* Compact spacing on mobile */
+.footer-menu-btn {
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
+/* Compact spacing on mobile with accessible touch targets */
 @media (max-width: 599px) {
   .footer-container {
     padding: 2px 4px;
@@ -328,6 +332,11 @@ const reopenDisclaimer = () => {
 
   .footer-content {
     gap: 2px;
+  }
+
+  .footer-row .v-btn {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 </style>

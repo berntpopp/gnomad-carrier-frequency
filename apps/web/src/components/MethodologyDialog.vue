@@ -14,7 +14,12 @@
         <v-icon start> mdi-function-variant </v-icon>
         {{ methodology.title }}
         <v-spacer />
-        <v-btn icon variant="text" @click="dialog = false">
+        <v-btn
+          icon
+          variant="text"
+          aria-label="Close methodology"
+          @click="dialog = false"
+        >
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>

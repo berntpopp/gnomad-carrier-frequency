@@ -22,6 +22,7 @@
                 :color="linkCopied ? 'success' : undefined"
                 :prepend-icon="linkCopied ? 'mdi-check' : 'mdi-link'"
                 aria-label="Copy shareable link to clipboard"
+                class="share-link-btn"
                 @click="copyShareLink"
               >
                 {{ linkCopied ? "Copied!" : "Link" }}
@@ -196,6 +197,21 @@ onMounted(() => {
 });
 </script>
 
+<style>
+/* Global high-contrast accessible focus ring for keyboard navigation */
+:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary)) !important;
+  outline-offset: 2px !important;
+}
+
+/* Ensure smooth font rendering and prevent layout shifts */
+html {
+  overflow-y: scroll;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+</style>
+
 <style scoped>
 .sr-only {
   position: absolute;
@@ -223,5 +239,16 @@ onMounted(() => {
 }
 .skip-link:focus {
   top: 0;
+}
+
+.share-link-btn {
+  min-height: 36px;
+}
+
+@media (max-width: 599px) {
+  .share-link-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 </style>

@@ -13,7 +13,13 @@
         <v-icon class="mr-2">mdi-cog</v-icon>
         <span>Settings</span>
         <v-spacer />
-        <v-btn icon variant="text" size="small" @click="close">
+        <v-btn
+          icon
+          variant="text"
+          size="small"
+          aria-label="Close settings"
+          @click="close"
+        >
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>

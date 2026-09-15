@@ -9,7 +9,12 @@
         <v-icon start> mdi-database </v-icon>
         Data Sources
         <v-spacer />
-        <v-btn icon variant="text" @click="dialog = false">
+        <v-btn
+          icon
+          variant="text"
+          aria-label="Close data sources"
+          @click="dialog = false"
+        >
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>
