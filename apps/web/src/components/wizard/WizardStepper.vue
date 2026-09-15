@@ -14,6 +14,7 @@
         :value="1"
         :title="xs ? '' : 'Gene'"
         :subtitle="smAndDown ? undefined : 'Search and select'"
+        aria-label="Step 1: Gene"
         data-testid="wizard-step-1"
       />
       <v-divider />
@@ -23,6 +24,7 @@
         :value="2"
         :title="xs ? '' : 'Status'"
         :subtitle="smAndDown ? undefined : 'Carrier or affected'"
+        aria-label="Step 2: Status"
         data-testid="wizard-step-2"
       />
       <v-divider />
@@ -32,6 +34,7 @@
         :value="3"
         :title="xs ? '' : 'Freq'"
         :subtitle="smAndDown ? undefined : 'Select source'"
+        aria-label="Step 3: Frequency"
         data-testid="wizard-step-3"
       />
       <v-divider />
@@ -39,6 +42,7 @@
         :value="4"
         :title="xs ? '' : 'Results'"
         :subtitle="smAndDown ? undefined : 'View calculations'"
+        aria-label="Step 4: Results"
         data-testid="wizard-step-4"
       />
     </v-stepper-header>

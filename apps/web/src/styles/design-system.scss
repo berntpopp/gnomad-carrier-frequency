@@ -99,6 +99,11 @@ th.text-right {
 .v-avatar,
 .v-window__container,
 .v-stepper-window,
+.v-slide-group,
+.v-slide-group__content,
+.v-tab,
+.v-tabs,
+.v-tab__slider,
 .v-table,
 .v-table__wrapper,
 .v-field__clearable,
@@ -109,8 +114,10 @@ th.text-right {
   transition-property: transform, opacity, background-color, border-color, box-shadow !important;
 }
 
-/* Immediate step & window container sizing without height animation reflow */
-.v-window__container {
+/* Immediate step, window, and slide container sizing without height animation reflow */
+.v-window,
+.v-window__container,
+.v-slide-group__content {
   transition: none !important;
   height: auto !important;
 }
@@ -163,4 +170,50 @@ th.text-right {
 small,
 caption {
   font-size: 0.75rem !important; /* Enforce 12px min for functional text */
+}
+
+/* --------------------------------------------------------------------------
+   5. Accessible Input & Icon Touch Targets (44x44px minimum)
+   -------------------------------------------------------------------------- */
+.v-field__input,
+.v-field__input input {
+  min-height: 44px;
+}
+
+.v-field__append-inner .v-icon,
+.v-field__clearable .v-icon {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --------------------------------------------------------------------------
+   6. Dark Mode Primary Contrast
+   -------------------------------------------------------------------------- */
+.v-theme--dark .v-chip.bg-primary,
+.v-theme--dark .v-btn.bg-primary {
+  color: #042f2e !important;
+  font-weight: 600 !important;
+}
+
+.v-theme--dark .v-chip.bg-primary .v-chip__content,
+.v-theme--dark .v-btn.bg-primary .v-btn__content {
+  color: #042f2e !important;
+}
+
+/* --------------------------------------------------------------------------
+   7. Hide Inactive Tooltips from Accessibility Tree
+   -------------------------------------------------------------------------- */
+.v-overlay.v-tooltip:not(.v-overlay--active) {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   8. Chip Close Button Touch Target Size (24x24px minimum)
+   -------------------------------------------------------------------------- */
+.v-chip__close {
+  min-width: 24px !important;
+  min-height: 24px !important;
 }

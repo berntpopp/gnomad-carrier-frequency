@@ -5,7 +5,6 @@
     <v-btn-toggle
       :model-value="currentFormat"
       mandatory
-      density="compact"
       color="primary"
       variant="outlined"
       aria-label="Frequency display format"
@@ -20,7 +19,7 @@
           <v-btn
             v-bind="tooltipProps"
             :value="option.value"
-            size="small"
+            class="format-btn"
             :aria-label="option.label"
           >
             {{ option.symbol }}
@@ -38,7 +37,7 @@
           v-bind="tooltipProps"
           variant="flat"
           color="primary"
-          size="small"
+          class="toolbar-action-btn"
           prepend-icon="mdi-table-eye"
           @click="emit('openModal', null)"
         >
@@ -66,7 +65,7 @@
       <template #activator="{ props: tooltipProps }">
         <v-btn
           v-bind="tooltipProps"
-          size="small"
+          class="toolbar-action-btn"
           :variant="showSubcontinental ? 'flat' : 'outlined'"
           :color="showSubcontinental ? 'primary' : undefined"
           :disabled="qualifyingVariantsCount === 0 || isLoading"
@@ -141,26 +140,37 @@ const formatOptions = [
   {
     value: "percent" as DisplayFormat,
     symbol: "%",
-    label: "Percentage",
+    label: "% — Percentage",
     tooltip: "Display as percentage (e.g. 4.31%)",
   },
   {
     value: "ratio" as DisplayFormat,
     symbol: "1:N",
-    label: "Ratio",
+    label: "1:N — Ratio",
     tooltip: "Display as ratio (e.g. 1:23)",
   },
   {
     value: "scientific" as DisplayFormat,
     symbol: "sci",
-    label: "Scientific notation",
+    label: "sci — Scientific notation",
     tooltip: "Display in scientific notation (e.g. 4.31 × 10⁻²)",
   },
   {
     value: "per100k" as DisplayFormat,
     symbol: "/100k",
-    label: "Per 100,000",
+    label: "/100k — Per 100,000",
     tooltip: "Display per 100,000 individuals",
   },
 ];
 </script>
+
+<style scoped>
+.format-btn {
+  min-height: 44px !important;
+  min-width: 44px !important;
+}
+
+.toolbar-action-btn {
+  min-height: 44px !important;
+}
+</style>

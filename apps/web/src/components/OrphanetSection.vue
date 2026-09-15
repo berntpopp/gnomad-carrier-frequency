@@ -30,7 +30,7 @@
         :href="primaryDisease.orphanetUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="text-body-2"
+        class="text-body-2 orphanet-link"
         >{{ primaryDisease.name }}</a
       >
 
@@ -53,9 +53,9 @@
       <!-- +N more chip -->
       <v-chip
         v-if="additionalDiseases.length > 0"
-        size="x-small"
+        size="small"
         variant="tonal"
-        class="ml-1"
+        class="ml-1 orphanet-more-chip"
         @click="expanded = !expanded"
       >
         {{ expanded ? "show less" : `+${additionalDiseases.length} more` }}
@@ -74,7 +74,7 @@
             :href="disease.orphanetUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-body-2"
+            class="text-body-2 orphanet-link"
             >{{ disease.name }}</a
           >
 
@@ -125,3 +125,20 @@ defineProps<{
 /** Controls the +N more expand/collapse state */
 const expanded = ref(false);
 </script>
+
+<style scoped>
+.orphanet-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  color: rgb(var(--v-theme-primary));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.orphanet-more-chip {
+  min-height: 36px;
+  cursor: pointer;
+}
+</style>

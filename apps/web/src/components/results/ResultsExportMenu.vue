@@ -6,7 +6,7 @@
           <v-btn
             v-bind="{ ...menuProps, ...tooltipProps }"
             variant="outlined"
-            size="small"
+            class="toolbar-action-btn"
             prepend-icon="mdi-download"
           >
             Export
@@ -111,3 +111,9 @@ function handleExport(
   }
 }
 </script>
+
+<style scoped>
+.toolbar-action-btn {
+  min-height: 44px !important;
+}
+</style>

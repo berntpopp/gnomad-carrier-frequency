@@ -1,5 +1,15 @@
 <template>
   <div data-testid="step-results">
+    <!-- Results loading skeleton - reserves layout space to prevent CLS -->
+    <div
+      v-if="!result"
+      class="d-flex flex-column ga-4 my-4"
+      data-testid="results-skeleton"
+    >
+      <v-skeleton-loader type="card" min-height="300" />
+      <v-skeleton-loader type="table" min-height="500" />
+    </div>
+
     <!-- ClinGen validation reminder in results -->
     <ClingenWarning v-if="result" :gene-symbol="result.gene" class="mb-4" />
 
@@ -129,11 +139,11 @@
       :using-default="usingDefault"
     />
 
-    <!-- Navigation buttons - touch-friendly on mobile -->
+    <!-- Navigation buttons - touch-friendly on mobile and desktop -->
     <div class="d-flex justify-space-between mt-6">
       <v-btn
         variant="tonal"
-        :min-height="smAndDown ? 44 : undefined"
+        min-height="44"
         prepend-icon="mdi-arrow-left"
         @click="$emit('back')"
       >
@@ -142,7 +152,7 @@
       <v-btn
         variant="outlined"
         color="primary"
-        :min-height="smAndDown ? 44 : undefined"
+        min-height="44"
         prepend-icon="mdi-refresh"
         @click="$emit('restart')"
       >
@@ -163,7 +173,6 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useDisplay } from "vuetify";
 import {
   config,
   getGnomadVersion,
@@ -196,8 +205,6 @@ import VariantModal from "@/components/VariantModal.vue";
 import ClingenWarning from "@/components/ClingenWarning.vue";
 import ResultsSummaryCard from "@/components/results/ResultsSummaryCard.vue";
 import ResultsPopulationTable from "@/components/results/ResultsPopulationTable.vue";
-
-const { smAndDown } = useDisplay();
 
 const props = defineProps<{
   result: CarrierFrequencyResult | null;

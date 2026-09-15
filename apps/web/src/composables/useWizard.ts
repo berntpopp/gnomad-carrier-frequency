@@ -21,9 +21,20 @@ function safeResetFormat(): void {
   }
 }
 
+function getInitialStep(): WizardStep {
+  if (typeof window !== "undefined" && window.location?.search) {
+    const params = new URLSearchParams(window.location.search);
+    const step = parseInt(params.get("step") || "1", 10);
+    if (step >= 1 && step <= 4) {
+      return step as WizardStep;
+    }
+  }
+  return 1;
+}
+
 // Singleton state - shared across all useWizard() calls
 const state = reactive<WizardState>({
-  currentStep: 1,
+  currentStep: getInitialStep(),
   gene: null,
   indexStatus: "heterozygous", // User decision: default to carrier
   frequencySource: "gnomad",

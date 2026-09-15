@@ -24,12 +24,12 @@
     />
 
     <!-- Table / Chart tabs -->
-    <v-tabs v-model="populationTab" density="compact" class="px-4">
-      <v-tab value="table" size="small" data-testid="table-tab">
+    <v-tabs v-model="populationTab" class="px-4">
+      <v-tab value="table" class="tab-btn" data-testid="table-tab">
         <v-icon start size="small">mdi-table</v-icon>
         Table
       </v-tab>
-      <v-tab value="chart" size="small" data-testid="chart-tab">
+      <v-tab value="chart" class="tab-btn" data-testid="chart-tab">
         <v-icon start size="small">mdi-chart-bar</v-icon>
         Chart
       </v-tab>
@@ -82,8 +82,6 @@
                               : 'mdi-chevron-right'
                           "
                           variant="plain"
-                          density="compact"
-                          size="small"
                           class="population-expand-btn mr-1"
                           :aria-label="
                             isPopExpanded(item.code)
@@ -565,6 +563,16 @@ function getRowClass(item: TableItem): string {
 
 .population-row:hover td:first-child {
   background-color: rgb(var(--v-theme-surface-variant)) !important;
+}
+
+.tab-btn {
+  min-height: 44px !important;
+}
+
+.population-expand-btn {
+  min-width: 44px !important;
+  min-height: 44px !important;
+  margin: -10px 0 -10px -8px;
 }
 
 .population-row:hover .population-expand-btn {

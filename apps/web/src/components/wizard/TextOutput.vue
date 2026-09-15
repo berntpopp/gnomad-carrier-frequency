@@ -36,11 +36,15 @@
         <v-btn-toggle
           v-model="languageModel"
           mandatory
-          density="compact"
           variant="outlined"
+          aria-label="Report language"
         >
-          <v-btn value="de" size="small"> DE </v-btn>
-          <v-btn value="en" size="small"> EN </v-btn>
+          <v-btn value="de" class="lang-btn" aria-label="DE — German">
+            DE
+          </v-btn>
+          <v-btn value="en" class="lang-btn" aria-label="EN — English">
+            EN
+          </v-btn>
         </v-btn-toggle>
       </div>
     </v-card-title>
@@ -54,30 +58,18 @@
         <v-btn-toggle
           v-model="selectedPerspective"
           mandatory
-          :density="smAndDown ? 'default' : 'compact'"
           color="primary"
           variant="outlined"
           class="flex-wrap"
+          aria-label="Clinical report perspective"
         >
-          <v-btn
-            value="affected"
-            :size="smAndDown ? 'default' : 'small'"
-            :min-height="smAndDown ? 44 : undefined"
-          >
+          <v-btn value="affected" class="perspective-btn">
             {{ labels.perspectives.affected }}
           </v-btn>
-          <v-btn
-            value="carrier"
-            :size="smAndDown ? 'default' : 'small'"
-            :min-height="smAndDown ? 44 : undefined"
-          >
+          <v-btn value="carrier" class="perspective-btn">
             {{ labels.perspectives.carrier }}
           </v-btn>
-          <v-btn
-            value="familyMember"
-            :size="smAndDown ? 'default' : 'small'"
-            :min-height="smAndDown ? 44 : undefined"
-          >
+          <v-btn value="familyMember" class="perspective-btn">
             {{ labels.perspectives.familyMember }}
           </v-btn>
         </v-btn-toggle>
@@ -112,10 +104,9 @@
               :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
               :color="copied ? 'success' : undefined"
               variant="text"
-              size="small"
-              density="compact"
               class="copy-btn"
               :disabled="!generatedText"
+              aria-label="Copy report text"
               @click="copy(generatedText)"
             />
           </template>
@@ -296,6 +287,15 @@ const labels = computed(() =>
   min-height: 36px;
 }
 
+.lang-btn {
+  min-height: 44px !important;
+  min-width: 44px !important;
+}
+
+.perspective-btn {
+  min-height: 44px !important;
+}
+
 /* Inline copy button positioned inside text preview */
 .text-preview-card {
   position: relative;
@@ -305,7 +305,9 @@ const labels = computed(() =>
   position: absolute;
   top: 8px;
   right: 8px;
-  opacity: 0.6;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  opacity: 0.75;
   transition: opacity 0.2s;
   z-index: 1;
 }

@@ -18,10 +18,11 @@
         <v-btn
           icon
           variant="text"
-          size="x-small"
           :loading="isLoading"
           title="Re-fetch variant data from gnomAD"
+          aria-label="Re-fetch variant data from gnomAD"
           data-testid="refetch-btn"
+          class="refetch-btn"
           @click="$emit('refetch')"
         >
           <v-icon size="small">mdi-refresh</v-icon>
@@ -391,9 +392,14 @@ const bayesianPrevalenceFormatted = computed(() => {
   font-size: 1.5rem !important;
 }
 
+.refetch-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
 .stat-detail {
   font-size: 0.8125rem;
-  color: rgba(var(--v-theme-on-surface), 0.6);
+  color: rgba(var(--v-theme-on-surface), 0.72);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }

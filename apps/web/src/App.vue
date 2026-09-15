@@ -36,25 +36,33 @@
           data.
         </p>
 
-        <!-- Show loading state while restoring from URL -->
-        <div
-          v-if="isRestoringFromUrl"
-          class="d-flex flex-column align-center justify-center py-16"
-        >
-          <v-progress-circular
-            indeterminate
-            color="primary"
-            size="48"
-            class="mb-4"
-          />
-          <div class="text-h6 mb-2">Loading shared calculation</div>
-          <div class="text-body-2 text-medium-emphasis">
-            Restoring parameters from URL...
-          </div>
+        <!-- Wizard with non-shifting restoration overlay -->
+        <div class="position-relative">
+          <WizardStepper />
+          <v-overlay
+            :model-value="isRestoringFromUrl"
+            contained
+            persistent
+            class="align-center justify-center"
+            scrim="surface"
+            opacity="0.94"
+          >
+            <div
+              class="d-flex flex-column align-center justify-center pa-8 text-center"
+            >
+              <v-progress-circular
+                indeterminate
+                color="primary"
+                size="48"
+                class="mb-4"
+              />
+              <div class="text-h6 mb-2">Loading shared calculation</div>
+              <div class="text-body-2 text-medium-emphasis">
+                Restoring parameters from URL...
+              </div>
+            </div>
+          </v-overlay>
         </div>
-
-        <!-- Show wizard when not restoring -->
-        <WizardStepper v-else />
       </v-container>
     </v-main>
 
@@ -257,13 +265,6 @@ html {
 }
 
 .share-link-btn {
-  min-height: 36px;
-}
-
-@media (max-width: 599px) {
-  .share-link-btn {
-    min-height: 44px;
-    min-width: 44px;
-  }
+  min-height: 44px;
 }
 </style>

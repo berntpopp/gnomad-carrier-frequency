@@ -6,7 +6,7 @@ import { fileURLToPath, URL } from 'node:url'
 import pkg from './package.json'
 
 function stripVuetifyLayoutTransitions() {
-  const layoutPropsRegex = /\b(height|width|top|left|right|bottom|margin|padding|max-height|max-width|font-size)\b/i;
+  const layoutPropsRegex = /\b(all|height|width|top|left|right|bottom|margin|padding|max-height|max-width|font-size)\b/i;
   return {
     name: 'strip-vuetify-layout-transitions',
     enforce: 'post' as const,
