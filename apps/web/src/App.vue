@@ -84,12 +84,25 @@
       v-model="showOfflineReady"
       :timeout="5000"
       location="bottom"
-      color="success"
+      color="#1b5e20"
+      class="text-white"
     >
-      App ready for offline use
+      <div class="d-flex align-center">
+        <v-icon
+          icon="mdi-check-circle"
+          class="mr-2"
+          size="small"
+          color="white"
+        />
+        <span style="color: #ffffff; font-weight: 500"
+          >App ready for offline use</span
+        >
+      </div>
 
       <template #actions>
-        <v-btn variant="text" @click="showOfflineReady = false"> Close </v-btn>
+        <v-btn variant="text" color="white" @click="showOfflineReady = false">
+          Close
+        </v-btn>
       </template>
     </v-snackbar>
   </v-app>

@@ -6,7 +6,7 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
 // Vuetify
 import "vuetify/styles";
-import "@mdi/font/css/materialdesignicons.css";
+import "@/styles/mdi.scss";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
@@ -60,6 +60,10 @@ const vuetify = createVuetify({
           secondary: "#a09588",
           surface: "#FFFFFF",
           background: "#FAFAFA",
+          success: "#1b5e20",
+          error: "#C62828",
+          warning: "#E65100",
+          info: "#0277BD",
         },
       },
       dark: {

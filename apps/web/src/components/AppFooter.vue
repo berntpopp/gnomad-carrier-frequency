@@ -53,7 +53,7 @@
               href="/docs/"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Open documentation"
+              aria-label="Docs — Documentation"
             >
               <v-icon size="small" start> mdi-book-open-outline </v-icon>
               <span class="d-none d-sm-inline">Docs</span>
@@ -143,7 +143,7 @@
                   v-bind="{ ...props, ...tooltipProps }"
                   variant="text"
                   size="small"
-                  aria-label="View frequently asked questions"
+                  aria-label="FAQ — Frequently asked questions"
                 >
                   <v-icon size="small" start> mdi-help-circle-outline </v-icon>
                   <span class="d-none d-sm-inline">FAQ</span>
