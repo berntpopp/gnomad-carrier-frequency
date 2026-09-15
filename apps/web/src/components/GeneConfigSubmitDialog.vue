@@ -1,61 +1,94 @@
 <template>
-  <v-dialog v-model="dialogOpen" max-width="560" scrollable>
+  <v-dialog v-model="dialogOpen" max-width="580" scrollable>
     <template #activator="{ props: activatorProps }">
       <slot name="activator" :props="activatorProps" />
     </template>
 
-    <v-card>
-      <v-card-title class="d-flex align-center">
-        <v-icon class="mr-2" color="primary"> mdi-flask-outline </v-icon>
-        {{ isUpdate ? "Suggest Config Update" : "Suggest Gene Config" }}
+    <v-card class="modal-card" rounded="lg">
+      <v-card-title class="d-flex align-center px-6 pt-5 pb-3">
+        <div class="modal-icon-badge primary-badge mr-3">
+          <v-icon size="22" color="primary">mdi-flask-outline</v-icon>
+        </div>
+        <div>
+          <div class="text-h6 font-weight-bold">
+            {{ isUpdate ? "Suggest Config Update" : "Suggest Gene Config" }}
+          </div>
+          <div class="text-caption text-medium-emphasis">
+            Submit curated gene parameters to GitHub
+          </div>
+        </div>
+        <v-spacer />
+        <v-btn
+          icon
+          variant="text"
+          aria-label="Close dialog"
+          class="modal-close-btn"
+          @click="dialogOpen = false"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
       </v-card-title>
 
-      <v-card-text>
-        <p class="text-body-2 mb-4">
-          Pre-fills a GitHub issue with your current settings. You'll add
-          clinical rationale and references on GitHub.
+      <v-divider />
+
+      <v-card-text class="px-6 py-4">
+        <p class="text-body-2 text-medium-emphasis mb-4">
+          Pre-fills a GitHub issue with your current analysis configuration. You
+          can supply clinical rationale and literature references directly on
+          GitHub.
         </p>
 
         <!-- Read-only fields (pre-filled from app state) -->
-        <v-text-field
-          :model-value="geneSymbol"
-          label="Gene symbol"
-          variant="outlined"
-          density="compact"
-          readonly
-          class="mb-2"
-        />
+        <div class="mb-4 pa-3 rounded bg-surface-variant-subtle">
+          <div
+            class="text-caption font-weight-bold text-uppercase text-medium-emphasis mb-2"
+          >
+            Current Analysis Context
+          </div>
+          <v-text-field
+            :model-value="geneSymbol"
+            label="Gene symbol"
+            variant="outlined"
+            density="compact"
+            readonly
+            class="mb-2 font-mono"
+          />
 
-        <v-text-field
-          :model-value="filterSummary"
-          label="Filter settings"
-          variant="outlined"
-          density="compact"
-          readonly
-          class="mb-2"
-        />
+          <v-text-field
+            :model-value="filterSummary"
+            label="Filter settings"
+            variant="outlined"
+            density="compact"
+            readonly
+            class="mb-2"
+          />
 
-        <v-text-field
-          :model-value="penetranceDisplay"
-          label="Penetrance"
-          variant="outlined"
-          density="compact"
-          readonly
-          class="mb-2"
-        />
+          <v-text-field
+            :model-value="penetranceDisplay"
+            label="Penetrance"
+            variant="outlined"
+            density="compact"
+            readonly
+            class="mb-2 font-mono"
+          />
 
-        <v-textarea
-          v-if="excludedVariantIds.length > 0"
-          :model-value="excludedVariantIds.join('\n')"
-          :label="`Excluded variants (${excludedVariantIds.length})`"
-          variant="outlined"
-          density="compact"
-          readonly
-          rows="3"
-          class="mb-2"
-        />
+          <v-textarea
+            v-if="excludedVariantIds.length > 0"
+            :model-value="excludedVariantIds.join('\n')"
+            :label="`Excluded variants (${excludedVariantIds.length})`"
+            variant="outlined"
+            density="compact"
+            readonly
+            rows="3"
+            class="font-mono"
+          />
+        </div>
 
-        <v-divider class="my-3" />
+        <div
+          class="text-caption font-weight-bold text-uppercase text-medium-emphasis mb-2"
+        >
+          Clinical Curation Details
+        </div>
 
         <!-- Editable fields -->
         <v-text-field
@@ -83,7 +116,7 @@
           variant="outlined"
           density="compact"
           placeholder="e.g. 219700"
-          class="mb-2"
+          class="mb-2 font-mono"
         />
 
         <v-select
@@ -95,12 +128,23 @@
         />
       </v-card-text>
 
-      <v-card-actions>
+      <v-divider />
+
+      <v-card-actions class="px-6 py-4">
         <v-spacer />
-        <v-btn variant="text" @click="dialogOpen = false"> Cancel </v-btn>
+        <v-btn
+          variant="outlined"
+          min-height="44"
+          min-width="100"
+          @click="dialogOpen = false"
+        >
+          Cancel
+        </v-btn>
         <v-btn
           color="primary"
           variant="flat"
+          min-height="44"
+          min-width="150"
           :disabled="!conditionName"
           prepend-icon="mdi-open-in-new"
           @click="openGitHubIssue"
@@ -194,3 +238,33 @@ function openGitHubIssue(): void {
   dialogOpen.value = false;
 }
 </script>
+
+<style scoped>
+.modal-card {
+  border: 1px solid rgba(var(--v-border-color), 0.12);
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.16) !important;
+}
+
+.modal-icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primary-badge {
+  background: rgba(var(--v-theme-primary), 0.12);
+}
+
+.modal-close-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.bg-surface-variant-subtle {
+  background: rgba(var(--v-theme-surface-variant), 0.18);
+  border: 1px solid rgba(var(--v-border-color), 0.08);
+}
+</style>

@@ -21,11 +21,15 @@ const { isOnline } = useNetworkStatus();
 
 <style scoped>
 .slide-fade-enter-active {
-  transition: all 0.3s ease-out;
+  transition:
+    opacity 0.25s ease-out,
+    transform 0.25s ease-out;
 }
 
 .slide-fade-leave-active {
-  transition: all 0.3s ease-in;
+  transition:
+    opacity 0.25s ease-in,
+    transform 0.25s ease-in;
 }
 
 .slide-fade-enter-from,

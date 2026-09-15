@@ -7,6 +7,7 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 // Vuetify
 import "vuetify/styles";
 import "@/styles/mdi.scss";
+import "@/styles/design-system.scss";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
@@ -57,20 +58,26 @@ const vuetify = createVuetify({
         dark: false,
         colors: {
           primary: "#117A7F",
-          secondary: "#a09588",
+          secondary: "#4b5563",
           surface: "#FFFFFF",
           background: "#FAFAFA",
-          success: "#1b5e20",
-          error: "#C62828",
-          warning: "#E65100",
-          info: "#0277BD",
+          "on-surface": "#111827",
+          "on-background": "#0f172a",
+          success: "#15803d",
+          error: "#b91c1c",
+          warning: "#c2410c",
+          info: "#0284c7",
         },
       },
       dark: {
         dark: true,
         colors: {
           primary: "#4DB6AC",
-          secondary: "#a09588",
+          secondary: "#9ca3af",
+          surface: "#18181b",
+          background: "#09090b",
+          "on-surface": "#f4f4f5",
+          "on-background": "#ffffff",
         },
       },
     },

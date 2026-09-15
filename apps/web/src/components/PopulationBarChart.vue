@@ -53,7 +53,7 @@
         <text
           :x="labelWidth - 8"
           :y="barY(i) + barHeight / 2 + 4"
-          :font-size="smAndDown ? 10 : 12"
+          :font-size="12"
           text-anchor="end"
           fill="rgb(var(--v-theme-on-surface))"
         >
@@ -68,14 +68,13 @@
           :height="barHeight"
           :fill="barColor(pop)"
           rx="2"
-          style="transition: width 0.3s ease"
         />
 
         <!-- Value label -->
         <text
           :x="labelWidth + barWidth(pop.carrierFrequency) + VALUE_MARGIN_GAP"
           :y="barY(i) + barHeight / 2 + 4"
-          :font-size="smAndDown ? 9 : 11"
+          :font-size="12"
           text-anchor="start"
           fill="rgb(var(--v-theme-on-surface))"
         >

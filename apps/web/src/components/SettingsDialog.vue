@@ -1,23 +1,36 @@
 <template>
   <v-dialog
     v-model="modelValue"
-    :max-width="900"
+    :max-width="920"
     :fullscreen="smAndDown"
     persistent
     aria-label="Settings"
     data-testid="settings-dialog"
     @update:model-value="(val: boolean) => (val ? onDialogOpen() : undefined)"
   >
-    <v-card ref="dialogCard" class="settings-dialog-card">
-      <v-card-title class="d-flex align-center px-4 py-3">
-        <v-icon class="mr-2">mdi-cog</v-icon>
-        <span>Settings</span>
+    <v-card
+      ref="dialogCard"
+      class="settings-dialog-card modal-card"
+      rounded="lg"
+    >
+      <v-card-title class="d-flex align-center px-6 pt-5 pb-3">
+        <div class="modal-icon-badge primary-badge mr-3">
+          <v-icon size="22" color="primary">mdi-cog-outline</v-icon>
+        </div>
+        <div>
+          <div class="text-h6 font-weight-bold">Settings</div>
+          <div class="text-caption text-medium-emphasis">
+            Configure application defaults, clinical templates, and quality
+            parameters
+          </div>
+        </div>
         <v-spacer />
         <v-btn
           icon
           variant="text"
           size="small"
           aria-label="Close settings"
+          class="modal-close-btn"
           @click="close"
         >
           <v-icon>mdi-close</v-icon>
@@ -27,7 +40,7 @@
       <v-divider />
 
       <!-- Mobile: dropdown section selector -->
-      <div v-if="smAndDown" class="px-4 pt-3">
+      <div v-if="smAndDown" class="px-4 py-3 border-bottom">
         <v-select
           v-model="activeSection"
           :items="filteredSections"
@@ -40,13 +53,15 @@
           <template #item="{ item: selectItem, props: itemProps }">
             <v-list-item v-bind="itemProps">
               <template #prepend>
-                <v-icon size="small">{{ selectItem.raw.icon }}</v-icon>
+                <v-icon size="small" class="mr-2">{{
+                  selectItem.raw.icon
+                }}</v-icon>
               </template>
             </v-list-item>
           </template>
           <template #selection="{ item: selectItem }">
             <v-icon size="small" class="mr-2">{{ selectItem.raw.icon }}</v-icon>
-            {{ selectItem.title }}
+            <span class="font-weight-medium">{{ selectItem.title }}</span>
           </template>
         </v-select>
       </div>
@@ -55,18 +70,20 @@
       <div class="settings-body" :class="{ 'flex-column': smAndDown }">
         <!-- Sidebar nav (desktop only) -->
         <div v-if="!smAndDown" class="settings-nav">
-          <v-text-field
-            v-model="searchQuery"
-            prepend-inner-icon="mdi-magnify"
-            placeholder="Search settings..."
-            density="compact"
-            variant="plain"
-            hide-details
-            clearable
-            class="mx-3 mt-2 mb-1"
-          />
+          <div class="px-3 pt-3 pb-2">
+            <v-text-field
+              v-model="searchQuery"
+              prepend-inner-icon="mdi-magnify"
+              placeholder="Search settings..."
+              density="compact"
+              variant="outlined"
+              hide-details
+              clearable
+              class="settings-search-field"
+            />
+          </div>
 
-          <v-divider class="mb-1" />
+          <v-divider class="mb-2" />
 
           <v-list
             v-model:selected="navSelection"
@@ -74,6 +91,7 @@
             nav
             mandatory
             color="primary"
+            class="px-2"
           >
             <v-list-item
               v-for="section in filteredSections"
@@ -81,12 +99,16 @@
               :value="section.id"
               :data-testid="`settings-tab-${section.id}`"
               :prepend-icon="section.icon"
+              rounded="lg"
+              class="mb-1 py-2"
               @click="activeSection = section.id"
             >
-              <v-list-item-title>{{ section.title }}</v-list-item-title>
-              <v-list-item-subtitle>{{
-                section.subtitle
-              }}</v-list-item-subtitle>
+              <v-list-item-title class="font-weight-medium">
+                {{ section.title }}
+              </v-list-item-title>
+              <v-list-item-subtitle class="settings-nav-subtitle text-caption">
+                {{ section.subtitle }}
+              </v-list-item-subtitle>
             </v-list-item>
           </v-list>
         </div>
@@ -115,10 +137,25 @@
 
       <v-divider />
 
-      <v-card-actions class="px-4">
+      <v-card-actions class="px-6 py-4">
         <v-spacer />
-        <v-btn variant="text" @click="close">Cancel</v-btn>
-        <v-btn color="primary" @click="save">Save</v-btn>
+        <v-btn
+          variant="outlined"
+          min-height="44"
+          min-width="100"
+          @click="close"
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          color="primary"
+          variant="flat"
+          min-height="44"
+          min-width="100"
+          @click="save"
+        >
+          Save
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -246,6 +283,33 @@ function save() {
   height: min(90vh, 810px);
 }
 
+.modal-card {
+  border: 1px solid rgba(var(--v-border-color), 0.12);
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.modal-icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primary-badge {
+  background: rgba(var(--v-theme-primary), 0.12);
+}
+
+.modal-close-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.border-bottom {
+  border-bottom: 1px solid rgba(var(--v-border-color), 0.12);
+}
+
 .settings-dialog-card {
   display: flex;
   flex-direction: column;
@@ -259,16 +323,22 @@ function save() {
 }
 
 .settings-nav {
-  width: 220px;
-  min-width: 220px;
-  border-right: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+  width: 240px;
+  min-width: 240px;
+  border-right: 1px solid rgba(var(--v-border-color), 0.12);
   overflow-y: auto;
+  background: rgba(var(--v-theme-surface-variant), 0.08);
+}
+
+.settings-nav-subtitle {
+  opacity: 0.85 !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
 }
 
 .settings-content {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 24px;
+  padding: 20px 24px;
   min-height: 0;
 }
 </style>

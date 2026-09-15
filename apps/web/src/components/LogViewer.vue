@@ -1,13 +1,26 @@
 <template>
   <div class="log-viewer">
     <!-- Header with actions -->
-    <div class="d-flex align-center justify-space-between mb-3">
-      <h3 class="text-h6">Application Logs</h3>
+    <div
+      class="d-flex align-center justify-space-between pb-3 mb-3 border-bottom"
+    >
+      <div class="d-flex align-center">
+        <div class="modal-icon-badge primary-badge mr-3">
+          <v-icon size="20" color="primary">mdi-console</v-icon>
+        </div>
+        <div>
+          <div class="text-subtitle-1 font-weight-bold">Application Logs</div>
+          <div class="text-caption text-medium-emphasis">
+            Diagnostics and runtime telemetry
+          </div>
+        </div>
+      </div>
       <v-btn
         icon
         variant="text"
         size="small"
         aria-label="Close log viewer"
+        class="modal-close-btn"
         @click="emit('close')"
       >
         <v-icon>mdi-close</v-icon>
@@ -15,8 +28,10 @@
     </div>
 
     <!-- Statistics -->
-    <v-card variant="tonal" density="compact" class="mb-3 pa-2">
-      <div class="d-flex flex-wrap ga-4 text-body-2">
+    <v-card variant="tonal" class="mb-3 pa-3 stats-card" rounded="lg">
+      <div
+        class="d-flex flex-wrap align-center justify-space-between ga-2 text-body-2 mb-2 font-mono"
+      >
         <span>
           <strong>{{ stats.totalCount }}</strong> entries
         </span>
@@ -27,13 +42,14 @@
           {{ stats.memoryEstimate }}
         </span>
       </div>
-      <div class="d-flex flex-wrap ga-2 mt-1 text-caption">
+      <div class="d-flex flex-wrap ga-2 text-caption">
         <v-chip
           v-for="level in levels"
           :key="level"
-          size="x-small"
+          size="small"
           :color="levelColors[level]"
           variant="flat"
+          class="font-mono"
         >
           {{ level }}: {{ stats.byLevel[level] }}
         </v-chip>
@@ -45,14 +61,14 @@
       <v-text-field
         v-model="searchQuery"
         prepend-inner-icon="mdi-magnify"
-        label="Search logs"
+        placeholder="Filter logs by message or category..."
         density="compact"
         variant="outlined"
         hide-details
         clearable
       />
 
-      <div class="d-flex flex-wrap ga-2">
+      <div class="d-flex flex-wrap ga-3 align-center py-1">
         <v-checkbox
           v-for="level in levels"
           :key="level"
@@ -62,45 +78,47 @@
           :color="levelColors[level]"
           density="compact"
           hide-details
+          class="level-checkbox font-mono"
         />
       </div>
     </div>
 
     <!-- Log entries -->
-    <v-list density="compact" class="log-list rounded border">
+    <v-list density="compact" class="log-list rounded border pa-1">
       <template v-if="filteredEntries.length > 0">
         <v-list-item
           v-for="entry in filteredEntries"
           :key="entry.id"
-          class="log-entry"
+          class="log-entry rounded mb-1 px-3 py-2"
           @click="toggleExpanded(entry.id)"
         >
           <template #prepend>
             <v-chip
-              size="x-small"
+              size="small"
               :color="levelColors[entry.level]"
               variant="flat"
-              class="mr-2"
-              style="width: 60px; justify-content: center"
+              class="mr-2 level-chip font-mono"
             >
               {{ entry.level }}
             </v-chip>
           </template>
 
-          <v-list-item-title class="text-body-2">
-            <span class="text-medium-emphasis mr-2">
+          <v-list-item-title class="text-body-2 log-item-text">
+            <span class="text-medium-emphasis mr-2 font-mono text-caption">
               {{ formatTimestamp(entry.timestamp) }}
             </span>
-            <span class="font-weight-medium mr-2">[{{ entry.category }}]</span>
-            {{ entry.message }}
+            <span class="font-weight-medium mr-2 font-mono text-primary"
+              >[{{ entry.category }}]</span
+            >
+            <span>{{ entry.message }}</span>
           </v-list-item-title>
 
           <!-- Expanded details -->
           <div
             v-if="expandedIds.has(entry.id) && entry.details"
-            class="mt-2 pa-2 rounded bg-grey-darken-4"
+            class="mt-2 pa-3 rounded bg-grey-darken-4 details-box"
           >
-            <pre class="text-caption text-wrap">{{
+            <pre class="text-caption text-wrap font-mono">{{
               formatDetails(entry.details)
             }}</pre>
           </div>
@@ -108,18 +126,19 @@
       </template>
 
       <v-list-item v-else>
-        <v-list-item-title class="text-medium-emphasis text-center">
+        <v-list-item-title class="text-medium-emphasis text-center py-4">
           No logs match current filters
         </v-list-item-title>
       </v-list-item>
     </v-list>
 
     <!-- Actions -->
-    <div class="d-flex flex-wrap ga-2 mt-3">
+    <div class="d-flex flex-wrap ga-3 mt-3 pt-2">
       <v-btn
         variant="outlined"
-        size="small"
+        min-height="44"
         prepend-icon="mdi-download"
+        class="flex-1"
         @click="handleDownload"
       >
         Download JSON
@@ -127,9 +146,10 @@
 
       <v-btn
         variant="outlined"
-        size="small"
+        min-height="44"
         color="warning"
         prepend-icon="mdi-delete"
+        class="flex-1"
         @click="handleClear"
       >
         Clear Logs
@@ -242,28 +262,73 @@ async function handleClear() {
   flex-direction: column;
 }
 
+.modal-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primary-badge {
+  background: rgba(var(--v-theme-primary), 0.12);
+}
+
+.modal-close-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.border-bottom {
+  border-bottom: 1px solid rgba(var(--v-border-color), 0.12);
+}
+
+.stats-card {
+  border: 1px solid rgba(var(--v-border-color), 0.12);
+}
+
 .log-list {
   flex: 1;
   overflow-y: auto;
-  max-height: 400px;
+  max-height: 420px;
+  background: rgba(var(--v-theme-surface-variant), 0.1);
 }
 
 .log-entry {
   cursor: pointer;
-  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border: 1px solid transparent;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .log-entry:hover {
-  background-color: rgba(var(--v-theme-surface-variant), 0.5);
+  background-color: rgba(var(--v-theme-surface-variant), 0.35);
+  border-color: rgba(var(--v-border-color), 0.2);
+}
+
+.level-chip {
+  width: 58px;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.level-checkbox {
+  min-height: 32px;
 }
 
 .border {
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border: 1px solid rgba(var(--v-border-color), 0.12);
+}
+
+.details-box {
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 pre {
   margin: 0;
-  font-family: monospace;
   white-space: pre-wrap;
   word-break: break-all;
 }
