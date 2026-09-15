@@ -171,7 +171,7 @@
 import { ref } from "vue";
 
 const dialog = ref(false);
-const version = import.meta.env.VITE_APP_VERSION ?? "1.9.0";
+const version = import.meta.env.VITE_APP_VERSION ?? "1.10.0";
 </script>
 
 <style scoped>
