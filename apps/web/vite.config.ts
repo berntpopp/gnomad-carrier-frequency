@@ -5,10 +5,38 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
 import pkg from './package.json'
 
+function stripVuetifyLayoutTransitions() {
+  const layoutPropsRegex = /\b(height|width|top|left|right|bottom|margin|padding|max-height|max-width|font-size)\b/i;
+  return {
+    name: 'strip-vuetify-layout-transitions',
+    enforce: 'post' as const,
+    transform(code: string, id: string) {
+      if (id.endsWith('.css') || id.includes('vue&type=style') || id.includes('.scss')) {
+        if (code.includes('transition') && layoutPropsRegex.test(code)) {
+          return {
+            code: code.replace(/transition(-property)?:\s*([^;]+);/g, (match, isProp, value) => {
+              if (layoutPropsRegex.test(value)) {
+                const parts = value.split(',').map((p: string) => p.trim()).filter((p: string) => !layoutPropsRegex.test(p));
+                if (parts.length === 0) {
+                  return isProp ? 'transition-property: transform, opacity, background-color, border-color, box-shadow;' : 'transition: transform 0.2s ease, opacity 0.2s ease;';
+                }
+                return `transition${isProp || ''}: ${parts.join(', ')};`;
+              }
+              return match;
+            }),
+            map: null,
+          };
+        }
+      }
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    stripVuetifyLayoutTransitions(),
     checker({
       // Enable vue-tsc for TypeScript checking — point to app tsconfig
       // so watch mode only checks src/ files, not Vuetify .vue SFCs in

@@ -160,6 +160,11 @@ const emit = defineEmits<{
 }
 
 .app-logo {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: color 0.15s ease;
   user-select: none;

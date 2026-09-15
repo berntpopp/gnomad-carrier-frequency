@@ -60,9 +60,13 @@
 
     <AppFooter @open-log-viewer="showLogViewer = true" />
 
-    <SettingsDialog v-model="showSettings" />
-    <LogViewerPanel v-model="showLogViewer" />
-    <HistoryDrawer v-model="showHistory" @restore="handleHistoryRestore" />
+    <SettingsDialog v-if="showSettings" v-model="showSettings" />
+    <LogViewerPanel v-if="showLogViewer" v-model="showLogViewer" />
+    <HistoryDrawer
+      v-if="showHistory"
+      v-model="showHistory"
+      @restore="handleHistoryRestore"
+    />
     <ConfirmDialog />
 
     <!-- PWA Update Notification -->
@@ -110,16 +114,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, defineAsyncComponent } from "vue";
 import { useClipboard } from "@vueuse/core";
 import AppBar from "@/components/AppBar.vue";
 import AppFooter from "@/components/AppFooter.vue";
 import DisclaimerBanner from "@/components/DisclaimerBanner.vue";
-import SettingsDialog from "@/components/SettingsDialog.vue";
-import LogViewerPanel from "@/components/LogViewerPanel.vue";
-import HistoryDrawer from "@/components/HistoryDrawer.vue";
 import WizardStepper from "@/components/wizard/WizardStepper.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+
+const SettingsDialog = defineAsyncComponent(
+  () => import("@/components/SettingsDialog.vue"),
+);
+const LogViewerPanel = defineAsyncComponent(
+  () => import("@/components/LogViewerPanel.vue"),
+);
+const HistoryDrawer = defineAsyncComponent(
+  () => import("@/components/HistoryDrawer.vue"),
+);
 import { useLogStore } from "@/stores/useLogStore";
 import {
   useWizard,
@@ -228,6 +239,10 @@ html {
   position: absolute;
   top: -100%;
   left: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 16px;
   background: rgb(var(--v-theme-primary));
   color: white;

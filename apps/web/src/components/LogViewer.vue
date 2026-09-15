@@ -178,10 +178,10 @@ const levels: LogLevel[] = ["DEBUG", "INFO", "WARN", "ERROR"];
 const enabledLevels = ref<LogLevel[]>(["INFO", "WARN", "ERROR"]);
 const expandedIds = ref(new Set<number>());
 
-// Level colors
+// Level colors with WCAG AAA contrast for white text
 const levelColors: Record<LogLevel, string> = {
-  DEBUG: "grey",
-  INFO: "info",
+  DEBUG: "blue-grey-darken-2",
+  INFO: "primary",
   WARN: "warning",
   ERROR: "error",
 };

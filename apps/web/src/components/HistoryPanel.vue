@@ -8,6 +8,7 @@
         variant="text"
         size="small"
         aria-label="Close history panel"
+        class="modal-close-btn"
         @click="emit('close')"
       >
         <v-icon>mdi-close</v-icon>
@@ -136,6 +137,11 @@ function handleDelete(id: string) {
 .history-entry {
   cursor: pointer;
   transition: background-color 0.2s ease;
+}
+
+.modal-close-btn {
+  min-width: 44px !important;
+  min-height: 44px !important;
 }
 
 .history-entry:hover {

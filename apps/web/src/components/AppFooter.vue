@@ -34,7 +34,7 @@
           :href="releasesUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-decoration-none text-inherit"
+          class="text-decoration-none text-inherit footer-version-link"
         >
           v{{ version }}
         </a>
@@ -324,6 +324,18 @@ const reopenDisclaimer = () => {
   min-height: 44px !important;
 }
 
+.footer-row .v-btn {
+  min-height: 44px !important;
+  min-width: 44px !important;
+}
+
+.footer-version-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+}
+
 /* Compact spacing on mobile with accessible touch targets */
 @media (max-width: 599px) {
   .footer-container {
@@ -332,11 +344,6 @@ const reopenDisclaimer = () => {
 
   .footer-content {
     gap: 2px;
-  }
-
-  .footer-row .v-btn {
-    min-height: 44px;
-    min-width: 44px;
   }
 }
 </style>
