@@ -14,6 +14,8 @@
           v-if="language === 'de'"
           v-model="genderStyleModel"
           :items="genderStyleOptions"
+          :label="labels.genderStyle"
+          :aria-label="labels.genderStyle"
           density="compact"
           variant="outlined"
           hide-details
@@ -26,6 +28,7 @@
           v-model="patientSexModel"
           :items="patientSexOptions"
           :label="labels.patientSex"
+          :aria-label="labels.patientSex"
           density="compact"
           variant="outlined"
           hide-details
@@ -236,6 +239,7 @@ const labels = computed(() =>
         noText:
           "Kein Text generiert. Bitte mindestens einen Abschnitt aktivieren.",
         patientSex: "Patient*in",
+        genderStyle: "Gender-Stil",
         perspectives: {
           affected: "Betroffener Patient",
           carrier: "Anlageträger/in",
@@ -261,6 +265,7 @@ const labels = computed(() =>
         copied: "Copied!",
         noText: "No text generated. Please enable at least one section.",
         patientSex: "Patient Sex",
+        genderStyle: "Gender Style",
         perspectives: {
           affected: "Affected Patient",
           carrier: "Carrier",

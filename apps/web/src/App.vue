@@ -11,7 +11,7 @@
 
     <v-main id="main-content" tabindex="-1">
       <v-container max-width="900">
-        <div class="d-flex align-center ga-2 mb-2">
+        <div class="d-flex align-center ga-2 mb-2 page-title-row">
           <h1 class="text-h4">gnomAD Carrier Frequency Calculator</h1>
           <v-tooltip v-if="wizardState.currentStep === 4" location="top">
             <template #activator="{ props: tooltipProps }">

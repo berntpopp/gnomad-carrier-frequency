@@ -5,6 +5,7 @@
     item-title="displayName"
     item-value="version"
     label="gnomAD Version"
+    aria-label="gnomAD Version"
     variant="outlined"
     density="compact"
     hide-details

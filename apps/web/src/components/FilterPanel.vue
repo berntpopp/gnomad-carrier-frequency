@@ -43,6 +43,7 @@
             }))
           "
           label="Condition profile"
+          aria-label="Condition profile"
           density="compact"
           variant="outlined"
           hide-details

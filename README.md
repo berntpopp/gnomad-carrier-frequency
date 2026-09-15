@@ -14,7 +14,7 @@ Calculate carrier frequencies for autosomal recessive conditions using gnomAD po
 > **For Research Use Only** -- This tool is intended for research and educational purposes. It is not a validated clinical diagnostic tool. Outputs must be independently reviewed and verified by qualified professionals before any clinical use.
 
 <a href="https://gnomad-carrier-frequency.kidney-genetics.org/">
-  <img src="docs/public/screenshots/hero-preview.webp" alt="gnomAD Carrier Frequency Calculator screenshot" width="800">
+  <img src="apps/web/docs/public/screenshots/hero-preview.webp" alt="gnomAD Carrier Frequency Calculator screenshot" width="800">
 </a>
 
 ## Features

@@ -10,6 +10,7 @@
       v-model="statusModel"
       hide-details
       class="status-radio-group"
+      aria-label="Index Patient Status"
     >
       <div class="status-cards-grid">
         <!-- Heterozygous carrier -->
@@ -24,6 +25,7 @@
               color="primary"
               density="compact"
               class="ma-0 pa-0"
+              aria-label="Heterozygous carrier"
               data-testid="status-option-heterozygous"
             />
             <div class="flex-grow-1">
@@ -57,6 +59,7 @@
               color="primary"
               density="compact"
               class="ma-0 pa-0"
+              aria-label="Homozygous affected"
             />
             <div class="flex-grow-1">
               <div
@@ -92,6 +95,7 @@
               color="primary"
               density="compact"
               class="ma-0 pa-0"
+              aria-label="Compound heterozygous (confirmed)"
             />
             <div class="flex-grow-1">
               <div
@@ -105,8 +109,8 @@
                 </v-chip>
               </div>
               <div class="text-caption text-medium-emphasis mt-1">
-                Two different pathogenic alleles with phase confirmed in trans
-                (parental testing). Risk equals 1/2 &times; carrier frequency
+                Two pathogenic alleles confirmed on opposite chromosomes (in
+                trans). Recurrence risk equals 1/2 &times; carrier frequency
                 &times; penetrance.
               </div>
             </div>
@@ -127,6 +131,7 @@
               color="primary"
               density="compact"
               class="ma-0 pa-0"
+              aria-label="Compound heterozygous (assumed)"
             />
             <div class="flex-grow-1">
               <div
@@ -180,6 +185,8 @@
         :max="100"
         :step="1"
         color="primary"
+        label="Disease Penetrance (%)"
+        aria-label="Disease Penetrance (%)"
         hide-details
         thumb-label
         class="mt-1"

@@ -1,5 +1,12 @@
 <template>
   <div data-testid="step-results">
+    <!-- ClinGen validation reminder in results -->
+    <ClingenWarning
+      v-if="effectiveGeneSymbol"
+      :gene-symbol="effectiveGeneSymbol"
+      class="mb-4"
+    />
+
     <!-- Results loading skeleton - reserves layout space to prevent CLS -->
     <div
       v-if="!result"
@@ -9,9 +16,6 @@
       <v-skeleton-loader type="card" min-height="300" />
       <v-skeleton-loader type="table" min-height="500" />
     </div>
-
-    <!-- ClinGen validation reminder in results -->
-    <ClingenWarning v-if="result" :gene-symbol="result.gene" class="mb-4" />
 
     <!-- Exclusion alert - shows when variants have been manually excluded -->
     <v-alert
@@ -234,7 +238,10 @@ const emit = defineEmits<{
 const filterStore = useFilterStore();
 const calcStore = useCalcStore();
 
-const { canonicalTranscript } = useGeneSearch();
+const { canonicalTranscript, selectedGene } = useGeneSearch();
+const effectiveGeneSymbol = computed(
+  () => props.result?.gene ?? selectedGene.value?.symbol ?? null,
+);
 
 const {
   loading: orphanetLoading,

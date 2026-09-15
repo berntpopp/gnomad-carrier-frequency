@@ -4,6 +4,7 @@
       v-model="search"
       prepend-inner-icon="mdi-magnify"
       label="Search variants"
+      aria-label="Search variants"
       single-line
       hide-details
       clearable
